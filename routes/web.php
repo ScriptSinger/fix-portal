@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\TaskController;
-
+use App\Http\Controllers\Admin\MainController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,7 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resources([
-    'tasks' => TaskController::class,
-
-]);
+Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
+    Route::get('/', [MainController::class, 'index'])->name('admin.index');
+});
