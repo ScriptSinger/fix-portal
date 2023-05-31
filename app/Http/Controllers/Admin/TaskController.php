@@ -22,7 +22,7 @@ class TaskController extends Controller
      */
     public function create()
     {
-        //
+        return view('admin.tasks.create');
     }
 
     /**
@@ -30,7 +30,12 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required'
+        ]);
+        Task::create($request->all());
+        // return redirect()->route('tasks.index')->session()->flash('success', 'Задание добавлено');
+        return redirect()->route('tasks.index')->with('success', 'Задание добавлено');
     }
 
     /**
@@ -46,7 +51,8 @@ class TaskController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $task = Task::find($id);
+        return view('admin.tasks.edit', compact('task'));
     }
 
     /**
@@ -54,7 +60,12 @@ class TaskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'title' => 'required'
+        ]);
+        $task = Task::find($id);
+        $task->update($request->all());
+        return redirect()->route('tasks.index')->with('success', 'Задание отредактировано');
     }
 
     /**
@@ -62,6 +73,9 @@ class TaskController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // $task = Task::find($id);
+        // $task->delete();
+        Task::destroy($id);
+        return redirect()->route('tasks.index')->with('success', 'Задание удалено');
     }
 }

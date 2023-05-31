@@ -24,6 +24,7 @@ mix.scripts(
         'resources/assets/admin/plugins/bootstrap/js/bootstrap.bundle.js',
         'resources/assets/admin/js/adminlte.js',
         'resources/assets/admin/js/demo.js',
+        'resources/assets/admin/plugins/sweetalert2/sweetalert2.all.min.js'
     ],
     'public/assets/admin/js/adminlte.js');
 
