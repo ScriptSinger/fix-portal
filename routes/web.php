@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\TaskController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +25,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/', [MainController::class, 'index'])->name('admin.index');
     Route::resource('tasks', TaskController::class);
 });
+
+Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register.form');
+Route::post('/register', [UserController::class, 'register'])->name('register.store');
+Route::get('/login', [UserController::class, 'showLoginForm'])->name('login.form');
+Route::post('/login', [UserController::class, 'login'])->name('login.store');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout.store');
