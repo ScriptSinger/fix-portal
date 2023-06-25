@@ -97,7 +97,7 @@
                         Sign up using Google+
                     </a>
                 </div>
-                <a href="#" class="text-center">I already have a membership</a>
+                <a href="{{ route('login') }}" class="text-center">I already have a membership</a>
             </div>
 
         </div>

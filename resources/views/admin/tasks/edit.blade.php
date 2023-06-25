@@ -21,7 +21,7 @@
             <div class="col-md-6 mx-auto">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Редактирование задания <small>{{ $task->title }}</small></h3>
+                        <h3 class="card-title">Редактирование заданиe <small>{{ $task->title }}</small></h3>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i

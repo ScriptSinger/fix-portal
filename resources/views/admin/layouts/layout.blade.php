@@ -159,6 +159,30 @@
                         <i class="fas fa-th-large"></i>
                     </a>
                 </li>
+                <li class="nav-item">
+                    @auth
+                        <a href="#" class="nav-link"
+                            onclick="event.preventDefault(); 
+                        document.getElementById('logout-form').submit();">
+                            <p>
+                                <i class="nav-icon fas fa-sign-out-alt"></i> Выйти
+                            </p>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                            <!-- Add CSRF token -->
+                            @method('POST')
+                            <!-- Override method as POST -->
+                        </form>
+                    @endauth
+                    @guest
+                        <a href="{{ route('login') }}" class="nav-link">
+                            <p>
+                                <i class="nav-icon fas fa-sign-out-alt"></i> Войти
+                            </p>
+                        </a>
+                    @endguest
+                </li>
             </ul>
         </nav>
         <!-- /.navbar -->
@@ -175,14 +199,17 @@
             <!-- Sidebar -->
             <div class="sidebar">
                 <!-- Sidebar user (optional) -->
+
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                    <div class="image">
-                        <img src="{{ asset('assets/admin/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
-                            alt="User Image">
-                    </div>
-                    <div class="info">
-                        <a href="#" class="d-block">Alexander Pierce</a>
-                    </div>
+                    @auth
+                        <div class="image">
+                            <img src="{{ asset('assets/admin/img/user2-160x160.jpg') }}" class="img-circle elevation-2"
+                                alt="User Image">
+                        </div>
+                        <div class="info">
+                            <a href="#" class="d-block">{{ auth()->user()->name }}</a>
+                        </div>
+                    @endauth
                 </div>
 
                 <!-- SidebarSearch Form -->

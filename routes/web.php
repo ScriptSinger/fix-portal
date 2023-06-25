@@ -28,6 +28,6 @@ Route::group(['prefix' => 'admin'], function () {
 
 Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register.form');
 Route::post('/register', [UserController::class, 'register'])->name('register.store');
-Route::get('/login', [UserController::class, 'showLoginForm'])->name('login.form');
-Route::post('/login', [UserController::class, 'login'])->name('login.store');
-Route::post('/logout', [UserController::class, 'logout'])->name('logout.store');
+Route::get('/login', [UserController::class, 'login'])->name('login');
+Route::post('/login', [UserController::class, 'authenticate'])->name('auth');
+Route::post('/logout', [UserController::class, 'logout'])->name('logout');
