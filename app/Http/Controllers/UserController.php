@@ -7,9 +7,40 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
+
+    public function redirectToGoogle()
+    {
+        return Socialite::driver('google')->redirect();
+    }
+
+    public function handleGoogleCallback()
+    {
+        $user = Socialite::driver('google')->user();
+
+        // Проверяем, есть ли пользователь с таким email в базе данных
+        $existingUser = User::where('email', $user->email)->first();
+
+        if ($existingUser) {
+            // Если пользователь существует, авторизуем его
+            Auth::login($existingUser);
+        } else {
+            // Иначе, создаем нового пользователя
+            $newUser = new User();
+            $newUser->name = $user->name;
+            $newUser->email = $user->email;
+            // Дополнительные поля, если нужны
+            // $newUser->save();
+            Auth::login($newUser);
+        }
+
+        // Перенаправляем пользователя после авторизации
+        return redirect()->route('admin.index')->with('success', 'Регистрация пройдена');
+    }
+
     public function showRegistrationForm()
     {
         return view('user.register');

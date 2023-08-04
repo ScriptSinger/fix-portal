@@ -38,6 +38,10 @@ Route::group(
         Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register.form');
         Route::post('/register', [UserController::class, 'register'])->name('register.store');
         Route::get('/login', [UserController::class, 'login'])->name('login');
+        Route::get('/login/google', [UserController::class, 'redirectToGoogle'])->name('login.google');
+        Route::get('/login/google/callback', [UserController::class, 'handleGoogleCallback']);
+
+
         Route::post('/login', [UserController::class, 'authenticate'])->name('auth');
     }
 );
