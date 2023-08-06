@@ -5,12 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Consumer extends Model
+class Category extends Model
 {
     use HasFactory;
-
-    public function tasks()
-    {
-        return $this->belongsTo(Task::class);
-    }
 }
