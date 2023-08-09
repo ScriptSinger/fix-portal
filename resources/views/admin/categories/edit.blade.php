@@ -6,12 +6,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Категории</h1>
+                        <h1>Редактировать категорию</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active">Blank Page</li>
+                            <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Назад</a></li>
+                            <li class="breadcrumb-item active">Редактировать категорию</li>
                         </ol>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
             <div class="col-md-6 mx-auto">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Редактирование категории: "{{ $category->title }}"</small></h3>
+                        <h3 class="card-title">Редактирование категории: «{{ $category->title }}»</h3>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
