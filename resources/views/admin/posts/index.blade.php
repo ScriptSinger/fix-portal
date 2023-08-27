@@ -6,22 +6,22 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Список меток</h1>
+                        <h1>Список статей</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                            <li class="breadcrumb-item active">Список меток</li>
+                            <li class="breadcrumb-item active">Список статей</li>
                         </ol>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
         <section class="content">
-            <div class="col-md-6 mx-auto">
+            <div class="container-fluid">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Список меток</h3>
+                        <h3 class="card-title">Список статей</h3>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
@@ -29,25 +29,29 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <a href="{{ route('tags.create') }}" type="submit" class="btn btn-primary mb-3">Добавить метку</a>
-                        @if (count($tags))
+                        <a href="{{ route('posts.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
+                            статью</a>
+                        @if (count($posts))
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th style="width: 10px">#</th>
-                                        <th>Наименование</th>
-                                        <th>Slug</th>
+                                        <th>Название</th>
+                                        <th>Постоянная ссылка</th>
+                                        <th>Категория</th>
+                                        <th>Метки</th>
+                                        <th>Дата</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($tags as $tag)
+                                    @foreach ($posts as $post)
                                         <tr>
-                                            <td>{{ $tag->id }}</td>
+                                            <td>{{ $post->id }}</td>
                                             <td>
                                                 <div class="btn-group">
                                                     <a type="button" class="btn btn-default"
-                                                        href="{{ route('tags.show', [$tag->id]) }}">
-                                                        {{ $tag->title }}</a>
+                                                        href="{{ route('posts.show', [$post->id]) }}">
+                                                        {{ $post->title }}</a>
                                                     <button type="button"
                                                         class="btn btn-default dropdown-toggle dropdown-icon"
                                                         data-toggle="dropdown" aria-expanded="false">
@@ -55,11 +59,11 @@
                                                     </button>
                                                     <div class="dropdown-menu" role="menu">
                                                         <a class="dropdown-item"
-                                                            href="{{ route('tags.edit', ['tag' => $tag->id]) }}"><i
+                                                            href="{{ route('posts.edit', ['post' => $post->id]) }}"><i
                                                                 class="fas fa-edit"></i> Редактировать</a>
 
                                                         <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('tags.destroy', ['tag' => $tag->id]) }}"
+                                                        <form action="{{ route('posts.destroy', ['post' => $post->id]) }}"
                                                             method="POST">
                                                             @csrf
                                                             @method('DELETE')
@@ -71,21 +75,23 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{{ $tag->slug }}</td>
+                                            <td>{{ $post->slug }}</td>
+                                            <td>{{ $post->category->title }}</td>
+                                            <td>{{ $post->tags->pluck('title')->join(', ') }}</td>
+                                            <td>{{ $post->created_at }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         @else
-                            <p>Заданий пока нет...</p>
+                            <p>статей пока нет...</p>
                         @endif
                     </div>
                     <div class="card-footer clearfix">
                         <div class="pagination pagination-sm m-0 float-right">
-                            {{ $tags->onEachSide(1)->links() }}</div>
+                            {{ $posts->onEachSide(1)->links() }}</div>
                     </div>
                 </div>
-
             </div>
         </section>
     </div>

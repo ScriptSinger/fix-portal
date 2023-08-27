@@ -290,7 +290,7 @@
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-tags"></i>
                                 <p>
-                                    Тэги
+                                    Метки
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -303,6 +303,29 @@
                                 </li>
                                 <li class="nav-item">
                                     <a href="{{ route('tags.create') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Добавить</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-edit"></i>
+                                <p>
+                                    Статьи
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ route('posts.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Список</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('posts.create') }}" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Добавить</p>
                                     </a>

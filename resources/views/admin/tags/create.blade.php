@@ -6,12 +6,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Добавить тэг</h1>
+                        <h1>Добавить метку</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                            <li class="breadcrumb-item active">Добавить тэг</li>
+                            <li class="breadcrumb-item active">Добавить метку</li>
                         </ol>
                     </div>
                 </div>
@@ -21,7 +21,7 @@
             <div class="col-md-6 mx-auto">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Добавить тэг</h3>
+                        <h3 class="card-title">Добавить метку</h3>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
@@ -35,7 +35,7 @@
                                 <label for="InputText">Название</label>
                                 <input type="text" name="title"
                                     class="form-control @error('title') is-invalid @enderror" id="InputTextTask"
-                                    placeholder="Новый тэг" aria-describedby="InputText-error" aria-invalid="true">
+                                    placeholder="Новая метка" aria-describedby="InputText-error" aria-invalid="true">
                                 <span id="InputText-error" class="error invalid-feedback">
                                     @if ($errors->any())
                                         @foreach ($errors->all() as $error)
