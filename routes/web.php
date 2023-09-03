@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -20,9 +21,9 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [PublicPostController::class, 'index'])->name('welcome');
+Route::get('/article', [PublicPostController::class, 'show'])->name('posts.single');
+
 
 Route::group(
     ['middleware' => 'admin', 'prefix' => 'admin'],
@@ -45,8 +46,6 @@ Route::group(
         Route::get('/login', [UserController::class, 'login'])->name('login');
         Route::get('/login/google', [UserController::class, 'redirectToGoogle'])->name('login.google');
         Route::get('/login/google/callback', [UserController::class, 'handleGoogleCallback']);
-
-
         Route::post('/login', [UserController::class, 'authenticate'])->name('auth');
     }
 );
