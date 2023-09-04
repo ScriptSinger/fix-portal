@@ -11,7 +11,7 @@ class TagController extends Controller
 
     public function index()
     {
-        $tags = Tag::paginate(2);
+        $tags = Tag::paginate(20);
         return view('admin/tags/index', compact('tags'));
     }
 
@@ -26,7 +26,7 @@ class TagController extends Controller
             'title' => 'required'
         ]);
         Tag::create($request->all());
-        return redirect()->route('tags.index')->with('success', 'Тэг добавлен');
+        return redirect()->route('tags.index')->with('success', 'Метка добавлена');
     }
 
     public function edit(string $id)
@@ -42,12 +42,23 @@ class TagController extends Controller
         ]);
         $tag = Tag::find($id);
         $tag->update($request->all());
-        return redirect()->route('tags.index')->with('success', 'Тэг отредактирован');
+        return redirect()->route('tags.index')->with('success', 'Метка отредактирована');
     }
 
     public function destroy(string $id)
     {
-        Tag::destroy($id);
-        return redirect()->route('categories.index')->with('success', 'Задание удалено');
+        $tag = Tag::find($id);
+
+        if (!$tag) {
+            return redirect()->route('tags.index')->with('error', 'Метка не найдена');
+        }
+
+        if ($tag->posts->count() > 0) {
+            return redirect()->route('tags.index')->with('error', 'Ошибка! Нельзя удалить метку, у которой есть связанные записи.');
+        }
+
+        $tag->delete();
+
+        return redirect()->route('tags.index')->with('success', 'Метка успешно удалена');
     }
 }

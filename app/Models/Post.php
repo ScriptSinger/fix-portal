@@ -30,6 +30,7 @@ class Post extends Model
             ]
         ];
     }
+
     public function tags()
     {
         return $this->belongsToMany(Tag::class);
@@ -63,7 +64,7 @@ class Post extends Model
     public function getImage()
     {
         if (!$this->thumbnail) {
-            return asset("images/no-image.png");
+            return asset("assets/images/no-image.jpg");
         }
         return asset("storage/{$this->thumbnail}");
     }

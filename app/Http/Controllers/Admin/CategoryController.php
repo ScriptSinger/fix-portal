@@ -10,7 +10,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::paginate(2);
+        $categories = Category::paginate(20);
         return view('admin.categories.index', compact('categories'));
     }
 
@@ -49,9 +49,18 @@ class CategoryController extends Controller
 
     public function destroy(string $id)
     {
-        // Category::destroy($id);
-        $category = Category::find($id); //Soft delete
+        $category = Category::find($id);
+
+        if (!$category) {
+            return redirect()->route('categories.index')->with('error', 'Категория не найдена');
+        }
+
+        if ($category->posts->count() > 0) {
+            return redirect()->route('categories.index')->with('error', 'Ошибка! Нельзя удалить категорию, у которой есть связанные записи.');
+        }
+
         $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Категория удалено');
+
+        return redirect()->route('categories.index')->with('success', 'Категория успешно удалена');
     }
 }

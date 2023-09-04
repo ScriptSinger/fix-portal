@@ -28,7 +28,7 @@ mix.scripts(
         'resources/assets/admin/js/adminlte.js',
         'resources/assets/admin/js/demo.js',
         'resources/assets/admin/plugins/sweetalert2/sweetalert2.all.min.js',
-
+        'resources/assets/admin/plugins/bs-custom-file-input/bs-custom-file-input.min.js'
     ],
     'public/assets/admin/js/adminlte.js');
 

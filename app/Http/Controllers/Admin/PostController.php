@@ -30,11 +30,11 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required',
-            'description' => 'required',
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
             'content' => 'required',
-            'category_id' => 'required|integer',
-            'thumbnail' => 'nullable|image'
+            'category_id' => 'required|exists:categories,id',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         $data = ($request->all());
         $data['thumbnail'] = Post::uploadThumbnail($request);
@@ -69,18 +69,17 @@ class PostController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'title' => 'required',
-            'description' => 'required',
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
             'content' => 'required',
-            'category_id' => 'required|integer',
-            'thumbnail' => 'nullable|image'
+            'category_id' => 'required|exists:categories,id',
+            'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         $post = Post::find($id);
         $data = ($request->all());
         $data['thumbnail'] = Post::uploadThumbnail($request, $post->thumbnail);
         $post->update($data);
         $post->tags()->sync($request->tags);
-
         return redirect()->route('posts.index')->with('success', 'Изменеия сохранены');
     }
 
@@ -89,11 +88,20 @@ class PostController extends Controller
      */
     public function destroy(string $id)
     {
-
         $post = Post::find($id);
+
+        if (!$post) {
+            return redirect()->route('posts.index')->with('error', 'Статья не найдена');
+        }
+
+        // Убедимся, что $post->thumbnail не равно null перед удалением файла
+        if ($post->thumbnail !== null) {
+            Storage::disk('public')->delete($post->thumbnail);
+        }
+
         $post->tags()->sync([]);
-        Storage::disk('public')->delete($post->thumbnail);
         $post->delete();
+
         return redirect()->route('posts.index')->with('success', 'Статья удалена');
     }
 }

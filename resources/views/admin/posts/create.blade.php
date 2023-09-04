@@ -36,26 +36,34 @@
                                     <div class="form-group">
                                         <label for="InputText">Название</label>
                                         <input type="text" name="title"
-                                            class="form-control @error('title') is-invalid @enderror" id="InputTextTask"
+                                            class="form-control @error('title') is-invalid @enderror" id="InputText"
                                             placeholder="Добавить заголовок" aria-describedby="InputText-error"
-                                            aria-invalid="true" required>
+                                            aria-invalid="true" required value="{{ old('title') }}">
                                         <span id="InputText-error" class="error invalid-feedback">
-                                            @if ($errors->any())
-                                                @foreach ($errors->all() as $error)
-                                                    {{ $error }}
-                                                @endforeach
-                                            @endif
+                                            @error('title')
+                                                {{ $message }}
+                                            @enderror
                                         </span>
                                     </div>
                                     <div class="form-group">
-                                        <label for="content">Содержание</label>
-                                        <textarea id="content" name="content" class="form-control @error('content') is-invalid @enderror" rows="7"
-                                            placeholder="Enter ..."></textarea>
+                                        <label for="InputTextArea1">Содержание</label>
+                                        <textarea id="InputTextArea1" name="content" class="form-control @error('content') is-invalid @enderror" rows="7"
+                                            placeholder="Enter ...">{{ old('content') }}</textarea>
+                                        <span id="InputTextArea1-error" class="error invalid-feedback">
+                                            @error('content')
+                                                {{ $message }}
+                                            @enderror
+                                        </span>
                                     </div>
                                     <div class="form-group">
-                                        <label for="description">Мета-описание</label>
-                                        <textarea id="description" name="description" class="form-control @error('description') is-invalid @enderror"
-                                            rows="3" placeholder="Enter ..."></textarea>
+                                        <label for="InputTextArea2">Мета-описание</label>
+                                        <textarea id="InputTextArea2" name="description" class="form-control @error('description') is-invalid @enderror"
+                                            rows="3" placeholder="Enter ...">{{ old('description') }}</textarea>
+                                        <span id="InputTextArea2-error" class="error invalid-feedback">
+                                            @error('description')
+                                                {{ $message }}
+                                            @enderror
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -65,7 +73,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <div class="card ">
+                            <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Категории</h3>
                                     <div class="card-tools">
@@ -77,17 +85,26 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="category_id"></label>
-                                        <select class="form-control" id="category_id" name="category_id">
+                                        <label for="InputSelect1"></label>
+                                        <select class="select2 @error('category_id') is-invalid @enderror" id="InputSelect1"
+                                            name="category_id" style="width: 100%;">
                                             @foreach ($categories as $key => $value)
                                                 <option value="{{ $key }}">{{ $value }}</option>
                                             @endforeach
                                         </select>
+                                        <span id="InputSelect1-error" class="error invalid-feedback">
+                                            @error('category_id')
+                                                {{ $message }}
+                                            @enderror
+                                        </span>
                                     </div>
-
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ route('categories.create') }}" type="submit" class="btn btn-primary"><i
+                                            class="fas fa-plus"></i> Добавить</a>
                                 </div>
                             </div>
-                            <div class="card">
+                            <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Метки</h3>
                                     <div class="card-tools">
@@ -99,8 +116,8 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="tags"></label>
-                                        <select name="tags[]" id="tags" class="select2" multiple="multiple"
+                                        <label for="InputSelect2"></label>
+                                        <select name="tags[]" id="InputSelect2" class="select2" multiple="multiple"
                                             data-placeholder="Выбрать тег" style="width: 100%;">
                                             @foreach ($tags as $key => $value)
                                                 <option value="{{ $key }}">{{ $value }}</option>
@@ -108,8 +125,12 @@
                                         </select>
                                     </div>
                                 </div>
+                                <div class="card-footer">
+                                    <a href="{{ route('tags.create') }}" type="submit" class="btn btn-primary"><i
+                                            class="fas fa-plus"></i> Добавить</a>
+                                </div>
                             </div>
-                            <div class="card ">
+                            <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Изображение записи</h3>
                                     <div class="card-tools">
@@ -121,14 +142,20 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="thumbnail"></label>
+                                        <label for="InputFile"></label>
                                         <div class="input-group">
                                             <div class="custom-file">
-                                                <input type="file" name="thumbnail" id="thumbnail"
-                                                    class="custom-file-input">
+                                                <input type="file" name="thumbnail" id="InputFile"
+                                                    class="custom-file-input  @error('thumbnail') is-invalid @enderror">
                                                 <label class="custom-file-label" for="thumbnail">Choose file</label>
                                             </div>
                                         </div>
+                                        <span id="InputFile-error" class="error invalid-feedback"
+                                            style="display: inline;">
+                                            @error('thumbnail')
+                                                {{ $message }}
+                                            @enderror
+                                        </span>
                                     </div>
                                 </div>
                             </div>
