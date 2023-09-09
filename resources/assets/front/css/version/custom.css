@@ -1,0 +1,32 @@
+/* Пагинация */
+
+.page-item.active .page-link {
+    border: 1px solid #000000
+        /* Стиль для активной ссылки */
+    ;
+}
+
+.page-item:last-child .page-link,
+.page-link {
+    background-color: #f9ca27 !important;
+    transition: background-color 0.3s ease;
+    /* Плавное изменение цвета фона */
+}
+
+.page-item:last-child .page-link:hover,
+.page-item:not(.active) .page-link:hover {
+    background-color: #c89700 !important;
+    /* Новый цвет фона при наведении для неактивных элементов */
+}
+
+.dmtop {
+    background-color: #f9ca27 !important;
+    transition: background-color 0.3s ease;
+
+}
+
+/* Скролл */
+
+.dmtop:hover {
+    background-color: #c89700 !important;
+}

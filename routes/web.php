@@ -22,7 +22,8 @@ use App\Http\Controllers\UserController;
 */
 
 Route::get('/', [PublicPostController::class, 'index'])->name('welcome');
-Route::get('/article', [PublicPostController::class, 'show'])->name('posts.single');
+Route::get('/article/{slug}', [PublicPostController::class, 'show'])->name('posts.single');
+Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('categories.single');
 
 
 Route::group(

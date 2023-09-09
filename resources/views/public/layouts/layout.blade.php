@@ -9,7 +9,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
 <!-- Site Metas -->
-<title>Markedia - Marketing Blog Template</title>
+<title>@yield('title')</title>
 <meta name="keywords" content="">
 <meta name="description" content="">
 <meta name="author" content="">
@@ -21,11 +21,6 @@
 <!-- Design fonts -->
 <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
 <link rel="stylesheet" href="    {{ asset('assets/front/css/main.css') }}">
-
-
-
-
-
 
 
 <!--[if lt IE 9]>
@@ -46,7 +41,7 @@
                         aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <a class="navbar-brand" href="marketing-index.html"><img
+                    <a class="navbar-brand" href="{{ route('welcome') }}"><img
                             src="{{ asset('assets/front/images/version/market-logo.png') }}" alt=""></a>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <ul class="navbar-nav mr-auto">

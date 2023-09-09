@@ -50,11 +50,13 @@ mix.styles(
     [
         'resources/assets/front/css/bootstrap.css',
         'resources/assets/front/css/font-awesome.min.css',
-        'resources/assets/front/css/style.css',
         'resources/assets/front/css/animate.css',
         'resources/assets/front/css/responsive.css',
         'resources/assets/front/css/colors.css',
-        'resources/assets/front/css/version/marketing.css'
+        'resources/assets/front/css/style.css',
+        'resources/assets/front/css/version/marketing.css',
+        'resources/assets/front/css/version/custom.css'
+
     ], 'public/assets/front/css/main.css');
 
 mix.scripts(
