@@ -21,9 +21,10 @@ use App\Http\Controllers\UserController;
 |
 */
 
-Route::get('/', [PublicPostController::class, 'index'])->name('welcome');
+Route::get('/', [PublicPostController::class, 'index'])->name('home');
 Route::get('/article/{slug}', [PublicPostController::class, 'show'])->name('posts.single');
 Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('categories.single');
+Route::get('/tag/{slug}', [TagController::class, 'show'])->name('tags.single');
 
 
 Route::group(

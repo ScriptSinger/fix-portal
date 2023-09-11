@@ -1,5 +1,5 @@
-@extends('public.layouts.layout')
-@section('title', 'Markedia - Marketing Blog Template :: Главная')
+@extends('public.layouts.main_layout')
+@section('title', 'Ufamasters - Ремонт Бытовой Техники :: Главная')
 @section('banner')
     <section id="cta" class="section">
         <div class="container">
