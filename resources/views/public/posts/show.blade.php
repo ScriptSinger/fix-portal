@@ -1,4 +1,4 @@
-@extends('public.layouts.main_layout')
+@extends('public.layouts.right_sidebar')
 @section('title', 'Ufamasters::' . $post->title)
 
 @section('content')
@@ -7,12 +7,12 @@
             <ol class="breadcrumb hidden-xs-down">
                 <li class="breadcrumb-item"><a href="{{ route('home') }}">Главная</a></li>
                 <li class="breadcrumb-item"><a
-                        href="{{ route('categories.single', ['slug' => $post->category->slug]) }}">{{ $post->category->title }}</a>
+                        href="{{ route('category.articles', ['slug' => $post->category->slug]) }}">{{ $post->category->title }}</a>
                 </li>
                 <li class="breadcrumb-item active">{{ $post->title }}</li>
             </ol>
 
-            <span class="color-yellow"><a href="{{ route('categories.single', ['slug' => $post->category->slug]) }}"
+            <span class="color-yellow"><a href="{{ route('category.articles', ['slug' => $post->category->slug]) }}"
                     title="">{{ $post->category->title }}</a></span>
 
             <h3>{{ $post->title }}</h3>
@@ -47,7 +47,7 @@
                 <div class="tag-cloud-single">
                     <span>Метки</span>
                     @foreach ($post->tags as $tag)
-                        <small><a href="{{ route('tags.single', ['slug' => $tag->slug]) }}"
+                        <small><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
                                 title="">{{ $tag->title }}</a></small>
                     @endforeach
                 </div><!-- end meta -->

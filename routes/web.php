@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Public\PostController as PublicPostController;
+use App\Http\Controllers\Public\TagController as PublicTagController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -23,8 +25,8 @@ use App\Http\Controllers\UserController;
 
 Route::get('/', [PublicPostController::class, 'index'])->name('home');
 Route::get('/article/{slug}', [PublicPostController::class, 'show'])->name('posts.single');
-Route::get('/category/{slug}', [CategoryController::class, 'show'])->name('categories.single');
-Route::get('/tag/{slug}', [TagController::class, 'show'])->name('tags.single');
+Route::get('/category/{slug}', [PublicCategoryController::class, 'showCategoryArticles'])->name('category.articles');
+Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
 
 
 Route::group(
