@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
+use App\Models\Post;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
