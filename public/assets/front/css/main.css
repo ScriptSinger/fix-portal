@@ -13323,11 +13323,7 @@ a:focus,
     color: #111111 !important;
     background-color: #f9ca27 !important;
 }
-/**************************************
-
-    Пагинация
-
-**************************************/
+/* Пагинация */
 
 .page-item.active .page-link {
     border: 1px solid #000000
@@ -13354,6 +13350,12 @@ a:focus,
 
 }
 
+/* Скролл */
+
 .dmtop:hover {
     background-color: #c89700 !important;
+}
+
+.has-error {
+    border: 1px solid #f00;
 }

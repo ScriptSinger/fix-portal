@@ -30,3 +30,7 @@
 .dmtop:hover {
     background-color: #c89700 !important;
 }
+
+.has-error {
+    border: 1px solid #f00;
+}

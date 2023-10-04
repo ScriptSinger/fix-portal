@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\TagController;
 use App\Http\Controllers\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\Public\TagController as PublicTagController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 
 /*
@@ -27,6 +28,7 @@ Route::get('/', [PublicPostController::class, 'index'])->name('home');
 Route::get('/article/{slug}', [PublicPostController::class, 'show'])->name('posts.single');
 Route::get('/category/{slug}', [PublicCategoryController::class, 'showCategoryArticles'])->name('category.articles');
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
+Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 
 Route::group(
