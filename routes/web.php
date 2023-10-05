@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\DeletedUserController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\TagController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\Public\TagController as PublicTagController;
@@ -39,6 +41,9 @@ Route::group(
         Route::resource('categories', CategoryController::class);
         Route::resource('tags', TagController::class);
         Route::resource('posts', PostController::class);
+        Route::resource('users', AdminUserController::class);
+        Route::get('/deleted-users', [DeletedUserController::class, 'index'])->name('deleted-users.index');
+        Route::get('/deleted-users/restore/{id}', [DeletedUserController::class, 'restore'])->name('deleted-users.restore');
     }
 );
 
