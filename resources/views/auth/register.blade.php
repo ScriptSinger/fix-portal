@@ -1,16 +1,9 @@
-<html lang="en">
+@extends('layouts.app')
+@section('body-class', 'register-page')
+@section('body-style', 'min-height: 542px;') <!-- Устанавливаем атрибут style для body -->
+@section('content')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AdminLTE 3 | Registration Page (v2)</title>
 
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&amp;display=fallback">
-    <link rel="stylesheet" href="{{ asset('assets/admin/css/adminlte.css') }}">
-</head>
-
-<body class="register-page" style="min-height: 542px;">
     <div class="register-box">
         <div class="card card-outline card-primary">
             <div class="card-header text-center">
@@ -18,7 +11,7 @@
             </div>
             <div class="card-body">
 
-                <form action="{{ route('register.store') }}" method="post">
+                <form action="{{ route('register') }}" method="post">
                     @csrf
                     <div class="input-group mb-3">
                         <input name="name" type="text" class="@error('name') is-invalid @enderror form-control"
@@ -49,8 +42,8 @@
                         </span>
                     </div>
                     <div class="input-group mb-3">
-                        <input name="password" type="password"
-                            class="@error('password') is-invalid @enderror form-control" placeholder="Password">
+                        <input name="password" type="password" class="@error('password') is-invalid @enderror form-control"
+                            placeholder="Password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -102,7 +95,6 @@
 
         </div>
     </div>
-    <script src="{{ asset('assets/admin/js/adminlte.js') }}"></script>
-</body>
 
-</html>
+
+@endsection
