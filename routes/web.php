@@ -47,7 +47,7 @@ Route::group(
     }
 );
 
-Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
+// Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Route::group(
 //     ['middleware' => 'guest'],

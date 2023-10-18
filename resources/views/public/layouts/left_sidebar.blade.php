@@ -20,7 +20,7 @@
 
 <!-- Design fonts -->
 <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
-<link rel="stylesheet" href="    {{ asset('assets/front/css/main.css') }}">
+<link rel="stylesheet" href="{{ asset('assets/front/css/main.css') }}">
 
 
 <!--[if lt IE 9]>
