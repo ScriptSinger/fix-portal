@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\MainController;
@@ -14,7 +15,7 @@ use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\Public\TagController as PublicTagController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\Admin\AuthSessionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -34,7 +35,7 @@ Route::get('/search', [SearchController::class, 'index'])->name('search');
 
 
 Route::group(
-    ['middleware' => 'admin', 'prefix' => 'admin'],
+    ['middleware' => 'auth:admin', 'prefix' => 'admin'],
     function () {
         Route::get('/', [MainController::class, 'index'])->name('admin.index');
         Route::resource('tasks', TaskController::class);
@@ -46,6 +47,8 @@ Route::group(
         Route::get('/deleted-users/restore/{id}', [DeletedUserController::class, 'restore'])->name('deleted-users.restore');
     }
 );
+
+
 
 // Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
 
@@ -60,5 +63,20 @@ Route::group(
 //         Route::post('/login', [UserController::class, 'authenticate'])->name('auth');
 //     }
 // );
+
+
+Route::group(
+    ['prefix' => 'admin'],
+    function () {
+        Route::get('login', [AuthSessionController::class, 'showLoginForm'])->name('admin.login');
+        Route::post('login', [AuthSessionController::class, 'login']);
+    }
+);
+
+
+
+
+
+
 
 require __DIR__ . '/auth.php';

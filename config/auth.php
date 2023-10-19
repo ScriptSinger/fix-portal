@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'admin' => [ // Создаем отдельный гвард для администраторов
+            'driver' => 'session',
+            'provider' => 'admins', // Использует провайдер для модели Admin
+        ],
     ],
 
     /*
@@ -65,6 +70,10 @@ return [
             'model' => App\Models\User::class,
         ],
 
+        'admins' => [ // Провайдер для модели Admin
+            'driver' => 'eloquent',
+            'model' => App\Models\Administrator::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
@@ -97,6 +106,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
     ],
 
     /*

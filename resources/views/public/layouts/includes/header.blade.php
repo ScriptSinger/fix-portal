@@ -27,13 +27,25 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Регистрация</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ 'login' }}">Вход</a>
-                    </li>
-
+                    @auth
+                        <li class="nav-item">
+                            <a href="#" class="nav-link"
+                                onclick="event.preventDefault(); 
+                                document.getElementById('logout-form').submit();">
+                                Выйти
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                                <!-- Add CSRF token -->
+                                @method('POST')
+                                <!-- Override method as POST -->
+                            </form>
+                        </li>
+                    @endauth
+                    @guest
+                        <li class="nav-item"> <a class="nav-link" href="{{ route('register') }}">Регистрация</a></li>
+                        <li class="nav-item"><a href="{{ route('login') }}" class="nav-link">Вход</a></li>
+                    @endguest
                 </ul>
             </div>
         </nav>
