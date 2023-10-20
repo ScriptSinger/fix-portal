@@ -29,22 +29,26 @@
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
-                            <a href="#" class="nav-link"
-                                onclick="event.preventDefault(); 
-                                document.getElementById('logout-form').submit();">
-                                Выйти
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                                <!-- Add CSRF token -->
-                                @method('POST')
-                                <!-- Override method as POST -->
-                            </form>
+                            <a href="" class="nav-link">Личный кабинет</a>
                         </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                Выход
+                            </a>
+                        </li>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                            @method('POST')
+                        </form>
                     @endauth
                     @guest
-                        <li class="nav-item"> <a class="nav-link" href="{{ route('register') }}">Регистрация</a></li>
-                        <li class="nav-item"><a href="{{ route('login') }}" class="nav-link">Вход</a></li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('register') }}">Регистрация</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('login') }}" class="nav-link">Вход</a>
+                        </li>
                     @endguest
                 </ul>
             </div>
