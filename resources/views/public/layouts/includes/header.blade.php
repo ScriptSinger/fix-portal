@@ -6,7 +6,7 @@
                 aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="{{ route('home') }}"><img
+            <a class="navbar-brand" href="{{ route('article.index') }}"><img
                     src="{{ asset('assets/front/images/version/market-logo.png') }}" alt=""></a>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">

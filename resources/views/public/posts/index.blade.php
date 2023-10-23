@@ -36,7 +36,7 @@
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
-                        <a href="{{ route('posts.single', ['slug' => $post->slug]) }}" title="">
+                        <a href="{{ route('article.index', ['slug' => $post->slug]) }}" title="">
                             <img src="{{ $post->getImage() }}" alt="" class="img-fluid">
                             <div class="hovereffect">
                                 <span></span>
@@ -59,7 +59,7 @@
                                 </li>
                             </ul>
                         </div><!-- end post-sharing -->
-                        <h4><a href="{{ route('posts.single', ['slug' => $post->slug]) }}"
+                        <h4><a href="{{ route('article.show', ['slug' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
                         <small><a href="{{ route('category.articles', ['slug' => $post->category->slug]) }}"

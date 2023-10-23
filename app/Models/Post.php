@@ -42,6 +42,11 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function postComment()
+    {
+        return $this->hasMany(PostComment::class);
+    }
+
 
     public static function uploadThumbnail(Request $request, $thumbnail = null)
     {

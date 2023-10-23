@@ -14,8 +14,10 @@ use App\Http\Controllers\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\Public\TagController as PublicTagController;
 use App\Http\Controllers\SearchController;
-use App\Http\Controllers\UserController;
+
 use App\Http\Controllers\Admin\AuthSessionController;
+use App\Http\Controllers\Comment\PostCommentController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,11 +29,26 @@ use App\Http\Controllers\Admin\AuthSessionController;
 |
 */
 
-Route::get('/', [PublicPostController::class, 'index'])->name('home');
-Route::get('/article/{slug}', [PublicPostController::class, 'show'])->name('posts.single');
+
+
+
+
+
 Route::get('/category/{slug}', [PublicCategoryController::class, 'showCategoryArticles'])->name('category.articles');
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::get('/', function () {
+    return redirect('/articles');
+});
+
+Route::group(['prefix' => 'articles'], function () {
+    Route::get('/', [PublicPostController::class, 'index'])->name('article.index');
+    Route::get('/{slug}', [PublicPostController::class, 'show'])->name('article.show');
+    Route::group(['prefix' => '{article_id}/comments'], function () {
+        Route::post('/', [PostCommentController::class, 'store'])->name('article.comment.store');
+    });
+});
 
 
 Route::group(
@@ -50,19 +67,6 @@ Route::group(
 
 
 
-// Route::post('/logout', [UserController::class, 'logout'])->name('logout')->middleware('auth');
-
-// Route::group(
-//     ['middleware' => 'guest'],
-//     function () {
-//         Route::get('/register', [UserController::class, 'showRegistrationForm'])->name('register.form');
-//         Route::post('/register', [UserController::class, 'register'])->name('register.store');
-//         Route::get('/login', [UserController::class, 'login'])->name('login');
-//         Route::get('/login/google', [UserController::class, 'redirectToGoogle'])->name('login.google');
-//         Route::get('/login/google/callback', [UserController::class, 'handleGoogleCallback']);
-//         Route::post('/login', [UserController::class, 'authenticate'])->name('auth');
-//     }
-// );
 
 
 Route::group(
