@@ -37,7 +37,7 @@ class PostController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
         $data = ($request->all());
-        $data['thumbnail'] = Post::uploadThumbnail($request);
+        $data['thumbnail'] = Post::uploadFile($request, 'thumbnail');
         $post = Post::create($data);
         $post->tags()->sync($request->tags);
 
@@ -77,10 +77,10 @@ class PostController extends Controller
         ]);
         $post = Post::find($id);
         $data = ($request->all());
-        $data['thumbnail'] = Post::uploadThumbnail($request, $post->thumbnail);
+        $data['thumbnail'] = Post::uploadFile($request, 'thumbnail',  $post->thumbnail);
         $post->update($data);
         $post->tags()->sync($request->tags);
-        return redirect()->route('posts.index')->with('success', 'Изменеия сохранены');
+        return redirect()->route('posts.index')->with('success', 'Изменения сохранены');
     }
 
     /**

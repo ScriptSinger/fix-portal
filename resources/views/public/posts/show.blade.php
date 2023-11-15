@@ -35,7 +35,7 @@
         </div><!-- end title -->
 
         <div class="single-post-media">
-            <img src="{{ $post->getImage() }}" alt="" class="img-fluid">
+            <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
         </div><!-- end media -->
 
         <div class="blog-content">

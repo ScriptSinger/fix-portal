@@ -5,12 +5,11 @@
 
 
     <div class="register-box">
-        <div class="card card-outline card-primary">
+        <div class="card card-warning">
             <div class="card-header text-center">
                 <h1>Регистрация</h1>
             </div>
             <div class="card-body">
-
                 <form action="{{ route('register') }}" method="post">
                     @csrf
                     <div class="input-group mb-3">
@@ -75,7 +74,7 @@
                         </div>
 
                         <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Register</button>
+                            <button type="submit" class="btn btn-warning btn-block">Register</button>
                         </div>
 
                     </div>

@@ -16,7 +16,9 @@ use App\Http\Controllers\Public\TagController as PublicTagController;
 use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\Admin\AuthSessionController;
+use App\Http\Controllers\Admin\CustomizationController;
 use App\Http\Controllers\Comment\PostCommentController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +64,10 @@ Route::group(
         Route::resource('users', AdminUserController::class);
         Route::get('/deleted-users', [DeletedUserController::class, 'index'])->name('deleted-users.index');
         Route::get('/deleted-users/restore/{id}', [DeletedUserController::class, 'restore'])->name('deleted-users.restore');
+
+
+        Route::get('/custom/edit', [CustomizationController::class, 'edit'])->name('custom.edit');
+        Route::post('/custom/update', [CustomizationController::class, 'update'])->name('custom.update');
     }
 );
 

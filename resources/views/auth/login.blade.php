@@ -7,12 +7,12 @@
 
 
     <div class="login-box">
-        <div class="card card-outline card-primary">
+        <div class="card card-warning">
             <div class="card-header text-center">
-                <a href="#" class="h1"><b>Admin</b>LTE</a>
+                <h1>Вход</h1>
             </div>
             <div class="card-body">
-                <p class="login-box-msg">Sign in to start your session</p>
+                <p class="login-box-msg">Войдите, чтобы начать сеанс</p>
                 <form action="{{ route('login') }}" method="post">
                     @csrf
 
@@ -47,7 +47,7 @@
 
                     <div class="row">
                         <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Войти</button>
+                            <button type="submit" class="btn btn-warning btn-block ">Войти</button>
                         </div>
 
                     </div>
