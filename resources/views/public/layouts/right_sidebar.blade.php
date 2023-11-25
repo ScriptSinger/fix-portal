@@ -28,7 +28,7 @@
 
     </div><!-- end wrapper -->
 
-    <script src="{{ asset('assets/front/js/main.js') }}"></script>
+    @include('public.layouts.includes.script')
 </body>
 
 </html>

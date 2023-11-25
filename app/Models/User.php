@@ -5,6 +5,9 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Traits\DateTrait;
+use App\Traits\FileUploadTrait;
+use App\Traits\ImageHandlerTrait;
+use App\Traits\ModelImageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,7 +16,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, DateTrait; // Использовать трейт для добавления метода getDate  ;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, DateTrait, ImageHandlerTrait; // Использовать трейт для добавления метода getDate  ;
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +27,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'location',
+        'phone',
+        'bio',
+        'avatar'
     ];
 
     /**

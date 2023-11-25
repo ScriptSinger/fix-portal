@@ -87,7 +87,7 @@
             <div class="col-md-12 text-center">
                 <br>
                 <br>
-                <div class="copyright">&copy; {{ $customization->copyright }}
+                <div class="copyright">&copy; {{ optional($customization)->copyright }}
                 </div>
             </div>
         </div>

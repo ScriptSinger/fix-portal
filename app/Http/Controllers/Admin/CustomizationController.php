@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customization;
+use App\Services\FileUploader;
 use Illuminate\Http\Request;
 
 class CustomizationController extends Controller
@@ -26,17 +27,15 @@ class CustomizationController extends Controller
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
 
-
-
         $customization = Customization::firstOrNew(['id' => 1], $data); // Здесь мы создаем объект
-        $attributes = ['favicon', 'logo', 'banner'];
 
-        foreach ($attributes as $attribute) {
-            $data[$attribute] = $customization->uploadFile($request, $attribute, $customization->{$attribute}, false);
-        }
+        $data = FileUploader::getInstance($data)
+            ->setModel($customization)
+            ->removePrev()
+            ->save()
+            ->getData();
 
         $customization->updateOrInsert(['id' => 1], $data);
-
         return redirect()->back()->with('success', 'Настройки обновлены успешно');
     }
 }

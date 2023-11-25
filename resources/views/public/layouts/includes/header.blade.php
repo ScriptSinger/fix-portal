@@ -30,7 +30,7 @@
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
-                            <a href="" class="nav-link">Личный кабинет</a>
+                            <a href="{{ route('profile') }}" class="nav-link">Личный кабинет</a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link"

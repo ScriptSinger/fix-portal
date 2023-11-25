@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Services\FileUploader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +14,9 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('category', 'tags')->paginate(20);
+        $posts = Post::with('category', 'tags')
+            ->orderBy('id', 'desc')
+            ->paginate(20);
         return view('admin.posts.index', compact('posts'));
     }
 
@@ -24,22 +27,25 @@ class PostController extends Controller
         return view('admin.posts.create', compact('categories', 'tags'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required|max:255',
             'content' => 'required',
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-        $data = ($request->all());
-        $data['thumbnail'] = Post::uploadFile($request, 'thumbnail');
+
+        $data = FileUploader::getInstance($data)
+            ->save(date('Y-m-d'))
+            ->getData();
+
         $post = Post::create($data);
-        $post->tags()->sync($request->tags);
+
+        if ($request->has('tags')) {
+            $post->tags()->sync($request->tags);
+        }
 
         return redirect()->route('posts.index')->with('success', 'Статья добавлена');
     }
@@ -68,18 +74,28 @@ class PostController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required|max:255',
             'description' => 'required|max:255',
             'content' => 'required',
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
+
         $post = Post::find($id);
-        $data = ($request->all());
-        $data['thumbnail'] = Post::uploadFile($request, 'thumbnail',  $post->thumbnail);
+
+        $data = FileUploader::getInstance($data)
+            ->setModel($post)
+            ->removePrev()
+            ->save(date('Y-m-d'))
+            ->getData();
+
         $post->update($data);
-        $post->tags()->sync($request->tags);
+
+        if ($request->has('tags')) {
+            $post->tags()->sync($request->tags);
+        }
+
         return redirect()->route('posts.index')->with('success', 'Изменения сохранены');
     }
 
@@ -101,7 +117,6 @@ class PostController extends Controller
 
         $post->tags()->sync([]);
         $post->delete();
-
         return redirect()->route('posts.index')->with('success', 'Статья удалена');
     }
 }

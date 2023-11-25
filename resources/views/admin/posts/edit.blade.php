@@ -171,7 +171,8 @@
                                             @enderror
                                         </span>
                                     </div>
-                                    <div><img class="img-thumbnail" src="{{ $post->getImage($post->thumbnail) }}"
+
+                                    <div><img class="img-thumbnail" src="{{ $post->getImage('thumbnail') }}"
                                             alt="">
                                     </div>
                                 </div>

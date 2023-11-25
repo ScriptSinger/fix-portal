@@ -65,7 +65,8 @@ mix.scripts(
         'resources/assets/front/js/tether.min.js',
         'resources/assets/front/js/bootstrap.min.js',
         'resources/assets/front/js/animate.js',
-        'resources/assets/front/js/custom.js'
+        'resources/assets/front/js/custom.js',
+        'resources/assets/admin/plugins/sweetalert2/sweetalert2.all.min.js',
     ], 'public/assets/front/js/main.js');
 
 mix.copyDirectory(

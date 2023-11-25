@@ -18,7 +18,8 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\CustomizationController;
 use App\Http\Controllers\Comment\PostCommentController;
-
+use App\Http\Controllers\Public\ProfileController;
+use App\Http\Controllers\Public\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,11 +35,20 @@ use App\Http\Controllers\Comment\PostCommentController;
 
 
 
+Route::group(
+    ['middleware' => 'auth:web'],
+    function () {
+        Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
+        Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
+    }
+);
 
 
 Route::get('/category/{slug}', [PublicCategoryController::class, 'showCategoryArticles'])->name('category.articles');
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+
 
 Route::get('/', function () {
     return redirect('/articles');

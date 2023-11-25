@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\FileUploadTrait;
-use App\Traits\ModelImageTrait;
+use App\Traits\ImageHandlerTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Customization extends Model
 {
-    use HasFactory, FileUploadTrait, ModelImageTrait;
+    use HasFactory, ImageHandlerTrait;
 
     protected $fillable = [
         'favicon',

@@ -162,7 +162,9 @@
                         @foreach ($post->postComment as $comment)
                             <div class="media">
                                 <a class="media-left" href="#">
-                                    <img src="upload/author.jpg" alt="" class="rounded-circle">
+
+                                    <img src="{{ $comment->user->getImage('avatar') }}" alt=""
+                                        class="rounded-circle" width="64px" height="64px">
                                 </a>
                                 <div class="media-body">
                                     <h4 class="media-heading user_name">

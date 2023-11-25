@@ -26,8 +26,8 @@
         <div class="dmtop">Scroll to Top</div>
 
     </div><!-- end wrapper -->
+    @include('public.layouts.includes.script')
 
-    <script src="{{ asset('assets/front/js/main.js') }}"></script>
 </body>
 
 </html>

@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\ImageHandlerTrait;
 use Carbon\Carbon;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\FileUploadTrait;
-use App\Traits\ModelImageTrait;
 
 class Post extends Model
 {
-    use HasFactory, Sluggable, FileUploadTrait, ModelImageTrait;
+    use HasFactory, Sluggable, ImageHandlerTrait;
 
     //массовое присваивание
     protected $fillable = [

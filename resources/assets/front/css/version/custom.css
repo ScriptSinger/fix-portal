@@ -31,6 +31,6 @@
     background-color: #c89700 !important;
 }
 
-.has-error {
-    border: 1px solid #f00;
+.form-wrapper .is-invalid {
+    border-color: #d9534f;
 }
