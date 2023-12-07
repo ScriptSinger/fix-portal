@@ -22,10 +22,10 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required'
         ]);
-        Category::create($request->all());
+        Category::create($data);
         // return redirect()->route('categories.index')->session()->flash('success', 'Категория добавлена');
         return redirect()->route('categories.index')->with('success', 'Категория добавлена');
     }
@@ -38,12 +38,12 @@ class CategoryController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $data = $request->validate([
             'title' => 'required'
         ]);
         $category = Category::find($id);
         // $category->slug = null; // обновление slug
-        $category->update($request->all());
+        $category->update($data);
         return redirect()->route('categories.index')->with('success', 'Категория отредактирована');
     }
 

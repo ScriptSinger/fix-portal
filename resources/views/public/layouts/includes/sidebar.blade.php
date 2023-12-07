@@ -15,7 +15,7 @@
             <div class="blog-list-widget">
                 <div class="list-group">
                     @foreach ($popular_posts as $post)
-                        <a href="{{ route('article.show', ['slug' => $post->slug]) }}"
+                        <a href="{{ route('articles.show', ['slug' => $post->slug]) }}"
                             class="list-group-item list-group-item-action flex-column align-items-start">
                             <div class="w-100 justify-content-between">
                                 <img src="{{ $post->getImage('thumbnail') }}" alt=""

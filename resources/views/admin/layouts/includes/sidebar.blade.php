@@ -91,21 +91,21 @@
                   </li>
                   <li class="nav-item">
                       <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-thumbtack"></i>
+                          <i class="nav-icon fas fa-plug"></i>
                           <p>
-                              Задания
+                              Приборы
                               <i class="right fas fa-angle-left"></i>
                           </p>
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('tasks.index') }}" class="nav-link">
+                              <a href="{{ route('appliances.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('tasks.create') }}" class="nav-link">
+                              <a href="{{ route('appliances.create') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Добавить</p>
                               </a>

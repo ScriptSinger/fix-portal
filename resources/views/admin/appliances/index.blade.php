@@ -6,22 +6,22 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Список категорий</h1>
+                        <h1>Список приборов</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                            <li class="breadcrumb-item active">Список категорий</li>
+                            <li class="breadcrumb-item active">Список приборов</li>
                         </ol>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
         <section class="content">
-            <div class="container-fluid">
+            <div class="col-md-6">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Список категорий</h3>
+
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
@@ -29,9 +29,9 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <a href="{{ route('categories.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
-                            категорию</a>
-                        @if (count($categories))
+                        <a href="{{ route('appliances.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
+                            прибор</a>
+                        @if (count($appliances))
                             <table class="table">
                                 <thead>
                                     <tr>
@@ -41,14 +41,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($categories as $category)
+                                    @foreach ($appliances as $appliance)
                                         <tr>
-                                            <td>{{ $category->id }}</td>
+                                            <td>{{ $appliance->id }}</td>
                                             <td>
                                                 <div class="btn-group">
                                                     <a type="button" class="btn btn-default"
-                                                        href="{{ route('categories.show', [$category->id]) }}">
-                                                        {{ $category->title }}</a>
+                                                        href="{{ route('appliances.show', [$appliance->id]) }}">
+                                                        {{ $appliance->title }}</a>
                                                     <button type="button"
                                                         class="btn btn-default dropdown-toggle dropdown-icon"
                                                         data-toggle="dropdown" aria-expanded="false">
@@ -56,12 +56,12 @@
                                                     </button>
                                                     <div class="dropdown-menu" role="menu">
                                                         <a class="dropdown-item"
-                                                            href="{{ route('categories.edit', ['category' => $category->id]) }}"><i
+                                                            href="{{ route('appliances.edit', ['appliance' => $appliance->id]) }}"><i
                                                                 class="fas fa-edit"></i> Редактировать</a>
 
                                                         <div class="dropdown-divider"></div>
                                                         <form
-                                                            action="{{ route('categories.destroy', ['category' => $category->id]) }}"
+                                                            action="{{ route('appliances.destroy', ['appliance' => $appliance->id]) }}"
                                                             method="POST">
                                                             @csrf
                                                             @method('DELETE')
@@ -73,7 +73,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>{{ $category->slug }}</td>
+                                            <td>{{ $appliance->slug }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -84,7 +84,7 @@
                     </div>
                     <div class="card-footer clearfix">
                         <div class="pagination pagination-sm m-0 float-right">
-                            {{ $categories->onEachSide(1)->links() }}</div>
+                            {{ $appliances->onEachSide(1)->links() }}</div>
                     </div>
                 </div>
 

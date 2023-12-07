@@ -13,7 +13,7 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         // Передаем данные пользователя в представление
-        return view('public.dashboard.index', compact('user'));
+        return view('public.profile.index', compact('user'));
     }
 
     public function updateProfile(Request $request)
@@ -29,7 +29,8 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        $data = FileUploader::getInstance($data)
+        $data = FileUploader::getInstance()
+            ->setData($data)
             ->setModel($user)
             ->removePrev()
             ->resizeSave()

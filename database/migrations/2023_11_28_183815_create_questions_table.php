@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('questions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('title')->index();
             $table->string('slug')->unique();
             $table->text('description');
-            $table->text('content');
-            $table->integer('category_id')->unsigned();
+
             $table->integer('views')->unsigned()->default(0);
-            $table->string('thumbnail')->nullable();
+            $table->json('photos')->nullable(); // Меняем строку на JSON для хранения массива
+            $table->integer('appliance_id')->unsigned();
+            $table->integer('user_id')->unsigned();
+
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('questions');
     }
 };

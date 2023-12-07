@@ -37,8 +37,11 @@ class PostController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $data = FileUploader::getInstance($data)
-            ->save(date('Y-m-d'))
+        $data = FileUploader::getInstance()
+            ->setData($data)
+            ->setSupDir('post')
+            ->setSubDir(date('Y-m-d'))
+            ->save()
             ->getData();
 
         $post = Post::create($data);
@@ -46,21 +49,14 @@ class PostController extends Controller
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
-
         return redirect()->route('posts.index')->with('success', 'Статья добавлена');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         $post = Post::find($id);
@@ -69,9 +65,6 @@ class PostController extends Controller
         return view('admin.posts.edit', compact('post', 'categories', 'tags'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         $data = $request->validate([
@@ -84,10 +77,13 @@ class PostController extends Controller
 
         $post = Post::find($id);
 
-        $data = FileUploader::getInstance($data)
+        $data = FileUploader::getInstance()
+            ->setData($data)
             ->setModel($post)
+            ->setSupDir('post')
+            ->setSubDir(date('Y-m-d'))
             ->removePrev()
-            ->save(date('Y-m-d'))
+            ->save()
             ->getData();
 
         $post->update($data);
@@ -95,13 +91,9 @@ class PostController extends Controller
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
-
         return redirect()->route('posts.index')->with('success', 'Изменения сохранены');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         $post = Post::find($id);

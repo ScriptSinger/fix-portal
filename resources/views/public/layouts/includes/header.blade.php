@@ -6,16 +6,16 @@
                 aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="{{ route('article.index') }}"><img
+            <a class="navbar-brand" href="{{ route('articles.index') }}"><img
                     src="{{ optional($customization)->getImage('logo') }}" alt=""></a>
 
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="marketing-index.html">Home</a>
+                        <a class="nav-link" href="{{ route('articles.index') }}">Главная</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="marketing-category.html">Marketing</a>
+                        <a class="nav-link" href="{{ route('questions.index') }}">Вопросы</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="marketing-category.html">Make Money</a>

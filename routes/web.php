@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Http\Controllers\Admin\ApplianceController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Admin\MainController;
@@ -17,9 +17,10 @@ use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\CustomizationController;
-use App\Http\Controllers\Comment\PostCommentController;
+use App\Http\Controllers\Public\PostCommentController;
 use App\Http\Controllers\Public\ProfileController;
-use App\Http\Controllers\Public\UserController;
+use App\Http\Controllers\Public\QuestionCommentController;
+use App\Http\Controllers\Public\QuestionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,14 +35,25 @@ use App\Http\Controllers\Public\UserController;
 
 
 
-
+Route::resource('questions', QuestionController::class);
 Route::group(
     ['middleware' => 'auth:web'],
     function () {
         Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
         Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
+        Route::group(['prefix' => 'questions'], function () {
+            Route::group(['prefix' => '{question_id}/comments'], function () {
+                Route::post('/', [QuestionCommentController::class, 'store'])->name('question.comment.store');
+            });
+        });
+        Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
+        Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
     }
 );
+
+
+
+
 
 
 Route::get('/category/{slug}', [PublicCategoryController::class, 'showCategoryArticles'])->name('category.articles');
@@ -55,8 +67,8 @@ Route::get('/', function () {
 });
 
 Route::group(['prefix' => 'articles'], function () {
-    Route::get('/', [PublicPostController::class, 'index'])->name('article.index');
-    Route::get('/{slug}', [PublicPostController::class, 'show'])->name('article.show');
+    Route::get('/', [PublicPostController::class, 'index'])->name('articles.index');
+    Route::get('/{slug}', [PublicPostController::class, 'show'])->name('articles.show');
     Route::group(['prefix' => '{article_id}/comments'], function () {
         Route::post('/', [PostCommentController::class, 'store'])->name('article.comment.store');
     });
@@ -72,6 +84,7 @@ Route::group(
         Route::resource('tags', TagController::class);
         Route::resource('posts', PostController::class);
         Route::resource('users', AdminUserController::class);
+        Route::resource('appliances', ApplianceController::class);
         Route::get('/deleted-users', [DeletedUserController::class, 'index'])->name('deleted-users.index');
         Route::get('/deleted-users/restore/{id}', [DeletedUserController::class, 'restore'])->name('deleted-users.restore');
 

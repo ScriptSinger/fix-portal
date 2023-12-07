@@ -26,11 +26,11 @@ class CustomizationController extends Controller
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg,gif'
         ]);
-
         $customization = Customization::firstOrNew(['id' => 1], $data); // Здесь мы создаем объект
-
-        $data = FileUploader::getInstance($data)
+        $data = FileUploader::getInstance()
+            ->setData($data)
             ->setModel($customization)
+            ->setSupDir('customization')
             ->removePrev()
             ->save()
             ->getData();

@@ -41,7 +41,7 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function postComment()
+    public function postComments()
     {
         return $this->hasMany(PostComment::class);
     }

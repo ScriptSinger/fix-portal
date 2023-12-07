@@ -1,5 +1,5 @@
 @extends('public.layouts.left_sidebar')
-@section('title', 'Ufamasters - Ремонт Бытовой Техники :: ' . $category->title)
+@section('title', "$category->title | " . config('app.name', 'Ufamasters'))
 @section('page-title')
     <div class="page-title db">
         <div class="container">
@@ -9,7 +9,7 @@
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('article.index') }}">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('articles.index') }}">Home</a></li>
                         <li class="breadcrumb-item active">{{ $category->title }}</li>
                     </ol>
                 </div><!-- end col -->
@@ -24,7 +24,7 @@
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
-                        <a href="{{ route('article.show', ['slug' => $post->slug]) }}" title="">
+                        <a href="{{ route('articles.show', ['slug' => $post->slug]) }}" title="">
                             <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
                             <div class="hovereffect">
                                 <span></span>
@@ -47,7 +47,7 @@
                                 </li>
                             </ul>
                         </div><!-- end post-sharing -->
-                        <h4><a href="{{ route('article.index', ['slug' => $post->slug]) }}"
+                        <h4><a href="{{ route('articles.index', ['slug' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
                         <small><a href="{{ route('category.articles', ['slug' => $category->slug]) }}"

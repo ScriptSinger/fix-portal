@@ -1,14 +1,18 @@
 @extends('public.layouts.right_sidebar')
-@section('title', config('app.name', 'Laravel'))
+@section('title', 'Статьи | ' . config('app.name', 'Ufamasters'))
 @section('banner')
     <section style="background-image: url('{{ optional($customization)->getImage('banner') }}');" id="cta"
         class="section">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-12 align-self-center">
-                    <h2>{{ optional($customization)->title }}</h2>
-                    <p class="lead">{{ optional($customization)->description }}</p>
-                    <a href="#" class="btn btn-primary">Try for free</a>
+                    <h2>{{ optional($customization)->title ?? 'Ремонт бытовой техники' }} </h2>
+
+                    <p class="lead">
+                        {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
+                    </p>
+                    </p>
+                    <a href="{{ route('questions.create') }}" class="btn btn-primary">Создать вопрос</a>
                 </div>
                 <div class="col-lg-4 col-md-12">
                     <div class="newsletter-widget text-center align-self-center">
@@ -35,7 +39,7 @@
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
-                        <a href="{{ route('article.index', ['slug' => $post->slug]) }}" title="">
+                        <a href="{{ route('articles.index', ['slug' => $post->slug]) }}" title="">
 
                             <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
                             <div class="hovereffect">
@@ -59,7 +63,7 @@
                                 </li>
                             </ul>
                         </div><!-- end post-sharing -->
-                        <h4><a href="{{ route('article.show', ['slug' => $post->slug]) }}"
+                        <h4><a href="{{ route('articles.show', ['slug' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
                         <small><a href="{{ route('category.articles', ['slug' => $post->category->slug]) }}"

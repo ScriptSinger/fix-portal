@@ -1,57 +1,57 @@
 @extends('public.layouts.right_sidebar')
-@section('title', "$post->title | " . config('app.name', 'Ufamasters'))
+@section('title', "$question->title | " . config('app.name', 'Ufamasters'))
 
 @section('content')
     <div class="page-wrapper">
         <div class="blog-title-area">
             <ol class="breadcrumb hidden-xs-down">
-                <li class="breadcrumb-item"><a href="{{ route('articles.index') }}">Главная</a></li>
-                <li class="breadcrumb-item"><a
-                        href="{{ route('category.articles', ['slug' => $post->category->slug]) }}">{{ $post->category->title }}</a>
-                </li>
-                <li class="breadcrumb-item active">{{ $post->title }}</li>
+                {{-- <li class="breadcrumb-item"><a href="{{ route('article.index') }}">Главная</a></li> --}}
+                {{-- <li class="breadcrumb-item"><a
+                        href="{{ route('appliance.articles', ['slug' => $question->appliance->slug]) }}">{{ $question->appliance->title }}</a>
+                </li> --}}
+                <li class="breadcrumb-item active">{{ $question->title }}</li>
             </ol>
 
-            <span class="color-yellow"><a href="{{ route('category.articles', ['slug' => $post->category->slug]) }}"
-                    title="">{{ $post->category->title }}</a></span>
+            {{-- <span class="color-yellow"><a href="{{ route('appliance.articles', ['slug' => $question->appliance->slug]) }}"
+                    title="">{{ $question->appliance->title }}</a></span> --}}
 
-            <h3>{{ $post->title }}</h3>
+            <h3>{{ $question->title }}</h3>
 
             <div class="blog-meta big-meta">
-                <small>{{ $post->getPostDate() }}</small>
-                <small><a href="blog-author.html" title="">by Jessica</a></small>
-                <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
+                <small>{{ $question->getCreatedDate() }}</small>
+                <small><a href="blog-author.html" title="">{{ optional($question->user)->name }}</a></small>
+                <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
+
             </div><!-- end meta -->
 
             <div class="post-sharing">
                 <ul class="list-inline">
-                    <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
-                                class="down-mobile">Share on Facebook</span></a></li>
-                    <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i> <span
-                                class="down-mobile">Tweet on Twitter</span></a></li>
-                    <li><a href="#" class="gp-button btn btn-primary"><i class="fa fa-google-plus"></i></a></li>
+                    <li><a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="btn"><i
+                                class="fa fa-edit"></i> <span class="down-mobile">Редактировать</span></a></li>
                 </ul>
             </div><!-- end post-sharing -->
         </div><!-- end title -->
 
-        <div class="single-post-media">
-            <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
-        </div><!-- end media -->
-
-        <div class="blog-content">
-            {!! $post->content !!}
+        <div class="blog-content mb-5">
+            {!! $question->description !!}
         </div><!-- end content -->
 
+        <div class="single-post-media">
+            @foreach (json_decode($question->photos) as $photo)
+                <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
+            @endforeach
+        </div><!-- end media -->
+
         <div class="blog-title-area">
-            @isset($post->tags)
+            {{-- @isset($question->tags)
                 <div class="tag-cloud-single">
                     <span>Метки</span>
-                    @foreach ($post->tags as $tag)
+                    @foreach ($question->tags as $tag)
                         <small><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
                                 title="">{{ $tag->title }}</a></small>
                     @endforeach
                 </div><!-- end meta -->
-            @endisset
+            @endisset --}}
 
 
             <div class="post-sharing">
@@ -78,14 +78,14 @@
         <hr class="invis1">
 
         <div class="custombox authorbox clearfix">
-            <h4 class="small-title">About author</h4>
+            <h4 class="small-title">Об авторе</h4>
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
                     <img src="upload/author.jpg" alt="" class="img-fluid rounded-circle">
                 </div><!-- end col -->
 
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-                    <h4><a href="#">Jessica</a></h4>
+                    <h4><a href="#">{{ optional($question->user)->name }}</a></h4>
                     <p>Quisque sed tristique felis. Lorem <a href="#">visit my website</a> amet, consectetur
                         adipiscing elit. Phasellus quis mi auctor, tincidunt nisl eget, finibus odio. Duis tempus elit quis
                         risus congue feugiat. Thanks for stop Markedia!</p>
@@ -112,7 +112,7 @@
         <hr class="invis1">
 
         <div class="custombox clearfix">
-            <h4 class="small-title">You may also like</h4>
+            <h4 class="small-title">Вам также может понравиться</h4>
             <div class="row">
                 <div class="col-lg-6">
                     <div class="blog-box">
@@ -126,8 +126,8 @@
                         </div><!-- end media -->
                         <div class="blog-meta">
                             <h4><a href="marketing-single.html" title="">We are guests of ABC Design Studio</a></h4>
-                            <small><a href="blog-category-01.html" title="">Trends</a></small>
-                            <small><a href="blog-category-01.html" title="">21 July, 2017</a></small>
+                            <small><a href="blog-appliance-01.html" title="">Trends</a></small>
+                            <small><a href="blog-appliance-01.html" title="">21 July, 2017</a></small>
                         </div><!-- end meta -->
                     </div><!-- end blog-box -->
                 </div><!-- end col -->
@@ -144,8 +144,8 @@
                         </div><!-- end media -->
                         <div class="blog-meta">
                             <h4><a href="marketing-single.html" title="">Nostalgia at work with family</a></h4>
-                            <small><a href="blog-category-01.html" title="">News</a></small>
-                            <small><a href="blog-category-01.html" title="">20 July, 2017</a></small>
+                            <small><a href="blog-appliance-01.html" title="">News</a></small>
+                            <small><a href="blog-appliance-01.html" title="">20 July, 2017</a></small>
                         </div><!-- end meta -->
                     </div><!-- end blog-box -->
                 </div><!-- end col -->
@@ -155,11 +155,11 @@
         <hr class="invis1">
 
         <div class="custombox clearfix">
-            <h4 class="small-title">{{ $post->postComments->count() }} Comments</h4>
+            <h4 class="small-title">{{ $question->questionComments->count() }} Комментариев</h4>
             <div class="row">
                 <div class="col-lg-12">
                     <div class="comments-list">
-                        @foreach ($post->postComments as $comment)
+                        @foreach ($question->questionComments as $comment)
                             <div class="media">
                                 <a class="media-left" href="#">
 
@@ -168,7 +168,7 @@
                                 </a>
                                 <div class="media-body">
                                     <h4 class="media-heading user_name">
-                                        {{ $comment->user->name }}<small>{{ $comment->dateAsCarbon->diffForHumans() }}</small>
+                                        {{ optional($question->user)->name }}<small>{{ $comment->dateAsCarbon->diffForHumans() }}</small>
                                     </h4>
                                     <p>{{ $comment->text }}</p>
                                     <a href="#" class="btn btn-primary btn-sm">Reply</a>
@@ -183,14 +183,14 @@
         <hr class="invis1">
         @auth()
             <div class="custombox clearfix">
-                <h4 class="small-title">Leave a Reply</h4>
+                <h4 class="small-title">Оставьте ответ</h4>
                 <div class="row">
                     <div class="col-lg-12">
                         <form class="form-wrapper" method="POST" enctype="multipart/form-data"
-                            action="{{ route('article.comment.store', ['article_id' => $post->id]) }}">
+                            action="{{ route('question.comment.store', ['question_id' => $question->id]) }}">
                             @csrf
-                            <textarea class="form-control" name="text" placeholder="Your comment"></textarea>
-                            <button type="submit" class="btn btn-primary">Submit Comment</button>
+                            <textarea class="form-control" name="text" placeholder="Ваш комментарий"></textarea>
+                            <button role="button" type="submit" class="btn btn-primary">Отправить</button>
                         </form>
                     </div>
                 </div>

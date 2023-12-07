@@ -28,6 +28,7 @@ class ViewServiceProvider extends ServiceProvider
             'public.layouts.includes.sidebar',
             'public.layouts.includes.header',
             'public.posts.index',
+            'public.questions.index',
             'public.layouts.includes.footer'
         ], PublicComposer::class);
     }
