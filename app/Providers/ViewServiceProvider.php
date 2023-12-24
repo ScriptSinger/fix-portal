@@ -25,10 +25,17 @@ class ViewServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer([
-            'public.layouts.includes.sidebar',
             'public.layouts.includes.header',
             'public.posts.index',
             'public.questions.index',
+
+            'public.layouts.includes.sidebar_widgets.prime_categories',
+            'public.layouts.includes.sidebar_widgets.prime_posts',
+
+            'public.layouts.includes.footer_widgets.popular_posts',
+            'public.layouts.includes.footer_widgets.popular_categories',
+
+
             'public.layouts.includes.footer'
         ], PublicComposer::class);
     }

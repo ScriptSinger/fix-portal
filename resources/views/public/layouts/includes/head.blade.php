@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Site Metas -->
-    <title>@yield('title') </title>
+    <title>@yield('title')</title>
 
 
     <meta name="keywords" content="">

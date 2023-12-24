@@ -1,4 +1,4 @@
-@extends('public.layouts.left_sidebar')
+@extends('public.layouts.bar')
 @section('title', "$category->title | " . config('app.name', 'Ufamasters'))
 @section('page-title')
     <div class="page-title db">
@@ -9,7 +9,7 @@
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('articles.index') }}">Home</a></li>
+                        <li class="breadcrumb-item active">Категории</li>
                         <li class="breadcrumb-item active">{{ $category->title }}</li>
                     </ol>
                 </div><!-- end col -->
@@ -18,13 +18,22 @@
     </div><!-- end page-title -->
 @endsection
 
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.includes.sidebar_widgets.prime_posts')
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+    </div>
+
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         <div class="blog-custom-build">
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
-                        <a href="{{ route('articles.show', ['slug' => $post->slug]) }}" title="">
+                        <a href="{{ route('articles.show', ['article' => $post->slug]) }}" title="">
                             <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
                             <div class="hovereffect">
                                 <span></span>
@@ -47,12 +56,12 @@
                                 </li>
                             </ul>
                         </div><!-- end post-sharing -->
-                        <h4><a href="{{ route('articles.index', ['slug' => $post->slug]) }}"
+                        <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
-                        <small><a href="{{ route('category.articles', ['slug' => $category->slug]) }}"
+                        <small><a href="{{ route('public.categories.show', ['category' => $category->slug]) }}"
                                 title="">{{ $category->title }}</a></small>
-                        <small>{{ $post->getPostDate() }}</small>
+                        <small>{{ $post->getCreatedDate() }}</small>
                         <small><a href="#" title="">by Jack</a></small>
                         <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
                     </div><!-- end meta -->

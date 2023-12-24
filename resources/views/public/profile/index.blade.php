@@ -1,4 +1,4 @@
-@extends('public.layouts.left_sidebar')
+@extends('public.layouts.bar')
 @section('title', 'Личный кабинет | ' . config('app.name', 'Ufamasters'))
 @section('page-title')
     <div class="page-title db">
@@ -20,6 +20,26 @@
         </div><!-- end container -->
     </div><!-- end page-title -->
 @endsection
+
+
+@section('sidebar')
+
+    <div class="sidebar">
+        <div class="widget">
+            <div class="mx-auto d-block text-center">
+                <img src="{{ $user->avatar !== null ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                    alt="" class="img-fluid rounded-circle mb-3">
+                <div>
+                    <h2 class="widget-title mb-2">{{ $user->name }}</h2>
+                    <p>{{ $user->location }}</p>
+                </div>
+            </div>
+        </div>
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+    </div>
+
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         <div class="row">
@@ -93,5 +113,5 @@
             </div>
         </div>
     </div><!-- end page-wrapper -->
-    </div><!-- end col -->
+
 @endsection

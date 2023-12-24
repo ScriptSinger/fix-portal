@@ -6,7 +6,7 @@
 <body class="hold-transition sidebar-mini">
     <!-- Site wrapper -->
     <div class="wrapper">
-
+        @include('admin.layouts.includes.preloader')
         @include('admin.layouts.includes.navbar')
 
         @include('admin.layouts.includes.sidebar')

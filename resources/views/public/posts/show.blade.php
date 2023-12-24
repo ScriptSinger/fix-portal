@@ -1,24 +1,33 @@
-@extends('public.layouts.right_sidebar')
+@extends('public.layouts.banner')
 @section('title', "$post->title | " . config('app.name', 'Ufamasters'))
+
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.includes.sidebar_widgets.prime_posts')
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+
+    </div>
+@endsection
 
 @section('content')
     <div class="page-wrapper">
         <div class="blog-title-area">
             <ol class="breadcrumb hidden-xs-down">
-                <li class="breadcrumb-item"><a href="{{ route('articles.index') }}">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{{ route('articles.index') }}">Статьи</a></li>
                 <li class="breadcrumb-item"><a
-                        href="{{ route('category.articles', ['slug' => $post->category->slug]) }}">{{ $post->category->title }}</a>
+                        href="{{ route('public.categories.show', ['category' => $post->category->slug]) }}">{{ $post->category->title }}</a>
                 </li>
                 <li class="breadcrumb-item active">{{ $post->title }}</li>
             </ol>
 
-            <span class="color-yellow"><a href="{{ route('category.articles', ['slug' => $post->category->slug]) }}"
+            <span class="color-yellow"><a href="{{ route('public.categories.show', ['category' => $post->category->slug]) }}"
                     title="">{{ $post->category->title }}</a></span>
 
             <h3>{{ $post->title }}</h3>
 
             <div class="blog-meta big-meta">
-                <small>{{ $post->getPostDate() }}</small>
+                <small>{{ $post->getCreatedDate() }}</small>
                 <small><a href="blog-author.html" title="">by Jessica</a></small>
                 <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
             </div><!-- end meta -->
@@ -87,7 +96,8 @@
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
                     <h4><a href="#">Jessica</a></h4>
                     <p>Quisque sed tristique felis. Lorem <a href="#">visit my website</a> amet, consectetur
-                        adipiscing elit. Phasellus quis mi auctor, tincidunt nisl eget, finibus odio. Duis tempus elit quis
+                        adipiscing elit. Phasellus quis mi auctor, tincidunt nisl eget, finibus odio. Duis tempus elit
+                        quis
                         risus congue feugiat. Thanks for stop Markedia!</p>
 
                     <div class="topsocial">
@@ -125,7 +135,8 @@
                             </a>
                         </div><!-- end media -->
                         <div class="blog-meta">
-                            <h4><a href="marketing-single.html" title="">We are guests of ABC Design Studio</a></h4>
+                            <h4><a href="marketing-single.html" title="">We are guests of ABC Design Studio</a>
+                            </h4>
                             <small><a href="blog-category-01.html" title="">Trends</a></small>
                             <small><a href="blog-category-01.html" title="">21 July, 2017</a></small>
                         </div><!-- end meta -->
@@ -197,6 +208,4 @@
             </div>
         @endauth
     </div><!-- end page-wrapper -->
-
-
 @endsection

@@ -17,6 +17,9 @@ use App\Http\Controllers\SearchController;
 
 use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\CustomizationController;
+use App\Http\Controllers\Admin\FirmwareController;
+use App\Http\Controllers\Public\ApplianceController as PublicApplianceController;
+use App\Http\Controllers\Public\FirmwareController as PublicFirmwareController;
 use App\Http\Controllers\Public\PostCommentController;
 use App\Http\Controllers\Public\ProfileController;
 use App\Http\Controllers\Public\QuestionCommentController;
@@ -51,14 +54,17 @@ Route::group(
     }
 );
 
+Route::get('/categories/{category}', [PublicCategoryController::class, 'show'])->name('public.categories.show');
+Route::get('/appliances/{appliance}', [PublicApplianceController::class, 'show'])->name('public.applinaces.show');
 
-
-
-
-
-Route::get('/category/{slug}', [PublicCategoryController::class, 'showCategoryArticles'])->name('category.articles');
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+Route::get('/firmwares', [PublicFirmwareController::class, 'index'])->name('firmwares.index');
+Route::get('/firmwares/search', [PublicFirmwareController::class, 'search'])->name('firmwares.search');
+Route::get('/firmwares/{firmware}', [PublicFirmwareController::class, 'show'])->name('firmwares.show');
+Route::get('/firmwares/download/{filename}', [PublicFirmwareController::class, 'download'])->name('firmwares.download');
+
 
 
 
@@ -68,7 +74,7 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'articles'], function () {
     Route::get('/', [PublicPostController::class, 'index'])->name('articles.index');
-    Route::get('/{slug}', [PublicPostController::class, 'show'])->name('articles.show');
+    Route::get('/{article}', [PublicPostController::class, 'show'])->name('articles.show');
     Route::group(['prefix' => '{article_id}/comments'], function () {
         Route::post('/', [PostCommentController::class, 'store'])->name('article.comment.store');
     });
@@ -76,7 +82,7 @@ Route::group(['prefix' => 'articles'], function () {
 
 
 Route::group(
-    ['middleware' => 'auth:admin', 'prefix' => 'admin'],
+    ['middleware' => 'auth:admin', 'prefix' => 'heturion'],
     function () {
         Route::get('/', [MainController::class, 'index'])->name('admin.index');
         Route::resource('tasks', TaskController::class);
@@ -91,6 +97,11 @@ Route::group(
 
         Route::get('/custom/edit', [CustomizationController::class, 'edit'])->name('custom.edit');
         Route::post('/custom/update', [CustomizationController::class, 'update'])->name('custom.update');
+        Route::get('/download/{filename}', [FirmwareController::class, 'downloadFile'])->name('admin.download');
+        Route::get('/firmwares', [FirmwareController::class, 'index'])->name('admin.firmwares.index');
+
+        Route::get('/firmwares/search', [FirmwareController::class, 'search'])->name('admin.firmwares.search');
+        Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('admin.firmwares.show');
     }
 );
 
@@ -99,7 +110,7 @@ Route::group(
 
 
 Route::group(
-    ['prefix' => 'admin'],
+    ['prefix' => 'heturion'],
     function () {
         Route::get('login', [AuthSessionController::class, 'showLoginForm'])->name('admin.login');
         Route::post('login', [AuthSessionController::class, 'login']);

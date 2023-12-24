@@ -23,7 +23,7 @@ class Appliance extends Model
         ];
     }
 
-    public function brandels()
+    public function questions()
     {
         return $this->hasMany(Question::class);
     }

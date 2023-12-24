@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
 use Carbon\Carbon;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    use HasFactory, Sluggable, ImageHandlerTrait;
+    use HasFactory, Sluggable, DateTrait, ImageHandlerTrait;
 
     //массовое присваивание
     protected $fillable = [
@@ -44,10 +45,5 @@ class Post extends Model
     public function postComments()
     {
         return $this->hasMany(PostComment::class);
-    }
-
-    public function getPostDate()
-    {
-        return Carbon::createFromFormat('Y-m-d H:i:s', $this->created_at)->format('d F, Y');
     }
 }

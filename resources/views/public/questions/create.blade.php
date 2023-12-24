@@ -1,4 +1,4 @@
-@extends('public.layouts.left_sidebar')
+@extends('public.layouts.bar')
 @section('title', 'Создать вопрос | ' . config('app.name', 'Ufamasters'))
 @section('page-title')
     <div class="page-title db">
@@ -6,6 +6,7 @@
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <h2>
+                        Создать вопрос
                     </h2>
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
@@ -18,6 +19,15 @@
         </div><!-- end container -->
     </div><!-- end page-title -->
 @endsection
+
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.includes.sidebar_widgets.prime_posts')
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+    </div>
+@endsection
+
 @section('content')
     <div class="page-wrapper">
         <div class="row">
@@ -26,7 +36,7 @@
                     class="form-wrapper has-danger">
                     @csrf
 
-                    <h4>Создать вопрос</h4>
+                    {{-- <h4>Создать вопрос</h4> --}}
 
                     <div class="form-group">
                         <label for="title">Модель</label>

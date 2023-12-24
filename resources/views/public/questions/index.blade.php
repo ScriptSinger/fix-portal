@@ -1,8 +1,9 @@
-@extends('public.layouts.right_sidebar')
+@extends('public.layouts.banner')
 @section('title', 'Вопросы | ' . config('app.name', 'Ufamasters'))
 @section('banner')
-    <section style="background-image: url('{{ optional($customization)->getImage('banner') }}');" id="cta"
-        class="section">
+    <section
+        style="background-image: url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}');"
+        id="cta" class="section">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-12 align-self-center">
@@ -30,6 +31,14 @@
             </div>
         </div>
     </section>
+@endsection
+
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.includes.sidebar_widgets.prime_posts')
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+    </div>
 @endsection
 
 @section('content')
@@ -70,9 +79,13 @@
                     </div><!-- end post-sharing -->
                     <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
                             title="">{{ $question->title }}</a></h4>
-                    {!! $question->description !!}
-                    {{-- <small><a href="{{ route('category.questions', ['slug' => $post->category->slug]) }}" --}}
+                    <p> {!! $question->description !!}</p>
+
+
+                    <small><a href="{{ route('public.applinaces.show', ['appliance' => $question->appliance->slug]) }}"
+                            title="">{{ $question->appliance->title }}</a></small>
                     {{-- title="">{{ $post->category->title }}</a></small> --}}
+
                     <small>{{ $question->getCreatedDate() }}</small>
                     <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
                     <small><i class="fa fa-eye"></i> {{ $question->views }}</small>

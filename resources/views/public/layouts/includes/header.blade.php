@@ -7,18 +7,19 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <a class="navbar-brand" href="{{ route('articles.index') }}"><img
-                    src="{{ optional($customization)->getImage('logo') }}" alt=""></a>
+                    src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/market-logo.png') }}"
+                    alt=""></a>
 
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('articles.index') }}">Главная</a>
+                        <a class="nav-link" href="{{ route('articles.index') }}">Статьи</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('questions.index') }}">Вопросы</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="marketing-category.html">Make Money</a>
+                        <a class="nav-link" href="{{ route('firmwares.index') }}">Прошивки</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="marketing-blog.html">Blog</a>

@@ -1,4 +1,4 @@
-@extends('public.layouts.left_sidebar')
+@extends('public.layouts.bar')
 @section('title', 'Редактировать вопрос | ' . config('app.name', 'Ufamasters'))
 @section('page-title')
     <div class="page-title db">
@@ -17,6 +17,14 @@
             </div><!-- end row -->
         </div><!-- end container -->
     </div><!-- end page-title -->
+@endsection
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.includes.sidebar_widgets.prime_posts')
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+
+    </div>
 @endsection
 @section('content')
     <div class="page-wrapper">

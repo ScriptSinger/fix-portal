@@ -1,19 +1,28 @@
-@extends('public.layouts.right_sidebar')
+@extends('public.layouts.banner')
 @section('title', "$question->title | " . config('app.name', 'Ufamasters'))
+
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.includes.sidebar_widgets.prime_posts')
+        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+    </div>
+@endsection
 
 @section('content')
     <div class="page-wrapper">
         <div class="blog-title-area">
             <ol class="breadcrumb hidden-xs-down">
-                {{-- <li class="breadcrumb-item"><a href="{{ route('article.index') }}">Главная</a></li> --}}
-                {{-- <li class="breadcrumb-item"><a
-                        href="{{ route('appliance.articles', ['slug' => $question->appliance->slug]) }}">{{ $question->appliance->title }}</a>
-                </li> --}}
+                <li class="breadcrumb-item"><a href="{{ route('questions.index') }}">Вопросы</a></li>
+                <li class="breadcrumb-item"><a
+                        href="{{ route('public.applinaces.show', ['appliance' => $question->appliance->slug]) }}">{{ $question->appliance->title }}</a>
+                </li>
                 <li class="breadcrumb-item active">{{ $question->title }}</li>
             </ol>
 
-            {{-- <span class="color-yellow"><a href="{{ route('appliance.articles', ['slug' => $question->appliance->slug]) }}"
-                    title="">{{ $question->appliance->title }}</a></span> --}}
+            <span class="color-yellow"><a
+                    href=" {{-- {{ route('appliance.articles', ['slug' => $question->appliance->slug]) }}" --}}
+           ">{{ $question->appliance->title }}</a></span>
 
             <h3>{{ $question->title }}</h3>
 
@@ -26,8 +35,10 @@
 
             <div class="post-sharing">
                 <ul class="list-inline">
-                    <li><a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="btn"><i
-                                class="fa fa-edit"></i> <span class="down-mobile">Редактировать</span></a></li>
+                    @can('update', $question)
+                        <li><a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="btn"><i
+                                    class="fa fa-edit"></i> <span class="down-mobile">Редактировать</span></a></li>
+                    @endcan
                 </ul>
             </div><!-- end post-sharing -->
         </div><!-- end title -->
