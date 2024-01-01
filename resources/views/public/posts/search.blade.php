@@ -1,33 +1,46 @@
-@extends('public.layouts.left_sidebar')
-@section('title', 'Ufamasters - Ремонт Бытовой Техники :: Поиск')
-@section('page-title')
-    <div class="page-title db">
+@extends('public.layouts.banner')
+@section('title', 'Статьи | ' . config('app.name', 'Ufamasters'))
+@section('banner')
+
+    <section
+        style="background-image: url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}');"
+        id="cta" class="section">
         <div class="container">
             <div class="row">
-                <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                    <h2> Поиск</h2>
-                </div><!-- end col -->
-                <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                        <li class="breadcrumb-item active">Поиск</li>
-                    </ol>
-                </div><!-- end col -->
-            </div><!-- end row -->
-        </div><!-- end container -->
-    </div><!-- end page-title -->
+                <div class="col-lg-8 col-md-12 align-self-center">
+                    <h2>{{ optional($customization)->title ?? 'Ремонт бытовой техники' }} </h2>
+
+                    <p class="lead">
+                        {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
+                    </p>
+                    </p>
+                    <a href="{{ route('questions.create') }}" class="btn btn-primary">Создать вопрос</a>
+                </div>
+                <div class="col-lg-4 col-md-12">
+                    @include('public.layouts.widgets.banner.posts_search')
+                </div>
+            </div>
+        </div>
+    </section>
 @endsection
 
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.widgets.sidebar.prime_posts')
+        @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_categories')
+    </div>
+@endsection
 
 @section('content')
     <div class="page-wrapper">
-
         <div class="blog-custom-build">
-            @if (isset($posts))
+            @if (count($posts))
                 @foreach ($posts as $post)
                     <div class="blog-box wow fadeIn">
                         <div class="post-media">
-                            <a href="{{ route('posts.single', ['slug' => $post->slug]) }}" title="">
+                            <a href="{{ route('articles.index', ['article' => $post->slug]) }}" title="">
+
                                 <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
                                 <div class="hovereffect">
                                     <span></span>
@@ -50,12 +63,16 @@
                                     </li>
                                 </ul>
                             </div><!-- end post-sharing -->
-                            <h4><a href="{{ route('posts.single', ['slug' => $post->slug]) }}"
+                            <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                     title="">{{ $post->title }}</a></h4>
-                            {!! $post->description !!}
-                            <small><a href="{{ route('category.articles', ['slug' => $post->category->slug]) }}"
+
+                            <p>
+                                {!! $post->description !!}
+                            </p>
+
+                            <small><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
                                     title="">{{ $post->category->title }}</a></small>
-                            <small>{{ $post->getPostDate() }}</small>
+                            <small>{{ $post->getCreatedDate() }}</small>
                             <small><a href="#" title="">by Jack</a></small>
                             <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
                         </div><!-- end meta -->
@@ -64,17 +81,16 @@
                     <hr class="invis">
                 @endforeach
             @else
-                <p>По вашему запросу ничего не найдено</p>
+                <p>Совпадений не найдено</p>
             @endif
         </div>
-
     </div>
 
     <hr class="invis">
     <div class="row">
         <div class="container col-md-12">
             <div class="row justify-content-center">
-                {{ $posts->appends(['search' => request()->search])->links('vendor.pagination.public') }}
+                {{ $posts->onEachSide(1)->links('vendor.pagination.public') }}
             </div>
         </div>
     </div>

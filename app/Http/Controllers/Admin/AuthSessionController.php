@@ -11,7 +11,7 @@ class AuthSessionController extends Controller
 {
     use AuthenticatesUsers;
 
-    protected $redirectTo = '/admin';
+    protected $redirectTo = '/heturion';
 
     public function showLoginForm()
     {

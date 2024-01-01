@@ -99,4 +99,27 @@ class QuestionController extends Controller
     {
         Question::where('id', $id)->destroy();
     }
+
+    public function search(Request $request)
+    {
+        $data = $request->validate([
+            'text' => 'required|max:255',
+        ]);
+
+        $questions = Question::where(function ($query) use ($data) {
+
+            $fields = [
+                'title',
+                'description'
+            ];
+
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', '%' . $data['text'] . '%');
+            }
+        })
+            ->paginate(50)
+            ->appends(['text' => $data['text']]);
+
+        return view('public.questions.search', compact('questions'));
+    }
 }

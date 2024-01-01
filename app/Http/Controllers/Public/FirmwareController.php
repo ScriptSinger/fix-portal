@@ -14,9 +14,9 @@ class FirmwareController extends Controller
         return view('public.firmwares.index', compact('firmwares'));
     }
 
-    public function show(string $id)
+    public function show(string $slug)
     {
-        $firmware = Firmware::findOrFail($id);
+        $firmware = Firmware::findOrFail($slug);
         return view('public.firmwares.show', compact('firmware'));
     }
 

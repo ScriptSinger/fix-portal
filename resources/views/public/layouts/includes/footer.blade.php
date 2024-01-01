@@ -2,15 +2,15 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                @include('public.layouts.includes.footer_widgets.recent_posts')
+                @include('public.layouts.widgets.footer.recent_posts')
             </div>
 
             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                @include('public.layouts.includes.footer_widgets.popular_posts')
+                @include('public.layouts.widgets.footer.popular_posts')
             </div>
 
             <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                @include('public.layouts.includes.footer_widgets.popular_categories')
+                @include('public.layouts.widgets.footer.popular_categories')
             </div><!-- end col -->
         </div><!-- end row -->
 

@@ -12,21 +12,11 @@
                     <p class="lead">
                         {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
                     </p>
-                    </p>
+
                     <a href="{{ route('questions.create') }}" class="btn btn-primary">Создать вопрос</a>
                 </div>
                 <div class="col-lg-4 col-md-12">
-                    <div class="newsletter-widget text-center align-self-center">
-                        <h3>Subscribe Today!</h3>
-                        <p>Subscribe to our weekly Newsletter and receive updates via email.</p>
-
-                        <form class="form-inline" method="GET" action="{{ route('search') }}">
-                            <input name="search" class="form-control mr-sm-2 @error('search') has-error @enderror"
-                                type="text" placeholder="How may I help?">
-                            <button class="btn btn-default btn-block" type="submit">Search</button>
-                        </form>
-
-                    </div><!-- end newsletter -->
+                    @include('public.layouts.widgets.banner.questions_search')
                 </div>
             </div>
         </div>
@@ -35,9 +25,9 @@
 
 @section('sidebar')
     <div class="sidebar">
-        @include('public.layouts.includes.sidebar_widgets.prime_posts')
-        @include('public.layouts.includes.sidebar_widgets.advertising')
-        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+        @include('public.layouts.widgets.sidebar.prime_posts')
+        @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
 @endsection
 
@@ -49,12 +39,9 @@
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
                         <a href="{{ route('questions.index', ['slug' => $question->slug]) }}" title="">
-
                             @foreach (json_decode($question->photos) as $photo)
                                 <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
                             @break
-
-                            <!-- Завершаем цикл после вывода первого элемента -->
                         @endforeach
                         <div class="hovereffect">
                             <span></span>

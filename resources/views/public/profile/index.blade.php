@@ -35,7 +35,7 @@
                 </div>
             </div>
         </div>
-        @include('public.layouts.includes.sidebar_widgets.advertising')
+        @include('public.layouts.widgets.sidebar.advertising')
     </div>
 
 @endsection

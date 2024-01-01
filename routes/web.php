@@ -25,6 +25,8 @@ use App\Http\Controllers\Public\ProfileController;
 use App\Http\Controllers\Public\QuestionCommentController;
 use App\Http\Controllers\Public\QuestionController;
 
+use function Laravel\Prompts\search;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -37,8 +39,11 @@ use App\Http\Controllers\Public\QuestionController;
 */
 
 
-
+Route::get('questions/search', [QuestionController::class, 'search'])->name('questions.search');
 Route::resource('questions', QuestionController::class);
+
+
+
 Route::group(
     ['middleware' => 'auth:web'],
     function () {
@@ -58,10 +63,10 @@ Route::get('/categories/{category}', [PublicCategoryController::class, 'show'])-
 Route::get('/appliances/{appliance}', [PublicApplianceController::class, 'show'])->name('public.applinaces.show');
 
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
-Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search', [SearchController::class, 'index'])->name('search'); // поправить
 
 Route::get('/firmwares', [PublicFirmwareController::class, 'index'])->name('firmwares.index');
-Route::get('/firmwares/search', [PublicFirmwareController::class, 'search'])->name('firmwares.search');
+Route::get('/firmwares/search', [PublicFirmwareController::class, 'search'])->name('firmwares.search'); // Порядок объявления до /firmwares/{firmware}
 Route::get('/firmwares/{firmware}', [PublicFirmwareController::class, 'show'])->name('firmwares.show');
 Route::get('/firmwares/download/{filename}', [PublicFirmwareController::class, 'download'])->name('firmwares.download');
 
@@ -99,13 +104,16 @@ Route::group(
         Route::post('/custom/update', [CustomizationController::class, 'update'])->name('custom.update');
         Route::get('/download/{filename}', [FirmwareController::class, 'downloadFile'])->name('admin.download');
         Route::get('/firmwares', [FirmwareController::class, 'index'])->name('admin.firmwares.index');
-
-        Route::get('/firmwares/search', [FirmwareController::class, 'search'])->name('admin.firmwares.search');
+        Route::get('/firmwares/duplicates', [FirmwareController::class, 'getDuplicates'])->name('admin.firmwares.duplicates'); // Порядок объявления до /firmwares/{firmware}
+        Route::get('/firmwares/search', [FirmwareController::class, 'search'])->name('admin.firmwares.search'); // Порядок объявления до /firmwares/{firmware}
         Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('admin.firmwares.show');
+        Route::delete('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('admin.firmwares.destroy');
+
+        Route::put('/markDuplicates', [FirmwareController::class, 'markDuplicates'])->name('admin.firmwares.markDuplicates');
+
+        Route::delete('/firmwares/delete', [FirmwareController::class, 'removeSecondFromAllDuplicates'])->name('admin.firmwares.remove_duplicates');
     }
 );
-
-
 
 
 

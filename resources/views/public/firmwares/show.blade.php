@@ -21,9 +21,9 @@
 
 @section('sidebar')
     <div class="sidebar">
-        @include('public.layouts.includes.sidebar_widgets.prime_posts')
-        @include('public.layouts.includes.sidebar_widgets.advertising')
-        @include('public.layouts.includes.sidebar_widgets.prime_categories')
+        @include('public.layouts.widgets.sidebar.prime_posts')
+        @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
 @endsection
 

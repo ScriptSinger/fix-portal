@@ -25,8 +25,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        {{-- <h1>Список прошивок</h1> --}}
-                        <h1>Total Firmwares: {{ $firmwares->total() }}</h1>
+                        <h1>Список прошивок</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -63,18 +62,23 @@
                     </div>
                     <div class="card-body">
 
+
+
+
+
+
+
                         @if (count($firmwares))
                             <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
                                 <div class="row">
                                     <div class="col-sm-12">
 
-                                        <table id="example1" class="table table-bordered  dataTable dtr-inline"
+                                        <table id="table" class="table table-bordered  dataTable dtr-inline"
                                             aria-describedby="example1_info">
 
 
                                             <thead>
                                                 <form action="{{ route('admin.firmwares.index') }}" method="GET">
-
                                                     <div class="input-group mb-3">
                                                         <div class="input-group-prepend">
                                                             <span class="input-group-text">
@@ -84,63 +88,17 @@
                                                         <button type="submit"
                                                             class="form-control btn btn-default">Отправить</button>
                                                     </div>
-
                                                     <tr>
                                                         <th>
-                                                            <div class="form-group mb-0">
-                                                                <select name="id" class="custom-select">
-                                                                    <option value="" disabled selected>Идентификатор
-                                                                    </option>
-                                                                    <option value="asc">По возрастанию</option>
-                                                                    <option value="desc">По убыванию</option>
-                                                                </select>
-                                                            </div>
-                                                        </th>
-
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <input type="text" name="title"
-                                                                    class="form-control float-right" placeholder="Название">
-                                                            </div>
-                                                        </th>
-
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <select name="size" class="custom-select">
-                                                                    <option value="" disabled selected>Размер
-                                                                    </option>
-                                                                    <option value="asc">По возрастанию</option>
-                                                                    <option value="desc">По убыванию</option>
-                                                                </select>
-                                                            </div>
+                                                            #
                                                         </th>
                                                         <th>
-                                                            <div class="form-group mb-0">
-                                                                <div class="form-group mb-0">
-                                                                    <input type="text" name="extension"
-                                                                        class="form-control float-right"
-                                                                        placeholder="Расширение">
-                                                                </div>
-                                                            </div>
+                                                            Название
                                                         </th>
-                                                        <th>
-
-                                                            <div class="form-group mb-0">
-                                                                <input type="text" name="platform"
-                                                                    class="form-control float-right"
-                                                                    placeholder="Платформа">
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <select name="crc32" class="custom-select">
-                                                                    <option value="" disabled selected>CRC32
-                                                                    </option>
-                                                                    <option value="asc">По возрастанию</option>
-                                                                    <option value="desc">По убыванию</option>
-                                                                </select>
-                                                            </div>
-                                                        </th>
+                                                        <th>Размер</th>
+                                                        <th>Расширение</th>
+                                                        <th>Платформа</th>
+                                                        <th>CRC32</th>
                                                         <th>
                                                             <div class="custom-control custom-checkbox">
                                                                 <input name="is_duplicate" class="custom-control-input"
@@ -150,8 +108,8 @@
                                                             </div>
 
                                                         </th>
-                                                    </tr>
 
+                                                    </tr>
                                                 </form>
                                             </thead>
 
@@ -226,11 +184,11 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-12 col-md-7">
+                                    {{-- <div class="col-sm-12 col-md-7">
                                         <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
                                             {{ $firmwares->withQueryString()->links('pagination::bootstrap-4') }}
                                         </div>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         @else
@@ -242,4 +200,19 @@
             </div>
         </section>
     </div>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+
+            let table = $('#table').DataTable({
+                "pageLength": 50, // Устанавливаем количество отображаемых записей на странице
+                "lengthMenu": [50, 100, 200], // Опции выбора количества записей на странице
+                // Другие опции и настройки DataTables
+
+            });
+
+
+        });
+    </script>
 @endsection

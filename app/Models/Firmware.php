@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Firmware extends Model
 {
+    use Sluggable, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -17,4 +20,13 @@ class Firmware extends Model
         'crc32',
         'data'
     ];
+
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'title'
+            ]
+        ];
+    }
 }
