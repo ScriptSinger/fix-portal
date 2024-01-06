@@ -1,15 +1,17 @@
 @extends('layouts.app')
+@section('title', 'Регистрация | ' . config('app.name', 'Ufamasters'))
 @section('body-class', 'register-page')
 @section('body-style', 'min-height: 542px;') <!-- Устанавливаем атрибут style для body -->
 @section('content')
 
 
     <div class="register-box">
-        <div class="card card-warning">
-            <div class="card-header text-center">
-                <h1>Регистрация</h1>
-            </div>
-            <div class="card-body">
+        <div class="login-logo">
+            <a href="{{ route('articles.index') }}"><b>Ufa</b>masters</a>
+        </div>
+        <div class="card">
+            <div class="card-body register-card-body">
+                <p class="login-box-msg">Зарегистрировать новый аккаунт</p>
                 <form action="{{ route('register') }}" method="post">
                     @csrf
                     <div class="input-group mb-3">
@@ -40,6 +42,7 @@
                             @endif
                         </span>
                     </div>
+
                     <div class="input-group mb-3">
                         <input name="password" type="password" class="@error('password') is-invalid @enderror form-control"
                             placeholder="Password">
@@ -54,6 +57,7 @@
                             @endif
                         </span>
                     </div>
+
                     <div class="input-group mb-3">
                         <input name="password_confirmation" type="password"
                             class="@error('password') is-invalid @enderror form-control" placeholder="Retype password">
@@ -62,34 +66,32 @@
                                 <span class="fas fa-lock"></span>
                             </div>
                         </div>
+                        <span id="InputText-error" class="error invalid-feedback">
+                            @if ($errors->any())
+                                {{ $errors->first('password_confirmation') }}
+                            @endif
+                        </span>
                     </div>
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="icheck-primary">
-                                <input type="checkbox" id="agreeTerms" name="terms" value="agree">
-                                <label for="agreeTerms">
-                                    I agree to the <a href="#">terms</a>
-                                </label>
-                            </div>
-                        </div>
 
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-warning btn-block">Register</button>
-                        </div>
-
+                    <div class="icheck-primary">
+                        <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                        <label for="agreeTerms">
+                            Я согласен с <a href="#">условиями</a>
+                        </label>
                     </div>
+                    <button type="submit" class="btn btn-block btn-dark btn-flat">Зарегистрироваться</button>
                 </form>
                 <div class="social-auth-links text-center">
-                    <a href="#" class="btn btn-block btn-primary">
+                    <a href="#" class="btn btn-block btn-primary btn-flat">
                         <i class="fab fa-facebook mr-2"></i>
                         Sign up using Facebook
                     </a>
-                    <a href="#" class="btn btn-block btn-danger">
+                    <a href="#" class="btn btn-block btn-danger btn-flat">
                         <i class="fab fa-google-plus mr-2"></i>
                         Sign up using Google+
                     </a>
                 </div>
-                <a href="{{ route('login') }}" class="text-center">I already have a membership</a>
+                <a href="{{ route('login') }}" class="text-center">У меня уже есть аккаунт</a>
             </div>
 
         </div>

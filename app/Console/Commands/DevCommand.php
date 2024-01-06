@@ -3,9 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Http\Filters\Duplicate;
+use App\Mail\RegistrationConfirmation;
 use App\Models\Firmware;
 use Illuminate\Console\Command;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Mail;
 
 // use Illuminate\Routing\Pipeline;
 
@@ -16,7 +18,7 @@ class DevCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'dev:command';
+    protected $signature = 'dev:go';
 
     /**
      * The console command description.
@@ -30,23 +32,8 @@ class DevCommand extends Command
      */
     public function handle()
     {
-        request()->merge(['is_duplicate' => true]);
+        $user = 'heturion';
 
-        $firmwares = app()->make(Pipeline::class)
-            ->send(Firmware::query())
-            ->through([
-                Duplicate::class
-            ])
-            ->thenReturn();
-
-        dd($firmwares->get());
+        Mail::to('heturion@gmail.com')->send(new RegistrationConfirmation($user));
     }
 }
-
-
-
-
-
-
-
-// Firmware::where('is_duplicate', true)->update(['is_duplicate' => false]);

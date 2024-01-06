@@ -45,7 +45,7 @@ Route::resource('questions', QuestionController::class);
 
 
 Route::group(
-    ['middleware' => 'auth:web'],
+    ['middleware' => ['auth:web', 'verified']],
     function () {
         Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
         Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
@@ -56,6 +56,7 @@ Route::group(
         });
         Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
         Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
+        Route::get('/firmwares/download/{filename}', [PublicFirmwareController::class, 'download'])->name('firmwares.download');
     }
 );
 
@@ -68,7 +69,7 @@ Route::get('/search', [SearchController::class, 'index'])->name('search'); // п
 Route::get('/firmwares', [PublicFirmwareController::class, 'index'])->name('firmwares.index');
 Route::get('/firmwares/search', [PublicFirmwareController::class, 'search'])->name('firmwares.search'); // Порядок объявления до /firmwares/{firmware}
 Route::get('/firmwares/{firmware}', [PublicFirmwareController::class, 'show'])->name('firmwares.show');
-Route::get('/firmwares/download/{filename}', [PublicFirmwareController::class, 'download'])->name('firmwares.download');
+
 
 
 

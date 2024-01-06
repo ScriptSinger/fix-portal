@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Events\CountDuplicatesCompleted;
-use App\Listeners\CountDuplicatesCompletedListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,9 +19,6 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
 
-        CountDuplicatesCompleted::class => [
-            CountDuplicatesCompletedListener::class,
-        ],
     ];
 
     /**

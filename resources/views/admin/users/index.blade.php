@@ -38,6 +38,7 @@
                                         <th style="width: 10px">#</th>
                                         <th>Имя</th>
                                         <th>Email</th>
+                                        <th>Дата Верификации</th>
                                         <th>Дата Регистрации</th>
                                     </tr>
                                 </thead>
@@ -74,6 +75,7 @@
                                                 </div>
                                             </td>
                                             <td>{{ $user->email }}</td>
+                                            <td>{{ $user->getEmailVerifiedDate() }}</td>
                                             <td>{{ $user->getCreatedDate() }}</td>
                                         </tr>
                                     @endforeach
