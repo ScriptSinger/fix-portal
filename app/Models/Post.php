@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
-use Carbon\Carbon;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -22,6 +21,7 @@ class Post extends Model
         'thumbnail'
 
     ];
+
 
     public function sluggable(): array
     {
@@ -42,8 +42,8 @@ class Post extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function postComments()
+    public function comments()
     {
-        return $this->hasMany(PostComment::class);
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

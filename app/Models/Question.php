@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
+
 
 class Question extends Model
 {
@@ -40,13 +40,13 @@ class Question extends Model
         return $this->belongsTo(Appliance::class);
     }
 
-    public function questionComments(): HasMany
-    {
-        return $this->hasMany(QuestionComment::class);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

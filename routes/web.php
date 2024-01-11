@@ -19,11 +19,13 @@ use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\CustomizationController;
 use App\Http\Controllers\Admin\FirmwareController;
 use App\Http\Controllers\Public\ApplianceController as PublicApplianceController;
+use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\FirmwareController as PublicFirmwareController;
-use App\Http\Controllers\Public\PostCommentController;
+
 use App\Http\Controllers\Public\ProfileController;
-use App\Http\Controllers\Public\QuestionCommentController;
+
 use App\Http\Controllers\Public\QuestionController;
+use App\Http\Controllers\Public\ReplyController;
 
 use function Laravel\Prompts\search;
 
@@ -49,11 +51,38 @@ Route::group(
     function () {
         Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
         Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
+
         Route::group(['prefix' => 'questions'], function () {
             Route::group(['prefix' => '{question_id}/comments'], function () {
-                Route::post('/', [QuestionCommentController::class, 'store'])->name('question.comment.store');
+                Route::post('/', [CommentController::class, 'storeQuestionComment'])->name('question.comment.store');
+
+
+                Route::group(['prefix' => '{comment_id}/replies'], function () {
+                    Route::post('/', [CommentController::class, 'storeQuestionComment'])->name('question.comment.reply.store');
+                });
             });
         });
+
+
+        Route::prefix('comments')->group(function () {
+
+            Route::post('/commentable/{commentableType}/{commentableId}', [CommentController::class, 'store'])->name('comments.store');
+            Route::put('/{comment_id}', [CommentController::class, 'update'])->name('comments.update');
+            Route::delete('/{comment_id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+
+            Route::prefix('/{comment_id}')->group(function () {
+                Route::post('/like', [CommentController::class, 'like'])->name('comments.like');
+                Route::post('/dislike', [CommentController::class, 'dislike'])->name('comments.dislike');
+            });
+
+
+            Route::post('/{comment_id}/replies', [ReplyController::class, 'store'])->name('comments.replies.store');
+            Route::put('/replies/{reply_id}', [ReplyController::class, 'update'])->name('comments.replies.update');
+            Route::delete('/replies/{reply_id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
+        });
+
+
+
         Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
         Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
         Route::get('/firmwares/download/{filename}', [PublicFirmwareController::class, 'download'])->name('firmwares.download');
@@ -78,13 +107,13 @@ Route::get('/', function () {
     return redirect('/articles');
 });
 
-Route::group(['prefix' => 'articles'], function () {
-    Route::get('/', [PublicPostController::class, 'index'])->name('articles.index');
-    Route::get('/{article}', [PublicPostController::class, 'show'])->name('articles.show');
-    Route::group(['prefix' => '{article_id}/comments'], function () {
-        Route::post('/', [PostCommentController::class, 'store'])->name('article.comment.store');
-    });
-});
+Route::group(
+    ['prefix' => 'articles'],
+    function () {
+        Route::get('/', [PublicPostController::class, 'index'])->name('articles.index');
+        Route::get('/{article}', [PublicPostController::class, 'show'])->name('articles.show');
+    }
+);
 
 
 Route::group(
@@ -125,11 +154,6 @@ Route::group(
         Route::post('login', [AuthSessionController::class, 'login']);
     }
 );
-
-
-
-
-
 
 
 require __DIR__ . '/auth.php';

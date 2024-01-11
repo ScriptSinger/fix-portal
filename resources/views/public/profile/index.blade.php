@@ -28,7 +28,7 @@
         <div class="widget">
             <div class="mx-auto d-block text-center">
                 <img src="{{ $user->avatar !== null ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
-                    alt="" class="img-fluid rounded-circle mb-3">
+                    alt="" class="img-fluid mb-3">
                 <div>
                     <h2 class="widget-title mb-2">{{ $user->name }}</h2>
                     <p>{{ $user->location }}</p>
@@ -89,7 +89,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="bio">Содержание</label>
+                        <label for="bio">О себе</label>
                         <textarea name="bio" class="form-control" id="bio"></textarea>
                         <span class="form-control-feedback">
                             @error('bio')

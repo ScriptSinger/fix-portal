@@ -2,34 +2,30 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Traits\DateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QuestionComment extends Model
+class Reply extends Model
 {
-    use HasFactory;
+    use HasFactory, DateTrait;
 
 
     protected $fillable = [
         'text',
         'user_id',
-        'question_id'
+        'comment_id',
+
+
     ];
-
-    public function question()
-    {
-        return $this->belongsTo(Post::class);
-    }
-
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function getDateAsCarbonAttribute()
+    public function comment()
     {
-        return Carbon::parse($this->created_at);
+        return $this->belongsTo(Comment::class);
     }
 }

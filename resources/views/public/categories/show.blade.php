@@ -61,7 +61,7 @@
                         {!! $post->description !!}
                         <small><a href="{{ route('public.categories.show', ['category' => $category->slug]) }}"
                                 title="">{{ $category->title }}</a></small>
-                        <small>{{ $post->getCreatedDate() }}</small>
+                        <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                         <small><a href="#" title="">by Jack</a></small>
                         <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
                     </div><!-- end meta -->

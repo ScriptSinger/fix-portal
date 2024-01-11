@@ -27,7 +27,7 @@
             <h3>{{ $question->title }}</h3>
 
             <div class="blog-meta big-meta">
-                <small>{{ $question->getCreatedDate() }}</small>
+                <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
                 <small><a href="blog-author.html" title="">{{ optional($question->user)->name }}</a></small>
                 <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
 
@@ -165,49 +165,10 @@
 
         <hr class="invis1">
 
-        <div class="custombox clearfix">
-            <h4 class="small-title">{{ $question->questionComments->count() }} Комментариев</h4>
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="comments-list">
-                        @foreach ($question->questionComments as $comment)
-                            <div class="media">
-                                <a class="media-left" href="#">
+        @include('public.partials.comments', [
+            'instance' => $question,
+            'commentableType' => 'question',
+        ])
 
-                                    <img src="{{ $comment->user->getImage('avatar') }}" alt=""
-                                        class="rounded-circle" width="64px" height="64px">
-                                </a>
-                                <div class="media-body">
-                                    <h4 class="media-heading user_name">
-                                        {{ optional($question->user)->name }}<small>{{ $comment->dateAsCarbon->diffForHumans() }}</small>
-                                    </h4>
-                                    <p>{{ $comment->text }}</p>
-                                    <a href="#" class="btn btn-primary btn-sm">Reply</a>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div><!-- end col -->
-            </div><!-- end row -->
-        </div><!-- end custom-box -->
-
-        <hr class="invis1">
-        @auth()
-            <div class="custombox clearfix">
-                <h4 class="small-title">Оставьте ответ</h4>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <form class="form-wrapper" method="POST" enctype="multipart/form-data"
-                            action="{{ route('question.comment.store', ['question_id' => $question->id]) }}">
-                            @csrf
-                            <textarea class="form-control" name="text" placeholder="Ваш комментарий"></textarea>
-                            <button role="button" type="submit" class="btn btn-primary">Отправить</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        @endauth
     </div><!-- end page-wrapper -->
-
-
 @endsection

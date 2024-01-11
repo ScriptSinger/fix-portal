@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\FileUploader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -49,13 +50,26 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Валидация данных
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'id' => 'nullable',
+            'name' => 'required|string|max:255',
+            // 'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
+            'phone' => 'nullable|string|regex:/^\+?\d{1,4}?[-.\s]?\(?\d{1,6}?\)?[-.\s]?\d{1,9}[-.\s]?\d{1,9}$/',
+            'location' => 'nullable|string|max:255',
+            'bio' => 'nullable|string|max:255',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        $user = User::findOrFail($id);
+        $user = User::findOrFail($data['id']);
+
+        $data = FileUploader::getInstance()
+            ->setData($data)
+            ->setModel($user)
+            ->removePrev()
+            ->resizeSave()
+            ->getData();
+
+        // $data['avatar'] = $user->processFileUpload($request, 'avatar', ['fileType' => 'png']);
         $user->update($data);
 
         return redirect()->route('users.index')->with('success', 'Пользователь успешно обновлен');

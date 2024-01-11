@@ -30,6 +30,9 @@
     </div><!-- end wrapper -->
 
     @include('public.layouts.includes.script')
+
+    @yield('script')
+
 </body>
 
 </html>

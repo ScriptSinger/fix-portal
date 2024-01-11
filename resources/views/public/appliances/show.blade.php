@@ -67,7 +67,7 @@
                     </p>
                     <small><a href="{{ route('public.applinaces.show', ['appliance' => $appliance->slug]) }}"
                             title="">{{ $appliance->title }}</a></small>
-                    <small>{{ $question->getCreatedDate() }}</small>
+                    <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
                     <small><a href="#" title="">by Jack</a></small>
                     <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
                 </div><!-- end meta -->

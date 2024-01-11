@@ -8,7 +8,7 @@
                     <div class="w-100 justify-content-between">
                         <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid float-left">
                         <h5 class="mb-1">{{ $post->title }}</h5>
-                        <small>{{ $post->getCreatedDate() }}</small>
+                        <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                         <small> | <i class="fa fa-eye"></i> {{ $post->views }}</small>
                     </div>
                 </a>

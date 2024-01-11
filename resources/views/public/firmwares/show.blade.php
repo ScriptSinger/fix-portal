@@ -29,44 +29,59 @@
 
 @section('content')
     <div class="page-wrapper" style="overflow-x: auto; max-width: 100%;">
-        <h3>Метаданные</h3>
-        <table class="table table-bordered">
-            <tbody>
-                <tr>
-                    <td>Размер</td>
-                    <td>{{ $firmware->size }} КБ</td>
-                </tr>
-                <tr>
-                    <td>Дата</td>
-                    <td>{{ $firmware->date }}</td>
-                </tr>
-                <tr>
-                    <td>Расширение</td>
-                    <td>{{ $firmware->extension }}</td>
-                </tr>
-                <tr>
-                    <td>Платформа</td>
-                    <td>{{ $firmware->platform }}</td>
-                </tr>
-                <tr>
-                    <td>CRC32</td>
-                    <td>{{ $firmware->crc32 }}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="custombox clearfix">
+            <h4 class="small-title">Метаданные</h4>
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td>Размер</td>
+                        <td>{{ $firmware->size }} КБ</td>
+                    </tr>
+                    <tr>
+                        <td>Дата</td>
+                        <td>{{ $firmware->date }}</td>
+                    </tr>
+                    <tr>
+                        <td>Расширение</td>
+                        <td>{{ $firmware->extension }}</td>
+                    </tr>
+                    <tr>
+                        <td>Платформа</td>
+                        <td>{{ $firmware->platform }}</td>
+                    </tr>
+                    <tr>
+                        <td>CRC32</td>
+                        <td>{{ $firmware->crc32 }}</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <a class="btn btn-primary"
-            href="{{ route('firmwares.download', ['filename' => $firmware->title . $firmware->extension]) }}">Скачать
-            файл</a>
+            <a class="btn btn-primary"
+                href="{{ route('firmwares.download', ['filename' => $firmware->title . $firmware->extension]) }}">Скачать
+                файл</a>
+        </div>
+
+        <hr class="invis1">
+
+        <div class="custombox clearfix">
+            <h4 class="btn btn-link small-title" role="button" data-toggle="collapse" data-target="#collapsedTable">
+                Параметры</h4>
+            <div class="collapse" id="collapsedTable">
+                <table class="table table-bordered">
+                    <tbody>
+                        {!! $firmware->data !!}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <hr class="invis1">
+
+        @include('public.partials.comments', [
+            'instance' => $firmware,
+            'commentableType' => 'firmware',
+        ])
 
     </div>
-    <div class="page-wrapper" style="overflow-x: auto; max-width: 100%;">
-        <h3>Параметры</h3>
-        <table class="table table-bordered ">
-            <tbody>
-                {!! $firmware->data !!}
-            </tbody>
-        </table>
-    </div>
-    </div>
+
 @endsection

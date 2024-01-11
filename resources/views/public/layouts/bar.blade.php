@@ -23,11 +23,12 @@
         </section>
 
         @include('public.layouts.includes.footer')
-
         <div class="dmtop">Scroll to Top</div>
-
     </div><!-- end wrapper -->
+
     @include('public.layouts.includes.script')
+
+    @yield('script')
 
 </body>
 
