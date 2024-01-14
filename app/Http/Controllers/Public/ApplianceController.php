@@ -10,6 +10,8 @@ class ApplianceController extends Controller
 {
     public function show($slug)
     {
+
+
         $appliance = Appliance::where('slug', $slug)->firstOrFail();
         $questions = $appliance->questions()->orderBy('id', 'desc')->paginate(15);
         return view('public.appliances.show', compact('appliance', 'questions'));

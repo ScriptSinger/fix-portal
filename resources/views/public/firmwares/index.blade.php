@@ -68,7 +68,7 @@
     <hr class="invis">
     <div class="row">
         <div class="container col-md-12">
-            <div class="row justify-content-center">
+            <div class="pagination justify-content-center pagination-sm">
                 {{ $firmwares->onEachSide(0)->links('vendor.pagination.public') }}
             </div>
         </div>

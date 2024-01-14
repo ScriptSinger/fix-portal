@@ -17,7 +17,7 @@ return new class extends Migration
             $table->bigInteger('commentable_id')->unsigned();
             $table->string('commentable_type');
             $table->text('text');
-
+            $table->json('photos')->nullable(); // Меняем строку на JSON для хранения массива
             $table->timestamps();
         });
     }

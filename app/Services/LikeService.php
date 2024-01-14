@@ -2,17 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\Comment;
 use App\Models\Dislike;
 use App\Models\Like;
 use App\Models\User;
 
 class LikeService
 {
-    public function toggleLike(Comment $comment, User $user)
+    public function toggleLike($instance, User $user)
     {
-        $existingLike = $comment->likes()->where('user_id', $user->id)->first();
-        $existingDislike = $comment->dislikes()->where('user_id', $user->id)->first();
+        $existingLike = $instance->likes()->where('user_id', $user->id)->first();
+        $existingDislike = $instance->dislikes()->where('user_id', $user->id)->first();
 
         if ($existingLike) {
             $existingLike->delete();
@@ -20,7 +19,7 @@ class LikeService
             $like = new Like();
 
             $like->user_id = $user->id;
-            $comment->likes()->save($like);
+            $instance->likes()->save($like);
 
             // Если у пользователя уже был дизлайк, убираем дизлайк
             if ($existingDislike) {
@@ -29,17 +28,17 @@ class LikeService
         }
     }
 
-    public function toggleDislike(Comment $comment, User $user)
+    public function toggleDislike($instance, User $user)
     {
-        $existingLike = $comment->likes()->where('user_id', $user->id)->first();
-        $existingDislike = $comment->dislikes()->where('user_id', $user->id)->first();
+        $existingLike = $instance->likes()->where('user_id', $user->id)->first();
+        $existingDislike = $instance->dislikes()->where('user_id', $user->id)->first();
 
         if ($existingDislike) {
             $existingDislike->delete();
         } else {
             $dislike = new Dislike();
             $dislike->user_id = $user->id;
-            $comment->dislikes()->save($dislike);
+            $instance->dislikes()->save($dislike);
 
             // Если у пользователя уже был лайк, убираем лайк
             if ($existingLike) {
@@ -50,11 +49,10 @@ class LikeService
 
 
 
-    public function counter(Comment $comment)
+    public function counter($instance)
     {
-        $likeCount = $comment->likes()->count();
-        $dislikeCount = $comment->dislikes()->count();
-
+        $likeCount = $instance->likes()->count();
+        $dislikeCount = $instance->dislikes()->count();
         return [
             'likeCount' => $likeCount,
             'dislikeCount' => $dislikeCount,

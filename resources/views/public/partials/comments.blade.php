@@ -16,10 +16,14 @@
                             </div>
                             <div class="media-body">
                                 <div class="media-heading user_name">
-                                    {{ $comment->user->name }}<small>{{ $comment->dateAsCarbon->diffForHumans() }}</small>
+                                    {{ $comment->user->name }}
+                                    <small>{{ $comment->dateAsCarbon->diffForHumans() }}</small>
 
                                     @can('delete', $comment)
-                                        <form action="{{ route('comments.destroy', ['comment_id' => $comment->id]) }}"
+                                        <form
+                                            action="{{ route('comments.destroy', [
+                                                'id' => $comment->id,
+                                            ]) }}"
                                             method="POST" class="d-inline-block">
                                             @csrf
                                             @method('DELETE')
@@ -36,40 +40,12 @@
 
                         <p>{{ $comment->text }}</p>
 
+                        <hr class="invis">
+
                         <div class="blog-meta big-meta">
-                            @auth('web')
-                                <form class="d-inline-block like-form"
-                                    data-like-route="{{ route('comments.like', ['comment_id' => $comment->id]) }}"
-                                    data-dislike-route="{{ route('comments.dislike', ['comment_id' => $comment->id]) }}">
-                                    @csrf
-
-                                    <button role="button" type="submit" class="btn-link like-button" data-type="like">
-                                        <small>
-                                            <i class="fa fa-thumbs-up"></i>
-                                            <span class="like-count">{{ '' . count($comment->likes) }}</span>
-                                        </small>
-                                    </button>
-
-                                    <button role="button" type="submit" class="btn-link like-button" data-type="dislike">
-                                        <small>
-                                            <i class="fa fa-thumbs-down"></i>
-                                            <span class="dislike-count">{{ '' . count($comment->dislikes) }}</span>
-                                        </small>
-                                    </button>
-                                </form>
-                            @else
-                                <small>
-                                    <i class="fa fa-thumbs-up"></i>
-                                    <span class="like-count">{{ '' . count($comment->likes) }}</span>
-                                </small>
-
-                                <small>
-                                    <i class="fa fa-thumbs-down"></i>
-                                    <span class="dislike-count">{{ '' . count($comment->dislikes) }}</span>
-                                </small>
-                            @endauth
-
-
+                            @include('public.partials.likes', [
+                                'instance' => $comment,
+                            ])
 
                             @auth('web')
                                 <a data-toggle="collapse" data-target="#replyForm{{ $comment->id }}"
@@ -77,7 +53,7 @@
                                 </a>
                                 <div id="replyForm{{ $comment->id }}" class="collapse media-body mb-4">
                                     <form class="form-wrapper" method="POST" enctype="multipart/form-data"
-                                        action="{{ route('comments.replies.store', ['comment_id' => $comment->id]) }}">
+                                        action="{{ route('comments.replies.store', ['id' => $comment->id]) }}">
                                         @csrf
                                         <textarea class="form-control" name="text" placeholder="Ваш ответ"></textarea>
                                         <div class="text-right">
@@ -90,9 +66,6 @@
                         </div>
 
                         <hr class="invis">
-
-
-
 
                         <div class="custombox clearfix p-3">
                             <h4 class="small-title">
@@ -113,31 +86,41 @@
                                         </a>
                                         <div class="media-body">
                                             <div class="media-heading">
-                                                {{ $reply->user->name }}
-                                                <small>{{ $reply->dateAsCarbon->diffForHumans() }}</small>
+                                                <div class="blog-meta big-meta">
+                                                    <small class="media-heading user_name">
+                                                        {{ $reply->user->name }}</small>
 
-                                                @can('delete', $reply)
-                                                    <form
-                                                        action="{{ route('comments.replies.destroy', ['reply_id' => $reply->id]) }}"
-                                                        method="POST" class="d-inline-block">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button role="button" type="submit"
-                                                            class="btn-link btn-sm text-reset"
-                                                            onclick="return confirm('Подтвердите удаление')">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                @endcan
+                                                    <small>{{ $reply->dateAsCarbon->diffForHumans() }}</small>
 
+
+
+                                                    @can('delete', $reply)
+                                                        <form
+                                                            action="{{ route('comments.replies.destroy', ['id' => $reply->id]) }}"
+                                                            method="POST" class="d-inline-block">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button role="button" type="submit"
+                                                                class="btn-link btn-sm text-reset"
+                                                                onclick="return confirm('Подтвердите удаление')">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     <p>{{ $reply->text }}</p>
+                                    <div class="blog-meta big-meta">
+                                        @include('public.partials.likes', [
+                                            'instance' => $reply,
+                                        ])
+                                    </div>
                                 @endforeach
                             </div>
                         </div>
-
                     </div>
                 @endforeach
             </div>
@@ -153,9 +136,10 @@
             <div class="col-lg-12">
                 <form class="form-wrapper" method="POST" enctype="multipart/form-data"
                     action="{{ route('comments.store', [
-                        'commentableType' => $commentableType,
-                        'commentableId' => $instance->id,
+                        'type' => strtolower(class_basename($instance)),
+                        'id' => $instance->id,
                     ]) }}">
+
                     @csrf
                     <textarea class="form-control" name="text" placeholder="Введите текст комментария"></textarea>
                     <button role="button" type="submit" class="btn btn-primary">Отправить</button>
@@ -169,7 +153,3 @@
             href="{{ route('register') }}">зарегистрироваться</a> или <a class="text-primary"
             href="{{ route('login') }}">войти</a></div>
 @endguest
-
-@section('script')
-    @include('public.layouts.scripts.submitHandler')
-@endsection

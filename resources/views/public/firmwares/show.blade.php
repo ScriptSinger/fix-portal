@@ -11,7 +11,8 @@
                     <ol class="breadcrumb">
 
                         <li class="breadcrumb-item active"><a href="{{ route('firmwares.index') }}">Прошивки</a></li>
-                        <li class="breadcrumb-item active">{{ $firmware->title }}</li>
+
+                        <li class="breadcrumb-item active">{{ Str::limit($firmware->title, 30, '...') }}</li>
                     </ol>
                 </div><!-- end col -->
             </div><!-- end row -->
@@ -79,7 +80,6 @@
 
         @include('public.partials.comments', [
             'instance' => $firmware,
-            'commentableType' => 'firmware',
         ])
 
     </div>

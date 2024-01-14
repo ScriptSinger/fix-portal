@@ -39,10 +39,15 @@
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
                         <a href="{{ route('questions.index', ['slug' => $question->slug]) }}" title="">
-                            @foreach (json_decode($question->photos) as $photo)
-                                <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
-                            @break
-                        @endforeach
+
+                            @if ($question->photos)
+                                @foreach (json_decode($question->photos) as $photo)
+                                    <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
+                                @break
+                            @endforeach
+                        @endif
+
+                        </p>
                         <div class="hovereffect">
                             <span></span>
                         </div>
@@ -69,10 +74,8 @@
                     <p> {!! $question->description !!}</p>
 
 
-                    <small><a href="{{ route('public.applinaces.show', ['appliance' => $question->appliance->slug]) }}"
+                    <small><a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
                             title="">{{ $question->appliance->title }}</a></small>
-                    {{-- title="">{{ $post->category->title }}</a></small> --}}
-
                     <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
                     <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
                     <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
@@ -88,7 +91,7 @@
 <div class="row">
     <div class="container col-md-12">
         <div class="row justify-content-center">
-            {{-- {{ $questions->onEachSide(1)->links('vendor.pagination.public') }} --}}
+            {{ $questions->onEachSide(1)->links('vendor.pagination.public') }}
         </div>
     </div>
 </div>

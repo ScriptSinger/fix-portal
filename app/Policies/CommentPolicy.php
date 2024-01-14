@@ -17,14 +17,4 @@ class CommentPolicy
     {
         return $user->id === $comment->user_id;
     }
-
-    public function like(User $user, Comment $comment): bool
-    {
-        return $user->id === $comment->user_id;
-    }
-
-    public function dislike(User $user, Comment $comment): bool
-    {
-        return $user->id === $comment->user_id;
-    }
 }

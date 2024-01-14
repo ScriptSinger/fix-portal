@@ -21,7 +21,7 @@ use App\Http\Controllers\Admin\FirmwareController;
 use App\Http\Controllers\Public\ApplianceController as PublicApplianceController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\FirmwareController as PublicFirmwareController;
-
+use App\Http\Controllers\Public\LikeController;
 use App\Http\Controllers\Public\ProfileController;
 
 use App\Http\Controllers\Public\QuestionController;
@@ -52,45 +52,34 @@ Route::group(
         Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
         Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
 
-        Route::group(['prefix' => 'questions'], function () {
-            Route::group(['prefix' => '{question_id}/comments'], function () {
-                Route::post('/', [CommentController::class, 'storeQuestionComment'])->name('question.comment.store');
+        Route::post('/{type}/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::group(['prefix' => '/comments'], function () {
+            Route::put('/{id}', [CommentController::class, 'update'])->name('comments.update');
+            Route::delete('/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
+            Route::post('/{id}/replies', [ReplyController::class, 'store'])->name('comments.replies.store');
+        });
+        Route::put('/replies/{id}', [ReplyController::class, 'update'])->name('comments.replies.update');
+        Route::delete('/replies/{id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
 
+        Route::prefix('/{type}/{id}/')->group(function () {
+            Route::post('/like', [LikeController::class, 'like'])->name('like');
+            Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
+        });
 
-                Route::group(['prefix' => '{comment_id}/replies'], function () {
-                    Route::post('/', [CommentController::class, 'storeQuestionComment'])->name('question.comment.reply.store');
-                });
-            });
+        Route::prefix('/questions')->group(function () {
+            Route::get('/create', [QuestionController::class, 'create'])->name('questions.create');
+            Route::post('/', [QuestionController::class, 'store'])->name('questions.store');
+            Route::delete('/{id}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+            // Переопределение методов ресурсного контроллера
         });
 
 
-        Route::prefix('comments')->group(function () {
-
-            Route::post('/commentable/{commentableType}/{commentableId}', [CommentController::class, 'store'])->name('comments.store');
-            Route::put('/{comment_id}', [CommentController::class, 'update'])->name('comments.update');
-            Route::delete('/{comment_id}', [CommentController::class, 'destroy'])->name('comments.destroy');
-
-            Route::prefix('/{comment_id}')->group(function () {
-                Route::post('/like', [CommentController::class, 'like'])->name('comments.like');
-                Route::post('/dislike', [CommentController::class, 'dislike'])->name('comments.dislike');
-            });
-
-
-            Route::post('/{comment_id}/replies', [ReplyController::class, 'store'])->name('comments.replies.store');
-            Route::put('/replies/{reply_id}', [ReplyController::class, 'update'])->name('comments.replies.update');
-            Route::delete('/replies/{reply_id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
-        });
-
-
-
-        Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
-        Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
         Route::get('/firmwares/download/{filename}', [PublicFirmwareController::class, 'download'])->name('firmwares.download');
     }
 );
 
 Route::get('/categories/{category}', [PublicCategoryController::class, 'show'])->name('public.categories.show');
-Route::get('/appliances/{appliance}', [PublicApplianceController::class, 'show'])->name('public.applinaces.show');
+Route::get('/appliances/{appliance}', [PublicApplianceController::class, 'show'])->name('public.appliances.show');
 
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
 Route::get('/search', [SearchController::class, 'index'])->name('search'); // поправить

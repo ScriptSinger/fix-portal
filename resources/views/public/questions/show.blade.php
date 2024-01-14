@@ -15,56 +15,66 @@
             <ol class="breadcrumb hidden-xs-down">
                 <li class="breadcrumb-item"><a href="{{ route('questions.index') }}">Вопросы</a></li>
                 <li class="breadcrumb-item"><a
-                        href="{{ route('public.applinaces.show', ['appliance' => $question->appliance->slug]) }}">{{ $question->appliance->title }}</a>
+                        href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}">{{ $question->appliance->title }}</a>
                 </li>
                 <li class="breadcrumb-item active">{{ $question->title }}</li>
             </ol>
 
             <span class="color-yellow"><a
-                    href=" {{-- {{ route('appliance.articles', ['slug' => $question->appliance->slug]) }}" --}}
-           ">{{ $question->appliance->title }}</a></span>
+                    href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
+                    title="">{{ $question->appliance->title }}</a></span>
+
 
             <h3>{{ $question->title }}</h3>
-
             <div class="blog-meta big-meta">
                 <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
                 <small><a href="blog-author.html" title="">{{ optional($question->user)->name }}</a></small>
                 <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
 
+                @can('update', $question)
+                    <small>
+                        <a href="{{ route('questions.edit', ['question' => $question->slug]) }}">
+                            <i class="fa fa-edit"></i>
+                            <b>Редактировать</b>
+                        </a>
+                    </small>
+                @endcan
+
+                @can('delete', $question)
+                    <small>
+                        <a href="#"
+                            onclick="event.preventDefault(); 
+              document.getElementById('removeQuestion').submit();">
+                            <i class="fa fa-trash"></i>
+                            <b>Удалить</b>
+                        </a>
+                        <form id="removeQuestion" action="{{ route('questions.destroy', ['id' => $question->id]) }}"
+                            method="POST" class="d-none">
+                            @csrf
+                            @method('DELETE')
+                        </form>
+                    </small>
+                @endcan
+
             </div><!-- end meta -->
 
-            <div class="post-sharing">
-                <ul class="list-inline">
-                    @can('update', $question)
-                        <li><a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="btn"><i
-                                    class="fa fa-edit"></i> <span class="down-mobile">Редактировать</span></a></li>
-                    @endcan
-                </ul>
-            </div><!-- end post-sharing -->
+
         </div><!-- end title -->
 
         <div class="blog-content mb-5">
             {!! $question->description !!}
         </div><!-- end content -->
 
-        <div class="single-post-media">
-            @foreach (json_decode($question->photos) as $photo)
-                <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
-            @endforeach
-        </div><!-- end media -->
+        @isset($question->photos)
+            <div class="single-post-media">
+                @foreach (json_decode($question->photos) as $photo)
+                    <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
+                    <hr class="invis">
+                @endforeach
+            </div><!-- end media -->
+        @endisset
 
         <div class="blog-title-area">
-            {{-- @isset($question->tags)
-                <div class="tag-cloud-single">
-                    <span>Метки</span>
-                    @foreach ($question->tags as $tag)
-                        <small><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
-                                title="">{{ $tag->title }}</a></small>
-                    @endforeach
-                </div><!-- end meta -->
-            @endisset --}}
-
-
             <div class="post-sharing">
                 <ul class="list-inline">
                     <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
@@ -167,7 +177,6 @@
 
         @include('public.partials.comments', [
             'instance' => $question,
-            'commentableType' => 'question',
         ])
 
     </div><!-- end page-wrapper -->

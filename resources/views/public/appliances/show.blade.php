@@ -33,13 +33,12 @@
             @foreach ($questions as $question)
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
-                        @foreach (json_decode($question->photos) as $photo)
-                            <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
-                        @break
-
-                        <!-- Завершаем цикл после вывода первого элемента -->
-                    @endforeach
-
+                        @isset($question->photos)
+                            @foreach (json_decode($question->photos) as $photo)
+                                <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
+                            @break
+                        @endforeach
+                    @endisset
                     <div class="hovereffect">
                         <span></span>
                     </div>
@@ -65,7 +64,7 @@
                     <p>
                         {!! $question->description !!}
                     </p>
-                    <small><a href="{{ route('public.applinaces.show', ['appliance' => $appliance->slug]) }}"
+                    <small><a href="{{ route('public.appliances.show', ['appliance' => $appliance->slug]) }}"
                             title="">{{ $appliance->title }}</a></small>
                     <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
                     <small><a href="#" title="">by Jack</a></small>

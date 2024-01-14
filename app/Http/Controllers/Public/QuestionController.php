@@ -95,9 +95,13 @@ class QuestionController extends Controller
         return redirect()->route('questions.index')->with('success', 'Изменения сохранены');
     }
 
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        Question::where('id', $id)->destroy();
+        $question = Question::findOrFail($id);
+        $this->authorize('update', $question);
+        $question->comments()->delete();
+        $question->delete();
+        return redirect()->route('questions.index')->with('success', 'Вопрос удален');
     }
 
     public function search(Request $request)

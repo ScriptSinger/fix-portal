@@ -6,6 +6,7 @@
 
                 var button = e.submitter;
                 var action = e.target.getAttribute('data-' + button.dataset.type + '-route');
+
                 var csrf = document.querySelector('input[name="_token"]').value;
 
 

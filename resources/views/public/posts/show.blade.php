@@ -166,7 +166,6 @@
 
         @include('public.partials.comments', [
             'instance' => $post,
-            'commentableType' => 'post',
         ])
 
     </div><!-- end page-wrapper -->
