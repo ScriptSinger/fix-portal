@@ -9,10 +9,7 @@
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">
-
-                        <li class="breadcrumb-item active"><a href="{{ route('firmwares.index') }}">Прошивки</a></li>
-
-                        <li class="breadcrumb-item active">{{ Str::limit($firmware->title, 30, '...') }}</li>
+                        {{ Breadcrumbs::render('firmware', $firmware) }}
                     </ol>
                 </div><!-- end col -->
             </div><!-- end row -->

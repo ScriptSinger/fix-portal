@@ -13,11 +13,7 @@
     <div class="page-wrapper">
         <div class="blog-title-area">
             <ol class="breadcrumb hidden-xs-down">
-                <li class="breadcrumb-item"><a href="{{ route('articles.index') }}">Статьи</a></li>
-                <li class="breadcrumb-item"><a
-                        href="{{ route('public.categories.show', ['category' => $post->category->slug]) }}">{{ $post->category->title }}</a>
-                </li>
-                <li class="breadcrumb-item active">{{ $post->title }}</li>
+                {{ Breadcrumbs::render('post', $post->category, $post) }}
             </ol>
 
             <span class="color-yellow"><a href="{{ route('public.categories.show', ['category' => $post->category->slug]) }}"

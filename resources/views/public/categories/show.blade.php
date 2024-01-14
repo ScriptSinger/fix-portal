@@ -9,8 +9,7 @@
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item active">Категории</li>
-                        <li class="breadcrumb-item active">{{ $category->title }}</li>
+                        {{ Breadcrumbs::render('category', $category) }}
                     </ol>
                 </div><!-- end col -->
             </div><!-- end row -->

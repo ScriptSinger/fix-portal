@@ -11,8 +11,7 @@
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                        <li class="breadcrumb-item active">Создать вопрос</li>
+                        {{ Breadcrumbs::render('question-create') }}
                     </ol>
                 </div><!-- end col -->
             </div><!-- end row -->

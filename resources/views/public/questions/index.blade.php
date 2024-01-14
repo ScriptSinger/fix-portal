@@ -45,9 +45,15 @@
                                     <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
                                 @break
                             @endforeach
+                        @else
+                            <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt=""
+                                class="img-fluid">
+
                         @endif
 
-                        </p>
+
+
+
                         <div class="hovereffect">
                             <span></span>
                         </div>
