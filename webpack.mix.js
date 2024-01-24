@@ -17,6 +17,11 @@ mix.styles(
         'resources/assets/admin/plugins/select2/css/select2.css',
         'resources/assets/admin/plugins/select2-bootstrap4-theme/select2-bootstrap4.css',
         'resources/assets/admin/css/adminlte.css',
+        'resources/assets/admin/plugins/datatables-bs4/css/dataTables.bootstrap4.css',
+        'resources/assets/admin/plugins/datatables-responsive/css/responsive.bootstrap4.css',
+        'resources/assets/admin/plugins/datatables-select/css/select.bootstrap4.css',
+        'resources/assets/admin/plugins/dropzone/dropzone.css',
+       
     ],
     'public/assets/admin/css/adminlte.css');
 
@@ -29,7 +34,14 @@ mix.scripts(
         'resources/assets/admin/js/demo.js',
         'resources/assets/admin/plugins/sweetalert2/sweetalert2.all.min.js',
         'resources/assets/admin/plugins/bs-custom-file-input/bs-custom-file-input.min.js',
-        'resources/assets/admin/plugins/datatables/jquery.dataTables.js'
+        'resources/assets/admin/plugins/datatables/jquery.dataTables.js',
+        'resources/assets/admin/plugins/datatables-bs4/js/dataTables.bootstrap4.js',
+        'resources/assets/admin/plugins/datatables-responsive/js/dataTables.responsive.js',
+        'resources/assets/admin/plugins/datatables-responsive/js/responsive.bootstrap4.js',
+        'resources/assets/admin/plugins/datatables-select/js/dataTables.select.js',
+        'resources/assets/admin/plugins/datatables-select/js/select.bootstrap4.js',
+        'resources/assets/admin/plugins/moment/moment-with-locales.js',
+        'resources/assets/admin/plugins/dropzone/dropzone.js'
     ],
     'public/assets/admin/js/adminlte.js');
 
@@ -56,7 +68,7 @@ mix.styles(
         'resources/assets/front/css/colors.css',
         'resources/assets/front/css/style.css',
         'resources/assets/front/css/version/marketing.css',
-        'resources/assets/front/css/version/custom.css'
+        'resources/assets/front/css/version/custom.css',
 
     ], 'public/assets/front/css/main.css');
 
@@ -68,6 +80,7 @@ mix.scripts(
         'resources/assets/front/js/animate.js',
         'resources/assets/front/js/custom.js',
         'resources/assets/admin/plugins/sweetalert2/sweetalert2.all.min.js',
+
     ], 'public/assets/front/js/main.js');
 
 mix.copyDirectory(
@@ -78,6 +91,10 @@ mix.copyDirectory(
 );
 mix.copyDirectory(
     'resources/assets/front/upload', 'public/assets/front/upload'
+);
+
+mix.copyDirectory(
+    'resources/assets/locale', 'public/assets/locale'
 );
 
 

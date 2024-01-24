@@ -131,7 +131,7 @@
                               <i class="nav-icon fas fa-sign-out-alt"></i> Выйти
                           </p>
                       </a>
-                      <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                      <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="d-none">
                           @csrf
                           <!-- Add CSRF token -->
                           @method('POST')

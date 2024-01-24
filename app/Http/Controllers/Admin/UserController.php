@@ -48,7 +48,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
         $data = $request->validate([
             'id' => 'nullable',
@@ -72,7 +72,7 @@ class UserController extends Controller
         // $data['avatar'] = $user->processFileUpload($request, 'avatar', ['fileType' => 'png']);
         $user->update($data);
 
-        return redirect()->route('users.index')->with('success', 'Пользователь успешно обновлен');
+        return redirect()->back()->with('success', 'Пользователь успешно обновлен');
     }
 
     /**

@@ -6,21 +6,23 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Список приборов</h1>
+                        <h1>Приборы</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                            <li class="breadcrumb-item active">Список приборов</li>
+                            <li class="breadcrumb-item active">Приборы</li>
                         </ol>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
         <section class="content">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
+                        <a href="{{ route('appliances.create') }}" type="submit" class="btn btn-primary">Добавить
+                            прибор</a>
 
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
@@ -29,66 +31,72 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <a href="{{ route('appliances.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
-                            прибор</a>
-                        @if (count($appliances))
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 10px">#</th>
-                                        <th>Название</th>
-                                        <th>Slug</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($appliances as $appliance)
-                                        <tr>
-                                            <td>{{ $appliance->id }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a type="button" class="btn btn-default"
-                                                        href="{{ route('appliances.show', [$appliance->id]) }}">
-                                                        {{ $appliance->title }}</a>
-                                                    <button type="button"
-                                                        class="btn btn-default dropdown-toggle dropdown-icon"
-                                                        data-toggle="dropdown" aria-expanded="false">
-                                                        <span class="sr-only">Toggle Dropdown</span>
-                                                    </button>
-                                                    <div class="dropdown-menu" role="menu">
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('appliances.edit', ['appliance' => $appliance->id]) }}"><i
-                                                                class="fas fa-edit"></i> Редактировать</a>
+                        <table id="dataTable" class="table table-bordered table-striped dataTable dtr-inline w-100"
+                            data-locale={{ asset('assets/locale/datatable/russian.json') }}>
+                        </table>
+                    </div>
 
-                                                        <div class="dropdown-divider"></div>
-                                                        <form
-                                                            action="{{ route('appliances.destroy', ['appliance' => $appliance->id]) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button class="dropdown-item" type="submit" class=""
-                                                                onclick="return confirm('Подтвердите удаление')">
-                                                                <i class="fas fa-trash"></i> Удалить
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ $appliance->slug }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @else
-                            <p>Категорий пока нет...</p>
-                        @endif
-                    </div>
-                    <div class="card-footer clearfix">
-                        <div class="pagination pagination-sm m-0 float-right">
-                            {{ $appliances->onEachSide(1)->links() }}</div>
-                    </div>
                 </div>
 
             </div>
         </section>
     </div>
+@endsection
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                responsive: true,
+                stateSave: true,
+                select: true,
+                language: {
+                    url: $('#dataTable').data('locale')
+                },
+
+                ajax: {
+                    url: '/api/heturion/appliances',
+                    dataSrc: ''
+                },
+
+                columns: [{
+                        data: 'id',
+                        title: 'ID'
+                    },
+                    {
+                        data: 'title',
+                        title: 'Title'
+                    },
+                    {
+                        data: 'slug',
+                        title: 'Slug'
+                    },
+
+                    {
+                        data: 'created_at',
+                        title: 'Создан',
+                        render: function(data, type, row) {
+
+                            var formattedDate = moment(data).format('DD.MM.YYYY HH:mm:ss');
+
+                            return type === 'display' ? formattedDate : data;
+                        }
+                    },
+
+
+
+                ],
+
+                columnDefs: [{
+                    targets: 1,
+                    render: function(data, type, row, meta) {
+                        return `<a href="appliances/${row.id}/edit">${row.title}</a>`;
+
+
+                    },
+
+                }],
+
+            });
+        });
+    </script>
 @endsection

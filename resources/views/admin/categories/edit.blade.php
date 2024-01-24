@@ -6,22 +6,22 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Редактировать категорию</h1>
+                        <h1>Категория #{{ $category->id }}</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Назад</a></li>
-                            <li class="breadcrumb-item active">Редактировать категорию</li>
+                            <li class="breadcrumb-item active">Категория #{{ $category->id }}</li>
                         </ol>
                     </div>
                 </div>
             </div><!-- /.container-fluid -->
         </section>
         <section class="content">
-            <div class="col-md-6 mx-auto">
+            <div class="col-md-6">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Редактирование категории: «{{ $category->title }}»</h3>
+
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
@@ -46,11 +46,44 @@
                                     @endif
                                 </span>
                             </div>
+
+                            <div class="form-group">
+                                <label for="InputText">Slug</label>
+                                <input type="text" class="form-control" id="InputTextCategory" disabled
+                                    value="{{ $category->slug }}">
+
+                            </div>
+
+                            <div class="form-group">
+                                <label for="InputText">Создано</label>
+                                <input type="text" class="form-control" id="InputTextCategory" disabled
+                                    value="{{ $category->dateAsCarbon->format('d-m-Y H:i:s') }}">
+                            </div>
                         </div>
+
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Сохранить</button>
+                            <div class="row">
+                                <div class="col-12">
+                                    <a href="#" class="btn btn-danger"
+                                        onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
+                                        Удалить
+                                    </a>
+
+                                    <button type="submit" class="btn btn-primary float-right">Редактировать</button>
+                                </div>
+                            </div>
                         </div>
                     </form>
+
+                    <form id="delete-form" class="d-none"
+                        action="{{ route('categories.destroy', ['category' => $category->id]) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger" type="submit" onclick="return confirm('Подтвердите удаление')">
+                            Удалить
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </section>

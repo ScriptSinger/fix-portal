@@ -23,9 +23,9 @@
             <div class="newsletter-widget text-center align-self-center">
                 <h3>Поиск прошивок</h3>
                 <p>Воспользуйтесь поиском прошивок. Введите ключевые слова</p>
-                <form class="form-inline" method="GET" action="{{ route('firmwares.search') }}">
-                    {{-- @csrf --}}
-                    <input type="text" name="text" placeholder="Поиск прошивки.." required="" class="form-control">
+                <form class="form-inline" method="GET" action="{{ route('firmwares.index') }}">
+
+                    <input type="text" name="text" placeholder="Название" class="form-control">
                     <input role="button" type="submit" value="Найти" class="btn btn-default btn-block">
                 </form>
             </div>
@@ -35,13 +35,14 @@
 @endsection
 
 @section('content')
-    <div class="page-wrapper" style=" overflow-x: auto; 
-    max-width: 100%; ">
+    <div class="page-wrapper" style="overflow-x: auto; max-width: 100%; ">
         @if (count($firmwares))
             <table class="table table-bordered">
                 <thead>
                     <tr>
                         <th>Название</th>
+                        <th>Размер</th>
+                        <th>Дата</th>
                         <th>Платформа</th>
                     </tr>
                 </thead>
@@ -53,7 +54,13 @@
                                     {{ $firmware->title }}</a>
                             </td>
                             <td>
-                                {{ $firmware->platform }}
+                                <small class="text-nowrap"> {{ $firmware->size }} КБ</small>
+                            </td>
+                            <td>
+                                <small class="text-nowrap"> {{ $firmware->date }}</small>
+                            </td>
+                            <td>
+                                <small> {{ $firmware->platform }}</small>
                             </td>
                         </tr>
                     @endforeach
@@ -67,7 +74,7 @@
     <div class="row">
         <div class="container col-md-12">
             <div class="pagination justify-content-center pagination-sm">
-                {{ $firmwares->onEachSide(0)->links('vendor.pagination.public') }}
+                {{ $firmwares->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
             </div>
         </div>
     </div>

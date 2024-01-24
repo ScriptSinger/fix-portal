@@ -26,6 +26,7 @@
     </div>
     <!-- ./wrapper -->
     @include('admin.layouts.includes.script')
+
     @yield('scripts')
 </body>
 

@@ -23,7 +23,6 @@
         @include('public.layouts.widgets.sidebar.advertising')
         @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
-
 @endsection
 
 @section('content')

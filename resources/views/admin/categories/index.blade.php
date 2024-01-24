@@ -21,7 +21,8 @@
             <div class="container-fluid">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Список категорий</h3>
+                        <a href="{{ route('categories.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
+                            категорию</a>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
@@ -29,66 +30,70 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <a href="{{ route('categories.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
-                            категорию</a>
-                        @if (count($categories))
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 10px">#</th>
-                                        <th>Название</th>
-                                        <th>Slug</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($categories as $category)
-                                        <tr>
-                                            <td>{{ $category->id }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a type="button" class="btn btn-default"
-                                                        href="{{ route('categories.show', [$category->id]) }}">
-                                                        {{ $category->title }}</a>
-                                                    <button type="button"
-                                                        class="btn btn-default dropdown-toggle dropdown-icon"
-                                                        data-toggle="dropdown" aria-expanded="false">
-                                                        <span class="sr-only">Toggle Dropdown</span>
-                                                    </button>
-                                                    <div class="dropdown-menu" role="menu">
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('categories.edit', ['category' => $category->id]) }}"><i
-                                                                class="fas fa-edit"></i> Редактировать</a>
+                        <div id="dataTable_wrapper" class="dataTables_wrapper dt-bootstrap4">
 
-                                                        <div class="dropdown-divider"></div>
-                                                        <form
-                                                            action="{{ route('categories.destroy', ['category' => $category->id]) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button class="dropdown-item" type="submit" class=""
-                                                                onclick="return confirm('Подтвердите удаление')">
-                                                                <i class="fas fa-trash"></i> Удалить
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ $category->slug }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
+
+                            <table id="dataTable" class="table table-bordered table-striped dataTable dtr-inline w-100"
+                                data-locale={{ asset('assets/locale/datatable/russian.json') }}>
+
                             </table>
-                        @else
-                            <p>Категорий пока нет...</p>
-                        @endif
-                    </div>
-                    <div class="card-footer clearfix">
-                        <div class="pagination pagination-sm m-0 float-right">
-                            {{ $categories->onEachSide(1)->links() }}</div>
-                    </div>
-                </div>
 
+                        </div>
+
+                    </div>
+
+                </div>
             </div>
         </section>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                responsive: true,
+                stateSave: true,
+                select: true,
+                language: {
+                    url: $('#dataTable').data('locale')
+                },
+
+                ajax: {
+                    url: '/api/heturion/categories',
+                    dataSrc: ''
+                },
+
+                columns: [{
+                        data: 'id',
+                        title: 'ID'
+                    },
+                    {
+                        data: 'title',
+                        title: 'Title'
+                    },
+                    {
+                        data: 'slug',
+                        title: 'Slug'
+                    },
+                    {
+                        data: 'created_at_diff',
+                        title: 'Created At'
+                    },
+
+                ],
+
+                columnDefs: [{
+                    targets: 1,
+                    render: function(data, type, row, meta) {
+                        return `<a href="categories/${row.id}/edit">${row.title}</a>`;
+
+
+                    },
+
+                }],
+
+            });
+        });
+    </script>
 @endsection

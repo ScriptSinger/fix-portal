@@ -1,23 +1,5 @@
 @extends('admin.layouts.layout')
-@section('search')
-    <div class="navbar-search-block">
-        <form class="form-inline" action="{{ route('admin.firmwares.search') }}" method="GET">
 
-            <div class="input-group input-group-sm">
-                <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search"
-                    name="text">
-                <div class="input-group-append">
-                    <button class="btn btn-navbar" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <button class="btn btn-navbar" type="button" data-widget="navbar-search">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-@endsection
 @section('content')
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -25,8 +7,7 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        {{-- <h1>Список прошивок</h1> --}}
-                        <h1>Total Firmwares: {{ $firmwares->total() }}</h1>
+                        <h1>Прошивки</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
@@ -63,183 +44,86 @@
                     </div>
                     <div class="card-body">
 
-                        @if (count($firmwares))
-                            <div id="example1_wrapper" class="dataTables_wrapper dt-bootstrap4">
-                                <div class="row">
-                                    <div class="col-sm-12">
-
-                                        <table id="example1" class="table table-bordered  dataTable dtr-inline"
-                                            aria-describedby="example1_info">
-
-
-                                            <thead>
-                                                <form action="{{ route('admin.firmwares.index') }}" method="GET">
-
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text">
-                                                                <i class="fas fa-filter"></i>
-                                                            </span>
-                                                        </div>
-                                                        <button type="submit"
-                                                            class="form-control btn btn-default">Отправить</button>
-                                                    </div>
-
-                                                    <tr>
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <select name="id" class="custom-select">
-                                                                    <option value="" disabled selected>Идентификатор
-                                                                    </option>
-                                                                    <option value="asc">По возрастанию</option>
-                                                                    <option value="desc">По убыванию</option>
-                                                                </select>
-                                                            </div>
-                                                        </th>
-
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <input type="text" name="title"
-                                                                    class="form-control float-right" placeholder="Название">
-                                                            </div>
-                                                        </th>
-
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <select name="size" class="custom-select">
-                                                                    <option value="" disabled selected>Размер
-                                                                    </option>
-                                                                    <option value="asc">По возрастанию</option>
-                                                                    <option value="desc">По убыванию</option>
-                                                                </select>
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <div class="form-group mb-0">
-                                                                    <input type="text" name="extension"
-                                                                        class="form-control float-right"
-                                                                        placeholder="Расширение">
-                                                                </div>
-                                                            </div>
-                                                        </th>
-                                                        <th>
-
-                                                            <div class="form-group mb-0">
-                                                                <input type="text" name="platform"
-                                                                    class="form-control float-right"
-                                                                    placeholder="Платформа">
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div class="form-group mb-0">
-                                                                <select name="crc32" class="custom-select">
-                                                                    <option value="" disabled selected>CRC32
-                                                                    </option>
-                                                                    <option value="asc">По возрастанию</option>
-                                                                    <option value="desc">По убыванию</option>
-                                                                </select>
-                                                            </div>
-                                                        </th>
-                                                        <th>
-                                                            <div class="custom-control custom-checkbox">
-                                                                <input name="is_duplicate" class="custom-control-input"
-                                                                    type="checkbox" id="customCheckbox1" value=true>
-                                                                <label for="customCheckbox1"
-                                                                    class="custom-control-label">Дубликаты</label>
-                                                            </div>
-
-                                                        </th>
-                                                    </tr>
-
-                                                </form>
-                                            </thead>
-
-                                            <tbody>
-                                                @foreach ($firmwares as $firmware)
-                                                    <tr>
-                                                        <td>{{ $firmware->id }}</td>
-                                                        <td>
-
-                                                            <div class="btn-group">
-                                                                <a type="button" class="btn btn-default"
-                                                                    href="{{ route('admin.firmwares.show', ['firmware' => $firmware->id]) }}">
-                                                                    {{ $firmware->title }}</a>
-
-
-                                                                <button type="button"
-                                                                    class="btn btn-default dropdown-toggle dropdown-icon"
-                                                                    data-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="sr-only">Toggle Dropdown</span>
-                                                                </button>
-                                                                <div class="dropdown-menu" role="menu">
-                                                                    {{-- <a class="dropdown-item"
-                                                                        href="{{ route('posts.edit', ['post' => $post->id]) }}"><i
-                                                                            class="fas fa-edit"></i> Редактировать</a> --}}
-
-                                                                    <div class="dropdown-divider"></div>
-                                                                    <form
-                                                                        action="{{ route('admin.firmwares.destroy', ['firmware' => $firmware->id]) }}"
-                                                                        method="POST">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button class="dropdown-item" type="submit"
-                                                                            class=""
-                                                                            onclick="return confirm('Подтвердите удаление')">
-                                                                            <i class="fas fa-trash"></i> Удалить
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </div>
-
-                                                        </td>
-                                                        <td>
-                                                            {{ $firmware->size }} <span>КБ</span>
-                                                        </td>
-                                                        <td>
-                                                            {{ $firmware->extension }}
-                                                        </td>
-                                                        <td>
-                                                            {{ $firmware->platform }}
-                                                        </td>
-                                                        <td>
-                                                            {{ $firmware->crc32 }}
-                                                        </td>
-                                                        <td>
-                                                            {{ $firmware->is_duplicate }}
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Название</th>
-                                                    <th>Размер</th>
-                                                    <th>Расширение</th>
-                                                    <th>Платформа</th>
-                                                    <th>CRC32</th>
-                                                    <th>Дубликат</th>
-                                                </tr>
-                                            </tfoot>
-                                        </table>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12 col-md-7">
-                                        <div class="dataTables_paginate paging_simple_numbers" id="example1_paginate">
-                                            {{ $firmwares->withQueryString()->links('pagination::bootstrap-4') }}
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table id="dataTable" class="table table-bordered table-striped dataTable dtr-inline w-100"
+                                    data-locale={{ asset('assets/locale/datatable/russian.json') }}>
+                                </table>
                             </div>
-                        @else
-                            <p>Совпадений не найдено</p>
-                        @endif
+                        </div>
 
                     </div>
                 </div>
             </div>
         </section>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                responsive: true,
+                stateSave: true,
+                select: true,
+                language: {
+                    url: $('#dataTable').data('locale')
+                },
+                ajax: {
+                    url: '/api/heturion/firmwares',
+                    dataSrc: ''
+                },
+
+                columns: [{
+                        data: 'id',
+                        title: 'ID'
+                    },
+                    {
+                        data: 'title',
+                        title: 'Title'
+                    },
+
+                    {
+                        data: 'size',
+                        title: 'Размер'
+                    },
+                    {
+                        data: 'date',
+                        title: 'Дата',
+                        className: 'text-nowrap'
+                    },
+                    {
+                        data: 'extension',
+                        title: 'Расширение'
+                    },
+                    {
+                        data: 'platform',
+                        title: 'Платформа'
+                    },
+                    {
+                        data: 'data',
+                        title: 'Платформа'
+                    },
+                    {
+                        data: 'is_duplicate',
+                        title: 'Дубликаты'
+                    },
+
+                ],
+
+                columnDefs: [{
+                        targets: 1,
+                        render: function(data, type, row, meta) {
+                            return `<a href="firmwares/${row.id}/edit">${row.title}</a>`;
+                        }
+                    },
+                    {
+                        targets: 6,
+                        visible: false
+                    }
+                ]
+
+            });
+        });
+    </script>
 @endsection

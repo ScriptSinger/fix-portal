@@ -114,6 +114,24 @@
                   </li>
                   <li class="nav-item">
                       <a href="#" class="nav-link">
+                          <i class="nav-icon fas fa-question"></i>
+                          <p>
+                              Вопросы
+                              <i class="right fas fa-angle-left"></i>
+                          </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                          <li class="nav-item">
+                              <a href="{{ route('questions.index') }}" class="nav-link">
+                                  <i class="far fa-circle nav-icon"></i>
+                                  <p>Список</p>
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+
+                  <li class="nav-item">
+                      <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-archive"></i>
                           <p>
                               Категории
@@ -205,7 +223,24 @@
 
                       </ul>
                   </li>
+                  <li class="nav-item">
+                      <a href="#" class="nav-link">
+                          <i class="nav-icon fas fa-comments"></i>
+                          <p>
+                              Коментарии
+                              <i class="right fas fa-angle-left"></i>
+                          </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                          <li class="nav-item">
+                              <a href="{{ route('admin.comments.index') }}" class="nav-link">
+                                  <i class="far fa-circle nav-icon"></i>
+                                  <p>Список</p>
+                              </a>
+                          </li>
 
+                      </ul>
+                  </li>
 
                   <li class="nav-header">EXAMPLES</li>
               </ul>

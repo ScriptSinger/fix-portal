@@ -3,14 +3,23 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Filters\Firmware\TextFilter;
 use App\Models\Firmware;
-use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 
 class FirmwareController extends Controller
 {
     public function index()
     {
-        $firmwares = Firmware::paginate(50);
+        $firmwares = app()->make(Pipeline::class)
+            ->send(Firmware::query())
+            ->through([
+                TextFilter::class
+
+            ])
+            ->thenReturn()
+            ->paginate(50);
+
         return view('public.firmwares.index', compact('firmwares'));
     }
 
@@ -28,31 +37,5 @@ class FirmwareController extends Controller
         } else {
             return redirect()->back()->with('error', 'Файл не найден');
         }
-    }
-
-
-    public function search(Request $request)
-    {
-        $data = $request->validate([
-            'text' => 'required|max:255',
-        ]);
-
-        $firmwares = Firmware::where(function ($query) use ($data) {
-            $fields = [
-                'title',
-                // 'size',
-                // 'date',
-                'extension',
-                'platform',
-                // 'crc32',
-                'data'
-            ];
-
-            foreach ($fields as $field) {
-                $query->orWhere($field, 'like', '%' . $data['text'] . '%');
-            }
-        })->paginate(50)->appends(['text' => $data['text']]); // Append 'text' parameter to pagination links;
-
-        return view('public.firmwares.search', compact('firmwares'));
     }
 }

@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
+
         'name',
         'email',
         'password',
@@ -54,23 +55,10 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
 
-
-
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
-
-
-
-
-
-
-
-
-
-
-
 
     public function questions(): HasMany
     {

@@ -13,9 +13,10 @@ use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Public\CategoryController as PublicCategoryController;
 use App\Http\Controllers\Public\PostController as PublicPostController;
 use App\Http\Controllers\Public\TagController as PublicTagController;
-use App\Http\Controllers\SearchController;
+
 
 use App\Http\Controllers\Admin\AuthSessionController;
+use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\CustomizationController;
 use App\Http\Controllers\Admin\FirmwareController;
 use App\Http\Controllers\Public\ApplianceController as PublicApplianceController;
@@ -27,7 +28,7 @@ use App\Http\Controllers\Public\ProfileController;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Public\ReplyController;
 
-use function Laravel\Prompts\search;
+// use function Laravel\Prompts\search;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ use function Laravel\Prompts\search;
 */
 
 
-Route::get('questions/search', [QuestionController::class, 'search'])->name('questions.search');
+
 Route::resource('questions', QuestionController::class);
 
 
@@ -82,10 +83,9 @@ Route::get('/categories/{category}', [PublicCategoryController::class, 'show'])-
 Route::get('/appliances/{appliance}', [PublicApplianceController::class, 'show'])->name('public.appliances.show');
 
 Route::get('/tag/{slug}', [PublicTagController::class, 'showTagArticles'])->name('tag.articles');
-Route::get('/search', [SearchController::class, 'index'])->name('search'); // поправить
+
 
 Route::get('/firmwares', [PublicFirmwareController::class, 'index'])->name('firmwares.index');
-Route::get('/firmwares/search', [PublicFirmwareController::class, 'search'])->name('firmwares.search'); // Порядок объявления до /firmwares/{firmware}
 Route::get('/firmwares/{firmware}', [PublicFirmwareController::class, 'show'])->name('firmwares.show');
 
 
@@ -125,12 +125,20 @@ Route::group(
         Route::get('/firmwares', [FirmwareController::class, 'index'])->name('admin.firmwares.index');
         Route::get('/firmwares/duplicates', [FirmwareController::class, 'getDuplicates'])->name('admin.firmwares.duplicates'); // Порядок объявления до /firmwares/{firmware}
         Route::get('/firmwares/search', [FirmwareController::class, 'search'])->name('admin.firmwares.search'); // Порядок объявления до /firmwares/{firmware}
+        Route::get('/firmwares/{firmware}/edit', [FirmwareController::class, 'edit'])->name('admin.firmwares.edit');
+        Route::put('/firmwares/{firmware}', [FirmwareController::class, 'update'])->name('admin.firmwares.update');
         Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('admin.firmwares.show');
+        Route::delete('/firmwares/{firmware}', [FirmwareController::class, 'destroy'])->name('admin.firmwares.destroy');
+
+        Route::get('/comments', [AdminCommentController::class, 'index'])->name('admin.comments.index');
+        Route::get('/comments/{id}/edit', [AdminCommentController::class, 'edit'])->name('admin.comments.edit');
+
         Route::delete('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('admin.firmwares.destroy');
 
         Route::put('/markDuplicates', [FirmwareController::class, 'markDuplicates'])->name('admin.firmwares.markDuplicates');
 
         Route::delete('/firmwares/delete', [FirmwareController::class, 'removeSecondFromAllDuplicates'])->name('admin.firmwares.remove_duplicates');
+        Route::resource('questions', App\Http\Controllers\Admin\QuestionController::class);
     }
 );
 
@@ -141,6 +149,8 @@ Route::group(
     function () {
         Route::get('login', [AuthSessionController::class, 'showLoginForm'])->name('admin.login');
         Route::post('login', [AuthSessionController::class, 'login']);
+        Route::post('logout', [AuthSessionController::class, 'logout'])
+            ->name('admin.logout');
     }
 );
 

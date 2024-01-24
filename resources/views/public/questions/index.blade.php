@@ -34,62 +34,63 @@
 @section('content')
     <div class="page-wrapper">
         <div class="blog-custom-build">
+            @if (count($questions))
+                @foreach ($questions as $question)
+                    <div class="blog-box wow fadeIn">
+                        <div class="post-media">
+                            <a href="{{ route('questions.index', ['slug' => $question->slug]) }}">
 
-            @foreach ($questions as $question)
-                <div class="blog-box wow fadeIn">
-                    <div class="post-media">
-                        <a href="{{ route('questions.index', ['slug' => $question->slug]) }}" title="">
+                                @if ($question->photos)
+                                    @foreach (json_decode($question->photos) as $photo)
+                                        <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
+                                    @break
+                                @endforeach
+                            @else
+                                <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt=""
+                                    class="img-fluid">
 
-                            @if ($question->photos)
-                                @foreach (json_decode($question->photos) as $photo)
-                                    <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
-                                @break
-                            @endforeach
-                        @else
-                            <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt=""
-                                class="img-fluid">
+                            @endif
 
-                        @endif
-
-
-
-
-                        <div class="hovereffect">
-                            <span></span>
-                        </div>
-                        <!-- end hover -->
-                    </a>
-                </div>
-                <!-- end media -->
-                <div class="blog-meta big-meta text-center">
-                    <div class="post-sharing">
-                        <ul class="list-inline">
-                            <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
-                                        class="down-mobile">Share
-                                        on Facebook</span></a></li>
-                            <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i> <span
-                                        class="down-mobile">Tweet
-                                        on Twitter</span></a></li>
-                            <li><a href="#" class="gp-button btn btn-primary"><i
-                                        class="fa fa-google-plus"></i></a>
-                            </li>
-                        </ul>
-                    </div><!-- end post-sharing -->
-                    <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
-                            title="">{{ $question->title }}</a></h4>
-                    <p> {!! $question->description !!}</p>
+                            <div class="hovereffect">
+                                <span></span>
+                            </div>
+                            <!-- end hover -->
+                        </a>
+                    </div>
+                    <!-- end media -->
+                    <div class="blog-meta big-meta text-center">
+                        <div class="post-sharing">
+                            <ul class="list-inline">
+                                <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i>
+                                        <span class="down-mobile">Share
+                                            on Facebook</span></a></li>
+                                <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i>
+                                        <span class="down-mobile">Tweet
+                                            on Twitter</span></a></li>
+                                <li><a href="#" class="gp-button btn btn-primary"><i
+                                            class="fa fa-google-plus"></i></a>
+                                </li>
+                            </ul>
+                        </div><!-- end post-sharing -->
+                        <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
+                                title="">{{ $question->title }}</a></h4>
+                        <p> {!! $question->description !!}</p>
 
 
-                    <small><a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
-                            title="">{{ $question->appliance->title }}</a></small>
-                    <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
-                    <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
-                    <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
-                </div><!-- end meta -->
-            </div><!-- end blog-box -->
+                        <small><a
+                                href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
+                                title="">{{ $question->appliance->title }}</a></small>
+                        <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
+                        <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
+                        <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
+                    </div><!-- end meta -->
+                </div><!-- end blog-box -->
 
-            <hr class="invis">
-        @endforeach
+                <hr class="invis">
+            @endforeach
+        @else
+            <p>Совпадений не найдено</p>
+        @endif
     </div>
 </div>
 
@@ -97,7 +98,7 @@
 <div class="row">
     <div class="container col-md-12">
         <div class="row justify-content-center">
-            {{ $questions->onEachSide(1)->links('vendor.pagination.public') }}
+            {{ $questions->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
         </div>
     </div>
 </div>

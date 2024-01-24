@@ -6,12 +6,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Список статей</h1>
+                        <h1>Статьи</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="#">Главная</a></li>
-                            <li class="breadcrumb-item active">Список статей</li>
+                            <li class="breadcrumb-item active">Статьи</li>
                         </ol>
                     </div>
                 </div>
@@ -21,7 +21,8 @@
             <div class="container-fluid">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Список статей</h3>
+                        <a href="{{ route('posts.create') }}" type="submit" class="btn btn-primary">Добавить
+                            статью</a>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
@@ -29,70 +30,72 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <a href="{{ route('posts.create') }}" type="submit" class="btn btn-primary mb-3">Добавить
-                            статью</a>
-                        @if (count($posts))
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th style="width: 10px">#</th>
-                                        <th>Название</th>
-                                        <th>Постоянная ссылка</th>
-                                        <th>Категория</th>
-                                        <th>Метки</th>
-                                        <th>Дата</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($posts as $post)
-                                        <tr>
-                                            <td>{{ $post->id }}</td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a type="button" class="btn btn-default"
-                                                        href="{{ route('posts.show', [$post->id]) }}">
-                                                        {{ $post->title }}</a>
-                                                    <button type="button"
-                                                        class="btn btn-default dropdown-toggle dropdown-icon"
-                                                        data-toggle="dropdown" aria-expanded="false">
-                                                        <span class="sr-only">Toggle Dropdown</span>
-                                                    </button>
-                                                    <div class="dropdown-menu" role="menu">
-                                                        <a class="dropdown-item"
-                                                            href="{{ route('posts.edit', ['post' => $post->id]) }}"><i
-                                                                class="fas fa-edit"></i> Редактировать</a>
 
-                                                        <div class="dropdown-divider"></div>
-                                                        <form action="{{ route('posts.destroy', ['post' => $post->id]) }}"
-                                                            method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button class="dropdown-item" type="submit" class=""
-                                                                onclick="return confirm('Подтвердите удаление')">
-                                                                <i class="fas fa-trash"></i> Удалить
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>{{ $post->slug }}</td>
-                                            <td>{{ $post->category->title }}</td>
-                                            <td>{{ $post->tags->pluck('title')->join(', ') }}</td>
-                                            <td>{{ $post->created_at }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        @else
-                            <p>статей пока нет...</p>
-                        @endif
+                        <table id="dataTable" class="table table-bordered table-striped dataTable dtr-inline w-100"
+                            data-locale={{ asset('assets/locale/datatable/russian.json') }}>
+                        </table>
+
                     </div>
-                    <div class="card-footer clearfix">
-                        <div class="pagination pagination-sm m-0 float-right">
-                            {{ $posts->onEachSide(1)->links() }}</div>
-                    </div>
+
                 </div>
             </div>
         </section>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                responsive: true,
+                stateSave: true,
+                select: true,
+                language: {
+                    url: $('#dataTable').data('locale')
+                },
+
+                ajax: {
+                    url: '/api/heturion/posts',
+                    dataSrc: ''
+                },
+
+                columns: [{
+                        data: 'id',
+                        title: 'ID'
+                    },
+                    {
+                        data: 'title',
+                        title: 'Title'
+                    },
+                    {
+                        data: 'slug',
+                        title: 'Slug'
+                    },
+                    {
+                        data: 'category.title',
+                        title: 'Category'
+                    },
+                    {
+                        data: 'tags',
+                        title: 'Tags',
+                        render: function(data, type, row, meta) {
+                            return data.map(tag => tag.title).join(', ');
+                        }
+                    }
+
+                ],
+
+                columnDefs: [{
+                    targets: 1,
+                    render: function(data, type, row, meta) {
+                        return `<a href="posts/${row.id}/edit">${row.title}</a>`;
+
+
+                    },
+
+                }],
+
+            });
+        });
+    </script>
 @endsection

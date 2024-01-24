@@ -3,16 +3,30 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Filters\Questions\TextFilter;
+use App\Http\Filters\Questions\TitleFilter;
 use App\Models\Appliance;
 use App\Models\Question;
 use App\Services\FileUploader;
 use Illuminate\Http\Request;
+use Illuminate\Pipeline\Pipeline;
 
 class QuestionController extends Controller
 {
     public function index()
     {
-        $questions = Question::orderBy('id', 'desc')->paginate(20);
+        $questions = app(Pipeline::class)
+            ->send(Question::query())
+            ->through([
+                TextFilter::class
+            ])
+            ->thenReturn()
+            ->with('appliance', 'user')
+
+            ->orderBy('id', 'desc')
+            ->paginate(50);
+
+
         return view('public.questions.index', compact('questions'));
     }
 
@@ -102,28 +116,5 @@ class QuestionController extends Controller
         $question->comments()->delete();
         $question->delete();
         return redirect()->route('questions.index')->with('success', 'Вопрос удален');
-    }
-
-    public function search(Request $request)
-    {
-        $data = $request->validate([
-            'text' => 'required|max:255',
-        ]);
-
-        $questions = Question::where(function ($query) use ($data) {
-
-            $fields = [
-                'title',
-                'description'
-            ];
-
-            foreach ($fields as $field) {
-                $query->orWhere($field, 'like', '%' . $data['text'] . '%');
-            }
-        })
-            ->paginate(50)
-            ->appends(['text' => $data['text']]);
-
-        return view('public.questions.search', compact('questions'));
     }
 }

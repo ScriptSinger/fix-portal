@@ -23,39 +23,43 @@ use Illuminate\Pipeline\Pipeline;
 
 class FirmwareController extends Controller
 {
-    public function index(Request $request)
-    {
-        $firmwares = app()->make(Pipeline::class)
-            ->send(Firmware::query())
-            ->through([
-                Duplicate::class,
-                IdSort::class,
-                TitleFilter::class,
-                SizeSort::class,
-                ExtensionFilter::class,
-                PlatformFilter::class,
-                Crc32Sort::class
-
-
-            ])
-            ->thenReturn()
-            ->paginate(50);
-
-        return view('admin.firmwares.index', compact('firmwares',));
-    }
-
     // public function index(Request $request)
     // {
-    //     $firmwares = Firmware::paginate(50);
+    //     $firmwares = app()->make(Pipeline::class)
+    //         ->send(Firmware::query())
+    //         ->through([
+    //             Duplicate::class,
+    //             IdSort::class,
+    //             // TitleFilter::class поправить
+    //             SizeSort::class,
+    //             ExtensionFilter::class,
+    //             PlatformFilter::class,
+    //             Crc32Sort::class
+
+
+    //         ])
+    //         ->thenReturn()
+    //         ->paginate(50);
+
     //     return view('admin.firmwares.index', compact('firmwares',));
     // }
 
+    public function index()
+    {
+        $firmwares = Firmware::all();
+        return view('admin.firmwares.index', compact('firmwares'));
+    }
 
     public function show(string $id)
     {
         $firmware = Firmware::findOrFail($id);
-
         return view('admin.firmwares.show', compact('firmware'));
+    }
+
+    public function edit(string $id)
+    {
+        $firmware = Firmware::findOrFail($id);
+        return view('admin.firmwares.edit', compact('firmware'));
     }
 
     public function downloadFile($filename)
@@ -67,6 +71,12 @@ class FirmwareController extends Controller
             return redirect()->back()->with('error', 'Файл не найден');
         }
     }
+
+
+
+    // -----
+
+
 
     public function markDuplicates()
     {
@@ -94,34 +104,6 @@ class FirmwareController extends Controller
 
 
 
-
-
-
-
-    public function search(Request $request)
-    {
-        $data = $request->validate([
-            'text' => 'required|max:255',
-        ]);
-
-        $firmwares = Firmware::where(function ($query) use ($data) {
-            $fields = [
-                'title',
-                // 'size',
-                // 'date',
-                'extension',
-                'platform',
-                // 'crc32',
-                'data'
-            ];
-
-            foreach ($fields as $field) {
-                $query->orWhere($field, 'like', '%' . $data['text'] . '%');
-            }
-        })->paginate(50)->appends(['text' => $data['text']]); // Append 'text' parameter to pagination links;
-
-        return view('admin.firmwares.search', compact('firmwares'));
-    }
 
 
     public function getDuplicates(DuplicateService $duplicateService)

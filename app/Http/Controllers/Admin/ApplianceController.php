@@ -47,13 +47,25 @@ class ApplianceController extends Controller
         ]);
 
         $appliance = Appliance::find($id);
-        // $category->slug = null; // обновление slug
+        // $appliance->slug = null; // обновление slug
         $appliance->update($data);
-        return redirect()->route('appliances.index')->with('success', 'Категория отредактирована');
+        return redirect()->route('appliances.index')->with('success', 'Отредактировано');
     }
 
     public function destroy(string $id)
     {
-        //
+        $appliance = Appliance::find($id);
+
+        if (!$appliance) {
+            return redirect()->route('categories.index')->with('error', 'Категория не найдена');
+        }
+
+        if ($appliance->questions->count() > 0) {
+            return redirect()->back()->with('error', 'Ошибка! Нельзя удалить прибор, у которого есть связанные записи.');
+        }
+
+        $appliance->delete();
+
+        return redirect()->route('appliances.index')->with('success', 'Категория успешно удалена');
     }
 }

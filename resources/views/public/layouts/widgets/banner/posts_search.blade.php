@@ -2,8 +2,8 @@
     <h3>Поиск статей</h3>
     <p>Возможно, нужная информация уже есть в статьях. Попробуйте поиск</p>
 
-    <form class="form-inline" method="GET" action="{{ route('search') }}">
-        <input name="search" class="form-control mr-sm-2 @error('search') has-error @enderror" type="text"
+    <form class="form-inline" method="GET" action="{{ route('articles.index') }}">
+        <input name="title" class="form-control mr-sm-2 @error('title') has-error @enderror" type="text"
             placeholder="Что вы хотели бы узнать?">
         <button role="button" class="btn btn-default btn-block" type="submit">Найти</button>
     </form>
