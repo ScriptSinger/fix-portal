@@ -1,7 +1,6 @@
 @extends('admin.layouts.layout')
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -10,17 +9,17 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Назад</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.posts.index') }}">Статьи</a></li>
                             <li class="breadcrumb-item active">Редактировать статью</li>
                         </ol>
                     </div>
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
 
         <section class="content">
-            <form method="POST" enctype="multipart/form-data" action="{{ route('posts.update', ['post' => $post->id]) }}"
-                id="quickForm" novalidate="novalidate">
+            <form method="POST" enctype="multipart/form-data"
+                action="{{ route('admin.posts.update', ['post' => $post->id]) }}" id="quickForm" novalidate="novalidate">
                 @csrf
                 @method('PUT')
                 <div class="container-fluid">
@@ -28,21 +27,18 @@
                         <div class="col-md-9">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
-
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
                                                 class="fas fa-expand"></i></button>
                                     </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="InputText">Название</label>
+                                        <label>Название</label>
                                         <input type="text" name="title"
-                                            class="form-control @error('title') is-invalid @enderror" id="InputText"
-                                            value="{{ $post->title }}" aria-describedby="InputText-error"
-                                            aria-invalid="true" required>
-                                        <span id="InputText-error" class="error invalid-feedback">
+                                            class="form-control @error('title') is-invalid @enderror"
+                                            value="{{ $post->title }}" required>
+                                        <span class="error invalid-feedback">
                                             @error('title')
                                                 {{ $message }}
                                             @enderror
@@ -55,20 +51,20 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="InputTextArea1">Содержание</label>
-                                        <textarea id="InputTextArea1" name="content" class="form-control @error('content') is-invalid @enderror" rows="7">{{ $post->content }}</textarea>
-                                        <span id="InputTextArea1-error" class="error invalid-feedback">
+                                        <label>Содержание</label>
+                                        <textarea id="content" data-upload-url="{{ route('api.summernote.upload') }}" name="content"
+                                            data-delete-url="{{ route('api.summernote.destroy') }}" class="form-control @error('content') is-invalid @enderror">{{ $post->content }}</textarea>
+                                        <span id="contentError" class="error invalid-feedback">
                                             @error('content')
                                                 {{ $message }}
                                             @enderror
                                         </span>
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="InputTextArea2">Мета-описание</label>
-                                        <textarea id="InputTextArea2" name="description" class="form-control @error('description') is-invalid @enderror"
+                                        <label>Мета-описание</label>
+                                        <textarea id="description" name="description" class="form-control @error('description') is-invalid @enderror"
                                             rows="3">{{ $post->description }}</textarea>
-                                        <span id="InputTextArea2-error" class="error invalid-feedback">
+                                        <span id="descriptionError" class="error invalid-feedback">
                                             @error('description')
                                                 {{ $message }}
                                             @enderror
@@ -76,18 +72,14 @@
                                     </div>
 
                                 </div>
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary">Сохранить</button>
-                                </div>
+
                             </div>
                         </div>
-
                         <div class="col-md-3">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Категории</h3>
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -112,15 +104,14 @@
                                     </div>
                                 </div>
                                 <div class="card-footer">
-                                    <a href="{{ route('categories.create') }}" type="submit" class="btn btn-primary"><i
-                                            class="fas fa-plus"></i> Добавить</a>
+                                    <a href="{{ route('admin.categories.create') }}" type="submit"
+                                        class="btn btn-primary"><i class="fas fa-plus"></i> Добавить</a>
                                 </div>
                             </div>
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Метки</h3>
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -140,7 +131,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer">
-                                    <a href="{{ route('tags.create') }}" type="submit" class="btn btn-primary"><i
+                                    <a href="{{ route('admin.tags.create') }}" type="submit" class="btn btn-primary"><i
                                             class="fas fa-plus"></i> Добавить</a>
                                 </div>
                             </div>
@@ -148,7 +139,6 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Изображение записи</h3>
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -180,7 +170,33 @@
                         </div>
                     </div>
                 </div>
+                <div class="card">
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-12">
+                                <a href="#" class="btn btn-danger"
+                                    onclick="event.preventDefault(); document.getElementById('deleteForm').submit();">
+                                    Удалить
+                                </a>
+                                <button type="submit" class="btn btn-primary float-right">Обновить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </form>
+            <form id="deleteForm" class="d-none" action="{{ route('admin.posts.destroy', ['post' => $post->id]) }}"
+                method="POST">
+                @csrf
+                @method('DELETE')
+                <button class="btn btn-danger" type="submit">
+                    Удалить
+                </button>
+            </form>
+
         </section>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/admin/js/custom/summernote/post.js') }}"></script>
+@endpush

@@ -25,8 +25,7 @@ class ApplianceController extends Controller
             'title' => 'required'
         ]);
         Appliance::create($data);
-        // return redirect()->route('categories.index')->session()->flash('success', 'Категория добавлена');
-        return redirect()->route('appliances.index')->with('success', 'Категория добавлена');
+        return redirect()->route('admin.appliances.index')->with('success', 'Прибор добавлен');
     }
 
     public function show(string $id)
@@ -36,7 +35,7 @@ class ApplianceController extends Controller
 
     public function edit(string $id)
     {
-        $appliance = Appliance::find($id);
+        $appliance = Appliance::findOrFail($id);
         return view('admin.appliances.edit', compact('appliance'));
     }
 
@@ -45,27 +44,21 @@ class ApplianceController extends Controller
         $data = $request->validate([
             'title' => 'required'
         ]);
-
         $appliance = Appliance::find($id);
-        // $appliance->slug = null; // обновление slug
         $appliance->update($data);
-        return redirect()->route('appliances.index')->with('success', 'Отредактировано');
+        return redirect()->route('admin.appliances.index')->with('success', 'Отредактировано');
     }
 
     public function destroy(string $id)
     {
         $appliance = Appliance::find($id);
-
         if (!$appliance) {
-            return redirect()->route('categories.index')->with('error', 'Категория не найдена');
+            return redirect()->route('admin.appliances.index')->with('error', 'Прибор не найден');
         }
-
         if ($appliance->questions->count() > 0) {
             return redirect()->back()->with('error', 'Ошибка! Нельзя удалить прибор, у которого есть связанные записи.');
         }
-
         $appliance->delete();
-
-        return redirect()->route('appliances.index')->with('success', 'Категория успешно удалена');
+        return redirect()->route('admin.appliances.index')->with('success', 'Прибор успешно удален');
     }
 }

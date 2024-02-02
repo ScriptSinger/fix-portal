@@ -16,7 +16,7 @@
                 {{ Breadcrumbs::render('post', $post->category, $post) }}
             </ol>
 
-            <span class="color-yellow"><a href="{{ route('public.categories.show', ['category' => $post->category->slug]) }}"
+            <span class="color-yellow"><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
                     title="">{{ $post->category->title }}</a></span>
 
             <h3>{{ $post->title }}</h3>

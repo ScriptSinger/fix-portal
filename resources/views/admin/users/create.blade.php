@@ -6,12 +6,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Добавить пользователя</h1>
+                        <h1>Добавить</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="#">Назад</a></li>
-                            <li class="breadcrumb-item active">Добавить пользователя</li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Пользователи</a></li>
+                            <li class="breadcrumb-item active">Добавить</li>
                         </ol>
                     </div>
                 </div>
@@ -21,14 +21,13 @@
             <div class="col-md-6">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Добавить пользователя</h3>
                         <div class="card-tools">
                             <!-- This will cause the card to maximize when clicked -->
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
                                     class="fas fa-expand"></i></button>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('users.store') }}" id="quickForm" novalidate="novalidate">
+                    <form method="POST" action="{{ route('admin.users.store') }}" id="quickForm" novalidate="novalidate">
                         @csrf
                         <div class="card-body">
                             <div class="form-group">

@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="card-footer">
                                     <a class="btn btn-primary"
-                                        href="{{ route('admin.download', ['filename' => $firmware->title . $firmware->extension]) }}">Скачать
+                                        href="{{ route('admin.firmwares.download', ['filename' => $firmware->title . $firmware->extension]) }}">Скачать
                                         файл</a>
                                 </div>
                             </div>

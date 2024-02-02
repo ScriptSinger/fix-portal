@@ -10,7 +10,7 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ route('tags.index') }}">Метки</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.tags.index') }}">Метки</a></li>
                             <li class="breadcrumb-item active">Создать</li>
                         </ol>
                     </div>
@@ -28,7 +28,7 @@
                                     class="fas fa-expand"></i></button>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('tags.store') }}" id="quickForm" novalidate="novalidate">
+                    <form method="POST" action="{{ route('admin.tags.store') }}" id="quickForm" novalidate="novalidate">
                         @csrf
                         <div class="card-body">
                             <div class="form-group">

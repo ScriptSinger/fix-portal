@@ -4,7 +4,7 @@
         <ul>
             @foreach ($popular_categories as $category)
                 <li><a
-                        href="{{ route('public.categories.show', ['category' => $category->slug]) }}">{{ $category->title }}<span>{{ $category->posts_count }}</span></a>
+                        href="{{ route('categories.show', ['category' => $category->slug]) }}">{{ $category->title }}<span>{{ $category->posts_count }}</span></a>
                 </li>
             @endforeach
         </ul>

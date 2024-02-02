@@ -9,7 +9,7 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ route('appliances.index') }}">Приборы</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.appliances.index') }}">Приборы</a></li>
                             <li class="breadcrumb-item active">Редактировать</li>
                         </ol>
                     </div>
@@ -25,17 +25,16 @@
                                     class="fas fa-expand"></i></button>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('appliances.update', ['appliance' => $appliance->id]) }}"
-                        id="quickForm" novalidate="novalidate">
+                    <form method="POST" action="{{ route('admin.appliances.update', ['appliance' => $appliance->id]) }}">
                         @csrf
                         @method('PUT')
                         <div class="card-body">
                             <div class="form-group">
-                                <label for="InputText">Название</label>
+                                <label>Название</label>
                                 <input type="text" name="title"
-                                    class="form-control @error('title') is-invalid @enderror" id="InputTextAppliance"
-                                    value="{{ $appliance->title }}" aria-describedby="InputText-error" aria-invalid="true">
-                                <span id="InputText-error" class="error invalid-feedback">
+                                    class="form-control @error('title') is-invalid @enderror"
+                                    value="{{ $appliance->title }}">
+                                <span class="error invalid-feedback">
                                     @if ($errors->any())
                                         @foreach ($errors->all() as $error)
                                             {{ $error }}
@@ -43,36 +42,61 @@
                                     @endif
                                 </span>
                             </div>
-
                             <div class="form-group">
-                                <label for="InputText">Slug</label>
-                                <input type="text" class="form-control" id="InputTextAppliance" disabled
-                                    value="{{ $appliance->slug }}">
+                                <label>Slug</label>
+                                <input type="text" class="form-control" disabled value="{{ $appliance->slug }}">
                             </div>
-
                             <div class="form-group">
-                                <label for="InputText">Создано</label>
-                                <input type="text" class="form-control" id="InputTextAppliance" disabled
-                                    value="{{ $appliance->dateAsCarbon->format('d-m-Y H:i:s') }}">
-                            </div>
-                        </div>
-
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-12">
-                                    <a href="#" class="btn btn-danger"
-                                        onclick="event.preventDefault(); confirm('Подтвердите удаление'); document.getElementById('deleteForm').submit();">
-                                        Удалить
-                                    </a>
-
-                                    <button type="submit" class="btn btn-primary float-right">Редактировать</button>
+                                <label>Создан</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control float-right" id="reservation"
+                                        value="{{ $appliance->created_at }}" disabled>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                            <div class="form-group">
+                                <label>Изменен</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control float-right" id="reservation"
+                                        value="{{ $appliance->updated_at }}" disabled>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Удален</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <i class="far fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" class="form-control float-right" id="reservation"
+                                        value="{{ $appliance->deleted_at }}" disabled>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <a href="#" class="btn btn-danger"
+                                            onclick="event.preventDefault(); confirm('Подтвердите удаление'); document.getElementById('deleteForm').submit();">
+                                            Удалить
+                                        </a>
 
+                                        <button type="submit" class="btn btn-primary float-right">Обновить</button>
+                                    </div>
+                                </div>
+                            </div>
+                    </form>
                     <form id="deleteForm" class="d-none"
-                        action="{{ route('appliances.destroy', ['appliance' => $appliance->id]) }}" method="POST">
+                        action="{{ route('admin.appliances.destroy', ['appliance' => $appliance->id]) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-danger" type="submit">

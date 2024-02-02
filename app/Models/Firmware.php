@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Firmware extends Model
 {
-    use Sluggable, SoftDeletes;
+    use  SoftDeletes;
 
     protected $fillable = [
         'title',

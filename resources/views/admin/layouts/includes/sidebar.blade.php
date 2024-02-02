@@ -70,21 +70,15 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('users.index') }}" class="nav-link">
+                              <a href="{{ route('admin.users.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('users.create') }}" class="nav-link">
+                              <a href="{{ route('admin.users.create') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Добавить</p>
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a href="{{ route('deleted-users.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Восстановить</p>
                               </a>
                           </li>
                       </ul>
@@ -99,13 +93,13 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('appliances.index') }}" class="nav-link">
+                              <a href="{{ route('admin.appliances.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('appliances.create') }}" class="nav-link">
+                              <a href="{{ route('admin.appliances.create') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Добавить</p>
                               </a>
@@ -122,7 +116,7 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('questions.index') }}" class="nav-link">
+                              <a href="{{ route('admin.questions.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
@@ -140,13 +134,13 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('categories.index') }}" class="nav-link">
+                              <a href="{{ route('admin.categories.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('categories.create') }}" class="nav-link">
+                              <a href="{{ route('admin.categories.create') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Добавить</p>
                               </a>
@@ -163,13 +157,13 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('tags.index') }}" class="nav-link">
+                              <a href="{{ route('admin.tags.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('tags.create') }}" class="nav-link">
+                              <a href="{{ route('admin.tags.create') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Добавить</p>
                               </a>
@@ -186,13 +180,13 @@
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('posts.index') }}" class="nav-link">
+                              <a href="{{ route('admin.posts.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('posts.create') }}" class="nav-link">
+                              <a href="{{ route('admin.posts.create') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Добавить</p>
                               </a>

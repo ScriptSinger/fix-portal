@@ -3,32 +3,35 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Appliance;
 use App\Models\Question;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
-
     public function index()
     {
         $questions = Question::all();
         return view('admin.questions.index', compact('questions'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
+        return view('admin.questions.create', compact('appliances'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|string',
+            'appliance_id' => 'required|exists:appliances,id',
+            'description' => 'required|string',
+        ]);
+        $user_id = auth()->user()->id;
+        $data['user_id'] = $user_id;
+        Question::create($data);
+        return redirect()->route('admin.questions.index')->with('success', 'Вопрос добавлен');
     }
 
     /**
@@ -36,30 +39,31 @@ class QuestionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        dd($id);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
-        //
+        $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
+        $question = Question::where('id', $id)->firstOrFail();
+        return view('admin.questions.edit', compact('question', 'appliances'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|string',
+            'appliance_id' => 'required|exists:appliances,id',
+            'description' => 'required|string',
+        ]);
+        $question = Question::where('id', $id)->firstOrFail();
+        $question->update($data);
+        return redirect()->route('admin.questions.index')->with('success', 'Вопрос обновлен');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        Question::find($id)->delete();
+        return redirect()->route('admin.appliances.index')->with('success', 'Прибор успешно удален');
     }
 }

@@ -11,7 +11,9 @@
                                 <img class="img-circle"
                                     src="{{ $comment->user->avatar !== null ? asset('storage/' . $comment->user->avatar) : asset('assets/front/images/avatar.png') }}"
                                     alt="User Image">
-                                <span class="username"><a href="#">{{ $comment->user->name }} #
+                                <span class="username"><a
+                                        href="{{ route('admin.users.edit', ['user' => $comment->user->id]) }}">{{ $comment->user->name }}
+                                        #
                                         {{ $comment->user->id }}</a></span>
                                 <span class="description">Shared publicly - 7:30 PM Today</span>
                             </div>
@@ -37,7 +39,7 @@
                                     class="fas fa-expand"></i></button>
                         </div>
                     </div>
-                    <form method="POST" action="{{ route('categories.update', ['category' => $comment->id]) }}"
+                    <form method="POST" action="{{ route('admin.categories.update', ['category' => $comment->id]) }}"
                         id="quickForm" novalidate="novalidate">
                         @csrf
                         @method('PUT')
@@ -68,14 +70,14 @@
                                         Удалить
                                     </a>
 
-                                    <button type="submit" class="btn btn-primary float-right">Редактировать</button>
+                                    <button type="submit" class="btn btn-primary float-right">Обновить</button>
                                 </div>
                             </div>
                         </div>
                     </form>
 
                     <form id="delete-form" class="d-none"
-                        action="{{ route('categories.destroy', ['category' => $comment->id]) }}" method="POST">
+                        action="{{ route('admin.categories.destroy', ['category' => $comment->id]) }}" method="POST">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-danger" type="submit" onclick="return confirm('Подтвердите удаление')">

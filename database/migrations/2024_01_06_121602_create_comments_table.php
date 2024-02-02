@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('text');
             $table->json('photos')->nullable(); // Меняем строку на JSON для хранения массива
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

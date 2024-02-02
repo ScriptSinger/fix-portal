@@ -46,7 +46,7 @@ class PostController extends Controller
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
-        return redirect()->route('posts.index')->with('success', 'Статья добавлена');
+        return redirect()->route('admin.posts.index')->with('success', 'Статья добавлена');
     }
 
     public function show(string $id)
@@ -56,7 +56,7 @@ class PostController extends Controller
 
     public function edit(string $id)
     {
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
         $categories = Category::pluck('title', 'id');
         $tags = Tag::pluck('title', 'id');
         return view('admin.posts.edit', compact('post', 'categories', 'tags'));
@@ -88,7 +88,7 @@ class PostController extends Controller
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
-        return redirect()->route('posts.index')->with('success', 'Изменения сохранены');
+        return redirect()->route('admin.posts.index')->with('success', 'Изменения сохранены');
     }
 
     public function destroy(string $id)
@@ -106,6 +106,6 @@ class PostController extends Controller
 
         $post->tags()->sync([]);
         $post->delete();
-        return redirect()->route('posts.index')->with('success', 'Статья удалена');
+        return redirect()->route('admin.posts.index')->with('success', 'Статья удалена');
     }
 }

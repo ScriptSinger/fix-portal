@@ -58,7 +58,7 @@
                         <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
-                        <small><a href="{{ route('public.categories.show', ['category' => $category->slug]) }}"
+                        <small><a href="{{ route('categories.show', ['category' => $category->slug]) }}"
                                 title="">{{ $category->title }}</a></small>
                         <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                         <small><a href="#" title="">by Jack</a></small>

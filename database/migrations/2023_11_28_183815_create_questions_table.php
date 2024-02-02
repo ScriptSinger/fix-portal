@@ -16,13 +16,12 @@ return new class extends Migration
             $table->string('title')->index();
             $table->string('slug')->unique();
             $table->text('description');
-
             $table->integer('views')->unsigned()->default(0);
             $table->json('photos')->nullable(); // Меняем строку на JSON для хранения массива
             $table->integer('appliance_id')->unsigned();
             $table->integer('user_id')->unsigned();
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

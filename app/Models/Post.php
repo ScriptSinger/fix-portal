@@ -7,12 +7,12 @@ use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
 {
-    use HasFactory, Sluggable, DateTrait, ImageHandlerTrait;
+    use HasFactory, Sluggable, SoftDeletes, DateTrait, ImageHandlerTrait;
 
-    //массовое присваивание
     protected $fillable = [
         'title',
         'description',
@@ -21,7 +21,6 @@ class Post extends Model
         'thumbnail'
 
     ];
-
 
     public function sluggable(): array
     {

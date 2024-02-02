@@ -11,11 +11,25 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::all();
-        foreach ($categories as $category) {
-            $category->created_at_diff = Carbon::parse($category->created_at)->format('d-m-Y H:i:s');
-        }
-
+        $categories = Category::withTrashed()->get();
         return response()->json($categories);
+    }
+
+    public function destroy(string $id)
+    {
+        $category = Category::findOrFail($id);
+        $category->delete();
+        return  response()->json(['message' => 'Категория успешно удалена'], 200);;
+    }
+
+    public function restore($id)
+    {
+        $category = Category::withTrashed()->find($id);
+        if ($category) {
+            $category->restore();
+            return response()->json(['message' => 'Категория успешно восстановлена'], 200);
+        } else {
+            return response()->json(['error' => 'Категория не найдена'], 404);
+        }
     }
 }

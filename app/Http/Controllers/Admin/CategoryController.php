@@ -43,7 +43,7 @@ class CategoryController extends Controller
         $category = Category::find($id);
         // $category->slug = null; // обновление slug
         $category->update($data);
-        return redirect()->route('categories.index')->with('success', 'Категория отредактирована');
+        return redirect()->route('admin.categories.index')->with('success', 'Категория отредактирована');
     }
 
     public function destroy(string $id)

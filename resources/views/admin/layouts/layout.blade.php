@@ -25,9 +25,26 @@
         <!-- /.control-sidebar -->
     </div>
     <!-- ./wrapper -->
-    @include('admin.layouts.includes.script')
 
-    @yield('scripts')
+
+    <script src="{{ asset('assets/admin/js/adminlte.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/adminlte/sidebar.js') }}"></script>
+
+    @if (session('success') || session('error'))
+        <script src="{{ asset('assets/admin/js/custom/toast/notifications.js') }}"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var notificationType = @json(session('success') ? 'success' : 'error');
+                var notificationMessage = @json(session('success') ?? session('error'));
+
+                showNotification(notificationType, notificationMessage);
+            });
+        </script>
+    @endif
+
+    @stack('scripts')
+
+
 </body>
 
 </html>

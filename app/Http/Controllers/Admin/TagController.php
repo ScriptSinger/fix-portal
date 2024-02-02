@@ -12,7 +12,7 @@ class TagController extends Controller
     public function index()
     {
         $tags = Tag::paginate(20);
-        return view('admin/tags/index', compact('tags'));
+        return view('admin.tags.index', compact('tags'));
     }
 
     public function create()
@@ -26,12 +26,12 @@ class TagController extends Controller
             'title' => 'required'
         ]);
         Tag::create($request->all());
-        return redirect()->route('tags.index')->with('success', 'Метка добавлена');
+        return redirect()->route('admin.tags.index')->with('success', 'Метка добавлена');
     }
 
     public function edit(string $id)
     {
-        $tag = Tag::find($id);
+        $tag = Tag::findOrFail($id);
         return view('admin.tags.edit', compact('tag'));
     }
 
@@ -40,9 +40,9 @@ class TagController extends Controller
         $request->validate([
             'title' => 'required'
         ]);
-        $tag = Tag::find($id);
+        $tag = Tag::findOrFail($id);
         $tag->update($request->all());
-        return redirect()->route('tags.index')->with('success', 'Метка отредактирована');
+        return redirect()->route('admin.tags.index')->with('success', 'Метка отредактирована');
     }
 
     public function destroy(string $id)
@@ -50,15 +50,15 @@ class TagController extends Controller
         $tag = Tag::find($id);
 
         if (!$tag) {
-            return redirect()->route('tags.index')->with('error', 'Метка не найдена');
+            return redirect()->route('admin.tags.index')->with('error', 'Метка не найдена');
         }
 
         if ($tag->posts->count() > 0) {
-            return redirect()->route('tags.index')->with('error', 'Ошибка! Нельзя удалить метку, у которой есть связанные записи.');
+            return redirect()->route('admin.tags.index')->with('error', 'Ошибка! Нельзя удалить метку, у которой есть связанные записи.');
         }
 
         $tag->delete();
 
-        return redirect()->route('tags.index')->with('success', 'Метка успешно удалена');
+        return redirect()->route('admin.tags.index')->with('success', 'Метка успешно удалена');
     }
 }

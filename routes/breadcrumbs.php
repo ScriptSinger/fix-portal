@@ -17,7 +17,7 @@ Breadcrumbs::for('home', function (BreadcrumbTrail $trail) {
 // Категория
 Breadcrumbs::for('category', function (BreadcrumbTrail $trail, Category $category) {
     $trail->parent('home');
-    $trail->push($category->title, route('public.categories.show', $category->slug));
+    $trail->push($category->title, route('categories.show', $category->slug));
 });
 
 // Post
