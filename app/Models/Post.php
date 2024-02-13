@@ -18,7 +18,8 @@ class Post extends Model
         'description',
         'content',
         'category_id',
-        'thumbnail'
+        'thumbnail',
+        'administrator_id'
 
     ];
 
@@ -29,6 +30,10 @@ class Post extends Model
                 'source' => 'title'
             ]
         ];
+    }
+    public function administrator()
+    {
+        return $this->belongsTo(Administrator::class);
     }
 
     public function tags()

@@ -49,4 +49,20 @@ class Question extends Model
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
+
+
+
+
+    public function getSrcFromContentAttribute()
+    {
+        $html = $this->attributes['description'];
+        return $this->getFirstSrc($html);
+    }
+
+    private function getFirstSrc($html)
+    {
+        $pattern = '/<img.+?src="(.+?)".*?>/';
+        preg_match($pattern, $html, $matches);
+        return isset($matches[1]) ? $matches[1] : null;
+    }
 }

@@ -27,6 +27,14 @@
                         <div class="col-md-9">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
+                                    <div class="user-block">
+                                        <img class="img-circle" src="{{ asset('assets/front/images/avatar.png') }}"
+                                            alt="User Image">
+                                        <span class="username"><a href="#">{{ $post->administrator->name }}
+                                                #
+                                                {{ $post->administrator->id }}</a></span>
+                                        <span class="description">Shared publicly - 7:30 PM Today</span>
+                                    </div>
                                     <div class="card-tools">
                                         <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
                                                 class="fas fa-expand"></i></button>
@@ -49,7 +57,6 @@
                                         <input type="text" class="form-control" id="InputLink"
                                             value="{{ $post->slug }}" disabled>
                                     </div>
-
                                     <div class="form-group">
                                         <label>Содержание</label>
                                         <textarea id="content" data-upload-url="{{ route('api.summernote.upload') }}" name="content"
@@ -70,9 +77,7 @@
                                             @enderror
                                         </span>
                                     </div>
-
                                 </div>
-
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -139,14 +144,13 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Изображение записи</h3>
                                     <div class="card-tools">
-                                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                            <i class="fas fa-minus"></i>
+                                        <button type="button" class="btn btn-tool" data-card-widget="maximize">
+                                            <i class="fas fa-expand"></i>
                                         </button>
                                     </div>
                                 </div>
                                 <div class="card-body">
                                     <div class="form-group">
-                                        <label for="InputFile"></label>
                                         <div class="input-group">
                                             <div class="custom-file">
                                                 <input type="file" name="thumbnail" id="InputFile"
@@ -198,5 +202,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/js/custom/summernote/post.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/summernote/full.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/summernote/lite.js') }}"></script>
 @endpush

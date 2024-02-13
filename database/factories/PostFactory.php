@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Administrator;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,11 +26,13 @@ class PostFactory extends Factory
         return [
             'title' => $this->faker->sentence,
             'slug' => Str::slug($this->faker->sentence),
+            'administrator_id' => 1,
             'description' => $this->faker->paragraph,
             'content' => $this->faker->paragraph(5), // Пример для генерации 5 абзацев контента
             'category_id' => Category::factory(), // Пример для случайной категории
             'views' => $this->faker->numberBetween(0, 1000), // Пример для случайного количества просмотров
-            'thumbnail' => $this->faker->imageUrl(400, 300, 'cats', true), // Пример изображения-заглушки
+            // 'thumbnail' => $this->faker->imageUrl(400, 300, 'cats', true), // Пример изображения-заглушки
+            'thumbnail' => null, // Пример изображения-заглушки
         ];
     }
 }

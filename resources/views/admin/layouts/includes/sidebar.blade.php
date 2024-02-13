@@ -2,9 +2,9 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
       <a href="{{ url('/') }}" target="_blank" class="brand-link">
-          <img src="{{ asset('assets/admin/img/AdminLTELogo.png') }}" alt="AdminLTE Logo"
+          <img src="{{ asset('assets/admin/img/AdminLTELogo.png') }}" alt="Logo"
               class="brand-image img-circle elevation-3" style="opacity: .8">
-          <span class="brand-text font-weight-light">AdminLTE 3</span>
+          <span class="brand-text font-weight-light">{{ config('app.name', 'Laravel') }}</span>
       </a>
 
       <!-- Sidebar -->
@@ -59,140 +59,89 @@
                           </p>
                       </a>
                   </li>
-
-                  <li class="nav-item">
+                  <li class="nav-item has-treeview">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-users"></i>
                           <p>
-                              Пользователи
+                              Сообщество
                               <i class="right fas fa-angle-left"></i>
                           </p>
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
                               <a href="{{ route('admin.users.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
+                                  <i class="fa fa-user nav-icon"></i>
+                                  <p>Пользователи</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('admin.users.create') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Добавить</p>
+                              <a href="{{ route('admin.comments.index') }}" class="nav-link">
+                                  <i class="fa fa-comment nav-icon"></i>
+                                  <p>Комментарии</p>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a href="{{ route('admin.replies.index') }}" class="nav-link">
+                                  <i class="fa fa-comments nav-icon"></i>
+                                  <p>Ответы</p>
                               </a>
                           </li>
                       </ul>
                   </li>
-                  <li class="nav-item">
+                  <li class="nav-item has-treeview">
                       <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-plug"></i>
+                          <i class="nav-icon fas fa-pen-square"></i>
                           <p>
-                              Приборы
-                              <i class="right fas fa-angle-left"></i>
-                          </p>
-                      </a>
-                      <ul class="nav nav-treeview">
-                          <li class="nav-item">
-                              <a href="{{ route('admin.appliances.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a href="{{ route('admin.appliances.create') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Добавить</p>
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-question"></i>
-                          <p>
-                              Вопросы
-                              <i class="right fas fa-angle-left"></i>
-                          </p>
-                      </a>
-                      <ul class="nav nav-treeview">
-                          <li class="nav-item">
-                              <a href="{{ route('admin.questions.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-archive"></i>
-                          <p>
-                              Категории
-                              <i class="right fas fa-angle-left"></i>
-                          </p>
-                      </a>
-                      <ul class="nav nav-treeview">
-                          <li class="nav-item">
-                              <a href="{{ route('admin.categories.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a href="{{ route('admin.categories.create') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Добавить</p>
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-tags"></i>
-                          <p>
-                              Метки
-                              <i class="right fas fa-angle-left"></i>
-                          </p>
-                      </a>
-                      <ul class="nav nav-treeview">
-                          <li class="nav-item">
-                              <a href="{{ route('admin.tags.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
-                              </a>
-                          </li>
-                          <li class="nav-item">
-                              <a href="{{ route('admin.tags.create') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Добавить</p>
-                              </a>
-                          </li>
-                      </ul>
-                  </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-edit"></i>
-                          <p>
-                              Статьи
+                              Контент
                               <i class="right fas fa-angle-left"></i>
                           </p>
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
                               <a href="{{ route('admin.posts.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
+                                  <i class="fa fa-file-alt nav-icon"></i>
+                                  <p>Статьи</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('admin.posts.create') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Добавить</p>
+                              <a href="{{ route('admin.categories.index') }}" class="nav-link">
+                                  <i class="fa fa-folder nav-icon"></i>
+                                  <p>Категории</p>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a href="{{ route('admin.tags.index') }}" class="nav-link">
+                                  <i class="fa fa-tags nav-icon"></i>
+                                  <p>Метки</p>
                               </a>
                           </li>
                       </ul>
                   </li>
+                  <li class="nav-item has-treeview">
+                      <a href="#" class="nav-link">
+                          <i class="nav-icon fas fa-bullhorn"></i>
+                          <p>
+                              Форум
+                              <i class="right fas fa-angle-left"></i>
+                          </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                          <li class="nav-item">
+                              <a href="{{ route('admin.appliances.index') }}" class="nav-link">
+                                  <i class="fa fa-plug nav-icon"></i>
+                                  <p>Приборы</p>
+                              </a>
+                          </li>
+                          <li class="nav-item">
+                              <a href="{{ route('admin.questions.index') }}" class="nav-link">
+                                  <i class="fa fa-question nav-icon"></i>
+                                  <p>Вопросы</p>
+                              </a>
+                          </li>
+
+                      </ul>
+                  </li>
+                  <li class="nav-header">ХРАНИЛИЩЕ</li>
                   <li class="nav-item">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-wave-square"></i>
@@ -208,38 +157,15 @@
                                   <p>Список</p>
                               </a>
                           </li>
-                          {{-- <li class="nav-item">
-                            <a href="{{ route('settings.create') }}" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Добавить</p>
-                            </a>
-                        </li> --}}
-
                       </ul>
                   </li>
-                  <li class="nav-item">
-                      <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-comments"></i>
-                          <p>
-                              Коментарии
-                              <i class="right fas fa-angle-left"></i>
-                          </p>
-                      </a>
-                      <ul class="nav nav-treeview">
-                          <li class="nav-item">
-                              <a href="{{ route('admin.comments.index') }}" class="nav-link">
-                                  <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
-                              </a>
-                          </li>
-
-                      </ul>
-                  </li>
-
-                  <li class="nav-header">EXAMPLES</li>
               </ul>
           </nav>
           <!-- /.sidebar-menu -->
       </div>
       <!-- /.sidebar -->
   </aside>
+
+  @push('scripts')
+      <script src="{{ asset('assets/admin/js/custom/adminlte/sidebar.js') }}"></script>
+  @endpush

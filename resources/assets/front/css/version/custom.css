@@ -1,5 +1,4 @@
 /* Пагинация */
-
 .page-item.active .page-link {
     border: 1px solid #000000
         /* Стиль для активной ссылки */
@@ -18,19 +17,18 @@
     background-color: #c89700 !important;
     /* Новый цвет фона при наведении для неактивных элементов */
 }
-
-.dmtop {
-    background-color: #f9ca27 !important;
-    transition: background-color 0.3s ease;
-
+ 
+.btn {
+  
+    cursor: pointer;
 }
 
-/* Скролл */
+.btn:hover {
+    color: #fff;
+    background-color: #000000;
+    border-color: #000000;
+ }
 
-.dmtop:hover {
-    background-color: #c89700 !important;
-}
-
-.form-wrapper .is-invalid {
-    border-color: #d9534f;
-}
+ .selected{
+    background: #000000!important
+ }

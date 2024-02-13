@@ -6,33 +6,40 @@
 <body>
     <div id="wrapper">
         @include('public.layouts.includes.header')
-
         @yield('banner')
-        <section class="section lb @if (Request::is('articles/*') || Request::is('questions/*')) ) m3rem @endif">
+        <section class="section lb @if (Request::is('articles/*') || Request::is('questions/*')) m3rem @endif">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
                         @yield('content')
-                    </div><!-- end col -->
-
+                    </div>
                     <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
                         @yield('sidebar')
-
-                    </div><!-- end col -->
-                </div><!-- end row -->
-            </div><!-- end container -->
+                    </div>
+                </div>
+            </div>
         </section>
-
         @include('public.layouts.includes.footer')
-
         <div class="dmtop">Scroll to Top</div>
+    </div>
+    <script src="{{ asset('assets/front/js/main.js') }}"></script>
+    @if (session('success') || session('error'))
+        <script src="{{ asset('assets/front/js/custom/toast/notifications.js') }}"></script>
 
-    </div><!-- end wrapper -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var notificationType = @json(session('success') ? 'success' : 'error');
+                var notificationMessage = @json(session('success') ?? session('error'));
 
-    @include('public.layouts.includes.script')
+                showNotification(notificationType, notificationMessage);
+            });
+        </script>
 
-    @yield('script')
-
+        @php
+            session()->forget(['success', 'error']);
+        @endphp
+    @endif
+    @stack('scripts')
 </body>
 
 </html>

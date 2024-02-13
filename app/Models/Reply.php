@@ -5,18 +5,18 @@ namespace App\Models;
 use App\Traits\DateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reply extends Model
 {
-    use HasFactory, DateTrait;
+    use HasFactory, SoftDeletes, DateTrait;
 
 
     protected $fillable = [
         'text',
         'user_id',
         'comment_id',
-
-
+        'user_id'
     ];
 
     public function user()

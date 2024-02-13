@@ -164,6 +164,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/js/custom/summernote/content.js') }}"></script>
-    <script src="{{ asset('assets/admin/js/custom/summernote/description.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/summernote/full.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/summernote/lite.js') }}"></script>
 @endpush

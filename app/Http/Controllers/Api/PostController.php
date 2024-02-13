@@ -18,7 +18,7 @@ class PostController extends Controller
     {
         $post = Post::findOrFail($id);
         $post->delete();
-        return  response()->json(['message' => 'Статья успешно удалена'], 200);;
+        return  response()->json(['message' => 'Статья успешно удалена'], 200);
     }
 
     public function restore($id)

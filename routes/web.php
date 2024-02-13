@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\FirmwareController as AdminFirmwareController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
+use App\Http\Controllers\Admin\ReplyController as AdminReplyController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Public\ApplianceController;
 use App\Http\Controllers\Public\CategoryController;
@@ -182,6 +183,11 @@ Route::group(
 
         Route::get('/comments', [AdminCommentController::class, 'index'])->name('admin.comments.index');
         Route::get('/comments/{comment}/edit', [AdminCommentController::class, 'edit'])->name('admin.comments.edit');
+        Route::put('/comments/{comment}', [AdminReplyController::class, 'update'])->name('admin.comments.update');
+
+        Route::get('/replies', [AdminReplyController::class, 'index'])->name('admin.replies.index');
+        Route::get('/replies/{reply}/edit', [AdminReplyController::class, 'edit'])->name('admin.replies.edit');
+        Route::put('/replies/{reply}', [AdminReplyController::class, 'update'])->name('admin.replies.update');
     }
 );
 

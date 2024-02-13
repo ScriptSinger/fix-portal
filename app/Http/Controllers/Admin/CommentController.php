@@ -19,4 +19,16 @@ class CommentController extends Controller
         $comment = Comment::with('user')->findOrfail($id);
         return view('admin.comments.edit', compact('comment'));
     }
+
+    public function update(Request $request,  $id)
+    {
+        $data = $request->validate([
+            'text' => 'required'
+        ]);
+
+        $comment = Comment::findOrfail($id);
+        $comment->update($data);
+
+        return redirect()->route('admin.comments.index')->with('success', 'Комментарий отредактирован');
+    }
 }

@@ -1,8 +1,11 @@
-$(document).ready(function () {
-    $("#content").summernote({
-        lang: "ru-RU",
-        focus: true,
-        height: 300, // Высота редактора
+$(function () {
+    $(".basic").summernote({
+        toolbar: [
+            ["style", ["bold", "underline"]],
+            ["insert", ["link", "picture"]],
+            ["view", ["fullscreen", "codeview"]],
+        ],
+        height: 150,
         callbacks: {
             onImageUpload: function (files) {
                 upload(files[0]);
@@ -13,24 +16,11 @@ $(document).ready(function () {
         },
     });
 
-    $("#description").summernote({
-        height: 150, // Высота редактора
-        toolbar: [
-            ["style", ["bold", "italic", "underline", "clear"]],
-            ["font", ["strikethrough", "superscript", "subscript"]],
-            ["fontsize", ["fontsize"]],
-            ["color", ["color"]],
-            ["para", ["ul", "ol", "paragraph"]],
-            ["height", ["height"]],
-        ],
-    });
-
     function upload(file) {
-        let url = $("#content").data("upload-url");
+        let url = $(".basic").data("upload-url");
         let token = $('meta[name="csrf-token"]').attr("content");
         let data = new FormData();
         data.append("file", file);
-
         $.ajax({
             url: url,
             headers: {
@@ -42,7 +32,7 @@ $(document).ready(function () {
             processData: false,
             success: function (response) {
                 response = window.location.origin + response;
-                $("#content").summernote(
+                $(".basic").summernote(
                     "insertImage",
                     response,
                     function ($image) {
@@ -56,14 +46,14 @@ $(document).ready(function () {
                     var errors = xhr.responseJSON.errors;
                     Object.keys(errors).forEach(function (key) {
                         alert(errors[key]);
-                        // $('#summernote').summernote('code', key + ': ' + errors[key]);
                     });
                 }
             },
         });
     }
+
     function destroy(src) {
-        let url = $("#content").data("delete-url");
+        let url = $(".basic").data("delete-url");
         let token = $('meta[name="csrf-token"]').attr("content");
         $.ajax({
             method: "DELETE",

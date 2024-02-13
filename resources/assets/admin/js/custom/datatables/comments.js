@@ -25,7 +25,10 @@ $(document).ready(function () {
                 data: "user",
                 title: "Пользователь",
                 render: function (data, type, row) {
-                    return `<a href="#">${data.name}</a>`;
+                    return `<a href="${routes.userEdit.replace(
+                        ":id",
+                        row.id
+                    )}">${data.name}</a>`;
                 },
             },
             {
@@ -90,7 +93,8 @@ $(document).ready(function () {
     $("#dataTable").on(
         "click",
         "button.btn-restore, button.btn-delete",
-        function () {
+        function (event) {
+            event.stopPropagation();
             var token = $('meta[name="csrf-token"]').attr("content");
             var id = $(this).data("row-id");
             var actionUrl = $(this).hasClass("btn-restore")

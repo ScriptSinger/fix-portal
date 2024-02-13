@@ -10,9 +10,11 @@ class CommentController extends Controller
 {
     public function index()
     {
-        $comments = Comment::with('user')->withTrashed()->get();
+        $comments = Comment::with('user', 'replies')->withTrashed()->get();
         return response()->json($comments);
     }
+
+
     public function destroy(string $id)
     {
         $comment = Comment::findOrFail($id);

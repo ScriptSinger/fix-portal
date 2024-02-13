@@ -38,7 +38,10 @@ class ProfileController extends Controller
 
         // $data['avatar'] = $user->processFileUpload($request, 'avatar', ['fileType' => 'png']);
         $user->update($data);
-        session()->flash('success', 'Профиль успешно обновлён!');
-        return redirect('/profile?timestamp=' . now()->timestamp);
+
+
+        // return redirect()->route('articles.index')->with('success', 'Профиль успешно обновлён!');
+        // session()->flash('success', 'Профиль успешно обновлён!');
+        return redirect('/profile?timestamp=' . now()->timestamp)->with('success', 'Профиль успешно обновлён!');
     }
 }

@@ -13,7 +13,7 @@
                         {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
                     </p>
 
-                    <a href="{{ route('questions.create') }}" class="btn btn-primary">Создать вопрос</a>
+                    <a href="{{ route('questions.create') }}" class="btn btn-dark">Создать вопрос</a>
                 </div>
                 <div class="col-lg-4 col-md-12">
                     @include('public.layouts.widgets.banner.questions_search')
@@ -39,67 +39,60 @@
                     <div class="blog-box wow fadeIn">
                         <div class="post-media">
                             <a href="{{ route('questions.index', ['slug' => $question->slug]) }}">
+                                @if ($question->srcFromContent)
+                                    <div>
+                                        <img src="{{ $question->srcFromContent }}" class="img-fluid">
+                                    </div>
+                                @else
+                                    <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt="Preview Image"
+                                        class="img-fluid">
+                                @endif
 
-                                @if ($question->photos)
-                                    @foreach (json_decode($question->photos) as $photo)
-                                        <img src="{{ asset('storage/' . $photo) }}" alt="Photo">
-                                    @break
-                                @endforeach
-                            @else
-                                <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt=""
-                                    class="img-fluid">
-
-                            @endif
-
-                            <div class="hovereffect">
-                                <span></span>
-                            </div>
-                            <!-- end hover -->
-                        </a>
+                                <div class="hovereffect">
+                                    <span></span>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- end media -->
+                        <div class="blog-meta big-meta text-center">
+                            <div class="post-sharing">
+                                <ul class="list-inline">
+                                    <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i>
+                                            <span class="down-mobile">Share
+                                                on Facebook</span></a></li>
+                                    <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i>
+                                            <span class="down-mobile">Tweet
+                                                on Twitter</span></a></li>
+                                    <li><a href="#" class="gp-button btn btn-primary"><i
+                                                class="fa fa-google-plus"></i></a>
+                                    </li>
+                                </ul>
+                            </div><!-- end post-sharing -->
+                            <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
+                                    title="">{{ $question->title }}</a></h4>
+                            <p>{!! Str::limit(strip_tags($question->description), 150) !!}</p>
+                            <small><a
+                                    href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
+                                    title="">{{ $question->appliance->title }}</a></small>
+                            <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
+                            <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
+                            <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
+                        </div>
                     </div>
-                    <!-- end media -->
-                    <div class="blog-meta big-meta text-center">
-                        <div class="post-sharing">
-                            <ul class="list-inline">
-                                <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i>
-                                        <span class="down-mobile">Share
-                                            on Facebook</span></a></li>
-                                <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i>
-                                        <span class="down-mobile">Tweet
-                                            on Twitter</span></a></li>
-                                <li><a href="#" class="gp-button btn btn-primary"><i
-                                            class="fa fa-google-plus"></i></a>
-                                </li>
-                            </ul>
-                        </div><!-- end post-sharing -->
-                        <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
-                                title="">{{ $question->title }}</a></h4>
-                        <p> {!! $question->description !!}</p>
-
-
-                        <small><a
-                                href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
-                                title="">{{ $question->appliance->title }}</a></small>
-                        <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
-                        <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
-                        <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
-                    </div><!-- end meta -->
-                </div><!-- end blog-box -->
-
-                <hr class="invis">
-            @endforeach
-        @else
-            <p>Совпадений не найдено</p>
-        @endif
-    </div>
-</div>
-
-<hr class="invis">
-<div class="row">
-    <div class="container col-md-12">
-        <div class="row justify-content-center">
-            {{ $questions->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
+                    <hr class="invis">
+                @endforeach
+            @else
+                <p>Совпадений не найдено</p>
+            @endif
         </div>
     </div>
-</div>
+
+    <hr class="invis">
+    <div class="row">
+        <div class="container col-md-12">
+            <div class="row justify-content-center">
+                {{ $questions->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
+            </div>
+        </div>
+    </div>
 @endsection

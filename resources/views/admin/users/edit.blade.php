@@ -4,7 +4,6 @@
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
-
                     <div class="col-sm-6">
                         <div class="user-block">
                             <img class="img-circle"
@@ -14,7 +13,6 @@
                             <span class="description">Shared publicly - 7:30 PM Today</span>
                         </div>
                     </div>
-
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Пользователи</a></li>
@@ -25,7 +23,7 @@
             </div>
         </section>
         <section class="content">
-            <form method="POST" action="{{ route('admin.users.update', ['user' => $user->id]) }}" novalidate="novalidate"
+            <form method="POST" action="{{ route('admin.users.update', ['user' => $user->id]) }}"
                 enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -173,7 +171,7 @@
                                     onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
                                     Удалить
                                 </a>
-                                <button type="submit" class="btn btn-primary float-right">Редактировать</button>
+                                <button type="submit" class="btn btn-primary float-right">Обновить</button>
                             </div>
                         </div>
                     </div>

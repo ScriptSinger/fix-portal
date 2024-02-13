@@ -47,8 +47,6 @@ class LikeService
         }
     }
 
-
-
     public function counter($instance)
     {
         $likeCount = $instance->likes()->count();

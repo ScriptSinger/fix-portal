@@ -39,10 +39,9 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user'));
     }
 
-    public function update(Request $request)
+    public function update(Request $request, string $id)
     {
         $data = $request->validate([
-            'id' => 'nullable',
             'name' => 'required|string|max:255',
             // 'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
             'phone' => 'nullable|string|regex:/^\+?\d{1,4}?[-.\s]?\(?\d{1,6}?\)?[-.\s]?\d{1,9}[-.\s]?\d{1,9}$/',
@@ -51,7 +50,7 @@ class UserController extends Controller
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        $user = User::findOrFail($data['id']);
+        $user = User::findOrFail($id);
         $data = FileUploader::getInstance()
             ->setData($data)
             ->setModel($user)

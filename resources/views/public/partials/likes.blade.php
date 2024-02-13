@@ -1,5 +1,4 @@
 @auth
-
     <form class="d-inline-block like-form"
         data-like-route="{{ route('like', [
             'type' => strtolower(class_basename($instance)),

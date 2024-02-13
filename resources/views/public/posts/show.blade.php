@@ -18,15 +18,12 @@
 
             <span class="color-yellow"><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
                     title="">{{ $post->category->title }}</a></span>
-
             <h3>{{ $post->title }}</h3>
-
             <div class="blog-meta big-meta">
                 <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                 <small><a href="blog-author.html" title="">by Jessica</a></small>
                 <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
-            </div><!-- end meta -->
-
+            </div>
             <div class="post-sharing">
                 <ul class="list-inline">
                     <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
@@ -35,29 +32,23 @@
                                 class="down-mobile">Tweet on Twitter</span></a></li>
                     <li><a href="#" class="gp-button btn btn-primary"><i class="fa fa-google-plus"></i></a></li>
                 </ul>
-            </div><!-- end post-sharing -->
-        </div><!-- end title -->
-
+            </div>
+        </div>
         <div class="single-post-media">
             <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
-        </div><!-- end media -->
-
+        </div>
         <div class="blog-content">
             {!! $post->content !!}
-        </div><!-- end content -->
-
+        </div>
         <div class="blog-title-area">
             @isset($post->tags)
                 <div class="tag-cloud-single">
-                    <span>Метки</span>
                     @foreach ($post->tags as $tag)
-                        <small><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
-                                title="">{{ $tag->title }}</a></small>
+                        <span><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
+                                title="">{{ $tag->title }}</a></span>
                     @endforeach
-                </div><!-- end meta -->
+                </div>
             @endisset
-
-
             <div class="post-sharing">
                 <ul class="list-inline">
                     <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
@@ -66,8 +57,8 @@
                                 class="down-mobile">Tweet on Twitter</span></a></li>
                     <li><a href="#" class="gp-button btn btn-primary"><i class="fa fa-google-plus"></i></a></li>
                 </ul>
-            </div><!-- end post-sharing -->
-        </div><!-- end title -->
+            </div>
+        </div>
 
         <div class="row">
             <div class="col-lg-12">
@@ -163,6 +154,5 @@
         @include('public.partials.comments', [
             'instance' => $post,
         ])
-
-    </div><!-- end page-wrapper -->
+    </div>
 @endsection

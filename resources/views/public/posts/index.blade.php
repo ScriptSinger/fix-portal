@@ -1,7 +1,6 @@
 @extends('public.layouts.banner')
 @section('title', 'Статьи | ' . config('app.name', 'Ufamasters'))
 @section('banner')
-
     <section
         style="background-image: url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}');"
         id="cta" class="section">
@@ -14,7 +13,7 @@
                         {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
                     </p>
                     </p>
-                    <a href="{{ route('questions.create') }}" class="btn btn-primary">Создать вопрос</a>
+                    <a href="{{ route('questions.create') }}" class="btn btn-dark">Создать вопрос</a>
                 </div>
                 <div class="col-lg-4 col-md-12">
                     @include('public.layouts.widgets.banner.posts_search')
@@ -40,15 +39,18 @@
                     <div class="blog-box wow fadeIn">
                         <div class="post-media">
                             <a href="{{ route('articles.index', ['article' => $post->slug]) }}" title="">
+                                @if ($post->thumbnail)
+                                    <img src="{{ $post->getImage('thumbnail') }}" alt="Preview Image" class="img-fluid">
+                                @else
+                                    <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid">
+                                @endif
 
-                                <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
                                 <div class="hovereffect">
                                     <span></span>
                                 </div>
-                                <!-- end hover -->
                             </a>
                         </div>
-                        <!-- end media -->
+
                         <div class="blog-meta big-meta text-center">
                             <div class="post-sharing">
                                 <ul class="list-inline">
@@ -62,22 +64,19 @@
                                                 class="fa fa-google-plus"></i></a>
                                     </li>
                                 </ul>
-                            </div><!-- end post-sharing -->
+                            </div>
                             <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                     title="">{{ $post->title }}</a></h4>
-
                             <p>
                                 {!! $post->description !!}
                             </p>
-
                             <small><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
                                     title="">{{ $post->category->title }}</a></small>
                             <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                             <small><a href="#" title="">by Jack</a></small>
                             <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
-                        </div><!-- end meta -->
-                    </div><!-- end blog-box -->
-
+                        </div>
+                    </div>
                     <hr class="invis">
                 @endforeach
             @else
@@ -85,11 +84,10 @@
             @endif
         </div>
     </div>
-
     <hr class="invis">
     <div class="row">
         <div class="container col-md-12">
-            <div class="pagination justify-content-center pagination-sm">
+            <div class="pagination justify-content-center">
                 {{ $posts->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
             </div>
         </div>

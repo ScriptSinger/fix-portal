@@ -1,7 +1,6 @@
 @extends('admin.layouts.layout')
 @section('content')
     <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
         <section class="content-header">
             <div class="container-fluid">
                 <div class="row mb-2">
@@ -10,12 +9,12 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ url()->previous() }}">Назад</a></li>
+                            <li class="breadcrumb-item"><a href="#">Главная</a></li>
                             <li class="breadcrumb-item active">Кастомизация</li>
                         </ol>
                     </div>
                 </div>
-            </div><!-- /.container-fluid -->
+            </div>
         </section>
         <section class="content">
             <form method="POST" enctype="multipart/form-data" action="{{ route('custom.update') }}" id="quickForm"
@@ -23,11 +22,10 @@
                 @csrf
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
                                                 class="fas fa-expand"></i></button>
                                     </div>
@@ -46,8 +44,6 @@
                                         </span>
                                     </div>
                                     <div class="form-group">
-
-
                                         <label for="InputTextArea1">Содержание</label>
                                         <textarea id="InputTextArea1" name="description" class="form-control @error('description') is-invalid @enderror"
                                             rows="7" placeholder="Рекомендуемое количество символов: 216">{{ optional($customization)->description }}</textarea>
@@ -73,14 +69,11 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-md-6">
-
+                        <div class="col-md-4">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
                                     <h3 class="card-title">Favicon</h3>
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -101,10 +94,7 @@
                                                 {{ $message }}
                                             @enderror
                                         </span>
-
-
                                     </div>
-
                                     <div style="max-width: 100px"><img class="img-thumbnail"
                                             src="{{ optional($customization)->getImage('favicon') }}" alt="">
                                     </div>
@@ -114,7 +104,6 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Логотип</h3>
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -137,7 +126,6 @@
                                                 {{ $message }}
                                             @enderror
                                         </span>
-
                                     </div>
                                     <div style="max-width: 100px"><img class="img-thumbnail"
                                             src="{{ optional($customization)->getImage('logo') }}" alt="">
@@ -149,7 +137,6 @@
                                 <div class="card-header">
                                     <h3 class="card-title">Баннер</h3>
                                     <div class="card-tools">
-                                        <!-- This will cause the card to maximize when clicked -->
                                         <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                             <i class="fas fa-minus"></i>
                                         </button>
@@ -178,9 +165,7 @@
                                             src="{{ optional($customization)->getImage('banner') }}" alt="">
                                     </div>
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
             </form>

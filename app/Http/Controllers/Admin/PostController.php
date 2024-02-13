@@ -41,6 +41,10 @@ class PostController extends Controller
             ->save()
             ->getData();
 
+
+        // dd(auth()->user()->id);
+
+        $data['administrator_id'] = auth()->user()->id;
         $post = Post::create($data);
 
         if ($request->has('tags')) {
@@ -56,7 +60,7 @@ class PostController extends Controller
 
     public function edit(string $id)
     {
-        $post = Post::findOrFail($id);
+        $post = Post::with('administrator')->findOrFail($id);
         $categories = Category::pluck('title', 'id');
         $tags = Tag::pluck('title', 'id');
         return view('admin.posts.edit', compact('post', 'categories', 'tags'));

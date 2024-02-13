@@ -5,7 +5,7 @@
     <form class="form-inline" method="GET" action="{{ route('articles.index') }}">
         <input name="title" class="form-control mr-sm-2 @error('title') has-error @enderror" type="text"
             placeholder="Что вы хотели бы узнать?">
-        <button role="button" class="btn btn-default btn-block" type="submit">Найти</button>
+        <button role="button" class="btn btn-dark btn-block" type="submit">Найти</button>
     </form>
 
 </div><!-- end newsletter -->

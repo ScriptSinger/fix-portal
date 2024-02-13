@@ -6,7 +6,8 @@
                 <a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                     class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="w-100 justify-content-between">
-                        <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid float-left">
+                        {{-- <img src="{{ optional($post)->getImage('thumbnail') }}" alt=""
+                            class="img-fluid float-left"> --}}
                         <h5 class="mb-1">{{ $post->title }}</h5>
                         <span class="rating">
                             <i class="fa fa-star"></i>

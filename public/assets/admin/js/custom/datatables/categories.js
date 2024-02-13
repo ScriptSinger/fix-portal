@@ -81,7 +81,8 @@ $(document).ready(function () {
     $("#dataTable").on(
         "click",
         "button.btn-restore, button.btn-delete",
-        function () {
+        function (event) {
+            event.stopPropagation();
             var token = $('meta[name="csrf-token"]').attr("content");
             var id = $(this).data("row-id");
             var actionUrl = $(this).hasClass("btn-restore")

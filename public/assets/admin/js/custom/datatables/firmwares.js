@@ -61,7 +61,9 @@ $(document).ready(function () {
             {
                 targets: 1,
                 render: function (data, type, row, meta) {
-                    return `<a href="firmwares/${row.id}/edit">${row.title}</a>`;
+                    return `<a href="${routes.edit.replace(":id", row.id)}">${
+                        row.title
+                    }</a>`;
                 },
             },
             {
@@ -80,7 +82,8 @@ $(document).ready(function () {
     $("#dataTable").on(
         "click",
         "button.btn-restore, button.btn-delete",
-        function () {
+        function (event) {
+            event.stopPropagation();
             var token = $('meta[name="csrf-token"]').attr("content");
             var id = $(this).data("row-id");
             var actionUrl = $(this).hasClass("btn-restore")

@@ -8,6 +8,8 @@ use App\Http\Filters\Questions\TextFilter;
 use App\Models\Appliance;
 use App\Models\Question;
 use App\Services\FileUploader;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
 
@@ -26,7 +28,6 @@ class QuestionController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(50);
 
-
         return view('public.questions.index', compact('questions'));
     }
 
@@ -42,22 +43,8 @@ class QuestionController extends Controller
             'title' => 'required|string',
             'appliance_id' => 'required|exists:appliances,id',
             'description' => 'required|string',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Проверка на изображения и ограничение размера до 2 МБ
-            'photos' => 'nullable|array|max:4', // Максимальное количество файлов в массиве photos: 4
-
         ]);
-        // $user_id = $request->user()->id; 
-        $user_id = auth()->user()->id;
-        $path = date('Y-m-d') . "/" . $user_id;
-
-        $data = FileUploader::getInstance()
-            ->setData($data)
-            ->setSupDir('question')
-            ->setSubDir($path)
-            ->multipleSave()
-            ->getData();
-
-        $data['user_id'] = $user_id;
+        $data['user_id'] = auth()->user()->id;
         Question::create($data);
         return redirect()->route('questions.index');
     }
@@ -67,7 +54,6 @@ class QuestionController extends Controller
         $question = Question::where('slug', $slug)->firstOrFail();
         $question->views += 1;
         $question->update();
-
         return view('public.questions.show', compact('question'));
     }
 
@@ -81,30 +67,17 @@ class QuestionController extends Controller
 
     public function update(Request $request, string $slug)
     {
-
         $data = $request->validate([
             'title' => 'required|string',
             'appliance_id' => 'required|exists:appliances,id',
             'description' => 'required|string',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Проверка на изображения и ограничение размера до 2 МБ
-            'photos' => 'nullable|array|max:4', // Максимальное количество файлов в массиве photos: 4
+            // 'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Проверка на изображения и ограничение размера до 2 МБ
+            // 'photos' => 'nullable|array|max:4', // Максимальное количество файлов в массиве photos: 4
         ]);
 
         $question = Question::where('slug', $slug)->firstOrFail();
         $this->authorize('update', $question);
-
-        $user_id = $request->user()->id;
-        $path = date('Y-m-d') . "/" . $user_id;
-        $data = FileUploader::getInstance()
-            ->setData($data)
-            ->setModel($question)
-            ->setSupDir('question')
-            ->setSubDir($path)
-            ->multipleRemovePrev()
-            ->multipleSave($path)
-            ->getData();
-
-        $data['user_id'] = $user_id;
+        $data['user_id'] = $request->user()->id;
         $question->update($data);
         return redirect()->route('questions.index')->with('success', 'Изменения сохранены');
     }

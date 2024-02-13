@@ -19,63 +19,24 @@
 
 @section('sidebar')
     <div class="sidebar">
-        <div class="widget-no-style">
-            <div class="newsletter-widget text-center align-self-center">
-                <h3>Поиск прошивок</h3>
-                <p>Воспользуйтесь поиском прошивок. Введите ключевые слова</p>
-                <form class="form-inline" method="GET" action="{{ route('firmwares.index') }}">
-
-                    <input type="text" name="text" placeholder="Название" class="form-control">
-                    <input role="button" type="submit" value="Найти" class="btn btn-default btn-block">
-                </form>
-            </div>
-        </div>
         @include('public.layouts.widgets.sidebar.advertising')
     </div>
 @endsection
 
 @section('content')
-    <div class="page-wrapper" style="overflow-x: auto; max-width: 100%; ">
-        @if (count($firmwares))
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Размер</th>
-                        <th>Дата</th>
-                        <th>Платформа</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($firmwares as $firmware)
-                        <tr>
-                            <td>
-                                <a href="{{ route('firmwares.show', ['firmware' => $firmware->id]) }}">
-                                    {{ $firmware->title }}</a>
-                            </td>
-                            <td>
-                                <small class="text-nowrap"> {{ $firmware->size }} КБ</small>
-                            </td>
-                            <td>
-                                <small class="text-nowrap"> {{ $firmware->date }}</small>
-                            </td>
-                            <td>
-                                <small> {{ $firmware->platform }}</small>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
+    <div class="page-wrapper">
+        <div class="table-responsive">
+            <table id="dataTable" class="table table-bordered table-striped dataTable dtr-inline w-100"
+                data-locale={{ asset('assets/locale/datatable/russian.json') }}
+                data-routes='{
+                    "index": "{{ route('api.firmwares.index') }}",
+                    "show": "{{ route('firmwares.show', ['firmware' => ':id']) }}"
+                }'>
             </table>
-        @else
-            <p>Совпадений не найдено</p>
-        @endif
-    </div>
-    <hr class="invis">
-    <div class="row">
-        <div class="container col-md-12">
-            <div class="pagination justify-content-center pagination-sm">
-                {{ $firmwares->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
-            </div>
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/front/js/custom/datatables/firmwares.js') }}"></script>
+@endpush

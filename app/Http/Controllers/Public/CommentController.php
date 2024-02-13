@@ -3,33 +3,30 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Public\StoreCommentRequest;
 use App\Models\Comment;
-use App\Services\FileUploader;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
+    // public function store(Request $request, $type, $id)
+    // {
+    //     $this->authorize('create', [Comment::class, $type]);
+    //     $data = $request->validate([
+    //         'text' => 'required|string',
+    //     ]);
 
-    public function store(Request $request, $type, $id)
+    //     $commentable = ("App\\Models\\" . ucfirst($type))::findOrFail($id);
+    //     $data['user_id'] = auth()->user()->id;
+    //     $commentable->comments()->create($data);
+    //     return redirect()->back();
+    // }
+    public function store(StoreCommentRequest $request, $type, $id)
     {
-        $this->authorize('create', [Comment::class, $type]);
-        $data = $request->validate([
-            'text' => 'required|string',
-            'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Проверка на изображения и ограничение размера до 2 МБ
-            'photos' => 'nullable|array|max:4', // Максимальное количество файлов в массиве photos: 4
-        ]);
+        $data = $request->validated();
         $commentable = ("App\\Models\\" . ucfirst($type))::findOrFail($id);
-        $user_id = auth()->user()->id;
-        $data['user_id'] = $user_id;
-        $path = date('Y-m-d') . "/" . $user_id;
-        $data = FileUploader::getInstance()
-            ->setData($data)
-            ->setSupDir('comments')
-            ->setSubDir($path)
-            ->multipleSave()
-            ->getData();
-
-        $comment = $commentable->comments()->create($data);
+        $data['user_id'] = auth()->user()->id;
+        $commentable->comments()->create($data);
         return redirect()->back();
     }
 

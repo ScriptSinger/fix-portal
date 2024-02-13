@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\FirmwareController;
 
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\ReplyController;
 use App\Http\Controllers\Api\SummernoteController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\UserController;
@@ -58,8 +59,13 @@ Route::group(
         Route::put('/users/{user}', [UserController::class, 'restore'])->name('api.users.restore');
 
         Route::get('/comments', [CommentController::class, 'index'])->name('api.comments.index');
+
         Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('api.comments.destroy');
         Route::put('/comments/{comment}', [CommentController::class, 'restore'])->name('api.comments.restore');
+
+        Route::get('/replies/{comment?}', [ReplyController::class, 'index'])->name('api.replies.index');
+        Route::delete('/replies/{reply}', [ReplyController::class, 'destroy'])->name('api.replies.destroy');
+        Route::put('/replies/{reply}', [ReplyController::class, 'restore'])->name('api.replies.restore');
 
         Route::get('/questions', [QuestionController::class, 'index'])->name('api.questions.index');
         Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('api.questions.destroy');
@@ -69,4 +75,14 @@ Route::group(
         Route::post('/summernote/upload', [SummernoteController::class, 'upload'])->name('api.summernote.upload');
         Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])->name('api.summernote.destroy');
     }
+);
+
+Route::group(
+    [['auth:verified']],
+    function () {
+        Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwares.index');
+        Route::post('/summernote/upload', [SummernoteController::class, 'upload'])->name('api.summernote.upload');
+        Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])->name('api.summernote.destroy');
+    }
+
 );
