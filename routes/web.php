@@ -15,15 +15,17 @@ use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\ReplyController as AdminReplyController;
+use App\Http\Controllers\Admin\RequestLogController;
 use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Public\ApplianceController;
 use App\Http\Controllers\Public\CategoryController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\LikeController;
 use App\Http\Controllers\Public\PostController;
-use App\Http\Controllers\Public\ProfileController;
+
 use App\Http\Controllers\Public\ReplyController;
 use App\Http\Controllers\Public\TagController;
+use App\Http\Controllers\Public\UserController;
 
 // use function Laravel\Prompts\search;
 
@@ -51,6 +53,9 @@ Route::group(
     }
 );
 
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/tag/{slug}', [TagController::class, 'showTagArticles'])->name('tag.articles');
 
@@ -65,8 +70,8 @@ Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('
 Route::group(
     ['middleware' => ['auth:web', 'verified']],
     function () {
-        Route::get('/profile', [ProfileController::class, 'showProfile'])->name('profile');
-        Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
+        Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
+        Route::put('/profile/update', [UserController::class, 'update'])->name('profile.update');
         Route::post('/{type}/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
         Route::group(['prefix' => '/comments'], function () {
             Route::put('/{id}', [CommentController::class, 'update'])->name('comments.update');
@@ -76,11 +81,6 @@ Route::group(
 
         Route::put('/replies/{id}', [ReplyController::class, 'update'])->name('comments.replies.update');
         Route::delete('/replies/{id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
-
-        Route::prefix('/{type}/{id}/')->group(function () {
-            Route::post('/like', [LikeController::class, 'like'])->name('like');
-            Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
-        });
 
         Route::prefix('/questions')->group(function () {
             Route::get('/create', [QuestionController::class, 'create'])->name('questions.create');
@@ -188,6 +188,8 @@ Route::group(
         Route::get('/replies', [AdminReplyController::class, 'index'])->name('admin.replies.index');
         Route::get('/replies/{reply}/edit', [AdminReplyController::class, 'edit'])->name('admin.replies.edit');
         Route::put('/replies/{reply}', [AdminReplyController::class, 'update'])->name('admin.replies.update');
+
+        Route::get('/logs', [RequestLogController::class, 'index'])->name('admin.logs.index');
     }
 );
 

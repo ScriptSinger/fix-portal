@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -31,7 +32,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'location',
         'phone',
         'bio',
-        'avatar'
+        'avatar',
+        'role_id'
     ];
 
     /**
@@ -54,6 +56,13 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
 
+
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
@@ -64,6 +73,27 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Question::class);
     }
 
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($user) {
+            $user->comments()->each(function ($comment) {
+                $comment->replies()->delete();
+            });
+            $user->comments()->delete();
+            $user->questions()->delete();
+        });
+
+        static::restoring(function ($user) {
+            $user->comments()->withTrashed()->each(function ($comment) {
+                $comment->replies()->withTrashed()->restore();
+            });
+            $user->comments()->withTrashed()->restore();
+            $user->questions()->withTrashed()->restore();
+        });
+    }
 
     public function hasVerifiedEmail()
     {

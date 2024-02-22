@@ -16,9 +16,9 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('likeable_id');
             $table->string('likeable_type');
-
             $table->timestamps();
-            $table->unique(['user_id', 'likeable_id', 'likeable_type']);
+            // $table->unique(['user_id', 'likeable_id', 'likeable_type']);
+            $table->softDeletes();
         });
     }
 

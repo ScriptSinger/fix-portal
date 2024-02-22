@@ -31,6 +31,7 @@ class Post extends Model
             ]
         ];
     }
+
     public function administrator()
     {
         return $this->belongsTo(Administrator::class);
@@ -49,5 +50,28 @@ class Post extends Model
     public function comments()
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($post) {
+            $post->comments()->each(function ($comment) {
+                $comment->replies()->delete();
+                $comment->likes()->delete();
+                $comment->dislikes()->delete();
+            });
+            $post->comments()->delete();
+        });
+
+        static::restoring(function ($post) {
+            $post->comments()->withTrashed()->each(function ($comment) {
+                $comment->replies()->withTrashed()->restore();
+                $comment->likes()->withTrashed()->restore();
+                $comment->dislikes()->withTrashed()->restore();
+            });
+            $post->comments()->withTrashed()->restore();
+        });
     }
 }

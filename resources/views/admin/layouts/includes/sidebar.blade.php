@@ -59,6 +59,14 @@
                           </p>
                       </a>
                   </li>
+                  <li class="nav-item">
+                      <a href="{{ route('admin.logs.index') }}" class="nav-link">
+                          <i class="nav-icon fas fa-history"></i>
+                          <p>
+                              Логи
+                          </p>
+                      </a>
+                  </li>
                   <li class="nav-item has-treeview">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-users"></i>
@@ -68,6 +76,7 @@
                           </p>
                       </a>
                       <ul class="nav nav-treeview">
+
                           <li class="nav-item">
                               <a href="{{ route('admin.users.index') }}" class="nav-link">
                                   <i class="fa fa-user nav-icon"></i>

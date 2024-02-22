@@ -1,17 +1,20 @@
 <?php
 
 use App\Http\Controllers\Api\ApplianceController;
+use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
+use App\Http\Controllers\Api\DropzoneController;
 use App\Http\Controllers\Api\FirmwareController;
 
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ReplyController;
+use App\Http\Controllers\Api\RequestLogController;
 use App\Http\Controllers\Api\SummernoteController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\UserController;
-
+use App\Http\Controllers\Public\LikeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -58,6 +61,8 @@ Route::group(
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('api.users.destroy');
         Route::put('/users/{user}', [UserController::class, 'restore'])->name('api.users.restore');
 
+        Route::get('/logs', [RequestLogController::class, 'index'])->name('api.logs.index');
+
         Route::get('/comments', [CommentController::class, 'index'])->name('api.comments.index');
 
         Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('api.comments.destroy');
@@ -77,12 +82,25 @@ Route::group(
     }
 );
 
+
+Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwares.index');
+Route::get('/masters', [UserController::class, 'masters'])->name('api.masters.index');
+// Route::get('/users', [UserController::class, 'index'])->name('api.users.index');
+
+
 Route::group(
-    [['auth:verified']],
+    ['middleware' => ['auth:web', 'verified']],
     function () {
-        Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwares.index');
         Route::post('/summernote/upload', [SummernoteController::class, 'upload'])->name('api.summernote.upload');
         Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])->name('api.summernote.destroy');
-    }
 
+        Route::post('/avatar/upload', [AvatarController::class, 'upload'])->name('api.avatar.upload');
+        Route::get('/avatar/show', [AvatarController::class, 'show'])->name('api.avatar.show');
+        Route::delete('/avatar/destroy', [AvatarController::class, 'destroy'])->name('api.avatar.destroy');
+
+        Route::prefix('/{type}/{id}/')->group(function () {
+            Route::post('/like', [LikeController::class, 'like'])->name('like');
+            Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
+        });
+    }
 );

@@ -3,23 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\Duplicate;
-use App\Http\Filters\ExtensionFilter;
-use App\Http\Filters\PlatformFilter;
-use App\Http\Filters\TitleFilter;
-use App\Http\Sort\Firmwares\Crc32Sort;
-
-use App\Http\Sort\Firmwares\IdSort;
-
-use App\Http\Sort\Firmwares\SizeSort;
-
 use App\Models\Firmware;
-
-use App\Models\Path;
-use App\Services\DuplicateService;
-use Illuminate\Http\Request;
-use Illuminate\Pipeline\Pipeline;
-
 
 class FirmwareController extends Controller
 {

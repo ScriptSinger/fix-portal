@@ -20,7 +20,6 @@ class PostController extends Controller
             ->with('category')
             ->orderBy('id', 'desc')
             ->paginate(2);
-
         return view('public.posts.index', compact('posts'));
     }
 
@@ -29,7 +28,6 @@ class PostController extends Controller
         $post = Post::where('slug', $slug)->firstOrFail();
         $post->views += 1;
         $post->update();
-
         return view('public.posts.show', compact('post'));
     }
 }

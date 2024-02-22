@@ -88,6 +88,7 @@ mix.styles(
         "resources/assets/admin/plugins/datatables-select/css/select.bootstrap4.css",
         "resources/assets/admin/plugins/datatables-buttons/css/buttons.bootstrap4.css",
         "resources/assets/admin/plugins/summernote/summernote-bs4.css",
+        "resources/assets/admin/plugins/dropzone/dropzone.css",
     ],
     "public/assets/front/css/main.css"
 );
@@ -106,6 +107,8 @@ mix.scripts(
         "resources/assets/admin/plugins/datatables-responsive/js/responsive.bootstrap4.js",
         "resources/assets/admin/plugins/datatables-select/js/dataTables.select.js",
         "resources/assets/admin/plugins/summernote/summernote-bs4.js",
+        "resources/assets/admin/plugins/dropzone/dropzone.js",
+        "resources/assets/admin/plugins/jquery.inputmask.js",
     ],
     "public/assets/front/js/main.js"
 );
@@ -135,6 +138,7 @@ mix.copyDirectory(
     "resources/assets/admin/plugins/summernote/font",
     "public/assets/front/css/font"
 );
+
 // mix.js('resources/js/app.js', 'public/assets/auth/js')
 //     .sass('resources/sass/app.scss', 'public/assets/auth/css')
 //     .sourceMaps();

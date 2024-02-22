@@ -37,11 +37,6 @@
                                 "restore": "{{ route('api.users.restore', ['user' => ':id']) }}"
                             }'>
                         </table>
-
-                        {{-- data-index="{{ route('api.users.index') }}"
-                            data-edit="{{ route('admin.users.edit', ['user' => ':id']) }}"
-                            data-destroy="{{ route('api.users.destroy', ['user' => ':id']) }}"
-                            data-restore="{{ route('api.users.restore', ['user' => ':id']) }}"> --}}
                     </div>
                 </div>
             </div>

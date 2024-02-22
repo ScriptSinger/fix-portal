@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Appliance;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,11 +21,13 @@ class ApplianceFactory extends Factory
 
     public function definition(): array
     {
-        $appliances = ['стиральная машина', 'холодильник', 'посудомоечная машина', 'морозильник'];
+        $appliances = ['Стиральные Машины', 'Холодильники', 'Посудомоечные Машины', 'Морозильники'];
 
         return [
             'title' => $this->faker->unique()->randomElement($appliances),
-            'slug' => $this->faker->unique()->slug,
+            'slug' => function (array $attributes) {
+                return SlugService::createSlug(Appliance::class, 'slug', $attributes['title']);
+            },
         ];
     }
 }

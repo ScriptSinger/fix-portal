@@ -17,10 +17,8 @@ class LikeService
             $existingLike->delete();
         } else {
             $like = new Like();
-
             $like->user_id = $user->id;
             $instance->likes()->save($like);
-
             // Если у пользователя уже был дизлайк, убираем дизлайк
             if ($existingDislike) {
                 $existingDislike->delete();

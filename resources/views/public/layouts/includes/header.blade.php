@@ -22,16 +22,16 @@
                         <a class="nav-link" href="{{ route('firmwares.index') }}">Прошивки</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="marketing-blog.html">Blog</a>
+                        <a class="nav-link" href="{{ route('users.index') }}">Мастера</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="marketing-contact.html">Contact Us</a>
+                        <a class="nav-link" href="marketing-contact.html">О Нас</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
                     @auth
                         <li class="nav-item">
-                            <a href="{{ route('profile') }}" class="nav-link">{{ auth()->user()->name }}</a>
+                            <a href="{{ route('profile.edit') }}" class="nav-link">{{ auth()->user()->name }}</a>
                         </li>
                         <li class="nav-item">
                             <a href="#" class="nav-link"

@@ -50,9 +50,6 @@ class Question extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-
-
-
     public function getSrcFromContentAttribute()
     {
         $html = $this->attributes['description'];
@@ -64,5 +61,24 @@ class Question extends Model
         $pattern = '/<img.+?src="(.+?)".*?>/';
         preg_match($pattern, $html, $matches);
         return isset($matches[1]) ? $matches[1] : null;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($question) {
+            $question->comments()->each(function ($comment) {
+                $comment->replies()->delete();
+            });
+            $question->comments()->delete();
+        });
+
+        static::restoring(function ($question) {
+            $question->comments()->withTrashed()->each(function ($comment) {
+                $comment->replies()->withTrashed()->restore();
+            });
+            $question->comments()->withTrashed()->restore();
+        });
     }
 }

@@ -22,18 +22,36 @@ $(document).ready(function () {
                 title: "ID",
             },
             {
+                data: "text",
+                title: "Комментарий",
+            },
+            {
                 data: "user",
                 title: "Пользователь",
                 render: function (data, type, row) {
-                    return `<a href="${routes.userEdit.replace(
-                        ":id",
-                        row.id
-                    )}">${data.name}</a>`;
+                    if (data) {
+                        return `<a href="${routes.userEdit.replace(
+                            ":id",
+                            row.id
+                        )}">${data.name}</a>`;
+                    } else {
+                        return "";
+                    }
                 },
             },
             {
-                data: "text",
-                title: "Комментарий",
+                data: "likes",
+                title: "Likes",
+                render: function (data, type, row) {
+                    return data.length;
+                },
+            },
+            {
+                data: "dislikes",
+                title: "Dislikes",
+                render: function (data, type, row) {
+                    return data.length;
+                },
             },
             {
                 data: "created_at",
@@ -70,7 +88,7 @@ $(document).ready(function () {
         ],
         columnDefs: [
             {
-                targets: 2,
+                targets: 1,
                 render: function (data, type, row, meta) {
                     var truncatedText =
                         type === "display" && data.length > 50
@@ -85,7 +103,7 @@ $(document).ready(function () {
         ],
         rowCallback: function (row, data, index) {
             if (data.deleted_at) {
-                $("td:eq(2)", row).wrapInner("<s>");
+                $("td:eq(1)", row).wrapInner("<s>");
             }
         },
     });

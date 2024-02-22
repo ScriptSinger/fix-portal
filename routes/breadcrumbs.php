@@ -5,6 +5,7 @@ use App\Models\Category;
 use App\Models\Firmware;
 use App\Models\Post;
 use App\Models\Question;
+use App\Models\User;
 use Illuminate\Support\Str;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -61,5 +62,15 @@ Breadcrumbs::for('firmware', function (BreadcrumbTrail $trail, Firmware $firmwar
 
 // Личный кабинет
 Breadcrumbs::for('profile', function (BreadcrumbTrail $trail) {
-    $trail->push('Личный кабинет', route('profile'));
+    $trail->push('Личный кабинет', route('profile.edit'));
+});
+
+// Users
+Breadcrumbs::for('users', function (BreadcrumbTrail $trail) {
+    $trail->push('Мастера', route('users.index'));
+});
+
+Breadcrumbs::for('user', function (BreadcrumbTrail $trail, User $user) {
+    $trail->parent('users');
+    $trail->push($user->name, route('users.show', $user));
 });

@@ -15,7 +15,7 @@ class ReplyController extends Controller
             $comment = Comment::with('user', 'replies')->withTrashed()->findOrFail($id);
             $replies = $comment->replies;
         } else {
-            $replies = Reply::with('user', 'comment', 'likes')->withTrashed()->get();
+            $replies = Reply::with('user', 'comment', 'likes', 'dislikes')->withTrashed()->get();
         }
         return response()->json($replies);
     }

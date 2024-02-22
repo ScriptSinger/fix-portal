@@ -29,7 +29,7 @@ class PostFactory extends Factory
             'administrator_id' => 1,
             'description' => $this->faker->paragraph,
             'content' => $this->faker->paragraph(5), // Пример для генерации 5 абзацев контента
-            'category_id' => Category::factory(), // Пример для случайной категории
+            'category_id' => Category::all()->random()->id,
             'views' => $this->faker->numberBetween(0, 1000), // Пример для случайного количества просмотров
             // 'thumbnail' => $this->faker->imageUrl(400, 300, 'cats', true), // Пример изображения-заглушки
             'thumbnail' => null, // Пример изображения-заглушки

@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-
 use App\Services\LikeService;
-
-use Illuminate\Http\Request;
 
 class LikeController extends Controller
 {
@@ -20,16 +17,11 @@ class LikeController extends Controller
 
     public function like($type, $id)
     {
-
         $model = "App\\Models\\" . ucfirst($type);
-
         $instance = $model::findOrFail($id);
-
-
         $user = auth()->user();
         $this->likeService->toggleLike($instance, $user);
         $counter = $this->likeService->counter($instance);
-
         return response()->json($counter);
     }
 

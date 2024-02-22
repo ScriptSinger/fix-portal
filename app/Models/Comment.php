@@ -20,8 +20,6 @@ class Comment extends Model
         'user_id',
     ];
 
-
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -45,5 +43,18 @@ class Comment extends Model
     public function dislikes()
     {
         return $this->morphMany(Dislike::class, 'dislikeable');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($comment) {
+            $comment->replies()->delete();
+        });
+
+        static::restoring(function ($comment) {
+            $comment->replies()->restore();
+        });
     }
 }

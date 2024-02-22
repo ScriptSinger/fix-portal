@@ -3,24 +3,13 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\Firmware\TextFilter;
 use App\Models\Firmware;
-use Illuminate\Pipeline\Pipeline;
 
 class FirmwareController extends Controller
 {
     public function index()
     {
-        $firmwares = app()->make(Pipeline::class)
-            ->send(Firmware::query())
-            ->through([
-                TextFilter::class
-
-            ])
-            ->thenReturn()
-            ->paginate(50);
-
-        return view('public.firmwares.index', compact('firmwares'));
+        return view('public.firmwares.index');
     }
 
     public function show(string $slug)

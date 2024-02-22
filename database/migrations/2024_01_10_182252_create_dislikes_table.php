@@ -17,7 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('dislikeable_id');
             $table->string('dislikeable_type');
             $table->timestamps();
-            $table->unique(['user_id', 'dislikeable_id', 'dislikeable_type']);
+            // $table->unique(['user_id', 'dislikeable_id', 'dislikeable_type']);
+            $table->softDeletes();
         });
     }
 
