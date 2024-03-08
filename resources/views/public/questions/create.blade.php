@@ -57,7 +57,11 @@
                     </div>
                     <div class="form-group">
                         <label>Неисправность</label>
-                        <textarea class="summernote" name="description" data-upload-url="{{ route('api.summernote.upload') }}"></textarea>
+                        <textarea class="summernote" name="description"
+                            data-routes='{
+                            "upload": "{{ route('api.summernote.upload') }}",
+                            "destroy": "{{ route('api.summernote.destroy') }}"
+                        }'></textarea>
                         <span class="form-control-feedback">
                             @error('description')
                                 {{ $message }}

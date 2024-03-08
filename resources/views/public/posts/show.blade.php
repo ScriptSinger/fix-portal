@@ -35,7 +35,7 @@
             </div>
         </div>
         <div class="single-post-media">
-            <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
+            <img src="{{ $post->thumbnail }}" alt="Preview Image" class="img-fluid">
         </div>
         <div class="blog-content">
             {!! $post->content !!}

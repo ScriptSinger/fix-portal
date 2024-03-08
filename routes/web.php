@@ -190,6 +190,7 @@ Route::group(
         Route::put('/replies/{reply}', [AdminReplyController::class, 'update'])->name('admin.replies.update');
 
         Route::get('/logs', [RequestLogController::class, 'index'])->name('admin.logs.index');
+        Route::delete('/logs/clear', [RequestLogController::class, 'clear'])->name('admin.logs.clear');
     }
 );
 

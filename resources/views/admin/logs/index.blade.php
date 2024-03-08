@@ -20,7 +20,10 @@
             <div class="container-fluid">
                 <div class="card card-outline card-primary">
                     <div class="card-header">
-
+                        <button class="btn btn-primary" type="submit"
+                            onclick="event.preventDefault(); document.getElementById('clear').submit();">
+                            Очистить
+                        </button>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
                                     class="fas fa-expand"></i></button>
@@ -39,6 +42,11 @@
                     </div>
                 </div>
             </div>
+            <form id="clear" class="d-none" action="{{ route('admin.logs.clear') }}" method="POST">
+                @csrf
+                @method('DELETE')
+                <input type="submit">
+            </form>
         </section>
     </div>
 @endsection

@@ -74,4 +74,21 @@ class Post extends Model
             $post->comments()->withTrashed()->restore();
         });
     }
+
+    // public function getContentAttribute($value)
+    // {
+    //     // Здесь вы можете написать код для обработки содержимого, 
+    //     // заменяя относительные пути к изображениям на функции asset
+    //     // Например:
+    //     $processedContent = preg_replace_callback(
+    //         '/src="([^"]+\.(?:jpe?g|png|gif|bmp|svg))"/i',
+    //         function ($matches) {
+    //             return 'src="' . asset($matches[1]) . '"';
+    //         },
+
+    //         $value
+    //     );
+
+    //     return $processedContent;
+    // }
 }

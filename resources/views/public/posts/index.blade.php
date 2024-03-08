@@ -40,17 +40,15 @@
                         <div class="post-media">
                             <a href="{{ route('articles.index', ['article' => $post->slug]) }}" title="">
                                 @if ($post->thumbnail)
-                                    <img src="{{ $post->getImage('thumbnail') }}" alt="Preview Image" class="img-fluid">
+                                    <img src="{{ $post->thumbnail }}" alt="Preview Image" class="img-fluid">
                                 @else
                                     <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid">
                                 @endif
-
                                 <div class="hovereffect">
                                     <span></span>
                                 </div>
                             </a>
                         </div>
-
                         <div class="blog-meta big-meta text-center">
                             <div class="post-sharing">
                                 <ul class="list-inline">

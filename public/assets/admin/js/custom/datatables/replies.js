@@ -47,13 +47,6 @@ $(document).ready(function () {
                 },
             },
             {
-                data: "dislikes",
-                title: "Dislikes",
-                render: function (data, type, row) {
-                    return data.length;
-                },
-            },
-            {
                 data: "created_at",
                 title: "Created At",
                 render: function (data, type, row) {

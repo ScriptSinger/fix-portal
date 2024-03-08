@@ -33,7 +33,11 @@
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
                         <a href="{{ route('articles.show', ['article' => $post->slug]) }}" title="">
-                            <img src="{{ $post->getImage('thumbnail') }}" alt="" class="img-fluid">
+                            @if ($post->thumbnail)
+                                <img src="{{ $post->thumbnail }}" alt="Preview Image" class="img-fluid">
+                            @else
+                                <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid">
+                            @endif
                             <div class="hovereffect">
                                 <span></span>
                             </div>

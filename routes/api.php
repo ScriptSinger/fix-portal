@@ -75,10 +75,6 @@ Route::group(
         Route::get('/questions', [QuestionController::class, 'index'])->name('api.questions.index');
         Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('api.questions.destroy');
         Route::put('/questions/{question}', [QuestionController::class, 'restore'])->name('api.questions.restore');
-
-
-        Route::post('/summernote/upload', [SummernoteController::class, 'upload'])->name('api.summernote.upload');
-        Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])->name('api.summernote.destroy');
     }
 );
 
@@ -87,12 +83,10 @@ Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwa
 Route::get('/masters', [UserController::class, 'masters'])->name('api.masters.index');
 // Route::get('/users', [UserController::class, 'index'])->name('api.users.index');
 
-
 Route::group(
     ['middleware' => ['auth:web', 'verified']],
     function () {
-        Route::post('/summernote/upload', [SummernoteController::class, 'upload'])->name('api.summernote.upload');
-        Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])->name('api.summernote.destroy');
+
 
         Route::post('/avatar/upload', [AvatarController::class, 'upload'])->name('api.avatar.upload');
         Route::get('/avatar/show', [AvatarController::class, 'show'])->name('api.avatar.show');
@@ -104,3 +98,24 @@ Route::group(
         });
     }
 );
+
+
+if (auth()->guard('admin')->check()) {
+    // Маршруты доступны только для администраторов
+    Route::post('/summernote/upload', [SummernoteController::class, 'upload'])
+        ->name('api.summernote.upload')
+        ->middleware(['auth:admin', 'prefix' => 'heturion']);
+
+    Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])
+        ->name('api.summernote.destroy')
+        ->middleware(['auth:admin', 'prefix' => 'heturion']);
+} else {
+    // Маршруты доступны для всех аутентифицированных пользователей
+    Route::post('/summernote/upload', [SummernoteController::class, 'upload'])
+        ->name('api.summernote.upload')
+        ->middleware(['auth:web', 'verified']);
+
+    Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])
+        ->name('api.summernote.destroy')
+        ->middleware(['auth:web', 'verified']);
+}

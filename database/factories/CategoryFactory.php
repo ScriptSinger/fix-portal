@@ -21,18 +21,27 @@ class CategoryFactory extends Factory
 
     protected $model = Category::class;
 
-
+    private $categoryIndex = 0;
     public function definition(): array
     {
+        $categories = [
+            'Ремонт холодильников',
+            'Ремонт стиральных машин',
+            'Коды ошибок стиральных машин',
+            'Коды ошибок холодильников',
+            'Характеристики компрессоров',
+            'Вопросы по ремонту бытовой техники',
+        ];
 
-        $categories = ['Коды ошибок стиральных машин', 'Коды ошибок холодильников', 'Характеристики компрессоров', 'Ремонт стиральных машин', 'Ремонт холодильников'];
+        $title = $categories[$this->categoryIndex];
+        $this->categoryIndex++;
 
+
+        $slug = SlugService::createSlug(Category::class, 'slug', $title);
 
         return [
-            'title' => $this->faker->unique()->randomElement($categories),
-            'slug' => function (array $attributes) {
-                return SlugService::createSlug(Category::class, 'slug', $attributes['title']);
-            },
+            'title' => $title,
+            'slug' => $slug,
         ];
     }
 }

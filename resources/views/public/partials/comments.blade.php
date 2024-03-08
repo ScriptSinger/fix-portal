@@ -51,7 +51,10 @@
                                         @csrf
                                         <div class="form-group">
                                             <textarea class="form-control summernote" name="text" placeholder="Ваш ответ"
-                                                data-upload-url="{{ route('api.summernote.upload') }}"></textarea>
+                                                data-routes='{
+                                                "upload": "{{ route('api.summernote.upload') }}",
+                                                "destroy": "{{ route('api.summernote.destroy') }}"
+                                            }'></textarea>
                                         </div>
                                         <div class="text-right">
                                             <button role="button" type="submit" class="btn btn-dark">Отправить</button>
@@ -128,7 +131,11 @@
                     ]) }}">
                     @csrf
                     <div class="form-group">
-                        <textarea class="form-control summernote" name="text" data-upload-url="{{ route('api.summernote.upload') }}"></textarea>
+                        <textarea class="form-control summernote" name="text"
+                            data-routes='{
+                            "upload": "{{ route('api.summernote.upload') }}",
+                            "destroy": "{{ route('api.summernote.destroy') }}"
+                        }'></textarea>
                     </div>
                     <button role="button" type="submit" class="btn btn-dark">Отправить</button>
                 </form>

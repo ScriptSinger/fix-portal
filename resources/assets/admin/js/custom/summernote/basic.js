@@ -1,5 +1,5 @@
 $(function () {
-    $(".basic").summernote({
+    $(".summernote").summernote({
         toolbar: [
             ["style", ["bold", "underline"]],
             ["insert", ["link", "picture"]],
@@ -8,16 +8,16 @@ $(function () {
         height: 150,
         callbacks: {
             onImageUpload: function (files) {
-                upload(files[0]);
+                upload(files[0], $(this));
             },
             onMediaDelete: function ($target) {
-                destroy($target.attr("src"));
+                destroy($target.attr("src"), $(this));
             },
         },
     });
 
-    function upload(file) {
-        let url = $(".basic").data("upload-url");
+    function upload(file, instance) {
+        let url = instance.data("routes").upload;
         let token = $('meta[name="csrf-token"]').attr("content");
         let data = new FormData();
         data.append("file", file);
@@ -31,14 +31,9 @@ $(function () {
             contentType: false,
             processData: false,
             success: function (response) {
-                response = window.location.origin + response;
-                $(".basic").summernote(
-                    "insertImage",
-                    response,
-                    function ($image) {
-                        $image.addClass("img-fluid");
-                    }
-                );
+                instance.summernote("insertImage", response, function ($image) {
+                    $image.addClass("img-fluid");
+                });
             },
 
             error: function (xhr) {
@@ -52,8 +47,8 @@ $(function () {
         });
     }
 
-    function destroy(src) {
-        let url = $(".basic").data("delete-url");
+    function destroy(src, instance) {
+        let url = instance.data("routes").destroy;
         let token = $('meta[name="csrf-token"]').attr("content");
         $.ajax({
             method: "DELETE",

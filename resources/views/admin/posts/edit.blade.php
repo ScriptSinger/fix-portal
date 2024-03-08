@@ -59,8 +59,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Содержание</label>
-                                        <textarea id="content" data-upload-url="{{ route('api.summernote.upload') }}" name="content"
-                                            data-delete-url="{{ route('api.summernote.destroy') }}" class="form-control @error('content') is-invalid @enderror">{{ $post->content }}</textarea>
+                                        <textarea id="content" name="content" class="form-control @error('content') is-invalid @enderror"
+                                            data-routes='{
+                                            "upload": "{{ route('api.summernote.upload') }}",
+                                            "destroy": "{{ route('api.summernote.destroy') }}"
+                                        }'>{{ $post->content }}</textarea>
                                         <span id="contentError" class="error invalid-feedback">
                                             @error('content')
                                                 {{ $message }}
