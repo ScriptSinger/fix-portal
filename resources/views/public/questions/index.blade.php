@@ -37,12 +37,10 @@
             @if (count($questions))
                 @foreach ($questions as $question)
                     <div class="blog-box wow fadeIn">
-                        <div class="post-media">
+                        <div class="post-media" style="max-height: 400px">
                             <a href="{{ route('questions.index', ['slug' => $question->slug]) }}">
                                 @if ($question->srcFromContent)
-                                    <div>
-                                        <img src="{{ $question->srcFromContent }}" class="img-fluid">
-                                    </div>
+                                    <img src="{{ $question->srcFromContent }}" class="img-fluid">
                                 @else
                                     <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt="Preview Image"
                                         class="img-fluid">
@@ -55,19 +53,11 @@
                         </div>
                         <!-- end media -->
                         <div class="blog-meta big-meta text-center">
-                            <div class="post-sharing">
-                                <ul class="list-inline">
-                                    <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i>
-                                            <span class="down-mobile">Share
-                                                on Facebook</span></a></li>
-                                    <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i>
-                                            <span class="down-mobile">Tweet
-                                                on Twitter</span></a></li>
-                                    <li><a href="#" class="gp-button btn btn-primary"><i
-                                                class="fa fa-google-plus"></i></a>
-                                    </li>
-                                </ul>
-                            </div><!-- end post-sharing -->
+
+                            @include('public.layouts.widgets.sharing', [
+                                'reference' => $question->slug,
+                            ])
+                            <!-- end post-sharing -->
                             <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
                                     title="">{{ $question->title }}</a></h4>
                             <p>{!! Str::limit(strip_tags($question->description), 150) !!}</p>

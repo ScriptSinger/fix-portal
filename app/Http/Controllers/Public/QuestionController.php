@@ -46,7 +46,7 @@ class QuestionController extends Controller
         ]);
         $data['user_id'] = auth()->user()->id;
         Question::create($data);
-        return redirect()->route('questions.index');
+        return redirect()->route('questions.index')->with('success', 'Вопрос создан');
     }
 
     public function show(string $slug)

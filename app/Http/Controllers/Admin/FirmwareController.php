@@ -7,11 +7,9 @@ use App\Models\Firmware;
 
 class FirmwareController extends Controller
 {
-
     public function index()
     {
-        $firmwares = Firmware::all();
-        return view('admin.firmwares.index', compact('firmwares'));
+        return view('admin.firmwares.index');
     }
 
     public function show(string $id)

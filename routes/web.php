@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\CustomizationController;
+use App\Http\Controllers\Admin\FileController;
 use App\Http\Controllers\Public\FirmwareController;
 use App\Http\Controllers\Admin\FirmwareController as AdminFirmwareController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
@@ -191,6 +192,10 @@ Route::group(
 
         Route::get('/logs', [RequestLogController::class, 'index'])->name('admin.logs.index');
         Route::delete('/logs/clear', [RequestLogController::class, 'clear'])->name('admin.logs.clear');
+
+        Route::get('/files', [FileController::class, 'index'])->name('admin.files.index');
+        Route::get('/files/{file}', [FileController::class, 'show'])->name('admin.files.show');
+        Route::get('/files-grid', [FileController::class, 'grid'])->name('admin.files.grid');
     }
 );
 

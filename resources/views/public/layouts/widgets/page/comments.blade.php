@@ -38,7 +38,7 @@
                         <div class="">{!! $comment->text !!}</div>
                         <hr class="invis">
                         <div class="blog-meta big-meta">
-                            @include('public.partials.likes', [
+                            @include('public.layouts.widgets.likes', [
                                 'instance' => $comment,
                             ])
                             @auth('web')
@@ -52,8 +52,8 @@
                                         <div class="form-group">
                                             <textarea class="form-control summernote" name="text" placeholder="Ваш ответ"
                                                 data-routes='{
-                                                "upload": "{{ route('api.summernote.upload') }}",
-                                                "destroy": "{{ route('api.summernote.destroy') }}"
+                                                "upload": "{{ route('api.files.upload') }}",
+                                                "destroy": "{{ route('api.files.destroy', ['file' => ':id']) }}"
                                             }'></textarea>
                                         </div>
                                         <div class="text-right">
@@ -104,7 +104,7 @@
                                     </div>
                                     <div>{!! $reply->text !!}</div>
                                     <div class="blog-meta big-meta">
-                                        @include('public.partials.likes', [
+                                        @include('public.layouts.widgets.likes', [
                                             'instance' => $reply,
                                         ])
                                     </div>
@@ -133,8 +133,8 @@
                     <div class="form-group">
                         <textarea class="form-control summernote" name="text"
                             data-routes='{
-                            "upload": "{{ route('api.summernote.upload') }}",
-                            "destroy": "{{ route('api.summernote.destroy') }}"
+                            "upload": "{{ route('api.files.upload') }}",
+                            "destroy": "{{ route('api.files.destroy', ['file' => ':id']) }}"
                         }'></textarea>
                     </div>
                     <button role="button" type="submit" class="btn btn-dark">Отправить</button>
@@ -151,5 +151,4 @@
 
 @push('scripts')
     <script src="{{ asset('assets/front/js/custom/summernote/basic.js') }}"></script>
-    <script src="{{ asset('assets/front/js/custom/likes.js') }}"></script>
 @endpush

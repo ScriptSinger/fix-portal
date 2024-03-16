@@ -1,0 +1,3 @@
+$(function () {
+    $(".filtr-container").filterizr();
+});

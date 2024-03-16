@@ -28,6 +28,17 @@ class PostController extends Controller
         $post = Post::where('slug', $slug)->firstOrFail();
         $post->views += 1;
         $post->update();
-        return view('public.posts.show', compact('post'));
+
+        $postTags = $post->tags;
+        // Найдите другие статьи, содержащие хотя бы один из этих тегов
+        $relatedPosts = Post::whereHas('tags', function ($query) use ($postTags) {
+            $query->whereIn('title', $postTags->pluck('title'));
+        })->where('slug', '!=', $slug)
+            ->orderBy('views', 'desc') // Сортировка по количеству просмотров в порядке убывания
+            ->take(2) // Ограничение количества результатов до 2
+            ->with('category') // Загрузка связанной категории
+            ->get();
+
+        return view('public.posts.show', compact('post', 'relatedPosts'));
     }
 }

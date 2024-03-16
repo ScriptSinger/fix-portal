@@ -25,7 +25,7 @@
     <script src="{{ asset('assets/front/js/main.js') }}"></script>
 
     @if (session('success') || session('error'))
-        <script src="{{ asset('assets/front/js/custom/toast/notifications.js') }}"></script>
+        <script src="{{ asset('assets/front/js/custom/sweetAlert2/notifications.js') }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 var notificationType = @json(session('success') ? 'success' : 'error');

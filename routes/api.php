@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\DropzoneController;
+use App\Http\Controllers\Api\FileController;
 use App\Http\Controllers\Api\FirmwareController;
 
 use App\Http\Controllers\Api\PostController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Api\SummernoteController;
 use App\Http\Controllers\Api\TagController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Public\LikeController;
+use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +77,8 @@ Route::group(
         Route::get('/questions', [QuestionController::class, 'index'])->name('api.questions.index');
         Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('api.questions.destroy');
         Route::put('/questions/{question}', [QuestionController::class, 'restore'])->name('api.questions.restore');
+
+        Route::get('/files', [FileController::class, 'index'])->name('api.files.index');
     }
 );
 
@@ -117,5 +121,15 @@ if (auth()->guard('admin')->check()) {
 
     Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])
         ->name('api.summernote.destroy')
+        ->middleware(['auth:web', 'verified']);
+
+
+
+    Route::post('/files/upload', [FileController::class, 'upload'])
+        ->name('api.files.upload')
+        ->middleware(['auth:web', 'verified']);
+
+    Route::delete('/files/{file}', [FileController::class, 'destroy'])
+        ->name('api.files.destroy')
         ->middleware(['auth:web', 'verified']);
 }

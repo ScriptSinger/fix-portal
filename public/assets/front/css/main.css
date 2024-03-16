@@ -13364,6 +13364,17 @@ a:focus,
     font-size: 80%;
     color: rgb(220, 53, 69);
  }
+
+ .whatsapp-button {
+    padding: 0.8rem 1rem !important;
+ }
+ .whatsapp-button.btn-primary:hover,
+ .whatsapp-button.btn-primary:focus,
+ .whatsapp-button.btn-primary {
+    border-color: #25D366 !important;
+    background-color: #25D366 !important;
+ }
+
 @charset "UTF-8";
 table.dataTable th.dt-left,
 table.dataTable td.dt-left {

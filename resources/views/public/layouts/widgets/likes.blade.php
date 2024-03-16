@@ -43,6 +43,7 @@
         @endisset
     </small>
 @endauth
-@section('script')
-    @include('public.layouts.scripts.submitHandler')
-@endsection
+
+@pushonce('scripts', 'likes')
+    <script src="{{ asset('assets/front/js/custom/likes.js') }}"></script>
+@endpushonce

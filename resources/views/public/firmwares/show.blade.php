@@ -27,6 +27,9 @@
 
 @section('content')
     <div class="page-wrapper">
+        <div class="blog-title-area">
+            @include('public.layouts.widgets.sharing', ['reference' => $firmware->id])
+        </div>
         <div class="custombox clearfix">
             <h4 class="small-title">Метаданные</h4>
             <div class="table-responsive">
@@ -80,7 +83,7 @@
 
         <hr class="invis1">
 
-        @include('public.partials.comments', [
+        @include('public.layouts.widgets.page.comments', [
             'instance' => $firmware,
         ])
     </div>

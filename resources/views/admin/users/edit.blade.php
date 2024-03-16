@@ -6,9 +6,12 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <div class="user-block">
-                            <img class="img-circle"
-                                src="{{ optional($user)->avatar ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
-                                alt="User Image">
+                            <a href="{{ optional($user)->avatar ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                                data-toggle="lightbox">
+                                <img class="img-circle"
+                                    src="{{ optional($user)->avatar ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                                    alt="User Image">
+                            </a>
                             <span class="username"><a href="#">{{ $user->name }} # {{ $user->id }}</a></span>
                             <span class="description">Shared publicly - 7:30 PM Today</span>
                         </div>
@@ -187,3 +190,6 @@
             </form>
     </div>
 @endsection
+@push('scripts')
+    <script src="{{ asset('assets/admin/js/custom/ekko-lightbox/files.js') }}"></script>
+@endpush

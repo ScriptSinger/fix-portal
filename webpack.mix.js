@@ -21,6 +21,7 @@ mix.styles(
         "resources/assets/admin/plugins/datatables-responsive/css/responsive.bootstrap4.css",
         "resources/assets/admin/plugins/datatables-select/css/select.bootstrap4.css",
         "resources/assets/admin/plugins/summernote/summernote-bs4.css",
+        "resources/assets/admin/plugins/ekko-lightbox/ekko-lightbox.css",
     ],
     "public/assets/admin/css/adminlte.css"
 );
@@ -42,6 +43,8 @@ mix.scripts(
         "resources/assets/admin/plugins/datatables-select/js/select.bootstrap4.js",
         "resources/assets/admin/plugins/moment/moment-with-locales.js",
         "resources/assets/admin/plugins/summernote/summernote-bs4.js",
+        "resources/assets/admin/plugins/ekko-lightbox/ekko-lightbox.js",
+        "resources/assets/admin/plugins/filterizr/jquery.filterizr.min.js",
     ],
     "public/assets/admin/js/adminlte.js"
 );

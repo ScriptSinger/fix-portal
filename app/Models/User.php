@@ -55,9 +55,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
     ];
 
-
-
-
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
@@ -71,6 +68,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function questions(): HasMany
     {
         return $this->hasMany(Question::class);
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(File::class);
     }
 
 

@@ -33,6 +33,7 @@ class PublicComposer
             $data = [
                 'popular_categories' => $this->categories->withCount('posts')->orderBy('posts_count', 'desc')->limit(7)->get(),
                 'popular_posts' => $this->posts->orderBy('views', 'desc')->limit(3)->get(),
+                'latest_posts' => $this->posts->orderBy('created_at', 'desc')->limit(3)->get(),
                 'customization' => $this->customization->first(),
             ];
 

@@ -31,8 +31,8 @@
         <div class="blog-custom-build">
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
-                    <div class="post-media">
-                        <a href="{{ route('articles.show', ['article' => $post->slug]) }}" title="">
+                    <div class="post-media" style="max-height: 400px">
+                        <a href="{{ route('articles.show', ['article' => $post->slug]) }}">
                             @if ($post->thumbnail)
                                 <img src="{{ $post->thumbnail }}" alt="Preview Image" class="img-fluid">
                             @else
@@ -46,19 +46,10 @@
                     </div>
                     <!-- end media -->
                     <div class="blog-meta big-meta text-center">
-                        <div class="post-sharing">
-                            <ul class="list-inline">
-                                <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
-                                            class="down-mobile">Share
-                                            on Facebook</span></a></li>
-                                <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i> <span
-                                            class="down-mobile">Tweet
-                                            on Twitter</span></a></li>
-                                <li><a href="#" class="gp-button btn btn-primary"><i
-                                            class="fa fa-google-plus"></i></a>
-                                </li>
-                            </ul>
-                        </div><!-- end post-sharing -->
+                        @include('public.layouts.widgets.sharing', [
+                            'reference' => $post->slug,
+                        ])
+                        <!-- end post-sharing -->
                         <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
