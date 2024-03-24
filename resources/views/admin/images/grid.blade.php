@@ -5,12 +5,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Файлы</h1>
+                        <h1>Изображения</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('admin.categories.index') }}">Главная</a></li>
-                            <li class="breadcrumb-item active">Файлы</li>
+                            <li class="breadcrumb-item active">Изображения</li>
                         </ol>
                     </div>
                 </div>
@@ -28,12 +28,12 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            @foreach ($files as $file)
+                            @foreach ($images as $image)
                                 <div class="col-sm-2">
-                                    <a href="{{ $file->url }}" data-toggle="lightbox"
-                                        data-footer="{{ $file->mime }}{{ $file->size }}"
-                                        data-title="{{ $file->url }}" data-gallery="gallery">
-                                        <img src="{{ $file->url }}" class="img-fluid img-thumbnail rounded">
+                                    <a href="{{ $image->url }}" data-toggle="lightbox"
+                                        data-footer="{{ $image->mime }}{{ $image->size }}"
+                                        data-title="{{ $image->url }}" data-gallery="gallery">
+                                        <img src="{{ $image->url }}" class="img-fluid img-thumbnail rounded">
                                     </a>
                                 </div>
                             @endforeach
@@ -50,6 +50,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/js/custom/ekko-lightbox/files.js') }}"></script>
-    <script src="{{ asset('assets/admin/js/custom/filterizr/files.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/ekko-lightbox/images.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/filterizr/images.js') }}"></script>
 @endpush

@@ -7,7 +7,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <a class="navbar-brand" href="{{ route('articles.index') }}"><img
-                    src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/market-logo.png') }}"
+                    src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo.png') }}"
                     alt=""></a>
 
             <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -25,7 +25,7 @@
                         <a class="nav-link" href="{{ route('users.index') }}">Мастера</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="marketing-contact.html">О Нас</a>
+                        <a class="nav-link" href="{{ route('about') }}">О Нас</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">

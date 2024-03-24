@@ -5,12 +5,12 @@
             <div class="container-fluid">
                 <div class="row mb-2">
                     <div class="col-sm-6">
-                        <h1>Файлы</h1>
+                        <h1>Изображения</h1>
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
                             <li class="breadcrumb-item"><a href="{{ route('admin.categories.index') }}">Главная</a></li>
-                            <li class="breadcrumb-item active">Файлы</li>
+                            <li class="breadcrumb-item active">Изображения</li>
                         </ol>
                     </div>
                 </div>
@@ -31,8 +31,9 @@
                             <table id="dataTable" class="table table-bordered table-striped dataTable dtr-inline w-100"
                                 data-locale={{ asset('assets/locale/datatable/russian.json') }}
                                 data-routes='{
-                                    "index": "{{ route('api.files.index') }}",
-                                    "show": "{{ route('admin.files.show', ['file' => ':id']) }}"
+                                    "index": "{{ route('api.users.images.index') }}",
+                                    "show": "{{ route('admin.images.show', ['image' => ':id']) }}",
+                                    "destroy": "{{ route('api.users.images.destroy', ['image' => ':id']) }}"
                                 }'>
                             </table>
                         </div>
@@ -44,6 +45,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/js/custom/datatables/files.js') }}"></script>
-    <script src="{{ asset('assets/admin/js/custom/ekko-lightbox/files.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/datatables/images.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/ekko-lightbox/images.js') }}"></script>
 @endpush

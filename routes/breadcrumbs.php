@@ -5,6 +5,7 @@ use App\Models\Category;
 use App\Models\Firmware;
 use App\Models\Post;
 use App\Models\Question;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Diglactic\Breadcrumbs\Breadcrumbs;
@@ -19,6 +20,11 @@ Breadcrumbs::for('home', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('category', function (BreadcrumbTrail $trail, Category $category) {
     $trail->parent('home');
     $trail->push($category->title, route('categories.show', $category->slug));
+});
+
+Breadcrumbs::for('tag', function (BreadcrumbTrail $trail, Tag $tag) {
+    $trail->parent('home');
+    $trail->push($tag->title, route('categories.show', $tag->slug));
 });
 
 // Post

@@ -1,23 +1,25 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\PostImageController;
 use App\Http\Controllers\Api\ApplianceController;
 use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Api\DropzoneController;
 use App\Http\Controllers\Api\FileController;
-use App\Http\Controllers\Api\FirmwareController;
 
+use App\Http\Controllers\Api\FirmwareController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\Public\MasterController;
+use App\Http\Controllers\Api\Public\UserImageController;
 use App\Http\Controllers\Api\QuestionController;
 use App\Http\Controllers\Api\ReplyController;
 use App\Http\Controllers\Api\RequestLogController;
-use App\Http\Controllers\Api\SummernoteController;
+use App\Http\Controllers\Api\StatisticController;
 use App\Http\Controllers\Api\TagController;
+
 use App\Http\Controllers\Api\UserController;
+
 use App\Http\Controllers\Public\LikeController;
-use App\Models\File;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -55,7 +57,7 @@ Route::group(
         Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('api.posts.destroy');
         Route::put('/posts/{post}', [PostController::class, 'restore'])->name('api.posts.restore');
 
-        Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwares.index');
+
         Route::delete('/firmwares/{firmware}', [FirmwareController::class, 'destroy'])->name('api.firmwares.destroy');
         Route::put('/firmwares/{firmware}', [FirmwareController::class, 'restore'])->name('api.firmwares.restore');
 
@@ -78,20 +80,25 @@ Route::group(
         Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])->name('api.questions.destroy');
         Route::put('/questions/{question}', [QuestionController::class, 'restore'])->name('api.questions.restore');
 
-        Route::get('/files', [FileController::class, 'index'])->name('api.files.index');
+
+
+        Route::get('/post-images', [PostImageController::class, 'index'])->name('api.post.images.index');
+        Route::get('/post-images/{image}', [PostImageController::class, 'show'])->name('api.post.images.show');
+        Route::post('/post-images', [PostImageController::class, 'upload'])->name('api.post.images.upload');
+        Route::delete('/post-images/{image}', [PostImageController::class, 'destroy'])->name('api.post.images.destroy');
+
+        Route::get('/statistics', [StatisticController::class, 'index'])->name('api.statistics.index');
     }
 );
 
-
 Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwares.index');
-Route::get('/masters', [UserController::class, 'masters'])->name('api.masters.index');
-// Route::get('/users', [UserController::class, 'index'])->name('api.users.index');
+Route::get('/masters', [MasterController::class, 'index'])->name('api.masters.index');
 
 Route::group(
-    ['middleware' => ['auth:web', 'verified']],
+    [
+        'middleware' => 'auth:web,admin,verified',
+    ],
     function () {
-
-
         Route::post('/avatar/upload', [AvatarController::class, 'upload'])->name('api.avatar.upload');
         Route::get('/avatar/show', [AvatarController::class, 'show'])->name('api.avatar.show');
         Route::delete('/avatar/destroy', [AvatarController::class, 'destroy'])->name('api.avatar.destroy');
@@ -100,36 +107,9 @@ Route::group(
             Route::post('/like', [LikeController::class, 'like'])->name('like');
             Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
         });
+
+        Route::get('users-images', [UserImageController::class, 'index'])->name('api.users.images.index');
+        Route::post('users-images', [UserImageController::class, 'upload'])->name('api.users.images.upload');
+        Route::delete('users-images/{image}', [UserImageController::class, 'destroy'])->name('api.users.images.destroy');
     }
 );
-
-
-if (auth()->guard('admin')->check()) {
-    // Маршруты доступны только для администраторов
-    Route::post('/summernote/upload', [SummernoteController::class, 'upload'])
-        ->name('api.summernote.upload')
-        ->middleware(['auth:admin', 'prefix' => 'heturion']);
-
-    Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])
-        ->name('api.summernote.destroy')
-        ->middleware(['auth:admin', 'prefix' => 'heturion']);
-} else {
-    // Маршруты доступны для всех аутентифицированных пользователей
-    Route::post('/summernote/upload', [SummernoteController::class, 'upload'])
-        ->name('api.summernote.upload')
-        ->middleware(['auth:web', 'verified']);
-
-    Route::delete('/summernote/destroy', [SummernoteController::class, 'destroy'])
-        ->name('api.summernote.destroy')
-        ->middleware(['auth:web', 'verified']);
-
-
-
-    Route::post('/files/upload', [FileController::class, 'upload'])
-        ->name('api.files.upload')
-        ->middleware(['auth:web', 'verified']);
-
-    Route::delete('/files/{file}', [FileController::class, 'destroy'])
-        ->name('api.files.destroy')
-        ->middleware(['auth:web', 'verified']);
-}

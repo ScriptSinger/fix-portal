@@ -61,8 +61,8 @@
                                         <label>Содержание</label>
                                         <textarea id="content" name="content" class="form-control @error('content') is-invalid @enderror"
                                             data-routes='{
-                                            "upload": "{{ route('api.summernote.upload') }}",
-                                            "destroy": "{{ route('api.summernote.destroy') }}"
+                                            "upload": "{{ route('api.post.images.upload') }}",
+                                            "destroy": "{{ route('api.post.images.destroy', ['image' => ':id']) }}"
                                         }'>{{ $post->content }}</textarea>
                                         <span id="contentError" class="error invalid-feedback">
                                             @error('content')
@@ -153,6 +153,9 @@
                                     </div>
                                 </div>
                                 <div class="card-body">
+                                    <div class="mb-3"><img class="img-thumbnail"
+                                            src="{{ Storage::url($post->thumbnail->small) }}">
+                                    </div>
                                     <div class="form-group">
                                         <div class="input-group">
                                             <div class="custom-file">
@@ -168,10 +171,9 @@
                                             @enderror
                                         </span>
                                     </div>
+                                </div>
+                                <div class="card-footer">
 
-                                    <div><img class="img-thumbnail" src="{{ $post->getImage('thumbnail') }}"
-                                            alt="">
-                                    </div>
                                 </div>
                             </div>
                         </div>

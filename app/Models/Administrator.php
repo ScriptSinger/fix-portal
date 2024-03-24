@@ -21,4 +21,9 @@ class Administrator extends Authenticatable
     {
         return $this->hasMany(Post::class);
     }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(Image::class);
+    }
 }

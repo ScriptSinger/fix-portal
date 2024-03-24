@@ -8,5 +8,5 @@
                 </li>
             @endforeach
         </ul>
-    </div><!-- end link-widget -->
-</div><!-- end widget -->
+    </div>
+</div>

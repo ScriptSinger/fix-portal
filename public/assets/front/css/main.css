@@ -13375,6 +13375,11 @@ a:focus,
     background-color: #25D366 !important;
  }
 
+ .small-image{
+    width: 72px;
+    height: 72px;
+ }
+
 @charset "UTF-8";
 table.dataTable th.dt-left,
 table.dataTable td.dt-left {

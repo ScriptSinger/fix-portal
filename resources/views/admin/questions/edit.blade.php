@@ -62,8 +62,8 @@
                                 <label>Содержание</label>
                                 <textarea id="content" name="description" class="form-control @error('description') is-invalid @enderror"
                                     data-routes='{
-                                    "upload": "{{ route('api.summernote.upload') }}",
-                                    "destroy": "{{ route('api.summernote.destroy') }}"
+                                    "upload": "{{ route('api.users.images.upload') }}",
+                                    "destroy": "{{ route('api.users.images.destroy', ['image' => ':id']) }}"
                                 }'>{{ $question->description }}</textarea>
                                 <span class="error invalid-feedback">
                                     @error('description')

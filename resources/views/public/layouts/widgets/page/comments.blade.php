@@ -52,8 +52,8 @@
                                         <div class="form-group">
                                             <textarea class="form-control summernote" name="text" placeholder="Ваш ответ"
                                                 data-routes='{
-                                                "upload": "{{ route('api.files.upload') }}",
-                                                "destroy": "{{ route('api.files.destroy', ['file' => ':id']) }}"
+                                                "upload": "{{ route('api.users.images.upload') }}",
+                                                "destroy": "{{ route('api.users.images.destroy', ['image' => ':id']) }}"
                                             }'></textarea>
                                         </div>
                                         <div class="text-right">
@@ -133,8 +133,8 @@
                     <div class="form-group">
                         <textarea class="form-control summernote" name="text"
                             data-routes='{
-                            "upload": "{{ route('api.files.upload') }}",
-                            "destroy": "{{ route('api.files.destroy', ['file' => ':id']) }}"
+                            "upload": "{{ route('api.users.images.upload') }}",
+                            "destroy": "{{ route('api.users.images.destroy', ['image' => ':id']) }}"
                         }'></textarea>
                     </div>
                     <button role="button" type="submit" class="btn btn-dark">Отправить</button>

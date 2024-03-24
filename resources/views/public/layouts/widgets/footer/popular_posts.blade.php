@@ -6,15 +6,17 @@
                 <a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                     class="list-group-item list-group-item-action flex-column align-items-start">
                     <div class="w-100 justify-content-between">
-                        <img src="{{ $post->thumbnail }}" alt="" class="img-fluid float-left">
-                        <h5 class="mb-1">{{ $post->title }}</h5>
-                        <span class="rating">
+                        <img src="{{ Storage::url($post->thumbnail->small) }}" alt="{{ $post->title }}"
+                            class="img-fluid float-left">
+                        <h5 class="mb-1">{{ $post->title }}
+                        </h5>
+                        <small class="rating">
                             <i class="fa fa-eye"></i>
                             {{ $post->views }}
-                        </span>
+                        </small>
                     </div>
                 </a>
             @endforeach
         </div>
-    </div><!-- end blog-list -->
-</div><!-- end widget -->
+    </div>
+</div>

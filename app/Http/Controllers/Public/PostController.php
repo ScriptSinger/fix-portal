@@ -17,9 +17,11 @@ class PostController extends Controller
                 TitleFilter::class
             ])
             ->thenReturn()
-            ->with('category')
+            ->with('category', 'thumbnail')
             ->orderBy('id', 'desc')
             ->paginate(10);
+
+
         return view('public.posts.index', compact('posts'));
     }
 

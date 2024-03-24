@@ -31,8 +31,10 @@
             <h4 class="small-title">О мастере</h4>
             <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-                    <img src="{{ $user->avatar !== null ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
-                        alt="" class=" rounded-circle" width="64px" height="64px">
+                    <a href="#" role="button" data-toggle="modal" data-target="#avatarModal">
+                        <img src="{{ $user->avatar !== null ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                            alt="" class=" rounded-circle" width="64px" height="64px">
+                    </a>
                 </div>
                 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
                     <small>{{ $user->location }}</small>
@@ -46,4 +48,5 @@
             </div>
         </div>
     </div>
+    @include('public.layouts.modal.avatar', ['avatar' => $user])
 @endsection

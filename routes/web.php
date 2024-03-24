@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\ApplianceController as AdminApplianceController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MainController;
-use App\Http\Controllers\Admin\DeletedUserController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\Admin\CustomizationController;
 use App\Http\Controllers\Admin\FileController;
 use App\Http\Controllers\Public\FirmwareController;
 use App\Http\Controllers\Admin\FirmwareController as AdminFirmwareController;
+use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
@@ -21,9 +21,7 @@ use App\Http\Controllers\Admin\TagController as AdminTagController;
 use App\Http\Controllers\Public\ApplianceController;
 use App\Http\Controllers\Public\CategoryController;
 use App\Http\Controllers\Public\CommentController;
-use App\Http\Controllers\Public\LikeController;
 use App\Http\Controllers\Public\PostController;
-
 use App\Http\Controllers\Public\ReplyController;
 use App\Http\Controllers\Public\TagController;
 use App\Http\Controllers\Public\UserController;
@@ -45,6 +43,8 @@ use App\Http\Controllers\Public\UserController;
 Route::get('/', function () {
     return redirect('/articles');
 });
+
+Route::view('/about', 'public.about.show')->name('about');
 
 Route::group(
     ['prefix' => 'articles'],
@@ -68,8 +68,8 @@ Route::get('/firmwares', [FirmwareController::class, 'index'])->name('firmwares.
 Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('firmwares.show');
 
 
-Route::group(
-    ['middleware' => ['auth:web', 'verified']],
+
+Route::middleware(['auth:web', 'verified'])->group(
     function () {
         Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
         Route::put('/profile/update', [UserController::class, 'update'])->name('profile.update');
@@ -86,10 +86,9 @@ Route::group(
         Route::prefix('/questions')->group(function () {
             Route::get('/create', [QuestionController::class, 'create'])->name('questions.create');
             Route::post('/', [QuestionController::class, 'store'])->name('questions.store');
-            Route::delete('/{id}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+            Route::delete('/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
             // Переопределение методов ресурсного контроллера
         });
-
 
         Route::get('/firmwares/download/{filename}', [FirmwareController::class, 'download'])->name('firmwares.download');
     }
@@ -179,8 +178,9 @@ Route::group(
 
         Route::get('/firmwares/download/{filename}', [AdminFirmwareController::class, 'download'])->name('admin.firmwares.download');
 
-        Route::get('/custom/edit', [CustomizationController::class, 'edit'])->name('custom.edit');
-        Route::post('/custom/update', [CustomizationController::class, 'update'])->name('custom.update');
+        Route::get('/customization', [CustomizationController::class, 'edit'])->name('custom.edit');
+        Route::post('/customization', [CustomizationController::class, 'update'])->name('custom.update');
+        Route::delete('/customization', [CustomizationController::class, 'destroy'])->name('custom.delete');
 
         Route::get('/comments', [AdminCommentController::class, 'index'])->name('admin.comments.index');
         Route::get('/comments/{comment}/edit', [AdminCommentController::class, 'edit'])->name('admin.comments.edit');
@@ -193,9 +193,9 @@ Route::group(
         Route::get('/logs', [RequestLogController::class, 'index'])->name('admin.logs.index');
         Route::delete('/logs/clear', [RequestLogController::class, 'clear'])->name('admin.logs.clear');
 
-        Route::get('/files', [FileController::class, 'index'])->name('admin.files.index');
-        Route::get('/files/{file}', [FileController::class, 'show'])->name('admin.files.show');
-        Route::get('/files-grid', [FileController::class, 'grid'])->name('admin.files.grid');
+        Route::get('/images', [ImageController::class, 'index'])->name('admin.images.index');
+        Route::get('/images/{image}', [ImageController::class, 'show'])->name('admin.images.show');
+        Route::get('/images-grid', [ImageController::class, 'grid'])->name('admin.images.grid');
     }
 );
 

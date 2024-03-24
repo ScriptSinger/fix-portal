@@ -32,13 +32,17 @@ $(document).ready(function () {
                 title: "ID",
             },
             {
-                data: "user.email",
-                title: "Account",
+                data: null,
+                title: "Account Images",
                 render: function (data, type, row, meta) {
-                    return `<a href="${routes.show.replace(
-                        ":id",
-                        row.user_id
-                    )}">${data}</a>`;
+                    if (row.user && row.user.email) {
+                        return `<a href="${routes.show.replace(
+                            ":id",
+                            row.user_id
+                        )}">${row.user.email}</a>`;
+                    } else {
+                        return "admin";
+                    }
                 },
             },
             {
@@ -49,7 +53,7 @@ $(document).ready(function () {
                         row.url
                     }" data-footer="${row.mime} ${getSizeInMb(
                         row.size
-                    )}"><img width=60 height=60 src="${data}" class="img-fluid"></a>`;
+                    )}"><img class="direct-chat-img" src="${data}" class="img-fluid"></a>`;
                 },
             },
             {
@@ -103,4 +107,36 @@ $(document).ready(function () {
         //     }
         // },
     });
+
+    $("#dataTable").on(
+        "click",
+        "button.btn-restore, button.btn-delete",
+        function (event) {
+            event.stopPropagation();
+            var token = $('meta[name="csrf-token"]').attr("content");
+            var id = $(this).data("row-id");
+            var actionUrl = $(this).hasClass("btn-restore")
+                ? routes.restore.replace(":id", id)
+                : routes.destroy.replace(":id", id);
+
+            $.ajax({
+                url: actionUrl,
+                method: $(this).hasClass("btn-restore") ? "PUT" : "DELETE",
+                headers: {
+                    "X-CSRF-TOKEN": token,
+                },
+                success: function (response) {
+                    dataTable.ajax.reload(null, false);
+                },
+                error: function (error) {
+                    console.error(
+                        $(this).hasClass("btn-restore")
+                            ? "Error restoring user:"
+                            : "Error deleting user:",
+                        error
+                    );
+                },
+            });
+        }
+    );
 });

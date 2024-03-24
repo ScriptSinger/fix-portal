@@ -43,7 +43,7 @@
                             <i class="fa fa-trash"></i>
                             <b>Удалить</b>
                         </a>
-                        <form id="removeQuestion" action="{{ route('questions.destroy', ['id' => $question->id]) }}"
+                        <form id="removeQuestion" action="{{ route('questions.destroy', ['question' => $question->id]) }}"
                             method="POST" class="d-none">
                             @csrf
                             @method('DELETE')

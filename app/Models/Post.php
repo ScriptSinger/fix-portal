@@ -7,8 +7,10 @@ use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
+
+use Intervention\Image\Laravel\Facades\Image;
 
 class Post extends Model
 {
@@ -37,6 +39,12 @@ class Post extends Model
     {
         return $this->belongsTo(Administrator::class);
     }
+
+    public function thumbnail()
+    {
+        return $this->hasOne(Thumbnail::class);
+    }
+
 
     public function tags()
     {
@@ -76,22 +84,8 @@ class Post extends Model
         });
     }
 
-    // public function getContentAttribute($value)
+    // public function getThumbnailAttribute($value)
     // {
-    //     // Здесь вы можете написать код для обработки содержимого, 
-    //     // заменяя относительные пути к изображениям на функции asset
-    //     // Например:
-    //     $processedContent = preg_replace_callback(
-    //         '/src="([^"]+\.(?:jpe?g|png|gif|bmp|svg))"/i',
-    //         function ($matches) {
-    //             return 'src="' . asset($matches[1]) . '"';
-    //         },
-
-    //         $value
-    //     );
-
-    //     return $processedContent;
+    //     return Storage::url($value);
     // }
-
-
 }

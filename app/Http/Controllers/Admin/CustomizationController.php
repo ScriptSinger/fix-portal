@@ -38,4 +38,10 @@ class CustomizationController extends Controller
         $customization->updateOrInsert(['id' => 1], $data);
         return redirect()->back()->with('success', 'Настройки обновлены успешно');
     }
+
+    public function destroy()
+    {
+        Customization::truncate();
+        return redirect()->back()->with('success', 'Удалено');
+    }
 }

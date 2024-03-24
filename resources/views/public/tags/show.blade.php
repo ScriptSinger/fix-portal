@@ -1,5 +1,7 @@
-@extends('public.layouts.left_sidebar')
-@section('title', 'Ufamasters - Ремонт Бытовой Техники :: ' . $tag->title)
+@extends('public.layouts.bar')
+@section('title', "$tag->title | " . config('app.name', 'Ufamasters'))
+@section('page-title')
+
 @section('page-title')
     <div class="page-title db">
         <div class="container">
@@ -9,13 +11,21 @@
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
-                        <li class="breadcrumb-item active">{{ $tag->title }}</li>
+                        {{ Breadcrumbs::render('tag', $tag) }}
                     </ol>
                 </div><!-- end col -->
             </div><!-- end row -->
         </div><!-- end container -->
     </div><!-- end page-title -->
+@endsection
+
+@section('sidebar')
+    <div class="sidebar">
+        @include('public.layouts.widgets.sidebar.prime_posts')
+        @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_categories')
+    </div>
+
 @endsection
 
 @section('content')
@@ -25,8 +35,8 @@
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
                     <div class="post-media">
-                        <a href="{{ route('posts.single', ['slug' => $post->slug]) }}" title="">
-                            <img src="{{ $post->getImage() }}" alt="" class="img-fluid">
+                        <a href="{{ route('articles.show', ['article' => $post->slug]) }}" title="">
+                            <img src="{{ $post->thumbnail }}" alt="" class="img-fluid">
                             <div class="hovereffect">
                                 <span></span>
                             </div>
@@ -35,25 +45,17 @@
                     </div>
                     <!-- end media -->
                     <div class="blog-meta big-meta text-center">
-                        <div class="post-sharing">
-                            <ul class="list-inline">
-                                <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
-                                            class="down-mobile">Share
-                                            on Facebook</span></a></li>
-                                <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i> <span
-                                            class="down-mobile">Tweet
-                                            on Twitter</span></a></li>
-                                <li><a href="#" class="gp-button btn btn-primary"><i
-                                            class="fa fa-google-plus"></i></a>
-                                </li>
-                            </ul>
-                        </div><!-- end post-sharing -->
-                        <h4><a href="{{ route('posts.single', ['slug' => $post->slug]) }}"
+                        @include('public.layouts.widgets.sharing', [
+                            'reference' => $post->slug,
+                        ])
+                        <!-- end post-sharing -->
+
+                        <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
                         {!! $post->description !!}
                         <small><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
                                 title="">{{ $tag->title }}</a></small>
-                        <small>{{ $post->getPostDate() }}</small>
+                        <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                         <small><a href="#" title="">by Jack</a></small>
                         <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
                     </div><!-- end meta -->

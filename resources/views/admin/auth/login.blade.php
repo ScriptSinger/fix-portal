@@ -1,10 +1,9 @@
-@extends('layouts.app')
+@extends('admin.auth.layouts.app')
 
 @section('body-class', 'login-page')
 @section('body-style', 'min-height: 466px;')
 
 @section('content')
-
 
     <div class="login-box">
         <div class="card card-outline card-primary">

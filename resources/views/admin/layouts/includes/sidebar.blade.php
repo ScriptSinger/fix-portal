@@ -171,21 +171,21 @@
 
                   <li class="nav-item">
                       <a href="#" class="nav-link">
-                          <i class="nav-icon fas fa-file"></i>
+                          <i class="nav-icon fas fa-images"></i>
                           <p>
-                              Файлы
+                              Изображения
                               <i class="right fas fa-angle-left"></i>
                           </p>
                       </a>
                       <ul class="nav nav-treeview">
                           <li class="nav-item">
-                              <a href="{{ route('admin.files.index') }}" class="nav-link">
+                              <a href="{{ route('admin.images.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Список</p>
                               </a>
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('admin.files.grid') }}" class="nav-link">
+                              <a href="{{ route('admin.images.grid') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
                                   <p>Сетка</p>
                               </a>

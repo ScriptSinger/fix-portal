@@ -22,6 +22,7 @@ mix.styles(
         "resources/assets/admin/plugins/datatables-select/css/select.bootstrap4.css",
         "resources/assets/admin/plugins/summernote/summernote-bs4.css",
         "resources/assets/admin/plugins/ekko-lightbox/ekko-lightbox.css",
+        "resources/assets/admin/plugins/dropzone/dropzone.css",
     ],
     "public/assets/admin/css/adminlte.css"
 );
@@ -45,6 +46,7 @@ mix.scripts(
         "resources/assets/admin/plugins/summernote/summernote-bs4.js",
         "resources/assets/admin/plugins/ekko-lightbox/ekko-lightbox.js",
         "resources/assets/admin/plugins/filterizr/jquery.filterizr.min.js",
+        "resources/assets/admin/plugins/dropzone/dropzone.js",
     ],
     "public/assets/admin/js/adminlte.js"
 );

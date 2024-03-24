@@ -59,8 +59,8 @@
                         <label>Неисправность</label>
                         <textarea class="summernote" name="description"
                             data-routes='{
-                            "upload": "{{ route('api.files.upload') }}",
-                            "destroy": "{{ route('api.files.destroy', ['file' => ':id']) }}"
+                            "upload": "{{ route('api.users.images.upload') }}",
+                            "destroy": "{{ route('api.users.images.destroy', ['image' => ':id']) }}"
                         }'></textarea>
                         <span class="form-control-feedback">
                             @error('description')

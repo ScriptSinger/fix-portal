@@ -57,7 +57,7 @@
 
                             <div class="form-group">
                                 <label>Неисправность</label>
-                                <textarea id="content" data-upload-url="{{ route('api.summernote.upload') }}" name="description"
+                                <textarea id="content" data-upload-url="{{ route('api.users.images.upload') }}" name="description"
                                     class="form-control @error('description') is-invalid @enderror" placeholder="Enter ...">{{ old('description') }}</textarea>
                                 <span class="error invalid-feedback">
                                     @error('description')

@@ -1,10 +1,8 @@
-@extends('layouts.app')
+@extends('public.auth.layouts.app')
 @section('title', 'Регистрация | ' . config('app.name', 'Ufamasters'))
 @section('body-class', 'register-page')
 @section('body-style', 'min-height: 542px;') <!-- Устанавливаем атрибут style для body -->
 @section('content')
-
-
     <div class="register-box">
         <div class="login-logo">
             <a href="{{ route('articles.index') }}"><b>Ufa</b>masters</a>
@@ -45,7 +43,7 @@
 
                     <div class="input-group mb-3">
                         <input name="password" type="password" class="@error('password') is-invalid @enderror form-control"
-                            placeholder="Password">
+                            placeholder="Password" autocomplete="new-password">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>
@@ -76,10 +74,11 @@
                     <div class="icheck-primary">
                         <input type="checkbox" id="agreeTerms" name="terms" value="agree">
                         <label for="agreeTerms">
-                            Я согласен с <a href="#">условиями</a>
+                            Я согласен с <a data-toggle="modal" data-target="#termsModal" href="#">условиями</a>
                         </label>
                     </div>
-                    <button type="submit" class="btn btn-block btn-dark btn-flat">Зарегистрироваться</button>
+                    <button id="registerButton" type="submit"
+                        class="btn btn-block btn-dark btn-flat">Зарегистрироваться</button>
                 </form>
                 <div class="social-auth-links text-center">
                     <a href="#" class="btn btn-block btn-primary btn-flat">
@@ -97,5 +96,9 @@
         </div>
     </div>
 
-
+    @include('public.auth.personal-policy')
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/front/js/custom/agree.js') }}"></script>
+@endpush

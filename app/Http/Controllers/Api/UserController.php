@@ -13,17 +13,6 @@ class UserController extends Controller
         return response()->json($users);
     }
 
-    public function masters()
-    {
-        $users = User::withTrashed() // Если вы хотите включить удаленных пользователей
-            ->whereHas('role', function ($query) {
-                $query->where('name', 'мастер');
-            })
-            ->get();
-
-        return response()->json($users);
-    }
-
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);

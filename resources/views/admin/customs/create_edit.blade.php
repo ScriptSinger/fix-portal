@@ -25,6 +25,12 @@
                         <div class="col-md-8">
                             <div class="card card-outline card-primary">
                                 <div class="card-header">
+
+                                    <button class="btn btn-primary" type="submit"
+                                        onclick="event.preventDefault(); document.getElementById('clear').submit();">
+                                        Очистить
+                                    </button>
+
                                     <div class="card-tools">
                                         <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
                                                 class="fas fa-expand"></i></button>
@@ -96,7 +102,7 @@
                                         </span>
                                     </div>
                                     <div style="max-width: 100px"><img class="img-thumbnail"
-                                            src="{{ optional($customization)->getImage('favicon') }}" alt="">
+                                            src="{{ optional($customization)->favicon }}" alt="">
                                     </div>
                                 </div>
                             </div>
@@ -128,7 +134,7 @@
                                         </span>
                                     </div>
                                     <div style="max-width: 100px"><img class="img-thumbnail"
-                                            src="{{ optional($customization)->getImage('logo') }}" alt="">
+                                            src="{{ optional($customization)->logo }}" alt="">
                                     </div>
                                 </div>
                             </div>
@@ -162,7 +168,7 @@
                                         </span>
                                     </div>
                                     <div style="max-width: 100px"><img class="img-thumbnail"
-                                            src="{{ optional($customization)->getImage('banner') }}" alt="">
+                                            src="{{ optional($customization)->banner }}" alt="">
                                     </div>
                                 </div>
                             </div>
@@ -171,4 +177,11 @@
             </form>
         </section>
     </div>
+
+
+    <form id="clear" class="d-none" action="{{ route('custom.delete') }}" method="POST">
+        @csrf
+        @method('DELETE')
+        <input type="submit">
+    </form>
 @endsection

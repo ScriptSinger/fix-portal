@@ -38,12 +38,12 @@
                 @foreach ($questions as $question)
                     <div class="blog-box wow fadeIn">
                         <div class="post-media" style="max-height: 400px">
-                            <a href="{{ route('questions.index', ['slug' => $question->slug]) }}">
+                            <a href="#" role="button" data-toggle="modal" data-target="#modal{{ $question->id }}">
                                 @if ($question->srcFromContent)
-                                    <img src="{{ $question->srcFromContent }}" class="img-fluid">
+                                    <img src="{{ $question->srcFromContent }}" class="img-fluid" loading="lazy">
                                 @else
                                     <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt="Preview Image"
-                                        class="img-fluid">
+                                        class="img-fluid" loading="lazy">
                                 @endif
 
                                 <div class="hovereffect">
@@ -51,6 +51,14 @@
                                 </div>
                             </a>
                         </div>
+                        @include('public.layouts.modal.index', [
+                            'entity' => $question,
+                            'image' => $question->srcFromContent
+                                ? $question->srcFromContent
+                                : asset('/assets/front/upload/market_blog_01.jpg'),
+                        ])
+
+
                         <!-- end media -->
                         <div class="blog-meta big-meta text-center">
 

@@ -5,7 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- <title>{{ config('app.name', 'Laravel') }}</title> --}}
     <title>@yield('title')</title>
+    {{-- @yield('title') --}}
 
     <!-- Fonts -->
     <link rel="stylesheet"
@@ -15,11 +18,13 @@
 
     <!-- Scripts -->
 
+
 </head>
 
 <body class="@yield('body-class', '')">
     @yield('content')
     <script src="{{ asset('assets/admin/js/adminlte.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

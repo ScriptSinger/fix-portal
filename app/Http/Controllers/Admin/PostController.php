@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
-use App\Services\FileUploader;
+use App\Services\ThumbnailService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -33,32 +32,28 @@ class PostController extends Controller
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
-
-        $data = FileUploader::getInstance()
-            ->setData($data)
-            ->setSupDir('post')
-            ->setSubDir(date('Y-m-d'))
-            ->save()
-            ->getData();
-
-
-        // dd(auth()->user()->id);
-
-        $data['administrator_id'] = auth()->user()->id;
-        $post = Post::create($data);
+        $post = Post::create([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'content' => $data['content'],
+            'category_id' => $data['category_id'],
+            'administrator_id' => auth()->guard('admin')->user()->id,
+        ]);
 
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
+        $paths = ThumbnailService::getInstance()->store($request->file('thumbnail'));
+        $post->thumbnail()->create($paths);
         return redirect()->route('admin.posts.index')->with('success', 'Статья добавлена');
     }
 
-    public function show(string $id)
+    public function show(int $id)
     {
         //
     }
 
-    public function edit(string $id)
+    public function edit(int $id)
     {
         $post = Post::with('administrator')->findOrFail($id);
         $categories = Category::pluck('title', 'id');
@@ -66,7 +61,7 @@ class PostController extends Controller
         return view('admin.posts.edit', compact('post', 'categories', 'tags'));
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request, int $id)
     {
         $data = $request->validate([
             'title' => 'required|max:255',
@@ -76,40 +71,45 @@ class PostController extends Controller
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $post = Post::find($id);
+        $post = Post::findOrFail($id);
+        $paths = [
+            $post->thumbnail->original,
+            $post->thumbnail->blog,
+            $post->thumbnail->small
+        ];
 
-        $data = FileUploader::getInstance()
-            ->setData($data)
-            ->setModel($post)
-            ->setSupDir('post')
-            ->setSubDir(date('Y-m-d'))
-            ->removePrev()
-            ->save()
-            ->getData();
+        $paths = ThumbnailService::getInstance()
+            ->destroy($paths)
+            ->store($request->file('thumbnail'));
 
-        $post->update($data);
+        $post->update([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'content' => $data['content'],
+            'category_id' => $data['category_id'],
+            'administrator_id' => auth()->guard('admin')->user()->id,
+        ]);
 
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
+
+        $post->thumbnail()->update($paths);
         return redirect()->route('admin.posts.index')->with('success', 'Изменения сохранены');
     }
 
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
-        $post = Post::find($id);
-
-        if (!$post) {
-            return redirect()->route('posts.index')->with('error', 'Статья не найдена');
-        }
-
-        // Убедимся, что $post->thumbnail не равно null перед удалением файла
-        if ($post->thumbnail !== null) {
-            Storage::disk('public')->delete($post->thumbnail);
-        }
-
+        $post = Post::findOrFail($id);
+        $paths = [
+            $post->thumbnail->original,
+            $post->thumbnail->blog,
+            $post->thumbnail->small
+        ];
+        $paths = ThumbnailService::getInstance()
+            ->destroy($paths);
         $post->tags()->sync([]);
-        $post->delete();
+        $post->forceDelete();
         return redirect()->route('admin.posts.index')->with('success', 'Статья удалена');
     }
 }

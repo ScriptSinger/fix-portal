@@ -28,47 +28,54 @@
 @section('content')
     <div class="page-wrapper">
         <div class="blog-custom-build">
-            @foreach ($questions as $question)
-                <div class="blog-box wow fadeIn">
-                    <div class="post-media">
-                        @if ($question->srcFromContent)
-                            <div>
-                                <img src="{{ $question->srcFromContent }}" alt="Preview Image" class="img-fluid">
-                            </div>
-                        @else
-                            <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt="Preview Image"
-                                class="img-fluid">
-                        @endif
-                        <div class="hovereffect">
-                            <span></span>
+            @if (count($questions))
+                @foreach ($questions as $question)
+                    <div class="blog-box wow fadeIn">
+                        <div class="post-media" style="max-height: 400px">
+                            <a href="#" role="button" data-toggle="modal" data-target="#modal{{ $question->id }}">
+                                @if ($question->srcFromContent)
+                                    <img src="{{ $question->srcFromContent }}" class="img-fluid" loading="lazy">
+                                @else
+                                    <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" alt="Preview Image"
+                                        class="img-fluid" loading="lazy">
+                                @endif
+
+                                <div class="hovereffect">
+                                    <span></span>
+                                </div>
+                            </a>
+                        </div>
+                        @include('public.layouts.modal.index', [
+                            'entity' => $question,
+                            'image' => $question->srcFromContent
+                                ? $question->srcFromContent
+                                : asset('/assets/front/upload/market_blog_01.jpg'),
+                        ])
+
+
+                        <!-- end media -->
+                        <div class="blog-meta big-meta text-center">
+
+                            @include('public.layouts.widgets.sharing', [
+                                'reference' => $question->slug,
+                            ])
+                            <!-- end post-sharing -->
+                            <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
+                                    title="">{{ $question->title }}</a></h4>
+                            <p>{!! Str::limit(strip_tags($question->description), 150) !!}</p>
+                            <small><a
+                                    href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
+                                    title="">{{ $question->appliance->title }}</a></small>
+                            <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
+                            <small><a href="#" title="">{{ optional($question->user)->name }}</a></small>
+                            <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
                         </div>
                     </div>
-                    <div class="blog-meta big-meta text-center">
-                        <div class="post-sharing">
-                            <ul class="list-inline">
-                                <li><a href="#" class="fb-button btn btn-primary"><i class="fa fa-facebook"></i> <span
-                                            class="down-mobile">Share
-                                            on Facebook</span></a></li>
-                                <li><a href="#" class="tw-button btn btn-primary"><i class="fa fa-twitter"></i> <span
-                                            class="down-mobile">Tweet
-                                            on Twitter</span></a></li>
-                                <li><a href="#" class="gp-button btn btn-primary"><i
-                                            class="fa fa-google-plus"></i></a>
-                                </li>
-                            </ul>
-                        </div>
-                        <h4><a href="{{ route('questions.show', ['question' => $question->slug]) }}"
-                                title="">{{ $question->title }}</a></h4>
-                        <p>{!! Str::limit(strip_tags($question->description), 150) !!}</p>
-                        <small><a href="{{ route('public.appliances.show', ['appliance' => $appliance->slug]) }}"
-                                title="">{{ $appliance->title }}</a></small>
-                        <small>{{ $question->dateAsCarbon->diffForHumans() }}</small>
-                        <small><a href="#" title="">by Jack</a></small>
-                        <small><i class="fa fa-eye"></i> {{ $question->views }}</small>
-                    </div>
-                </div>
-                <hr class="invis">
-            @endforeach
+                    <hr class="invis">
+                @endforeach
+            @else
+                <p>Совпадений не найдено</p>
+            @endif
         </div>
     </div>
 
@@ -76,7 +83,7 @@
     <div class="row">
         <div class="container col-md-12">
             <div class="row justify-content-center">
-                {{ $questions->onEachSide(1)->links('vendor.pagination.public') }}
+                {{ $questions->withQueryString()->onEachSide(0)->links('vendor.pagination.public') }}
             </div>
         </div>
     </div>

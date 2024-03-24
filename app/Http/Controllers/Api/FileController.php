@@ -13,8 +13,14 @@ class FileController extends Controller
 {
     public function index()
     {
-        $files = File::with('user')->get();
+        $files = File::with('administrator', 'user')->get();
         return response()->json($files);
+    }
+
+    public function show($id)
+    {
+        $file = File::findOrFail($id);
+        return response()->json($file);
     }
 
 
@@ -24,24 +30,24 @@ class FileController extends Controller
         $validated = $request->validate([
             'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-        $folder = 'user_' . auth()->user()->id;
-        $path = $validated['file']->store("files/$folder", 'public');
+
+        $folder = date('Y-m-d');
+        $path = $validated['file']->store("posts/$folder", 'public');
         $url = Storage::url($path);
         $file = new File();
         $file->url = $url;
         $file->mime  = Storage::disk('public')->mimeType($path);
         $file->size  = Storage::disk('public')->size($path);
-        $file->user()->associate(auth()->user());
+        $file->administrator()->associate(auth()->guard('admin')->user());
         $file->save();
-
         return response()->json(['id' => $file->id, 'url' => $url]);
     }
+
 
     public function destroy($id)
     {
         try {
             $file = File::findOrFail($id);
-            $this->authorize('delete', $file);
             Storage::disk('public')->delete($file->url);
             $file->delete();
             return response()->json(['message' => 'Файл успешно удален']);

@@ -22,7 +22,7 @@
 
             <div class="blog-meta big-meta">
                 <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
-                <small><a href="blog-author.html" title="">by Jessica</a></small>
+                <small>{{ auth()->guard('admin')->user()->name }}</small>
                 <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
             </div>
 
@@ -32,7 +32,7 @@
         </div>
 
         <div class="single-post-media">
-            <img src="{{ $post->thumbnail }}" alt="Preview Image" class="img-fluid">
+            <img src="{{ Storage::url($post->thumbnail->original) }}" alt="Preview Image" class="img-fluid">
         </div>
 
         <div class="blog-content">
