@@ -3,7 +3,7 @@ $(function () {
         toolbar: [
             ["style", ["bold", "underline"]],
             ["insert", ["link", "picture"]],
-            ["view", ["fullscreen", "codeview"]],
+            ["view", ["fullscreen"]],
         ],
         height: 150,
         callbacks: {

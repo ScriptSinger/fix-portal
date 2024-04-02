@@ -40,11 +40,15 @@ class PostController extends Controller
             'administrator_id' => auth()->guard('admin')->user()->id,
         ]);
 
+        if ($request->hasFile('thumbnail')) {
+            $paths = ThumbnailService::getInstance()->store($request->file('thumbnail'));
+            $post->thumbnail()->create($paths);
+        }
+
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
-        $paths = ThumbnailService::getInstance()->store($request->file('thumbnail'));
-        $post->thumbnail()->create($paths);
+
         return redirect()->route('admin.posts.index')->with('success', 'Статья добавлена');
     }
 
@@ -72,15 +76,23 @@ class PostController extends Controller
         ]);
 
         $post = Post::findOrFail($id);
-        $paths = [
-            $post->thumbnail->original,
-            $post->thumbnail->blog,
-            $post->thumbnail->small
-        ];
+        $paths = [];
+        if ($request->hasFile('thumbnail')) {
+            if ($post->thumbnail) {
+                $paths = [
+                    $post->thumbnail->original,
+                    $post->thumbnail->blog,
+                    $post->thumbnail->small
+                ];
+            }
+            $paths = ThumbnailService::getInstance()
+                ->destroy($paths)
+                ->store($request->file('thumbnail'));
 
-        $paths = ThumbnailService::getInstance()
-            ->destroy($paths)
-            ->store($request->file('thumbnail'));
+            $post->thumbnail()->updateOrCreate([], $paths);
+        }
+
+
 
         $post->update([
             'title' => $data['title'],
@@ -90,11 +102,12 @@ class PostController extends Controller
             'administrator_id' => auth()->guard('admin')->user()->id,
         ]);
 
+
+
         if ($request->has('tags')) {
             $post->tags()->sync($request->tags);
         }
 
-        $post->thumbnail()->update($paths);
         return redirect()->route('admin.posts.index')->with('success', 'Изменения сохранены');
     }
 

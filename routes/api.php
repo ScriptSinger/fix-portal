@@ -2,13 +2,11 @@
 
 use App\Http\Controllers\Api\Admin\PostImageController;
 use App\Http\Controllers\Api\ApplianceController;
-use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CommentController;
-use App\Http\Controllers\Api\FileController;
-
 use App\Http\Controllers\Api\FirmwareController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\Public\AvatarController;
 use App\Http\Controllers\Api\Public\MasterController;
 use App\Http\Controllers\Api\Public\UserImageController;
 use App\Http\Controllers\Api\QuestionController;
@@ -96,13 +94,9 @@ Route::get('/masters', [MasterController::class, 'index'])->name('api.masters.in
 
 Route::group(
     [
-        'middleware' => 'auth:web,admin,verified',
+        'middleware' => 'auth:web,admin',
     ],
     function () {
-        Route::post('/avatar/upload', [AvatarController::class, 'upload'])->name('api.avatar.upload');
-        Route::get('/avatar/show', [AvatarController::class, 'show'])->name('api.avatar.show');
-        Route::delete('/avatar/destroy', [AvatarController::class, 'destroy'])->name('api.avatar.destroy');
-
         Route::prefix('/{type}/{id}/')->group(function () {
             Route::post('/like', [LikeController::class, 'like'])->name('like');
             Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
@@ -111,5 +105,9 @@ Route::group(
         Route::get('users-images', [UserImageController::class, 'index'])->name('api.users.images.index');
         Route::post('users-images', [UserImageController::class, 'upload'])->name('api.users.images.upload');
         Route::delete('users-images/{image}', [UserImageController::class, 'destroy'])->name('api.users.images.destroy');
+
+        Route::get('/avatars', [AvatarController::class, 'show'])->name('api.avatars.show');
+        Route::post('/avatars', [AvatarController::class, 'upload'])->name('api.avatars.upload');
+        Route::delete('/avatars', [AvatarController::class, 'destroy'])->name('api.avatars.destroy');
     }
 );

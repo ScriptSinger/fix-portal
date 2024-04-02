@@ -10,8 +10,8 @@
                         <div class="media">
                             <div class="media-left">
                                 <a>
-                                    <img src="{{ $comment->user->avatar !== null ? asset('storage/' . $comment->user->avatar) : asset('assets/front/images/avatar.png') }}"
-                                        alt="" class="rounded-circle" width="64px" height="64px">
+                                    <img src="{{ optional($comment->user->avatar)->uri ? Storage::url($comment->user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
+                                        class="rounded-circle" width="64px" height="64px">
                                 </a>
                             </div>
                             <div class="media-body">
@@ -76,8 +76,8 @@
                                 @foreach ($comment->replies as $reply)
                                     <div class="media">
                                         <a class="media-left" href="#">
-                                            <img src="{{ $reply->user->avatar !== null ? asset('storage/' . $reply->user->avatar) : asset('assets/front/images/avatar.png') }}"
-                                                alt="" class="rounded-circle" width="64px" height="64px">
+                                            <img src="{{ optional($reply->user->avatar)->uri ? Storage::url($reply->user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
+                                                class="rounded-circle" width="64px" height="64px">
                                         </a>
                                         <div class="media-body">
                                             <div class="media-heading">

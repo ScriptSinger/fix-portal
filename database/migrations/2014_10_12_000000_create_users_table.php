@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('location')->nullable();
             $table->text('bio')->nullable();
-            $table->string('avatar')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

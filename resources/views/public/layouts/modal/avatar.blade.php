@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src="{{ $user->avatar !== null ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                <img src="{{ optional($user->avatar)->uri ? Storage::url($user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
                     alt="Аватар" class="img-fluid">
             </div>
             <div class="modal-footer">

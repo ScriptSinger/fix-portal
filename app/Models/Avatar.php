@@ -6,19 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Thumbnail extends Model
+class Avatar extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'post_id',
-        'original',
-        'blog',
-        'small'
+        'uri',
+        'mime',
+        'size'
     ];
 
-    public function post(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(User::class);
     }
 }

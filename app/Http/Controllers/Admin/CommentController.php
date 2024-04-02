@@ -10,7 +10,10 @@ class CommentController extends Controller
 {
     public function index()
     {
-        $comments = Comment::all();
+
+        $comments = Comment::with('user.avatar')->get();
+
+
         return view('admin.comments.index', compact('comments'));
     }
 

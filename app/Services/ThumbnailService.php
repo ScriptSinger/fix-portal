@@ -34,17 +34,17 @@ class ThumbnailService
         Storage::disk('public')->makeDirectory($smallDir);
 
         $blogPath = Storage::disk('public')->path($blogDir . $name);
-        $image->resize(800, 460);
+        $image->cover(800, 460);
         $image->toJpeg()->save($blogPath);
 
         $smallPath = Storage::disk('public')->path($smallDir . $name);
-        $image->resize(90, 90);
+        $image->cover(90, 90);
         $image->toJpeg()->save($smallPath);
 
         return [
-            'original' => $file->store($basePath . 'original', 'public'),
-            'blog' =>   $blogDir . $name,
-            'small' =>  $smallDir . $name,
+            'original' => Storage::url($file->store($basePath . 'original', 'public')),
+            'blog' =>   Storage::url($blogDir . $name),
+            'small' => Storage::url($smallDir . $name),
         ];
     }
 

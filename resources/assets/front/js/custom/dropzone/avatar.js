@@ -3,16 +3,17 @@ $(document).ready(function () {
     let routes = $("#upload-form").data("routes");
 
     Dropzone.options.uploadForm = {
+        autoProcessQueue: false,
         method: "POST",
         url: routes.upload,
-        paramName: "file",
+        paramName: "avatar",
         maxFilesize: 2,
         maxFiles: 1,
         dictDefaultMessage: "Перетащите файл сюда или нажмите для выбора",
         uploadMultiple: false,
         autoProcessQueue: false,
         addRemoveLinks: true,
-        acceptedFiles: "image/jpeg,image/png,image/jpg,image/gif",
+        acceptedFiles: "image/jpeg,image/png,image/jpg",
 
         init: function () {
             var dz = this;
@@ -22,39 +23,28 @@ $(document).ready(function () {
                 dz.processQueue();
             });
 
-            this.on("success", function (file, response) {
-                // console.log("Файл успешно загружен!", response);
-            });
-
-            this.on("error", function (file, errorMessage) {
-                console.error("Ошибка при загрузке файла:", errorMessage);
-            });
-
-            this.on("addedfile", function (file) {
-                if (dz.files.length > 1 && file) {
-                    // Если добавлено более одного файла, удалите предыдущее превью
-                    dz.removeFile(dz.files[0]);
-                }
-            });
-
             $.ajax({
                 url: routes.show,
                 method: "GET",
-                headers: {
-                    "X-CSRF-TOKEN": token,
-                },
                 success: function (response) {
                     if (response) {
                         let mockFile = {
                             name: response.name,
                             size: response.size,
                         };
-                        dz.displayExistingFile(mockFile, response.path);
+                        dz.files.push(mockFile);
+                        dz.displayExistingFile(mockFile, response.uri);
                     }
                 },
                 error: function (error) {
                     console.error("Ошибка при получении данных:", error);
                 },
+            });
+
+            this.on("addedfile", function (file) {
+                if (dz.files.length > 1 && file) {
+                    dz.removeFile(dz.files[0]);
+                }
             });
 
             this.on("removedfile", (file) => {

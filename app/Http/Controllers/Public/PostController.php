@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Post\TitleFilter;
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Pipeline\Pipeline;
 
@@ -27,7 +28,7 @@ class PostController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->firstOrFail();
+        $post = Post::where('slug', $slug)->with('comments.user.avatar')->firstOrFail();
         $post->views += 1;
         $post->update();
 

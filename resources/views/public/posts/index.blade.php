@@ -40,8 +40,8 @@
                         <div class="post-media">
                             <a role="button" href="#" data-toggle="modal" data-target="#modal{{ $post->id }}">
                                 @if ($post->thumbnail)
-                                    <img class="img-fluid" src="{{ Storage::url($post->thumbnail->blog) }}"
-                                        alt="{{ $post->title }}" loading="lazy">
+                                    <img class="img-fluid" src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
+                                        loading="lazy">
                                 @else
                                     <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid"
                                         loading="lazy">
@@ -54,7 +54,7 @@
 
                         @include('public.layouts.modal.index', [
                             'entity' => $post,
-                            'image' => Storage::url($post->thumbnail->original),
+                            'image' => optional($post->thumbnail)->original,
                         ])
 
                         <div class="blog-meta big-meta text-center">
@@ -70,7 +70,7 @@
                             <small><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
                                     title="">{{ $post->category->title }}</a></small>
                             <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
-                            <small>{{ auth()->guard('admin')->user()->name }}</small>
+                            <small>{{ $post->administrator->name }}</small>
                             <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
                         </div>
                     </div>

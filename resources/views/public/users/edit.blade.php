@@ -21,17 +21,8 @@
 @endsection
 @section('sidebar')
     <div class="sidebar">
-        <div class="widget">
-            <div class="mx-auto d-block text-center">
-                <img src="{{ $user->avatar !== null ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
-                    alt="" class="img-fluid mb-3">
-                <div>
-                    <h2 class="widget-title mb-2">{{ $user->name }}</h2>
-                    <p>{{ $user->location }}</p>
-                </div>
-            </div>
-        </div>
         @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
 @endsection
 @section('content')
@@ -131,9 +122,9 @@
             <div class="tab-pane fade" id="image" role="tabpanel" aria-labelledby="image-tab">
                 <form method="POST" enctype="multipart/form-data" class="dropzone mb-3" id="upload-form"
                     data-routes='{
-                        "upload": "{{ route('api.avatar.upload') }}",
-                        "show": "{{ route('api.avatar.show') }}",
-                        "destroy": "{{ route('api.avatar.destroy') }}"
+                        "upload": "{{ route('api.avatars.upload') }}",
+                        "show": "{{ route('api.avatars.show') }}",
+                        "destroy": "{{ route('api.avatars.destroy') }}"
                         }'>
 
                     @csrf

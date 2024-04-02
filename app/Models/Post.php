@@ -7,7 +7,10 @@ use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Intervention\Image\Laravel\Facades\Image;
@@ -35,28 +38,28 @@ class Post extends Model
         ];
     }
 
-    public function administrator()
+    public function administrator(): BelongsTo
     {
         return $this->belongsTo(Administrator::class);
     }
 
-    public function thumbnail()
+    public function thumbnail(): HasOne
     {
         return $this->hasOne(Thumbnail::class);
     }
 
 
-    public function tags()
+    public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function comments()
+    public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }

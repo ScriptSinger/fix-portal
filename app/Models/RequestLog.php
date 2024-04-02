@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RequestLog extends Model
 {
@@ -21,7 +22,7 @@ class RequestLog extends Model
     ];
 
     // Если вам нужно получать данные о пользователе, можно определить отношение в модели
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

@@ -154,7 +154,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3"><img class="img-thumbnail"
-                                            src="{{ Storage::url($post->thumbnail->small) }}">
+                                            src="{{ optional($post->thumbnail)->small }}">
                                     </div>
                                     <div class="form-group">
                                         <div class="input-group">
