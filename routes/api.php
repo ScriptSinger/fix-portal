@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\BlockedController;
 use App\Http\Controllers\Api\Admin\PostImageController;
 use App\Http\Controllers\Api\ApplianceController;
 use App\Http\Controllers\Api\CategoryController;
@@ -86,6 +87,10 @@ Route::group(
         Route::delete('/post-images/{image}', [PostImageController::class, 'destroy'])->name('api.post.images.destroy');
 
         Route::get('/statistics', [StatisticController::class, 'index'])->name('api.statistics.index');
+
+        Route::get('/blockeds', [BlockedController::class, 'index'])->name('api.blockeds.index');
+        Route::delete('/blockeds/{blocked}', [BlockedController::class, 'destroy'])->name('api.blockeds.destroy');
+        Route::put('/blockeds/{blocked}', [BlockedController::class, 'restore'])->name('api.blockeds.restore');
     }
 );
 

@@ -10,8 +10,8 @@ class MainController extends Controller
 {
     public function index(DuplicateService $duplicateService)
     {
-        $firmware = new Firmware();
-        $duplicateCount = count($duplicateService->getDuplicates($firmware));
-        return view('admin.statistics.index', compact('duplicateCount'));
+        // $firmware = new Firmware();
+        // $duplicateCount = count($duplicateService->getDuplicates($firmware));
+        return view('admin.statistics.index');
     }
 }

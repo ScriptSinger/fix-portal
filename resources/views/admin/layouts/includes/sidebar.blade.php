@@ -67,6 +67,32 @@
                           </p>
                       </a>
                   </li>
+
+                  <li class="nav-item has-treeview">
+                      <a href="#" class="nav-link">
+                          <i class="nav-icon fas fa-ban"></i>
+                          <p>
+                              Блокировка
+                              <i class="right fas fa-angle-left"></i>
+                          </p>
+                      </a>
+                      <ul class="nav nav-treeview">
+                          <li class="nav-item">
+                              <a href="{{ route('admin.blockeds.index') }}" class="nav-link">
+                                  <i class="far fa-circle nav-icon"></i>
+                                  <p>Список</p>
+                              </a>
+
+                          </li>
+                          <li class="nav-item">
+                              <a href="{{ route('admin.blockeds.create') }}" class="nav-link">
+                                  <i class="far fa-circle nav-icon"></i>
+                                  <p>Добавить</p>
+                              </a>
+                          </li>
+                      </ul>
+                  </li>
+
                   <li class="nav-item has-treeview">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-users"></i>
@@ -151,7 +177,7 @@
                       </ul>
                   </li>
                   <li class="nav-header">ХРАНИЛИЩЕ</li>
-                  <li class="nav-item">
+                  <li class="nav-item has-treeview">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-wave-square"></i>
                           <p>
@@ -169,7 +195,7 @@
                       </ul>
                   </li>
 
-                  <li class="nav-item">
+                  <li class="nav-item has-treeview">
                       <a href="#" class="nav-link">
                           <i class="nav-icon fas fa-images"></i>
                           <p>
@@ -192,7 +218,6 @@
                           </li>
                       </ul>
                   </li>
-
               </ul>
           </nav>
           <!-- /.sidebar-menu -->

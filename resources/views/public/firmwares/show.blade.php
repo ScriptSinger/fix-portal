@@ -70,7 +70,7 @@
             <h4 class="btn btn-dark btn-link small-title" role="button" data-toggle="collapse"
                 data-target="#collapsedTable">
                 Параметры</h4>
-            <div class="collapse" id="collapsedTable">
+            <div class="collapse show" id="collapsedTable">
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <tbody>

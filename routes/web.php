@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\AuthSessionController;
+use App\Http\Controllers\Admin\BlockedController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\CustomizationController;
@@ -196,6 +197,13 @@ Route::group(
         Route::get('/images', [ImageController::class, 'index'])->name('admin.images.index');
         Route::get('/images/{image}', [ImageController::class, 'show'])->name('admin.images.show');
         Route::get('/images-grid', [ImageController::class, 'grid'])->name('admin.images.grid');
+
+        Route::get('/blockeds', [BlockedController::class, 'index'])->name('admin.blockeds.index');
+        Route::get('/blockeds/create', [BlockedController::class, 'create'])->name('admin.blockeds.create');
+        Route::post('/blockeds', [BlockedController::class, 'store'])->name('admin.blockeds.store');
+        Route::get('/blockeds/{blocked}/edit', [BlockedController::class, 'edit'])->name('admin.blockeds.edit');
+        Route::put('/blockeds/{blocked}', [BlockedController::class, 'update'])->name('admin.blockeds.update');
+        Route::delete('/blockeds/{blocked}', [BlockedController::class, 'destroy'])->name('admin.blockeds.destroy');
     }
 );
 

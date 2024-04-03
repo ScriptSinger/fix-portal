@@ -6,10 +6,10 @@
                 <div class="row mb-2">
                     <div class="col-sm-6">
                         <div class="user-block">
-                            <a href="{{ optional($user)->avatar ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                            <a href="{{ optional($user->avatar)->uri ? Storage::url($user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
                                 data-toggle="lightbox">
                                 <img class="img-circle"
-                                    src="{{ optional($user)->avatar ? asset('storage/' . $user->avatar) : asset('assets/front/images/avatar.png') }}"
+                                    src="{{ optional($user->avatar)->uri ? Storage::url($user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
                                     alt="User Image">
                             </a>
                             <span class="username"><a href="#">{{ $user->name }} # {{ $user->id }}</a></span>
@@ -165,6 +165,27 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-md-6">
+                        <div class="card card-outline card-primary   card-widget widget-user-2 shadow-sm">
+                            <div class="card-header">
+                                IP-адреса
+                                <div class="card-tools">
+                                    <button type="button" class="btn btn-tool" data-card-widget="maximize"><i
+                                            class="fas fa-expand"></i></button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                @foreach ($user->ips as $ip)
+                                    <tr>
+                                        <td>{{ $ip->ip_address }}</td>
+                                    </tr>
+                                    </table>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div class="card">
                     <div class="card-footer">

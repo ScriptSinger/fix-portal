@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('platform')->nullable();
             $table->string('crc32')->nullable();
             $table->text('data')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
