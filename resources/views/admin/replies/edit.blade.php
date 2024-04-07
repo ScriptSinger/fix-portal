@@ -40,7 +40,7 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Содержание</label>
-                                <textarea name="text" class="form-control basic" data-upload-url="{{ route('api.summernote.upload') }}">{{ $reply->text }}</textarea>
+                                <textarea id="description" name="text" class="form-control">{{ $reply->text }}</textarea>
 
                             </div>
                             <div class="form-group">
@@ -80,5 +80,5 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/admin/js/custom/summernote/basic.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/custom/summernote/lite.js') }}"></script>
 @endpush

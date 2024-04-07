@@ -40,6 +40,15 @@ $(document).ready(function () {
                 },
             },
             {
+                data: "commentable",
+                title: "Commentable",
+                render: function (data, type, row) {
+                    return data
+                        ? "slug = " + data.slug + " | id = " + data.id
+                        : "";
+                },
+            },
+            {
                 data: "likes",
                 title: "Likes",
                 render: function (data, type, row) {

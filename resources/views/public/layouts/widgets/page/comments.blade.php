@@ -72,7 +72,7 @@
                                     {{ trans_choice('ответ|ответа|ответов', $comment->replies->count(), [], 'ru') }}
                                 </a>
                             </h4>
-                            <div id="collapsedReply{{ $comment->id }}" class="collapse">
+                            <div id="collapsedReply{{ $comment->id }}" class="collapse show">
                                 @foreach ($comment->replies as $reply)
                                     <div class="media">
                                         <a class="media-left" href="#">

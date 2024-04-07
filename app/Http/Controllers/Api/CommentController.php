@@ -10,7 +10,7 @@ class CommentController extends Controller
 {
     public function index()
     {
-        $comments = Comment::with('user', 'replies', 'likes', 'dislikes')->withTrashed()->get();
+        $comments = Comment::with('user', 'commentable', 'replies', 'likes', 'dislikes')->withTrashed()->get();
         return response()->json($comments);
     }
 

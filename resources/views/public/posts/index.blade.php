@@ -22,6 +22,7 @@
         </div>
     </section>
 @endsection
+@section('description', 'Коллекция статей от мастеров по ремонту бытовой техники')
 
 @section('sidebar')
     <div class="sidebar">

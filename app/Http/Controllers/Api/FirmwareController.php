@@ -4,21 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Firmware;
-use App\Services\FirmwareService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class FirmwareController extends Controller
 {
 
-    public function index(Request $request)
+    public function index()
     {
-
-        $columns = ['id', 'title', 'size', 'date', 'extension', 'platform', 'crc32', 'data'];
-        $query = DB::table('firmware');
-
-
-        return response()->json(FirmwareService::simple($request, $query, $columns));
+        $firmwares = Firmware::all();
+        return response()->json($firmwares);
     }
 
     public function destroy(string $id)

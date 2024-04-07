@@ -12,12 +12,13 @@
 
 
     <meta name="keywords" content="">
-    <meta name="description" content="">
+    <meta name="description" content="@yield('description')">
     <meta name="author" content="">
 
     <!-- Site Icons -->
     {{-- <link rel="shortcut icon" href="{{ asset('assets/front/images/favicon.ico') }}" type="image/x-icon" />
     <link rel="apple-touch-icon" href="{{ asset('assets/front/images/favicon.ico') }}"> --}}
+
 
     <!-- Design fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto+Slab:400,700" rel="stylesheet">
