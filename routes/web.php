@@ -9,7 +9,7 @@ use App\Http\Controllers\Admin\BlockedController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\CustomizationController;
-use App\Http\Controllers\Admin\FileController;
+
 use App\Http\Controllers\Public\FirmwareController;
 use App\Http\Controllers\Admin\FirmwareController as AdminFirmwareController;
 use App\Http\Controllers\Admin\ImageController;
@@ -54,6 +54,9 @@ Route::group(
         Route::get('/{article}', [PostController::class, 'show'])->name('articles.show');
     }
 );
+
+Route::redirect('/article/{slug}', '/articles/{slug}', 301);
+
 
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');

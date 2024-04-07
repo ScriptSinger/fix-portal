@@ -35,7 +35,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="">{!! $comment->text !!}</div>
+                        <div style="overflow-wrap: break-word; word-wrap: break-word;">{!! $comment->text !!}</div>
                         <hr class="invis">
                         <div class="blog-meta big-meta">
                             @include('public.layouts.widgets.likes', [
@@ -102,7 +102,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div>{!! $reply->text !!}</div>
+                                    <div style="overflow-wrap: break-word; word-wrap: break-word;">
+                                        {!! $reply->text !!}</div>
                                     <div class="blog-meta big-meta">
                                         @include('public.layouts.widgets.likes', [
                                             'instance' => $reply,

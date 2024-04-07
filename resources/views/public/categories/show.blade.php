@@ -31,19 +31,25 @@
         <div class="blog-custom-build">
             @foreach ($posts as $post)
                 <div class="blog-box wow fadeIn">
-                    <div class="post-media" style="max-height: 400px">
-                        <a href="{{ route('articles.show', ['article' => $post->slug]) }}">
+                    <div class="post-media">
+                        <a role="button" href="#" data-toggle="modal" data-target="#modal{{ $post->id }}">
                             @if ($post->thumbnail)
-                                <img src="{{ $post->thumbnail }}" alt="Preview Image" class="img-fluid">
+                                <img class="img-fluid" src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
+                                    loading="lazy">
                             @else
-                                <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid">
+                                <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid"
+                                    loading="lazy">
                             @endif
                             <div class="hovereffect">
                                 <span></span>
                             </div>
-                            <!-- end hover -->
                         </a>
                     </div>
+
+                    @include('public.layouts.modal.index', [
+                        'entity' => $post,
+                        'image' => optional($post->thumbnail)->original,
+                    ])
                     <!-- end media -->
                     <div class="blog-meta big-meta text-center">
                         @include('public.layouts.widgets.sharing', [
@@ -52,11 +58,11 @@
                         <!-- end post-sharing -->
                         <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                                 title="">{{ $post->title }}</a></h4>
-                        {!! $post->description !!}
+                        <p>{!! $post->description !!}</p>
                         <small><a href="{{ route('categories.show', ['category' => $category->slug]) }}"
                                 title="">{{ $category->title }}</a></small>
                         <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
-                        <small><a href="#" title="">by Jack</a></small>
+                        <small>{{ $post->administrator->name }}</small>
                         <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
                     </div><!-- end meta -->
                 </div><!-- end blog-box -->
