@@ -13380,6 +13380,9 @@ a:focus,
     height: 72px;
  }
 
+ .title__link{
+    cursor: pointer;
+ }
 @charset "UTF-8";
 table.dataTable th.dt-left,
 table.dataTable td.dt-left {

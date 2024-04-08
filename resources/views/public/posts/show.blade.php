@@ -61,3 +61,7 @@
 
     </div>
 @endsection
+
+@push('scripts')
+    <script src="{{ asset('assets/front/js/custom/smoothScroll.js') }}"></script>
+@endpush

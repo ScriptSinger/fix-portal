@@ -16,8 +16,7 @@
         </div>
     </div>
 @endsection
-@section('description', 'Бесплатные прошивки для восстановления бытовой техники от Ufamasters. Широкий ассортимент для
-    разных устройств')
+@section('description', 'База данных бесплатных прошивок (firmwares) для бытовой техники от Ufamasters')
 
 @section('sidebar')
     <div class="sidebar">
