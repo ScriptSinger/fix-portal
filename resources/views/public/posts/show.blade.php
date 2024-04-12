@@ -31,11 +31,12 @@
             ])
         </div>
 
-        <div class="single-post-media">
-            <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" class="img-fluid">
-        </div>
 
         <div class="blog-content">
+            <div class="single-post-media">
+                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" class="img-fluid">
+            </div>
+
             {!! $post->content !!}
         </div>
 
@@ -59,9 +60,12 @@
             'instance' => $post,
         ])
 
+        @include('public.layouts.modal.show')
+
     </div>
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/front/js/custom/smoothScroll.js') }}"></script>
+    <script src="{{ asset('assets/front/js/custom/modal/blogModal.js') }}"></script>
 @endpush

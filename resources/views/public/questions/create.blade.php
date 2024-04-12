@@ -34,8 +34,9 @@
                     class="form-wrapper has-danger">
                     @csrf
                     <div class="form-group">
-                        <label>Модель</label>
-                        <input class="p-1 px-2 w-100 @error('title') is-invalid  @enderror" type="text" name="title">
+                        <label>Название вопроса</label>
+                        <input class="p-1 px-2 w-100 @error('title') is-invalid  @enderror" type="text" name="title"
+                            placeholder="Введите бренд и модель прибора (например, Samsung RL39)">
                         <span class="form-control-feedback">
                             @error('title')
                                 {{ $message }}

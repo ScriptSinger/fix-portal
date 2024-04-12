@@ -38,9 +38,10 @@
                     @method('PUT')
                     <h4>Редактировать вопрос</h4>
                     <div class="form-group">
-                        <label for="title">Модель</label>
+                        <label for="title">Название вопроса</label>
                         <input class="p-1 px-2 w-100 @error('title') is-invalid  @enderror" type="text" name="title"
-                            id="title" value="{{ $question->title }}">
+                            id="title" value="{{ $question->title }}"
+                            placeholder="Введите бренд и модель прибора (например, Samsung RL39)">
                         <span class="form-control-feedback">
                             @error('title')
                                 {{ $message }}

@@ -1,11 +1,11 @@
 @extends('public.layouts.bar')
-@section('title', "Прошивка: $firmware->title | " . config('app.name', 'Ufamasters'))
+@section('title', "$firmware->title | " . config('app.name', 'Ufamasters'))
 @section('page-title')
     <div class="page-title db">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                    <h2>Прошивка: {{ $firmware->title }}</h2>
+                    <h2>{{ $firmware->title }}</h2>
                 </div><!-- end col -->
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                     <ol class="breadcrumb">

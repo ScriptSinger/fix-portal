@@ -75,6 +75,9 @@
         @include('public.layouts.widgets.page.comments', [
             'instance' => $question,
         ])
-
+        @include('public.layouts.modal.show')
     </div><!-- end page-wrapper -->
 @endsection
+@push('scripts')
+    <script src="{{ asset('assets/front/js/custom/modal/blogModal.js') }}"></script>
+@endpush
