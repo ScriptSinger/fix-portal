@@ -1,4 +1,4 @@
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -7,7 +7,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src="" class="w-100" id="modalImage">
+                <img src="#" class="w-100" id="modalImage">
             </div>
         </div>
     </div>

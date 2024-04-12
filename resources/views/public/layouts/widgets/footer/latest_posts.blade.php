@@ -11,8 +11,8 @@
                         <h5 class="mb-1">{{ $post->title }}</h5>
                         <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
                     </div>
+                </a>
             @endforeach
-            </a>
         </div>
     </div>
 </div>

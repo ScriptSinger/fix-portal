@@ -1,7 +1,7 @@
 <div class="post-sharing">
     <ul class="list-inline">
         <li class="mb-2"><a href="https://vk.com/share.php?url={{ route('articles.show', ['article' => $reference]) }}"
-                id="vk_share_button" class="fb-button btn btn-primary" target="_blank"><i class="fa fa-vk"></i>
+                class="fb-button btn btn-primary" target="_blank"><i class="fa fa-vk"></i>
                 <span class="down-mobile">Поделиться</span></a></li>
 
         <li class="mb-2"><a

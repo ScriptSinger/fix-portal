@@ -12,7 +12,7 @@
                     <p class="lead">
                         {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
                     </p>
-                    </p>
+
                     <a href="{{ route('questions.create') }}" class="btn btn-dark">Создать вопрос</a>
                 </div>
                 <div class="col-lg-4 col-md-12">

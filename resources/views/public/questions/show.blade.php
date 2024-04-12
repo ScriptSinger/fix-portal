@@ -12,9 +12,7 @@
 @section('content')
     <div class="page-wrapper">
         <div class="blog-title-area">
-            <ol class="breadcrumb hidden-xs-down">
-                {{ Breadcrumbs::render('question', $question->appliance, $question) }}
-            </ol>
+            {{ Breadcrumbs::render('question', $question->appliance, $question) }}
 
             <span class="color-yellow"><a
                     href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"

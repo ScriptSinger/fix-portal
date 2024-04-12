@@ -75,10 +75,10 @@
                             <div id="collapsedReply{{ $comment->id }}" class="collapse show">
                                 @foreach ($comment->replies as $reply)
                                     <div class="media">
-                                        <a class="media-left" href="#">
-                                            <img src="{{ optional($reply->user->avatar)->uri ? Storage::url($reply->user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
-                                                class="rounded-circle" width="64px" height="64px">
-                                        </a>
+
+                                        <img src="{{ optional($reply->user->avatar)->uri ? Storage::url($reply->user->avatar->uri) : asset('assets/front/images/avatar.png') }}"
+                                            class="rounded-circle" width="64px" height="64px">
+
                                         <div class="media-body">
                                             <div class="media-heading">
                                                 <div class="blog-meta big-meta">

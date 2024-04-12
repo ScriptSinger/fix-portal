@@ -13,9 +13,8 @@
     <div class="page-wrapper">
 
         <div class="blog-title-area">
-            <ol class="breadcrumb hidden-xs-down">
-                {{ Breadcrumbs::render('post', $post->category, $post) }}
-            </ol>
+            {{ Breadcrumbs::render('post', $post->category, $post) }}
+
             <span class="color-yellow"><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
                     title="">{{ $post->category->title }}</a></span>
             <h3>{{ $post->title }}</h3>
