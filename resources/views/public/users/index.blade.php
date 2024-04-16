@@ -8,9 +8,7 @@
                     <h2>Мастера по ремонту бытовой техники</h2>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
-                    <ol class="breadcrumb">
-                        {{ Breadcrumbs::render('users') }}
-                    </ol>
+                    {{ Breadcrumbs::render('users') }}
                 </div>
             </div>
         </div>

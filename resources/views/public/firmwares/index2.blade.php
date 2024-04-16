@@ -8,15 +8,14 @@
                     <h2>Каталог прошивок для бытовой техники</h2>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
-                    <ol class="breadcrumb">
-                        {{ Breadcrumbs::render('firmwares') }}
-                    </ol>
+                    {{ Breadcrumbs::render('firmwares') }}
                 </div>
             </div>
         </div>
     </div>
 @endsection
-@section('description', 'Каталог прошивок для бытовой техники: холодильников, стиральных и посудомоечных машин, варочных
+@section('description',
+    'Каталог прошивок для бытовой техники: холодильников, стиральных и посудомоечных машин, варочных
     панелей. Загруженные мастерами, теперь доступны на нашем сайте.')
 
 @section('sidebar')

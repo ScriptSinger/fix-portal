@@ -7,7 +7,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src="#" class="w-100" id="modalImage">
+                <img src="#" class="w-100" id="modalImage" alt="#">
             </div>
         </div>
     </div>

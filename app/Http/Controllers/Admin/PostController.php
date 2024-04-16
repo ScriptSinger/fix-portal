@@ -26,8 +26,8 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|max:255',
-            'description' => 'required|max:255',
+            'title' => 'required',
+            'description' => 'required',
             'content' => 'required',
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -68,8 +68,8 @@ class PostController extends Controller
     public function update(Request $request, int $id)
     {
         $data = $request->validate([
-            'title' => 'required|max:255',
-            'description' => 'required|max:255',
+            'title' => 'required',
+            'description' => 'required',
             'content' => 'required',
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'

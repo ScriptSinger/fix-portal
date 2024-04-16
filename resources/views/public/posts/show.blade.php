@@ -33,7 +33,7 @@
 
         <div class="blog-content">
             <div class="single-post-media">
-                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" class="img-fluid">
+                <img src="{{ optional($post->thumbnail)->blog }}" alt="{{ $post->title }}" class="img-fluid">
             </div>
 
             {!! $post->content !!}
