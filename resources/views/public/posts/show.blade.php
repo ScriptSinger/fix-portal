@@ -1,5 +1,6 @@
 @extends('public.layouts.banner')
 @section('title', "$post->title | " . config('app.name', 'Ufamasters'))
+@section('description', $post->description)
 
 @section('sidebar')
     <div class="sidebar">
