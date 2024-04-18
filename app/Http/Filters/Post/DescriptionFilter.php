@@ -5,13 +5,13 @@ namespace App\Http\Filters\Post;
 
 use Illuminate\Database\Eloquent\Builder;
 
-class TitleFilter
+class DescriptionFilter
 {
     public function handle(Builder $builder, \Closure $next)
     {
         if (request()->has('title')) {
-            $title = request('title');
-            $builder->where('title', 'like', '%' . $title . '%');
+            $description = request('title');
+            $builder->where('description', 'like', '%' . $description . '%');
         }
 
         return $next($builder);

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Filters\Post\DescriptionFilter;
+use App\Http\Filters\Post\TextFilter;
 use App\Http\Filters\Post\TitleFilter;
 use App\Models\Comment;
 use App\Models\Post;
@@ -15,7 +17,7 @@ class PostController extends Controller
         $posts = app(Pipeline::class)
             ->send(Post::query())
             ->through([
-                TitleFilter::class
+                TextFilter::class
             ])
             ->thenReturn()
             ->with('category', 'thumbnail')

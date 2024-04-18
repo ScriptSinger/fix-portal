@@ -26,7 +26,7 @@ class PostImageController extends Controller
     public function upload(Request $request)
     {
         $validated = $request->validate([
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
 
         $folder = date('Y-m-d');
