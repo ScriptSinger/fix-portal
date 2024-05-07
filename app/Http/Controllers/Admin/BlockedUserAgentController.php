@@ -24,7 +24,7 @@ class BlockedUserAgentController extends Controller
             'user_agent' => ['required'], // Поле обязательно для заполнения и должно быть действительным IP-адресом
         ]);
         BlockedUserAgent::create(['user_agent' => $data['user_agent']]);
-        return redirect()->route('admin.blockeds.agents.index')->with('success', 'User-agent добавлен в черный список');
+        return redirect()->route('admin.agents.index')->with('success', 'User-agent добавлен в черный список');
     }
 
     public function edit(int $id)

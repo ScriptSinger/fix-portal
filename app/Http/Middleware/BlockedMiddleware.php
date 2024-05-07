@@ -20,7 +20,7 @@ class BlockedMiddleware
 
         $userAgent = $request->header('User-Agent');
 
-        $blockedUserAgent = BlockedUserAgent::where('user_agent', 'like', '%' . $userAgent . '%')->exists();
+        $blockedUserAgent = BlockedUserAgent::where('user_agent', $userAgent)->exists();
         if ($blockedUserAgent) {
             abort(403);
         }
