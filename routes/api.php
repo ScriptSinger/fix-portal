@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\BlockedController;
+use App\Http\Controllers\Api\Admin\BlockedUserAgentController;
 use App\Http\Controllers\Api\Admin\PostImageController;
 use App\Http\Controllers\Api\ApplianceController;
 use App\Http\Controllers\Api\CategoryController;
@@ -91,6 +92,10 @@ Route::group(
         Route::get('/blockeds', [BlockedController::class, 'index'])->name('api.blockeds.index');
         Route::delete('/blockeds/{blocked}', [BlockedController::class, 'destroy'])->name('api.blockeds.destroy');
         Route::put('/blockeds/{blocked}', [BlockedController::class, 'restore'])->name('api.blockeds.restore');
+
+        Route::get('/blocked-agents', [BlockedUserAgentController::class, 'index'])->name('api.agents.index');
+        Route::delete('/agents/{agent}', [BlockedUserAgentController::class, 'destroy'])->name('api.agents.destroy');
+        Route::put('/agents/{agent}', [BlockedUserAgentController::class, 'restore'])->name('api.agents.restore');
     }
 );
 

@@ -51,4 +51,10 @@ class BlockedController extends Controller
         $blocker->forceDelete();
         return redirect()->route('admin.blockeds.index')->with('success', 'IP-адрес успешно удален из базы данных');
     }
+
+    public function clear()
+    {
+        Blocker::truncate();
+        return redirect()->route('admin.blockeds.index')->with('success', ' Данные были очищены');
+    }
 }

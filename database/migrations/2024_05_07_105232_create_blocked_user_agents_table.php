@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ips', function (Blueprint $table) {
+        Schema::create('blocked_user_agents', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->string('ip_address');
+            $table->string('user_agent');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ips');
+        Schema::dropIfExists('blocked_user_agents');
     }
 };

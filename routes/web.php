@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MainController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\AuthSessionController;
 use App\Http\Controllers\Admin\BlockedController;
+use App\Http\Controllers\Admin\BlockedUserAgentController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
 use App\Http\Controllers\Admin\CustomizationController;
@@ -207,6 +208,15 @@ Route::group(
         Route::get('/blockeds/{blocked}/edit', [BlockedController::class, 'edit'])->name('admin.blockeds.edit');
         Route::put('/blockeds/{blocked}', [BlockedController::class, 'update'])->name('admin.blockeds.update');
         Route::delete('/blockeds/{blocked}', [BlockedController::class, 'destroy'])->name('admin.blockeds.destroy');
+        Route::delete('/blockeds', [BlockedController::class, 'clear'])->name('admin.blockeds.clear');
+
+        Route::get('/agents', [BlockedUserAgentController::class, 'index'])->name('admin.agents.index');
+        Route::get('/agents/create', [BlockedUserAgentController::class, 'create'])->name('admin.agents.create');
+        Route::post('/agents', [BlockedUserAgentController::class, 'store'])->name('admin.agents.store');
+        Route::get('/agents/{agent}/edit', [BlockedUserAgentController::class, 'edit'])->name('admin.agents.edit');
+        Route::put('/agents/{agent}', [BlockedUserAgentController::class, 'update'])->name('admin.agents.update');
+        Route::delete('/agents/{agent}', [BlockedUserAgentController::class, 'destroy'])->name('admin.agents.destroy');
+        Route::delete('/agents', [BlockedUserAgentController::class, 'clear'])->name('admin.agents.clear');
     }
 );
 

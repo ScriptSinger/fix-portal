@@ -80,15 +80,16 @@
                           <li class="nav-item">
                               <a href="{{ route('admin.blockeds.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
-                                  <p>Список</p>
+                                  <p>Ip-addresses</p>
                               </a>
 
                           </li>
                           <li class="nav-item">
-                              <a href="{{ route('admin.blockeds.create') }}" class="nav-link">
+                              <a href="{{ route('admin.agents.index') }}" class="nav-link">
                                   <i class="far fa-circle nav-icon"></i>
-                                  <p>Добавить</p>
+                                  <p>User-agents</p>
                               </a>
+
                           </li>
                       </ul>
                   </li>
