@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('referer')->nullable();
             $table->string('methodType');
             $table->bigInteger('user_id')->unsigned()->nullable();
+            $table->integer('status');
             $table->timestamps();
         });
     }

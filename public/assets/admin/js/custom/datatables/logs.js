@@ -51,6 +51,10 @@ $(document).ready(function () {
                 title: "Метод",
             },
             {
+                data: "status",
+                title: "Статус",
+            },
+            {
                 data: "referer",
                 title: "Referer",
             },

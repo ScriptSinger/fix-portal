@@ -2,6 +2,7 @@
     "/assets/admin/css/adminlte.css": "/assets/admin/css/adminlte.css",
     "/assets/admin/js/adminlte.js": "/assets/admin/js/adminlte.js",
     "/assets/admin/js/custom/adminlte/sidebar.js": "/assets/admin/js/custom/adminlte/sidebar.js",
+    "/assets/admin/js/custom/datatables/agents.js": "/assets/admin/js/custom/datatables/agents.js",
     "/assets/admin/js/custom/datatables/appliances.js": "/assets/admin/js/custom/datatables/appliances.js",
     "/assets/admin/js/custom/datatables/blockeds.js": "/assets/admin/js/custom/datatables/blockeds.js",
     "/assets/admin/js/custom/datatables/categories.js": "/assets/admin/js/custom/datatables/categories.js",
