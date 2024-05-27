@@ -33,7 +33,7 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:50',
+            'name' => 'required|string|max:30',
             // 'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
             'phone' => ['required', 'string', 'max:255', 'regex:/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/'],
             'location' => 'required|string|max:255',
