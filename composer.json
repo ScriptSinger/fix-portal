@@ -17,7 +17,8 @@
         "laravel/socialite": "^5.8",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.2",
-        "phpseclib/phpseclib": "^3.0.35"
+        "phpseclib/phpseclib": "^3.0.35",
+        "spatie/laravel-sitemap": "^7.3"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.9",
