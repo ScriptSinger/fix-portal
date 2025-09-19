@@ -36,7 +36,7 @@ jobs:
 
             docker compose build
             docker compose up -d
-            docker compose run --rm php php composer install --no-dev --optimize-autoloader
+            docker compose run --rm php composer install --no-dev --optimize-autoloader
             docker compose run --rm php php artisan migrate --force
             docker compose run --rm php php artisan config:cache
             docker compose run --rm php php artisan route:cache
