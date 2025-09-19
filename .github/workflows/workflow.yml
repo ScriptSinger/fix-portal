@@ -33,9 +33,10 @@ jobs:
             git pull origin ${{ github.ref_name }}
 
             export COMPOSE_FILE=docker-compose.prod.yml
-            
+
             docker compose build
             docker compose up -d
+            docker compose run --rm php php composer install --no-dev --optimize-autoloader
             docker compose run --rm php php artisan migrate --force
             docker compose run --rm php php artisan config:cache
             docker compose run --rm php php artisan route:cache
