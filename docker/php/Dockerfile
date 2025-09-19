@@ -24,7 +24,9 @@ RUN sed -i "s/^user = .*/user = phpuser/" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i "s/^listen\.owner.*/listen.owner = phpuser/" /usr/local/etc/php-fpm.d/www.conf && \
     sed -i "s/^listen\.group.*/listen.group = phpuser/" /usr/local/etc/php-fpm.d/www.conf
 
+# Устанавливаем Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+RUN chmod +x /usr/bin/composer
 
 WORKDIR /var/www/html
 
