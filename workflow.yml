@@ -1,0 +1,41 @@
+
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - main
+      - ci-test
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy to server
+        run: |
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+         
+            cat > ~/ufamasters/.env <<EOL
+          ${{ secrets.ENV_FILE }}
+          EOL
+
+            cd ~/ufamasters
+            git pull origin ${{ github.ref_name }}
+            docker compose build
+            docker compose up -d
+            docker compose run --rm php php artisan migrate --force
+            docker compose run --rm php php artisan config:cache
+            docker compose run --rm php php artisan route:cache
+            docker compose run --rm php php artisan view:cache
+          EOF
