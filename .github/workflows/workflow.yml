@@ -43,9 +43,11 @@ jobs:
             docker compose build --pull --no-cache
             docker compose up -d --force-recreate
 
+            docker compose run --rm php rm -rf vendor composer.lock
             docker compose run --rm php composer install --no-dev --prefer-dist --optimize-autoloader
+
             docker compose run --rm php php artisan migrate --force
             docker compose run --rm php php artisan optimize
 
-            docker system prune -af --volumes
+            docker system prune -af
           EOF
