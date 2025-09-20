@@ -25,6 +25,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
 
+            # обновление env
             cat > ~/ufamasters/.env <<EOL
           ${{ secrets.ENV_FILE }}
           EOL
@@ -34,15 +35,17 @@ jobs:
             git fetch origin ${{ github.ref_name }}
             git checkout ${{ github.ref_name }}
             git reset --hard origin/${{ github.ref_name }}
-
+            git clean -fd
 
             export COMPOSE_FILE=docker-compose.prod.yml
 
-            docker compose build
-            docker compose up -d
-            docker compose run --rm php composer install --no-dev --optimize-autoloader
+            docker compose pull
+            docker compose build --pull --no-cache
+            docker compose up -d --force-recreate
+
+            docker compose run --rm php composer install --no-dev --prefer-dist --optimize-autoloader
             docker compose run --rm php php artisan migrate --force
-            docker compose run --rm php php artisan config:cache
-            docker compose run --rm php php artisan route:cache
-            docker compose run --rm php php artisan view:cache
+            docker compose run --rm php php artisan optimize
+
+            docker system prune -af --volumes
           EOF
