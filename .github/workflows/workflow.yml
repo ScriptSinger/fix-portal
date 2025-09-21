@@ -23,32 +23,27 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
 
-            # обновление env
-            cat > ~/ufamasters/.env <<EOL
-          ${{ secrets.ENV_FILE }}
-          EOL
+            echo "${{ secrets.ENV_FILE }}" > ~/ufamasters/.env
 
             cd ~/ufamasters
 
-            git fetch origin ${{ github.ref_name }}
             git checkout ${{ github.ref_name }}
-            git reset --hard origin/${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
             git clean -fd
 
             export COMPOSE_FILE=docker-compose.prod.yml
 
-            docker compose pull
-            docker compose build --pull --no-cache
-            docker compose up -d --force-recreate
+            docker system prune -af
+            docker compose down
 
-            docker compose run --rm php rm -rf vendor composer.lock
-            docker compose exec php composer install --no-dev --prefer-dist --optimize-autoloader
+            docker compose up -d --build
 
+
+            docker compose run --rm composer composer install --no-dev --prefer-dist --optimize-autoloader
 
             docker compose run --rm php php artisan migrate --force
             docker compose run --rm php php artisan optimize
 
-            docker system prune -af
           EOF

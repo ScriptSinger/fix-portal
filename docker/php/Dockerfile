@@ -1,6 +1,6 @@
 FROM php:8.2-fpm-alpine
 
-# Устанавливаем системные пакеты и зависимости
+
 RUN apk add --no-cache \
     bash \
     git \
@@ -12,7 +12,7 @@ RUN apk add --no-cache \
     postgresql-dev \
     && docker-php-ext-install pdo pdo_mysql zip bcmath gd
 
-# Создаём пользователя с UID/GID
+
 ARG UID=1000
 ARG GID=1000
 RUN addgroup -g ${GID} phpuser \
