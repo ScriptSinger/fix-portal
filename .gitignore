@@ -17,3 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+firmware_dump.sql
+thumbnails_dump.sql

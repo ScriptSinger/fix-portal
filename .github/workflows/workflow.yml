@@ -7,12 +7,69 @@ on:
       - ci-test
 
 jobs:
-  deploy:
+  build-artifact:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, pdo, bcmath
+          tools: composer:v2
+
+      - name: Install composer dependencies (no-dev)
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+      - name: Build frontend
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run build
+          fi
+
+      - name: Laravel cache
+        run: |
+          php artisan config:cache || true
+          php artisan route:cache || true
+          php artisan view:cache || true
+
+      - name: Create artifact
+        run: |
+          tar -czf release.tar.gz \
+            docker-compose.yml \
+            Dockerfile \
+            .env.example \
+            artisan \
+            bootstrap \
+            config \
+            database \
+            public \
+            resources \
+            routes \
+            storage \
+            vendor \
+            composer.json \
+            composer.lock
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: release.tar.gz
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-artifact
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: release
 
       - name: Setup SSH key
         run: |
@@ -23,24 +80,23 @@ jobs:
 
       - name: Deploy to server
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          scp -i ~/.ssh/id_ed25519 release.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/release.tar.gz
 
-            echo "${{ secrets.ENV_FILE }}" > ~/ufamasters/.env
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
 
             cd ~/ufamasters
 
-            git checkout ${{ github.ref_name }}
-            git pull origin ${{ github.ref_name }}
+
+            tar -xzf /tmp/release.tar.gz -C ~/ufamasters
 
 
-            docker system prune -af
+            echo "${{ secrets.ENV_FILE }}" > .env
+
             docker compose down
-
+            docker system prune -af
             docker compose up -d --build
 
-            docker compose run --rm composer composer install --no-dev --prefer-dist --optimize-autoloader
 
             docker compose run --rm php php artisan migrate --force
             docker compose run --rm php php artisan optimize
-
           EOF
