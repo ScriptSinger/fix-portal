@@ -40,20 +40,24 @@ jobs:
       - name: Create artifact
         run: |
           tar -czf release.tar.gz \
-            docker-compose.yml \
-            docker \
-            .env.example \
-            artisan \
+            app \
             bootstrap \
             config \
             database \
+            docker \
+            lang\
             public \
             resources \
             routes \
             storage \
             vendor \
+           .env.example \
+            artisan \
             composer.json \
-            composer.lock
+            composer.lock \
+            docker-compose.yml \
+            package-lock.json \
+            package.json \
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
