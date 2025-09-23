@@ -41,6 +41,7 @@ jobs:
         run: |
           tar -czf release.tar.gz \
             docker-compose.yml \
+            docker \
             .env.example \
             artisan \
             bootstrap \
