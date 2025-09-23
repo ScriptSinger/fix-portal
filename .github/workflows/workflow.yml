@@ -40,7 +40,6 @@ jobs:
 
             docker compose up -d --build
 
-
             docker compose run --rm composer composer install --no-dev --prefer-dist --optimize-autoloader
 
             docker compose run --rm php php artisan migrate --force
