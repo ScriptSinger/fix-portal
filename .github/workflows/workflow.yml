@@ -28,7 +28,7 @@ jobs:
         run: |
           if [ -f package.json ]; then
             npm ci
-            npm run build
+            npm run prod
           fi
 
       - name: Laravel cache
