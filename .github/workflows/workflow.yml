@@ -31,6 +31,12 @@ jobs:
             npm run prod
           fi
 
+      - name: Laravel cache
+        run: |
+          php artisan config:cache || true
+          php artisan route:cache || true
+          php artisan view:cache || true
+
       - name: Create artifact
         run: |
           tar -czf release.tar.gz \
@@ -44,7 +50,6 @@ jobs:
             resources \
             routes \
             storage \
-            vendor \
            .env.example \
             artisan \
             composer.json \
@@ -94,13 +99,10 @@ jobs:
             docker system prune -af
             docker compose up -d --build
 
-
-            docker compose run --rm php php artisan config:cache
-            docker compose run --rm php php artisan route:cache
-            docker compose run --rm php php artisan view:cache
-            docker compose run --rm php php artisan migrate --force
-            docker compose run --rm php php artisan optimize
+            docker compose run --rm composer composer install --no-dev --prefer-dist --optimize-autoloader
 
             docker compose run --rm php php artisan migrate --force
+            docker compose run --rm php php artisan route:clear
+            docker compose run --rm php php artisan view:clear
             docker compose run --rm php php artisan optimize
           EOF
