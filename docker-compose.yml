@@ -7,7 +7,7 @@ services:
         user: "${UID}:${GID}" # Для запуска контейнера от текущего пользователя хоста
         volumes:
             - ./:/var/www/html
-            - storage_data:/var/www/html/storage
+
         networks:
             - laravel
     composer:
@@ -25,7 +25,7 @@ services:
             - "80:80"
         volumes:
             - ./public:/var/www/html/public:ro
-            - ./storage_data:/var/www/html/storage:ro
+            - ./storage:/var/www/html/storage:ro
             - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
             - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
 
@@ -52,5 +52,3 @@ networks:
 
 volumes:
     db_data:
-    storage_data:
-    vendor_data:
