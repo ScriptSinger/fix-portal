@@ -57,9 +57,16 @@ services:
             - laravel
         labels:
             - "traefik.enable=true"
+            # HTTPS роутер
             - "traefik.http.routers.laravel.rule=Host(`ufamasters.ru`,`www.ufamasters.ru`)"
             - "traefik.http.routers.laravel.entrypoints=websecure"
             - "traefik.http.routers.laravel.tls.certresolver=myresolver"
+
+              # HTTP → HTTPS редирект
+            - "traefik.http.routers.laravel-insecure.rule=Host(`ufamasters.ru`,`www.ufamasters.ru`)"
+            - "traefik.http.routers.laravel-insecure.entrypoints=web"
+            - "traefik.http.routers.laravel-insecure.middlewares=redirect-to-https"
+            - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     mysql:
         image: mysql:8.0.38-debian
         restart: unless-stopped
