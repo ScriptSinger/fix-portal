@@ -1,4 +1,27 @@
 services:
+    traefik:
+        image: traefik:v2.11
+        container_name: traefik
+        restart: unless-stopped
+        command:
+            - "--api.dashboard=true"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.websecure.address=:443"
+            - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+            - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+            - "--certificatesresolvers.myresolver.acme.email=admin@ufamasters.ru"
+            - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./letsencrypt:/letsencrypt
+        networks:
+            - laravel
+
     php:
         build:
             context: .
@@ -23,8 +46,6 @@ services:
     nginx:
         image: nginx:1.25-alpine
         restart: unless-stopped
-        ports:
-            - "80:80"
         volumes:
             - ./:/var/www/html
             - ./docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
@@ -34,7 +55,11 @@ services:
             - php
         networks:
             - laravel
-
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.laravel.rule=Host(`ufamasters.ru`,`www.ufamasters.ru`)"
+            - "traefik.http.routers.laravel.entrypoints=websecure"
+            - "traefik.http.routers.laravel.tls.certresolver=myresolver"
     mysql:
         image: mysql:8.0.38-debian
         restart: unless-stopped
