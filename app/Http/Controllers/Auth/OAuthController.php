@@ -24,11 +24,16 @@ class OAuthController extends Controller
             ['email' => $socialUser->getEmail()],
             [
                 'name' => $socialUser->getName(),
+                'password' => bcrypt(str()->random(16)),
                 // Можно сохранить аватарку, id соцсети и т.д.
                 // $provider . '_id' => $socialUser->getId(),
             ]
         );
 
+        // Если соцсеть подтверждает email — сразу отмечаем как verified
+        if ($user->email_verified_at === null) {
+            $user->markEmailAsVerified();
+        }
         Auth::login($user);
 
         return redirect()->intended('/');
