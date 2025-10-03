@@ -19,3 +19,4 @@ yarn-error.log
 /.vscode
 firmware_dump.sql
 thumbnails_dump.sql
+docker-compose.override.yml
