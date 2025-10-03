@@ -37,7 +37,7 @@ class StatisticController extends Controller
         $finder = new Finder();
         $finder->files()->in(storage_path('app/public/images'));
         $usersImagesCount = iterator_count($finder);
-
+        $verifiedUsersCount = User::whereNotNull('email_verified_at')->count();
 
 
         // Возвращаем статистическую информацию в формате JSON
@@ -51,7 +51,8 @@ class StatisticController extends Controller
             'firmwaresFilesCount' => $firmwaresFilesCount,
             'usersImagesCount' =>  $usersImagesCount,
             'commentsCount' => $commentsCount,
-            'repliesCount' => $repiesCount
+            'repliesCount' => $repiesCount,
+            'verifiedUsersCount' => $verifiedUsersCount,
         ]);
     }
 }

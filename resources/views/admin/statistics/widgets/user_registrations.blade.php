@@ -4,8 +4,12 @@
             <i class="fas fa-3x fa-sync-alt"></i>
         </div>
         <div class="inner">
-            <h3 data-route="{{ route('api.statistics.index') }}" data-statistic-key="userRegistrations">
-                0</h3>
+            <h3>
+                <span data-route="{{ route('api.statistics.index') }}" data-statistic-key="userRegistrations">0</span>
+                /
+                <span data-route="{{ route('api.statistics.index') }}" data-statistic-key="verifiedUsersCount">0</span>
+            </h3>
+
             <p>User Registrations</p>
         </div>
         <div class="icon">
