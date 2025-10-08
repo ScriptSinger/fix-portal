@@ -14,6 +14,9 @@ RUN adduser -G laravel -D -s /bin/sh -u ${UID} laravel
 RUN sed -i "s/^user = .*/user = laravel/" /usr/local/etc/php-fpm.d/www.conf
 RUN sed -i "s/^group = .*/group = laravel/" /usr/local/etc/php-fpm.d/www.conf
 
+# Меняем зеркало Alpine на более быстрое (Cloudflare CDN)
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.cloudflare.com\/alpine/' /etc/apk/repositories
+
 RUN apk add --no-cache \
     bash \
     git \
