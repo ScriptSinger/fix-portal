@@ -42,7 +42,7 @@
             <p>Для вопросов или предложений по работе сайта: <a
                     href="mailto:ufamasters102@gmail.com">ufamasters102@gmail.com</a>.</p>
             <h4>Обмен опытом</h4>
-            <p>Наше<a href="https://chat.whatsapp.com/GbiHdEKIArIBcnhALEVbdu">WhatsApp-сообщество</a>, где участники делятся опытом и поддерживают друг друга — присоединяйтесь
+            <p>Наше <a href="https://chat.whatsapp.com/GbiHdEKIArIBcnhALEVbdu">WhatsApp-сообщество</a>, где участники делятся опытом и поддерживают друг друга — присоединяйтесь
             </p>
         </div>
 
