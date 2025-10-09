@@ -8,7 +8,11 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-
+    public function index()
+    {
+        $categories = Category::all();
+        return view('public.categories.index', compact('categories'));
+    }
 
     public function show($slug)
     {

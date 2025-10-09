@@ -1,22 +1,20 @@
 @extends('public.layouts.bar')
 @section('title', "$tag->title | " . config('app.name', 'Ufamasters'))
 @section('page-title')
-
-@section('page-title')
 <div class="page-title db">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                 <h2> {{ $tag->title }}</h2>
-            </div><!-- end col -->
+            </div>
             <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                 <ol class="breadcrumb">
                     {{ Breadcrumbs::render('tag', $tag) }}
                 </ol>
-            </div><!-- end col -->
-        </div><!-- end row -->
-    </div><!-- end container -->
-</div><!-- end page-title -->
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('sidebar')
@@ -25,42 +23,46 @@
     @include('public.layouts.widgets.sidebar.advertising')
     @include('public.layouts.widgets.sidebar.prime_categories')
 </div>
-
 @endsection
 
 @section('content')
 <div class="page-wrapper">
     <div class="blog-custom-build">
-
         @foreach ($posts as $post)
         <div class="blog-box wow fadeIn">
             <div class="post-media">
-                <a href="{{ route('articles.show', ['article' => $post->slug]) }}" title="">
-                    <img src="{{ optional($post->thumbnail)->blog }}" alt="{{ $post->title }}" class="img-fluid">
+                <a role="button" href="#" data-toggle="modal" data-target="#modal{{ $post->id }}">
+                    @if ($post->thumbnail)
+                    <img class="img-fluid" src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
+                        loading="lazy">
+                    @else
+                    <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid"
+                        loading="lazy">
+                    @endif
                     <div class="hovereffect">
                         <span></span>
                     </div>
-                    <!-- end hover -->
                 </a>
             </div>
-            <!-- end media -->
+            @include('public.layouts.modal.index', [
+            'entity' => $post,
+            'image' => optional($post->thumbnail)->original,
+            ])
+
             <div class="blog-meta big-meta text-center">
                 @include('public.layouts.widgets.sharing', [
                 'reference' => $post->slug,
                 ])
-                <!-- end post-sharing -->
 
                 <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                         title="">{{ $post->title }}</a></h4>
-                {!! $post->description !!}
-                <small><a href="{{ route('tag.articles', ['slug' => $tag->slug]) }}"
-                        title="">{{ $tag->title }}</a></small>
-                <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
-                <small><a href="#" title="">by Jack</a></small>
-                <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
-            </div><!-- end meta -->
-        </div><!-- end blog-box -->
+                <p>{!! $post->description !!}</p>
 
+                <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
+                <small>{{ $post->administrator->name }}</small>
+                <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
+            </div>
+        </div>
         <hr class="invis">
         @endforeach
     </div>
@@ -74,5 +76,4 @@
         </div>
     </div>
 </div>
-
 @endsection

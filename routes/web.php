@@ -62,8 +62,10 @@ Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 Route::get('/users', [UserController::class, 'index'])->name('users.index');
 Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
 
+Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
-Route::get('/tag/{slug}', [TagController::class, 'showTagArticles'])->name('tag.articles');
+Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
+Route::get('/tag/{tag}', [TagController::class, 'show'])->name('tags.show');
 
 Route::resource('questions', QuestionController::class);
 
