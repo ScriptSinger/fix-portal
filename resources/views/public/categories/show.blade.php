@@ -6,15 +6,15 @@
         <div class="row">
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                 <h2> {{ $category->title }}</h2>
-            </div><!-- end col -->
+            </div>
             <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
                 <ol class="breadcrumb">
                     {{ Breadcrumbs::render('category', $category) }}
                 </ol>
-            </div><!-- end col -->
-        </div><!-- end row -->
-    </div><!-- end container -->
-</div><!-- end page-title -->
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('sidebar')
