@@ -1,6 +1,8 @@
 @extends('public.layouts.banner')
 @section('title', 'Статьи | ' . config('app.name', 'Ufamasters'))
 @section('banner')
+@section('canonical', url('/articles'))
+
 <section
     style="background-image: url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}');"
     id="cta" class="section">
@@ -36,49 +38,49 @@
 <div class="page-wrapper">
     <div class="blog-custom-build">
         @if (count($posts))
-        @foreach ($posts as $post)
-        <div class="blog-box wow fadeIn">
-            <div class="post-media">
-                <a role="button" href="#" data-toggle="modal" data-target="#modal{{ $post->id }}">
-                    @if ($post->thumbnail)
-                    <img class="img-fluid" src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
-                        loading="lazy">
-                    @else
-                    <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid"
-                        loading="lazy">
-                    @endif
-                    <div class="hovereffect">
-                        <span></span>
+            @foreach ($posts as $post)
+                <div class="blog-box wow fadeIn">
+                    <div class="post-media">
+                        <a role="button" href="#" data-toggle="modal" data-target="#modal{{ $post->id }}">
+                            @if ($post->thumbnail)
+                                <img class="img-fluid" src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
+                                    loading="lazy">
+                            @else
+                                <img src="{{ asset('/assets/front/upload/market_blog_01.jpg') }}" class="img-fluid"
+                                    loading="lazy">
+                            @endif
+                            <div class="hovereffect">
+                                <span></span>
+                            </div>
+                        </a>
                     </div>
-                </a>
-            </div>
 
-            @include('public.layouts.modal.index', [
-            'entity' => $post,
-            'image' => optional($post->thumbnail)->original,
-            ])
+                    @include('public.layouts.modal.index', [
+                        'entity' => $post,
+                        'image' => optional($post->thumbnail)->original,
+                    ])
 
-            <div class="blog-meta big-meta text-center">
-                @include('public.layouts.widgets.sharing', [
-                'reference' => $post->slug,
-                ])
+                    <div class="blog-meta big-meta text-center">
+                        @include('public.layouts.widgets.sharing', [
+                            'reference' => $post->slug,
+                        ])
 
-                <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
-                        title="">{{ $post->title }}</a></h4>
-                <p>
-                    {!! $post->description !!}
-                </p>
-                <small><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
-                        title="">{{ $post->category->title }}</a></small>
-                <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
-                <small>{{ $post->administrator->name }}</small>
-                <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
-            </div>
-        </div>
-        <hr class="invis">
-        @endforeach
+                        <h4><a href="{{ route('articles.show', ['article' => $post->slug]) }}"
+                                title="">{{ $post->title }}</a></h4>
+                        <p>
+                            {!! $post->description !!}
+                        </p>
+                        <small><a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
+                                title="">{{ $post->category->title }}</a></small>
+                        <small>{{ $post->dateAsCarbon->diffForHumans() }}</small>
+                        <small>{{ $post->administrator->name }}</small>
+                        <small><i class="fa fa-eye"></i> {{ $post->views }}</small>
+                    </div>
+                </div>
+                <hr class="invis">
+            @endforeach
         @else
-        <p>Совпадений не найдено</p>
+            <p>Совпадений не найдено</p>
         @endif
     </div>
 </div>
