@@ -19,8 +19,9 @@
 
 @section('sidebar')
     <div class="sidebar">
-        @include('public.layouts.widgets.sidebar.prime_posts')
+        @include('public.layouts.widgets.sidebar.telegram_group')
         @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_posts')
         @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
 @endsection

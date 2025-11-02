@@ -3,8 +3,9 @@
 
 @section('sidebar')
     <div class="sidebar">
-        @include('public.layouts.widgets.sidebar.prime_posts')
+        @include('public.layouts.widgets.sidebar.telegram_group')
         @include('public.layouts.widgets.sidebar.advertising')
+        @include('public.layouts.widgets.sidebar.prime_posts')
         @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
 @endsection
@@ -36,7 +37,7 @@
                 @can('delete', $question)
                     <small>
                         <a href="#"
-                            onclick="event.preventDefault(); 
+                            onclick="event.preventDefault();
               document.getElementById('removeQuestion').submit();">
                             <i class="fa fa-trash"></i>
                             <b>Удалить</b>
