@@ -1,4 +1,5 @@
-FROM composer:2
+FROM composer:2.7-php8.4
+
 
 ARG UID
 ARG GID
