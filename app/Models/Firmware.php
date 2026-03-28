@@ -36,6 +36,19 @@ class Firmware extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function getModelNameAttribute(): ?string
+    {
+        if (!$this->data) {
+            return null;
+        }
+
+        if (preg_match('/<td>\\s*Модель\\s*<\\/td>\\s*<td>(.*?)<\\/td>/ui', $this->data, $matches)) {
+            return strip_tags($matches[1]);
+        }
+
+        return null;
+    }
+
     protected static function boot()
     {
         parent::boot();
