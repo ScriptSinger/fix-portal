@@ -95,7 +95,7 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
 
-            cd ~/appliance_repair
+            cd ~/ufamasters
 
             tar -xzf /tmp/release.tar.gz -C .
 
