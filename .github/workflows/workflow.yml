@@ -57,7 +57,6 @@ jobs:
             composer.json \
             composer.lock \
             docker-compose.yml \
-            docker-compose.override.yml \
             package-lock.json \
             package.json
 

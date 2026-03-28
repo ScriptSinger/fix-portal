@@ -20,3 +20,4 @@ yarn-error.log
 firmware_dump.sql
 thumbnails_dump.sql
 docker-compose.override.yml
+posts_dump
