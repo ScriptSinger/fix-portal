@@ -22,7 +22,8 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required'
+            'title' => 'required',
+            'description' => 'nullable|string'
         ]);
         Category::create($data);
         // return redirect()->route('categories.index')->session()->flash('success', 'Категория добавлена');
@@ -38,7 +39,8 @@ class CategoryController extends Controller
     public function update(Request $request, string $id)
     {
         $data = $request->validate([
-            'title' => 'required'
+            'title' => 'required',
+            'description' => 'nullable|string'
         ]);
         $category = Category::find($id);
         // $category->slug = null; // обновление slug

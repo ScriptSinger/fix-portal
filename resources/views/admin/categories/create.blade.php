@@ -42,6 +42,19 @@
                                     @endif
                                 </span>
                             </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea name="description" rows="4"
+                                    class="form-control @error('description') is-invalid @enderror"
+                                    placeholder="Краткое описание категории">{{ old('description') }}</textarea>
+                                <span class="error invalid-feedback">
+                                    @if ($errors->any())
+                                        @foreach ($errors->all() as $error)
+                                            {{ $error }}
+                                        @endforeach
+                                    @endif
+                                </span>
+                            </div>
                         </div>
                         <div class="card-footer">
                             <button type="submit" class="btn btn-primary">Сохранить</button>

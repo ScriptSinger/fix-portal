@@ -14,7 +14,7 @@ class Category extends Model
     use HasFactory, Sluggable, SoftDeletes, DateTrait;
 
 
-    protected $fillable = ['title'];
+    protected $fillable = ['title', 'description'];
 
     public function sluggable(): array
     {
