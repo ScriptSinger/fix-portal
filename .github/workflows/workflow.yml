@@ -24,18 +24,22 @@ jobs:
       - name: Install composer dependencies (no-dev)
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
+      - name: Setup Node.js
+        if: ${{ hashFiles('package.json') != '' }}
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Node Dependencies
+        if: ${{ hashFiles('package.json') != '' }}
+        run: npm ci
+
       - name: Build frontend
         run: |
           if [ -f package.json ]; then
-            npm ci
             npm run prod
           fi
-
-      - name: Laravel cache
-        run: |
-          php artisan config:cache || true
-          php artisan route:cache || true
-          php artisan view:cache || true
 
       - name: Create artifact
         run: |
@@ -45,18 +49,17 @@ jobs:
             config \
             database \
             docker \
-            lang\
+            lang \
             public \
             resources \
             routes \
-            storage \
            .env.example \
             artisan \
             composer.json \
             composer.lock \
             docker-compose.yml \
             package-lock.json \
-            package.json \
+            package.json
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -94,9 +97,7 @@ jobs:
             echo "${{ secrets.ENV_FILE }}" > .env
 
             docker compose down
-            docker system prune -af
             docker compose up -d --build
-            docker compose run --rm composer composer install --no-dev --prefer-dist --optimize-autoloader
             docker compose run --rm php php artisan migrate --force
             docker compose run --rm php php artisan route:clear
             docker compose run --rm php php artisan view:clear
