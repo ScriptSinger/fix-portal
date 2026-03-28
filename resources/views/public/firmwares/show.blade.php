@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', "$firmware->title | " . config('app.name', 'Ufamasters'))
+@section('description', 'Прошивка: ' . $firmware->title . '. Платформа: ' . ($firmware->platform ?? '—') . ', формат: ' . ($firmware->extension ?? '—') . '.')
 @section('page-title')
     <div class="page-title db">
         <div class="container">
