@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', "Теги статей | " . config('app.name', 'Ufamasters'))
+@section('description', 'Список тегов статей по ремонту бытовой техники.')
 @section('page-title')
 <div class="page-title db">
     <div class="container">

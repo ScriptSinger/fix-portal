@@ -1,5 +1,6 @@
 @extends('public.layouts.banner')
 @section('title', "$question->title | " . config('app.name', 'Ufamasters'))
+@section('description', Str::limit(strip_tags($question->description ?? ''), 160))
 
 @section('sidebar')
     <div class="sidebar">

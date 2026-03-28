@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', 'Мастера по ремонту бытовой техники | ' . config('app.name', 'Ufamasters'))
+@section('description', 'Каталог мастеров по ремонту бытовой техники: контакты, специализация и отзывы.')
 @section('page-title')
     <div class="page-title db">
         <div class="container">

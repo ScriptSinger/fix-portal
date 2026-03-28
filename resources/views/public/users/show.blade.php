@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', "Прошивка: $user->title | " . config('app.name', 'Ufamasters'))
+@section('description', Str::limit(strip_tags($user->bio ?? ('Профиль мастера: ' . $user->name)), 160))
 @section('page-title')
     <div class="page-title db">
         <div class="container">
