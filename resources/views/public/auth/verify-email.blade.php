@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', 'Подтверждение Email | ' . config('app.name', 'Ufamasters'))
+@section('robots', 'noindex, nofollow')
 @section('page-title')
     <div class="page-title db">
         <div class="container">

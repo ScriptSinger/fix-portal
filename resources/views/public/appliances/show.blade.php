@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', "$appliance->title | " . config('app.name', 'Ufamasters'))
+@section('description', 'Вопросы и ответы по технике: ' . $appliance->title . '. Решения, советы и опыт пользователей.')
 @section('page-title')
     <div class="page-title db">
         <div class="container">

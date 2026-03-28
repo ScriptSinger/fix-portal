@@ -7,6 +7,7 @@
 
     <meta name="keywords" content="">
     <meta name="description" content="@yield('description')">
+    <meta name="robots" content="@yield('robots', 'index,follow')">
     <meta name="author" content="">
 
     @hasSection('canonical')

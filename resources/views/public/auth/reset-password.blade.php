@@ -1,5 +1,6 @@
 @extends('public.auth.layouts.app')
 @section('title', 'Восстановление пароля | ' . config('app.name', 'Ufamasters'))
+@section('robots', 'noindex, nofollow')
 @section('body-class', 'register-page')
 @section('body-style', 'min-height: 542px;') <!-- Устанавливаем атрибут style для body -->
 @section('content')

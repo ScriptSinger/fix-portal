@@ -1,5 +1,6 @@
 @extends('public.layouts.bar')
 @section('title', 'О нас | ' . config('app.name', 'Ufamasters'))
+@section('description', 'О нас: платформа с статьями, вопросами и ответами, базой прошивок и каталогом мастеров по ремонту бытовой техники.')
 @section('page-title')
     <div class="page-title db">
         <div class="container">

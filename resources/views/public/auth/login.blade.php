@@ -1,5 +1,6 @@
 @extends('public.auth.layouts.app')
 @section('title', 'Вход | ' . config('app.name', 'Ufamasters'))
+@section('robots', 'noindex, nofollow')
 @section('body-class', 'login-page')
 @section('body-style', 'min-height: 466px;')
 
