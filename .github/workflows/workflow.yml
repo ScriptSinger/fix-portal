@@ -1,44 +1,43 @@
-name: Deploy to Server
+name: Deploy to Production
 
 on:
   push:
     branches:
       - main
-      - test
+      - ci-test
 
 jobs:
-  build:
-    name: Build Release
+  build-artifact:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
-          extensions: mbstring, xml, zip, pdo, curl, openssl
-          tools: composer
+          php-version: 8.2
+          extensions: mbstring, pdo, bcmath
+          tools: composer:v2
 
-      - name: Setup Node.js
-        if: ${{ hashFiles('package.json') != '' }}
-        uses: actions/setup-node@v5
-        with:
-          node-version: "22"
-          cache: npm
+      - name: Install composer dependencies (no-dev)
+        run: composer install --no-dev --prefer-dist --optimize-autoloader
 
-      - name: Install Composer Dependencies
-        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
+      - name: Build frontend
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+            npm run prod
+          fi
 
-      - name: Install Node Dependencies
-        run: npm ci
+      - name: Laravel cache
+        run: |
+          php artisan config:cache || true
+          php artisan route:cache || true
+          php artisan view:cache || true
 
-      - name: Build Frontend Assets
-        run: npm run prod
-
-      - name: Create Release Archive
+      - name: Create artifact
         run: |
           tar -czf release.tar.gz \
             app \
@@ -46,67 +45,60 @@ jobs:
             config \
             database \
             docker \
-            lang \
+            lang\
             public \
             resources \
             routes \
             storage \
-            vendor \
-            .env.example \
+           .env.example \
             artisan \
             composer.json \
             composer.lock \
             docker-compose.yml \
             package-lock.json \
-            package.json
+            package.json \
 
-      - name: Upload Artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: release
           path: release.tar.gz
 
   deploy:
-    name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-artifact
 
     steps:
-      - name: Download Artifact
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: release
-          path: .
 
-      - name: Setup SSH Key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          printf "%s" "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Upload Release to Server
+      - name: Deploy to server
         run: |
-          scp -i ~/.ssh/id_ed25519 release.tar.gz \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/release.tar.gz
+          scp -i ~/.ssh/id_ed25519 release.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/release.tar.gz
 
-      - name: Deploy on Server
-        run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            set -e
+          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
 
             cd ~/ufamasters
 
-            tar -xzf /tmp/release.tar.gz -C .
+            tar -xzf /tmp/release.tar.gz -C ~/ufamasters
 
             echo "${{ secrets.ENV_FILE }}" > .env
 
-            docker compose up -d --build --remove-orphans
-            docker compose exec php php artisan storage:link
-            docker compose exec php php artisan optimize:clear
-            docker compose exec php php artisan config:clear
-            docker compose exec php php artisan config:cache
-            docker compose exec php php artisan route:cache
-            docker compose exec php php artisan view:cache
+            docker compose down
+            docker system prune -af
+            docker compose up -d --build
+            docker compose run --rm composer composer install --no-dev --prefer-dist --optimize-autoloader
             docker compose run --rm php php artisan migrate --force
+            docker compose run --rm php php artisan route:clear
+            docker compose run --rm php php artisan view:clear
+            docker compose run --rm php php artisan optimize
           EOF
