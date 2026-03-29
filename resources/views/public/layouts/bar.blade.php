@@ -7,13 +7,17 @@
         @include('public.layouts.includes.header')
         @yield('page-title')
         <section class="section lb">
-            <div class="container">
+            @hasSection('full-width')
+                <div class="container-fluid">
+            @else
+                <div class="container">
+            @endif
                 <div class="row">
-                    <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
-                        @yield('sidebar')
-                    </div>
-                    <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+                    <div class="@yield('content-col', 'col-lg-8 col-md-12 col-sm-12 col-xs-12') @yield('content-order', '')">
                         @yield('content')
+                    </div>
+                    <div class="@yield('sidebar-col', 'col-lg-4 col-md-12 col-sm-12 col-xs-12') @yield('sidebar-order', '')">
+                        @yield('sidebar')
                     </div>
                 </div>
             </div>

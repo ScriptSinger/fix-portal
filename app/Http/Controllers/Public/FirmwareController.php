@@ -22,7 +22,21 @@ class FirmwareController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(20);
 
-        return view('public.firmwares.index2', compact('firmwares'));
+        $platforms = Firmware::query()
+            ->whereNotNull('platform')
+            ->where('platform', '!=', '')
+            ->distinct()
+            ->orderBy('platform')
+            ->pluck('platform');
+
+        $extensions = Firmware::query()
+            ->whereNotNull('extension')
+            ->where('extension', '!=', '')
+            ->distinct()
+            ->orderBy('extension')
+            ->pluck('extension');
+
+        return view('public.firmwares.index', compact('firmwares', 'platforms', 'extensions'));
     }
 
     public function show(string $slug)

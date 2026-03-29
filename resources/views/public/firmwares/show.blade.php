@@ -9,6 +9,9 @@
 @if (!$firmwareExists)
     @section('robots', 'noindex, nofollow')
 @endif
+@section('full-width', true)
+@section('sidebar-col', 'col-lg-3 col-md-12 col-sm-12 col-xs-12')
+@section('content-col', 'col-lg-9 col-md-12 col-sm-12 col-xs-12')
 @section('page-title')
     <div class="page-title db">
         <div class="container">
@@ -87,9 +90,13 @@
                 </table>
             </div>
 
-            <a class="btn btn-dark"
-                href="{{ route('firmwares.download', ['filename' => $firmware->title . $firmware->extension]) }}">Скачать
-                файл</a>
+            @if (!empty($firmware->title))
+                <a class="btn btn-dark"
+                    href="{{ route('firmwares.download', ['filename' => $firmware->title . ($firmware->extension ?? '')]) }}">Скачать
+                    файл</a>
+            @else
+                <span class="text-muted">Файл недоступен</span>
+            @endif
         </div>
 
         <hr class="invis1">

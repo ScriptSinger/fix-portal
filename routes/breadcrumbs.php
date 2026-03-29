@@ -66,7 +66,8 @@ Breadcrumbs::for('firmwares', function (BreadcrumbTrail $trail) {
 
 Breadcrumbs::for('firmware', function (BreadcrumbTrail $trail, Firmware $firmware) {
     $trail->parent('firmwares');
-    $trail->push(Str::limit($firmware->title, 30, '...'), route('firmwares.show', $firmware));
+    $title = $firmware->model_name ?: ($firmware->title ?: ('Прошивка #' . $firmware->id));
+    $trail->push(Str::limit($title, 30, '...'), route('firmwares.show', $firmware));
 });
 
 Breadcrumbs::for('profile', function (BreadcrumbTrail $trail) {

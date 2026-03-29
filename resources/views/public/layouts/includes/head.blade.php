@@ -25,4 +25,5 @@
         href="{{ asset('assets/front/images/favicon_io/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ asset('assets/front/images/favicon_io/site.webmanifest') }}">
     <meta name="yandex-verification" content="7843198b5b2a0b60" />
+    @stack('styles')
 </head>

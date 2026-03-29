@@ -5,14 +5,24 @@ $(function () {
 
         language: {
             url: $("#dataTable").data("locale"),
+            search: "Поиск:",
+            searchPlaceholder: "Название / модель / платформа / расширение / ID",
         },
-        info: false,
         processing: true,
+        serverSide: true,
         pagingType: "numbers",
 
         ajax: {
             url: routes.index,
-            dataSrc: "",
+            data: function (d) {
+                var form = $("#firmwareFilters");
+                if (form.length) {
+                    d.platform = form.find('[name="platform"]').val();
+                    d.extension = form.find('[name="extension"]').val();
+                    d.crc32 = form.find('[name="crc32"]').val();
+                }
+            },
+            dataSrc: "data",
         },
 
         stateSave: true,
@@ -44,14 +54,6 @@ $(function () {
                 data: "platform",
                 title: "Платформа",
             },
-            {
-                data: "crc32",
-                title: "CRC32",
-            },
-            {
-                data: "data",
-                title: "Параметры",
-            },
         ],
 
         columnDefs: [
@@ -77,16 +79,6 @@ $(function () {
                     return data + " КБ";
                 },
             },
-            {
-                targets: 7,
-                render: function (data, type, row, meta) {
-                    var truncatedText =
-                        type === "display" && data && data.length > 100
-                            ? data.substr(0, 100) + "..."
-                            : data;
-                    return truncatedText;
-                },
-            },
         ],
 
         rowCallback: function (row, data, index) {
@@ -100,4 +92,19 @@ $(function () {
         // Предотвращаем срабатывание события select при клике на ссылку
         event.stopPropagation();
     });
+
+    $("#firmwareFilters").on("submit", function (event) {
+        event.preventDefault();
+        dataTable.ajax.reload();
+    });
+
+    $("#resetFilters").on("click", function () {
+        $("#firmwareFilters")[0].reset();
+        if ($.fn.select2) {
+            $("#filterPlatform").val("").trigger("change");
+            $("#filterExtension").val("").trigger("change");
+        }
+        dataTable.ajax.reload();
+    });
+
 });
