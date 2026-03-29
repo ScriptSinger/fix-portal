@@ -10,7 +10,7 @@
 @section('content-col', 'col-lg-9 col-md-12 col-sm-12 col-xs-12 col-lg-pull-3')
 @section('page-title')
     <div class="page-title db">
-        <div class="container">
+        <div class="page-title-hero-inner">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <h2>Прошивки для бытовой техники</h2>
@@ -33,37 +33,7 @@
 
 @section('content')
     <div class="page-wrapper">
-        <style>
-            .select2-container--default .select2-selection--single {
-                height: 38px;
-                border: 1px solid #ced4da;
-                border-radius: 4px;
-            }
-            .select2-container--default .select2-selection--single .select2-selection__rendered {
-                line-height: 36px;
-            }
-            .select2-container--default .select2-selection--single .select2-selection__arrow {
-                height: 36px;
-            }
-            .filter-actions-row {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-            }
-            .filter-actions-right {
-                display: flex;
-                gap: 12px;
-                justify-content: flex-end;
-                flex-wrap: wrap;
-            }
-            .filter-actions-right .btn.btn-primary:hover,
-            .filter-actions-right .btn.btn-primary:focus {
-                background-color: #007bff !important;
-                border-color: #007bff !important;
-                box-shadow: inset 0 0 0 9999px rgba(0, 0, 0, 0.08);
-            }
-        </style>
-        <form class="mb-3" method="GET" action="{{ route('firmwares.index') }}">
+        <form class="mb-3 firmware-filter-form" method="GET" action="{{ route('firmwares.index') }}">
             <div class="row">
                 <div class="col-md-6 col-sm-12 col-xs-12 mb-2">
                     <label>Поиск</label>
@@ -103,10 +73,7 @@
                 </div>
                 <div class="col-md-6 col-sm-12 col-xs-12 mb-2 filter-actions-row">
                     <label>&nbsp;</label>
-                    <div class="filter-actions-right">
-                        <button type="submit" class="btn btn-primary">Применить</button>
-                        <a href="{{ route('firmwares.index') }}" class="btn btn-primary">Сбросить</a>
-                    </div>
+                    <x-ui.filter-actions :reset-url="route('firmwares.index')" />
                 </div>
             </div>
         </form>

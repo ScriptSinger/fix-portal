@@ -10,11 +10,12 @@
     @section('robots', 'noindex, nofollow')
 @endif
 @section('full-width', true)
-@section('sidebar-col', 'col-lg-3 col-md-12 col-sm-12 col-xs-12')
-@section('content-col', 'col-lg-9 col-md-12 col-sm-12 col-xs-12')
+@section('sidebar-first', true)
+@section('sidebar-col', 'col-lg-3 col-md-12 col-sm-12 col-xs-12 col-lg-push-9')
+@section('content-col', 'col-lg-9 col-md-12 col-sm-12 col-xs-12 col-lg-pull-3')
 @section('page-title')
     <div class="page-title db">
-        <div class="container">
+        <div class="page-title-hero-inner">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <h2>{{ $firmware->model_name ?? $firmware->title }}</h2>

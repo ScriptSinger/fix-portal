@@ -13342,17 +13342,10 @@ a:focus,
     background-color: #c89700 !important;
     /* Новый цвет фона при наведении для неактивных элементов */
 }
- 
+
 .btn {
-  
     cursor: pointer;
 }
-
-.btn:hover {
-    color: #fff;
-    background-color: #000000;
-    border-color: #000000;
- }
 
  .selected{
     background: #000000!important
@@ -13383,6 +13376,57 @@ a:focus,
  .title__link{
     cursor: pointer;
  }
+ 
+.page-title-hero-inner {
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+.firmware-filter-form .select2-container--default .select2-selection--single {
+    height: 38px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+}
+
+.firmware-filter-form .select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 36px;
+}
+
+.firmware-filter-form .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 36px;
+}
+
+.firmware-filter-form .filter-actions-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.firmware-filter-form .filter-actions-right {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.firmware-filter-form .filter-actions-right .btn.btn-primary {
+    transition: filter 0.15s ease, box-shadow 0.15s ease;
+}
+
+.firmware-filter-form .filter-actions-right .btn.btn-primary:hover,
+.firmware-filter-form .filter-actions-right .btn.btn-primary:focus {
+    filter: brightness(1.1);
+}
+
+.firmware-filter-form .filter-action-btn {
+    transition: filter 0.15s ease;
+}
+
+.firmware-filter-form .filter-action-btn:hover,
+.firmware-filter-form .filter-action-btn:focus {
+    filter: brightness(1.05);
+}
+
 @charset "UTF-8";
 table.dataTable th.dt-left,
 table.dataTable td.dt-left {
