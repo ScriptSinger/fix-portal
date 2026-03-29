@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\Firmwares\DataFilter;
-
 use App\Models\Firmware;
-use Illuminate\Pipeline\Pipeline;
 
 class FirmwareController extends Controller
 {
@@ -24,12 +21,14 @@ class FirmwareController extends Controller
             $query->where('crc32', request('crc32'));
         }
         if (request()->filled('search')) {
-            $search = request('search');
+            $search = trim(request('search'));
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('platform', 'like', '%' . $search . '%')
-                    ->orWhere('extension', 'like', '%' . $search . '%')
-                    ->orWhere('data', 'like', '%' . $search . '%');
+                $q->where('title', 'like', '%' . $search . '%');
+                $this->applyStructuredDataSearch($q, $search);
+
+                if (ctype_digit($search)) {
+                    $q->orWhere('id', (int) $search);
+                }
             });
         }
 
@@ -80,5 +79,23 @@ class FirmwareController extends Controller
         } else {
             return redirect()->back()->with('error', 'Файл не найден');
         }
+    }
+
+    private function applyStructuredDataSearch($query, string $search): void
+    {
+        $escaped = $this->escapeLike($search);
+        $labels = ['Модель', 'Model', 'S/N', 'SN', 'Серийный номер', 'PNS', 'PNC', 'P/N', 'Part Number', 'Код прошивки', 'Firmware Code', 'Для S/N'];
+
+        foreach ($labels as $label) {
+            $query->orWhereRaw(
+                "data LIKE ? ESCAPE '\\\\'",
+                ['%<td>' . $label . '</td>%<td>' . $escaped . '%</td>%']
+            );
+        }
+    }
+
+    private function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 }

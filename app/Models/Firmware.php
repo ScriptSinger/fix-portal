@@ -36,36 +36,63 @@ class Firmware extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
-    public function getModelNameAttribute(): ?string
+    public function getParsedDataAttribute(): array
     {
         if (!$this->data) {
-            return null;
+            return [];
         }
 
-        if (preg_match('/<td>\\s*Модель\\s*<\\/td>\\s*<td>(.*?)<\\/td>/ui', $this->data, $matches)) {
-            return strip_tags($matches[1]);
+        $parsed = [];
+        preg_match_all('/<tr[^>]*>\\s*<td[^>]*>(.*?)<\\/td>\\s*<td[^>]*>(.*?)<\\/td>\\s*<\\/tr>/uis', $this->data, $rows, PREG_SET_ORDER);
+
+        foreach ($rows as $row) {
+            $label = $this->sanitizeCellValue($row[1] ?? '');
+            $value = $this->sanitizeCellValue($row[2] ?? '');
+
+            if ($label === '') {
+                continue;
+            }
+
+            if (!array_key_exists($label, $parsed) || $parsed[$label] === '') {
+                $parsed[$label] = $value;
+            }
         }
 
-        return null;
+        return $parsed;
+    }
+
+    public function getModelNameAttribute(): ?string
+    {
+        return $this->getParsedField(['Модель', 'Model']);
     }
 
     public function getSerialNumberAttribute(): ?string
     {
-        if (!$this->data) {
-            return null;
-        }
+        return $this->getParsedField(['S/N', 'SN', 'Серийный номер', 'Serial Number']);
+    }
 
-        if (preg_match('/<td>\\s*S\\/?N\\s*<\\/td>\\s*<td>(.*?)<\\/td>/ui', $this->data, $matches)) {
-            return strip_tags($matches[1]);
-        }
+    public function getPnsAttribute(): ?string
+    {
+        return $this->getParsedField(['PNS', 'PNC', 'P/N', 'Part Number']);
+    }
 
-        return null;
+    public function getFirmwareCodeAttribute(): ?string
+    {
+        return $this->getParsedField(['Код прошивки', 'Firmware Code']);
+    }
+
+    public function getSerialRangeAttribute(): ?string
+    {
+        return $this->getParsedField(['Для S/N']);
     }
 
     public function getMetaTitleAttribute(): string
     {
         if ($this->model_name && $this->serial_number) {
             return $this->model_name . ' | S/N ' . $this->serial_number;
+        }
+        if ($this->model_name && $this->pns) {
+            return $this->model_name . ' | PNS ' . $this->pns;
         }
         if ($this->model_name) {
             return $this->model_name . ' | ID ' . $this->id;
@@ -82,6 +109,15 @@ class Firmware extends Model
         if ($this->model_name) {
             $parts[] = 'Модель: ' . $this->model_name;
         }
+        if ($this->serial_number) {
+            $parts[] = 'S/N: ' . $this->serial_number;
+        }
+        if ($this->pns) {
+            $parts[] = 'PNS: ' . $this->pns;
+        }
+        if ($this->firmware_code) {
+            $parts[] = 'Код прошивки: ' . $this->firmware_code;
+        }
         if ($this->platform) {
             $parts[] = 'Платформа: ' . $this->platform;
         }
@@ -91,6 +127,25 @@ class Firmware extends Model
 
         $text = implode('. ', $parts) . '.';
         return mb_substr($text, 0, 160);
+    }
+
+    private function getParsedField(array $candidates): ?string
+    {
+        $data = $this->parsed_data;
+
+        foreach ($candidates as $label) {
+            if (!empty($data[$label])) {
+                return $data[$label];
+            }
+        }
+
+        return null;
+    }
+
+    private function sanitizeCellValue(string $value): string
+    {
+        $decoded = html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return trim(preg_replace('/\\s+/u', ' ', $decoded) ?? '');
     }
 
     protected static function boot()

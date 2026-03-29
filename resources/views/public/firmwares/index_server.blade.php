@@ -38,7 +38,7 @@
                 <div class="col-md-6 col-sm-12 col-xs-12 mb-2">
                     <label>Поиск</label>
                     <input type="text" name="search" class="form-control"
-                        placeholder="Название / модель / платформа / расширение"
+                        placeholder="Модель или серийный номер"
                         value="{{ request('search') }}">
                 </div>
                 <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
