@@ -1,6 +1,9 @@
 @extends('public.layouts.bar')
 @section('title', 'Прошивки для бытовой техники | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Каталог прошивок для бытовой техники: поиск и просмотр файлов по моделям и платформам.')
+@if (request()->has('page') && request('page') > 1)
+    @section('robots', 'noindex, follow')
+@endif
 @section('page-title')
     <div class="page-title db">
         <div class="container">

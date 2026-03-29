@@ -1,12 +1,20 @@
 @extends('public.layouts.bar')
-@section('title', "$firmware->title | " . config('app.name', 'Ufamasters'))
-@section('description', 'Прошивка: ' . $firmware->title . '. Модель: ' . ($firmware->model_name ?? '—') . ', платформа: ' . ($firmware->platform ?? '—') . ', формат: ' . ($firmware->extension ?? '—') . '.')
+@section('title', $firmware->meta_title . ' | ' . config('app.name', 'Ufamasters'))
+@section('description', $firmware->meta_description)
+@section('canonical', route('firmwares.show', ['firmware' => $firmware->id]))
+@php
+    $firmwarePath = 'firmwares/' . $firmware->title . ($firmware->extension ?? '');
+    $firmwareExists = \Illuminate\Support\Facades\Storage::disk('public')->exists($firmwarePath);
+@endphp
+@if (!$firmwareExists)
+    @section('robots', 'noindex, nofollow')
+@endif
 @section('page-title')
     <div class="page-title db">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                    <h2>{{ $firmware->title }}</h2>
+                    <h2>{{ $firmware->model_name ?? $firmware->title }}</h2>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
 
@@ -26,6 +34,24 @@
         @include('public.layouts.widgets.sidebar.prime_categories')
     </div>
 @endsection
+
+@php
+    $jsonLd = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'SoftwareApplication',
+        'name' => $firmware->title,
+        'applicationCategory' => 'Firmware',
+        'operatingSystem' => $firmware->platform,
+        'fileFormat' => $firmware->extension,
+        'softwareVersion' => $firmware->model_name,
+        'identifier' => (string) $firmware->id,
+        'description' => $firmware->meta_description,
+    ], fn($v) => $v !== null && $v !== '');
+@endphp
+
+<script type="application/ld+json">
+    @json($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+</script>
 
 @section('content')
     <div class="page-wrapper">
