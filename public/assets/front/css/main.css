@@ -13376,7 +13376,7 @@ a:focus,
  .title__link{
     cursor: pointer;
  }
- 
+
 .page-title-hero-inner {
     padding-left: 3rem;
     padding-right: 3rem;
@@ -13425,6 +13425,17 @@ a:focus,
 .firmware-filter-form .filter-action-btn:hover,
 .firmware-filter-form .filter-action-btn:focus {
     filter: brightness(1.05);
+}
+
+@media (max-width: 576px) {
+    .pagination {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .pagination .page-item:not(.active):not(:first-child):not(:last-child) {
+        display: none;
+    }
 }
 
 @charset "UTF-8";
