@@ -11,8 +11,8 @@
 @endif
 @section('full-width', true)
 @section('sidebar-first', true)
-@section('sidebar-col', 'col-lg-3 col-md-12 col-sm-12 col-xs-12 col-lg-push-9')
-@section('content-col', 'col-lg-9 col-md-12 col-sm-12 col-xs-12 col-lg-pull-3')
+@section('sidebar-col', 'col-lg-2 col-md-12 col-sm-12 col-xs-12 col-lg-push-10')
+@section('content-col', 'col-lg-10 col-md-12 col-sm-12 col-xs-12 col-lg-pull-2')
 @section('page-title')
     <div class="page-title db">
         <div class="page-title-hero-inner">
