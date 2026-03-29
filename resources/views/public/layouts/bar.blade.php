@@ -13,12 +13,21 @@
                 <div class="container">
             @endif
                 <div class="row">
-                    <div class="@yield('content-col', 'col-lg-8 col-md-12 col-sm-12 col-xs-12') @yield('content-order', '')">
-                        @yield('content')
-                    </div>
-                    <div class="@yield('sidebar-col', 'col-lg-4 col-md-12 col-sm-12 col-xs-12') @yield('sidebar-order', '')">
-                        @yield('sidebar')
-                    </div>
+                    @hasSection('sidebar-first')
+                        <div class="@yield('sidebar-col', 'col-lg-4 col-md-12 col-sm-12 col-xs-12') @yield('sidebar-order', '')">
+                            @yield('sidebar')
+                        </div>
+                        <div class="@yield('content-col', 'col-lg-8 col-md-12 col-sm-12 col-xs-12') @yield('content-order', '')">
+                            @yield('content')
+                        </div>
+                    @else
+                        <div class="@yield('content-col', 'col-lg-8 col-md-12 col-sm-12 col-xs-12') @yield('content-order', '')">
+                            @yield('content')
+                        </div>
+                        <div class="@yield('sidebar-col', 'col-lg-4 col-md-12 col-sm-12 col-xs-12') @yield('sidebar-order', '')">
+                            @yield('sidebar')
+                        </div>
+                    @endif
                 </div>
             </div>
         </section>

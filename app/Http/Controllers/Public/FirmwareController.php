@@ -12,15 +12,42 @@ class FirmwareController extends Controller
 {
     public function index()
     {
-        $firmwares = app(Pipeline::class)
-            ->send(Firmware::query())
-            ->through([
-                DataFilter::class
-            ])
-            ->thenReturn()
-            // ->with('category', 'thumbnail')
-            ->orderBy('id', 'desc')
-            ->paginate(20);
+        $query = Firmware::query();
+
+        if (request()->filled('platform')) {
+            $query->where('platform', request('platform'));
+        }
+        if (request()->filled('extension')) {
+            $query->where('extension', request('extension'));
+        }
+        if (request()->filled('crc32')) {
+            $query->where('crc32', request('crc32'));
+        }
+        if (request()->filled('search')) {
+            $search = request('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('platform', 'like', '%' . $search . '%')
+                    ->orWhere('extension', 'like', '%' . $search . '%')
+                    ->orWhere('data', 'like', '%' . $search . '%');
+            });
+        }
+
+        $sort = request('sort', 'id');
+        $dir = request('dir', 'desc');
+        if (!in_array($sort, ['id', 'title', 'size', 'date', 'extension', 'platform'])) {
+            $sort = 'id';
+        }
+        if (!in_array($dir, ['asc', 'desc'])) {
+            $dir = 'desc';
+        }
+
+        $perPage = (int) request('per_page', 50);
+        if (!in_array($perPage, [25, 50, 100, 200])) {
+            $perPage = 50;
+        }
+
+        $firmwares = $query->orderBy($sort, $dir)->paginate($perPage)->withQueryString();
 
         $platforms = Firmware::query()
             ->whereNotNull('platform')
@@ -36,7 +63,7 @@ class FirmwareController extends Controller
             ->orderBy('extension')
             ->pluck('extension');
 
-        return view('public.firmwares.index', compact('firmwares', 'platforms', 'extensions'));
+        return view('public.firmwares.index_server', compact('firmwares', 'platforms', 'extensions', 'sort', 'dir', 'perPage'));
     }
 
     public function show(string $slug)
