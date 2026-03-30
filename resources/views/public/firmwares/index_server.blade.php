@@ -1,8 +1,15 @@
 @extends('public.layouts.bar')
 @section('title', 'Прошивки для бытовой техники | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Каталог прошивок для бытовой техники: поиск и просмотр файлов по моделям и платформам.')
-@if (request()->has('page') && request('page') > 1)
+@php
+    $isFiltered = request()->hasAny(['search', 'platform', 'extension', 'crc32']);
+    $isPaginated = request('page', 1) > 1;
+@endphp
+
+@if ($isFiltered || $isPaginated)
     @section('robots', 'noindex, follow')
+@else
+    @section('robots', 'index, follow')
 @endif
 @section('full-width', true)
 @section('sidebar-first', true)
@@ -37,8 +44,7 @@
             <div class="row">
                 <div class="col-md-6 col-sm-12 col-xs-12 mb-2">
                     <label>Поиск</label>
-                    <input type="text" name="search" class="form-control"
-                        placeholder="Модель или серийный номер"
+                    <input type="text" name="search" class="form-control" placeholder="Модель или серийный номер"
                         value="{{ request('search') }}">
                 </div>
                 <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
@@ -108,7 +114,8 @@
                             <td>{{ $firmware->id }}</td>
                             <td>
                                 <a href="{{ route('firmwares.show', ['firmware' => $firmware->id]) }}">
-                                    <span title="{{ $firmware->title }}">{{ \Illuminate\Support\Str::limit($firmware->title, 40) }}</span>
+                                    <span
+                                        title="{{ $firmware->title }}">{{ \Illuminate\Support\Str::limit($firmware->title, 40) }}</span>
                                 </a>
                             </td>
                             <td>{{ $firmware->size }} КБ</td>
