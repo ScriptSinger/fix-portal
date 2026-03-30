@@ -1,6 +1,15 @@
 @extends('public.layouts.bar')
 @section('title', "$category->title | " . config('app.name', 'Ufamasters'))
-@section('description', $category->description ?? ('Категория статей: ' . $category->title))
+@section('description', $category->description ?? 'Категория статей: ' . $category->title)
+
+@php
+    $isPaginated = request('page', 1) > 1;
+@endphp
+
+@section('robots', $isPaginated ? 'noindex, follow' : 'index, follow')
+@section('canonical', route('categories.show', $category->slug))
+
+
 @section('page-title')
     <div class="page-title db">
         <div class="container">
