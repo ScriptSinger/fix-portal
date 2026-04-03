@@ -15,6 +15,7 @@ use App\Http\Controllers\Public\FirmwareController;
 use App\Http\Controllers\Admin\FirmwareController as AdminFirmwareController;
 use App\Http\Controllers\Admin\ImageController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
+use App\Http\Controllers\Admin\PostCtaController;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Admin\QuestionController as AdminQuestionController;
 use App\Http\Controllers\Admin\ReplyController as AdminReplyController;
@@ -139,6 +140,9 @@ Route::group(
                 'update'  => 'admin.posts.update',
                 'destroy' => 'admin.posts.destroy',
             ]);
+
+        Route::put('posts/{post}/cta', [PostCtaController::class, 'upsert'])->name('admin.posts.cta.upsert');
+        Route::delete('posts/{post}/cta', [PostCtaController::class, 'destroy'])->name('admin.posts.cta.destroy');
 
         Route::resource('users', AdminUserController::class)
             ->names([

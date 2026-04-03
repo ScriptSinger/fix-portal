@@ -59,10 +59,15 @@ class PostController extends Controller
 
     public function edit(int $id)
     {
-        $post = Post::with('administrator')->findOrFail($id);
+        $post = Post::with([
+            'administrator',
+            'ctas' => fn($query) => $query->orderByDesc('priority')->orderByDesc('id'),
+        ])->findOrFail($id);
         $categories = Category::pluck('title', 'id');
         $tags = Tag::pluck('title', 'id');
-        return view('admin.posts.edit', compact('post', 'categories', 'tags'));
+        $cta = $post->ctas->firstWhere('placement', 'end') ?? $post->ctas->first();
+
+        return view('admin.posts.edit', compact('post', 'categories', 'tags', 'cta'));
     }
 
     public function update(Request $request, int $id)

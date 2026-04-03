@@ -159,6 +159,9 @@
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary float-right">Сохранить</button>
                             </div>
+                            <div class="col-12 mt-2 text-muted">
+                                CTA можно добавить после сохранения статьи на странице редактирования.
+                            </div>
                         </div>
                     </div>
                 </div>

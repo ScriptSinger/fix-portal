@@ -202,6 +202,180 @@
                 </button>
             </form>
 
+            <form method="POST" action="{{ route('admin.posts.cta.upsert', ['post' => $post->id]) }}">
+                @csrf
+                @method('PUT')
+                <div class="card card-outline card-warning mt-4">
+                    <div class="card-header">
+                        <h3 class="card-title">CTA для коммерческой страницы</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>URL посадочной</label>
+                                    <input type="url" name="cta_target_url"
+                                        class="form-control @error('cta_target_url') is-invalid @enderror"
+                                        placeholder="https://appliance-repair.ru/..."
+                                        value="{{ old('cta_target_url', $cta->target_url ?? '') }}">
+                                    <span class="error invalid-feedback">
+                                        @error('cta_target_url')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Заголовок CTA</label>
+                                    <input type="text" name="cta_title"
+                                        class="form-control @error('cta_title') is-invalid @enderror"
+                                        value="{{ old('cta_title', $cta->title ?? '') }}">
+                                    <small class="form-text text-muted">Показывается как заголовок рекламного блока.</small>
+                                    <span class="error invalid-feedback">
+                                        @error('cta_title')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Текст CTA</label>
+                                    <textarea name="cta_text" rows="4" class="form-control @error('cta_text') is-invalid @enderror">{{ old('cta_text', $cta->text ?? '') }}</textarea>
+                                    <span class="error invalid-feedback">
+                                        @error('cta_text')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Текст ссылки</label>
+                                    <input type="text" name="cta_anchor"
+                                        class="form-control @error('cta_anchor') is-invalid @enderror"
+                                        value="{{ old('cta_anchor', $cta->anchor ?? '') }}">
+                                    <small class="form-text text-muted">Например: Вызвать мастера в Уфе.</small>
+                                    <span class="error invalid-feedback">
+                                        @error('cta_anchor')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Город</label>
+                                    <input type="text" name="cta_city"
+                                        class="form-control @error('cta_city') is-invalid @enderror"
+                                        value="{{ old('cta_city', $cta->city ?? 'ufa') }}">
+                                    <span class="error invalid-feedback">
+                                        @error('cta_city')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Приоритет</label>
+                                    <input type="number" min="0" name="cta_priority"
+                                        class="form-control @error('cta_priority') is-invalid @enderror"
+                                        value="{{ old('cta_priority', $cta->priority ?? 0) }}">
+                                    <span class="error invalid-feedback">
+                                        @error('cta_priority')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Бренд</label>
+                                    <input type="text" name="cta_brand"
+                                        class="form-control @error('cta_brand') is-invalid @enderror"
+                                        value="{{ old('cta_brand', $cta->brand ?? '') }}">
+                                    <span class="error invalid-feedback">
+                                        @error('cta_brand')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Тип техники</label>
+                                    <input type="text" name="cta_appliance_type"
+                                        class="form-control @error('cta_appliance_type') is-invalid @enderror"
+                                        value="{{ old('cta_appliance_type', $cta->appliance_type ?? '') }}">
+                                    <span class="error invalid-feedback">
+                                        @error('cta_appliance_type')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Проблема</label>
+                                    <input type="text" name="cta_problem"
+                                        class="form-control @error('cta_problem') is-invalid @enderror"
+                                        value="{{ old('cta_problem', $cta->problem ?? '') }}">
+                                    <span class="error invalid-feedback">
+                                        @error('cta_problem')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Размещение</label>
+                                    <select name="cta_placement"
+                                        class="form-control @error('cta_placement') is-invalid @enderror">
+                                        <option value="end" @selected(old('cta_placement', $cta->placement ?? 'end') === 'end')>В конце статьи</option>
+                                        <option value="middle" @selected(old('cta_placement', $cta->placement ?? '') === 'middle')>В середине статьи</option>
+                                        <option value="sidebar" @selected(old('cta_placement', $cta->placement ?? '') === 'sidebar')>В сайдбаре</option>
+                                    </select>
+                                    <span class="error invalid-feedback">
+                                        @error('cta_placement')
+                                            {{ $message }}
+                                        @enderror
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-center">
+                                <div class="form-check mt-4">
+                                    <input type="hidden" name="cta_is_active" value="0">
+                                    <input type="checkbox" name="cta_is_active" value="1"
+                                        class="form-check-input" id="ctaIsActiveEdit"
+                                        @checked(old('cta_is_active', (int) ($cta->is_active ?? 1)))>
+                                    <label class="form-check-label" for="ctaIsActiveEdit">CTA активен</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <div>
+                            @if ($cta)
+                                <button class="btn btn-danger" type="submit" form="deleteCtaForm">Удалить CTA</button>
+                            @endif
+                        </div>
+                        <button type="submit" class="btn btn-warning">Сохранить CTA</button>
+                    </div>
+                </div>
+            </form>
+
+            @if ($cta)
+                <form id="deleteCtaForm" action="{{ route('admin.posts.cta.destroy', ['post' => $post->id]) }}"
+                    method="POST" class="d-none">
+                    @csrf
+                    @method('DELETE')
+                    <input type="hidden" name="placement" value="{{ $cta->placement }}">
+                </form>
+            @endif
+
         </section>
     </div>
 @endsection

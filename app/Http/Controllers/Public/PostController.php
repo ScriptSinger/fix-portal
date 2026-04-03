@@ -30,9 +30,19 @@ class PostController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)->with('comments.user.avatar')->firstOrFail();
+        $post = Post::where('slug', $slug)
+            ->with([
+                'comments.user.avatar',
+                'ctas' => fn($query) => $query
+                    ->where('is_active', true)
+                    ->orderByDesc('priority')
+                    ->orderByDesc('id'),
+            ])
+            ->firstOrFail();
         $post->views += 1;
         $post->update();
+
+        $cta = $post->ctas->firstWhere('placement', 'end');
 
         $postTags = $post->tags;
         // Найдите другие статьи, содержащие хотя бы один из этих тегов
@@ -44,6 +54,6 @@ class PostController extends Controller
             ->with('category') // Загрузка связанной категории
             ->get();
 
-        return view('public.posts.show', compact('post', 'relatedPosts'));
+        return view('public.posts.show', compact('post', 'relatedPosts', 'cta'));
     }
 }
