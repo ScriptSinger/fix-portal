@@ -98,7 +98,7 @@ Route::middleware(['auth:web', 'verified'])->group(
             // Переопределение методов ресурсного контроллера
         });
 
-        Route::get('/firmwares/download/{filename}', [FirmwareController::class, 'download'])->name('firmwares.download');
+        Route::get('/firmwares/{firmware}/download', [FirmwareController::class, 'download'])->name('firmwares.download');
     }
 );
 

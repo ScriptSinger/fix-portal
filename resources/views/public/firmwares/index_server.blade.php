@@ -106,6 +106,8 @@
                         <th><a href="{{ $sortUrl('date') }}">Дата{{ $sortIndicator('date') }}</a></th>
                         <th><a href="{{ $sortUrl('extension') }}">Расширение{{ $sortIndicator('extension') }}</a></th>
                         <th><a href="{{ $sortUrl('platform') }}">Платформа{{ $sortIndicator('platform') }}</a></th>
+                        <th><a href="{{ $sortUrl('views_count') }}">Просмотры{{ $sortIndicator('views_count') }}</a></th>
+                        <th><a href="{{ $sortUrl('downloads_count') }}">Загрузки{{ $sortIndicator('downloads_count') }}</a></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -122,6 +124,8 @@
                             <td class="text-nowrap">{{ $firmware->date }}</td>
                             <td>{{ $firmware->extension }}</td>
                             <td>{{ $firmware->platform }}</td>
+                            <td>{{ $firmware->views_count }}</td>
+                            <td>{{ $firmware->downloads_count }}</td>
                         </tr>
                     @endforeach
                 </tbody>

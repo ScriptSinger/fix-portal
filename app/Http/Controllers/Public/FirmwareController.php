@@ -34,7 +34,7 @@ class FirmwareController extends Controller
 
         $sort = request('sort', 'id');
         $dir = request('dir', 'desc');
-        if (!in_array($sort, ['id', 'title', 'size', 'date', 'extension', 'platform'])) {
+        if (!in_array($sort, ['id', 'title', 'size', 'date', 'extension', 'platform', 'views_count', 'downloads_count'])) {
             $sort = 'id';
         }
         if (!in_array($dir, ['asc', 'desc'])) {
@@ -68,13 +68,20 @@ class FirmwareController extends Controller
     public function show(string $slug)
     {
         $firmware = Firmware::findOrFail($slug);
+        $firmware->increment('views_count');
+        $firmware->refresh();
+
         return view('public.firmwares.show', compact('firmware'));
     }
 
-    public function download($filename)
+    public function download(int $id)
     {
+        $firmware = Firmware::findOrFail($id);
+        $filename = $firmware->title . ($firmware->extension ?? '');
         $path = storage_path('app/public/firmwares/' . $filename);
+
         if (file_exists($path)) {
+            $firmware->increment('downloads_count');
             return response()->download($path);
         } else {
             return redirect()->back()->with('error', 'Файл не найден');

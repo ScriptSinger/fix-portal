@@ -19,7 +19,9 @@ class Firmware extends Model
         'extension',
         'platform',
         'crc32',
-        'data'
+        'data',
+        'views_count',
+        'downloads_count',
     ];
 
     public function sluggable(): array

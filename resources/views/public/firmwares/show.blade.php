@@ -87,13 +87,20 @@
                             <td>CRC32</td>
                             <td>{{ $firmware->crc32 }}</td>
                         </tr>
+                        <tr>
+                            <td>Просмотры</td>
+                            <td>{{ $firmware->views_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Загрузки</td>
+                            <td>{{ $firmware->downloads_count }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
             @if (!empty($firmware->title))
-                <a class="btn btn-dark"
-                    href="{{ route('firmwares.download', ['filename' => $firmware->title . ($firmware->extension ?? '')]) }}">Скачать
+                <a class="btn btn-dark" href="{{ route('firmwares.download', ['firmware' => $firmware->id]) }}">Скачать
                     файл</a>
             @else
                 <span class="text-muted">Файл недоступен</span>
