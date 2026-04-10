@@ -109,4 +109,5 @@ jobs:
             docker compose run --rm php php artisan route:clear
             docker compose run --rm php php artisan view:clear
             docker compose run --rm php php artisan optimize
+            docker compose run --rm php php artisan sitemap:generate
           EOF
