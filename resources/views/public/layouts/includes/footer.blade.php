@@ -18,9 +18,12 @@
             <div class="col-md-12 text-center">
                 <br>
                 <br>
-                <div class="copyright">&copy;
-                    {{ optional($customization)->copyright ?? 'Copyright 2014-2024 Ufamasters.ru. Все права защищены.' }}
-                </div>
+                @php
+                    $currentYear = now()->year;
+                    $copyrightText = optional($customization)->copyright ?? "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
+                    $copyrightText = preg_replace('/(\b\d{4}-)\d{4}\b/u', '${1}' . $currentYear, $copyrightText);
+                @endphp
+                <div class="copyright">&copy; {{ $copyrightText }}</div>
             </div>
         </div>
     </div><!-- end container -->
