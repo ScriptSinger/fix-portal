@@ -47,7 +47,7 @@
             <div class="custombox clearfix post-cta post-cta--end">
                 <h4 class="small-title">{{ $cta->title ?: 'Нужен мастер в Уфе?' }}</h4>
                 @if (!empty($cta->text))
-                    <p>{{ $cta->text }}</p>
+                    <div class="post-cta__text">{!! $cta->text !!}</div>
                 @endif
                 <a href="{{ $cta->trackedUrl() }}" class="btn btn-primary" rel="nofollow sponsored">
                     {{ $cta->anchor ?: 'Подробнее' }}

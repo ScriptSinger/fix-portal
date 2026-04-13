@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $("#description").summernote({
+    $("#description, .lite").summernote({
         height: 150,
         toolbar: [
             ["style", ["bold", "italic", "underline", "clear"]],

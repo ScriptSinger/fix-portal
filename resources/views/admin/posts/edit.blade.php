@@ -242,7 +242,8 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>Текст CTA</label>
-                                    <textarea name="cta_text" rows="4" class="form-control @error('cta_text') is-invalid @enderror">{{ old('cta_text', $cta->text ?? '') }}</textarea>
+                                    <textarea name="cta_text" rows="4" class="form-control lite @error('cta_text') is-invalid @enderror">{{ old('cta_text', $cta->text ?? '') }}</textarea>
+                                    <small class="form-text text-muted">Можно использовать абзацы, жирный текст, списки и ссылки.</small>
                                     <span class="error invalid-feedback">
                                         @error('cta_text')
                                             {{ $message }}
