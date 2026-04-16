@@ -26,4 +26,5 @@
     <link rel="manifest" href="{{ asset('assets/front/images/favicon_io/site.webmanifest') }}">
     <meta name="yandex-verification" content="7843198b5b2a0b60" />
     @stack('styles')
+    @includeWhen(app()->environment('production'), 'components.analytics.metrika')
 </head>
