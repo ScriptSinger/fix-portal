@@ -60,8 +60,8 @@ Route::group(
 Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 
 
-Route::get('/users', [UserController::class, 'index'])->name('users.index');
-Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+// Route::get('/users', [UserController::class, 'index'])->name('users.index');
+// Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
 
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');

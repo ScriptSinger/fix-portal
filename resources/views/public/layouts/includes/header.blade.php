@@ -22,9 +22,6 @@
                         <a class="nav-link" href="{{ route('firmwares.index') }}">Прошивки</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('users.index') }}">Мастера</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{{ route('about') }}">О Нас</a>
                     </li>
                 </ul>
@@ -55,5 +52,5 @@
                 </ul>
             </div>
         </nav>
-    </div><!-- end container-fluid -->
-</header><!-- end market-header -->
+    </div>
+</header>

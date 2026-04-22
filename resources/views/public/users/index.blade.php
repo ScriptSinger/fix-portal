@@ -29,7 +29,7 @@
                 data-locale={{ asset('assets/locale/datatable/russian.json') }}
                 data-routes='{
                     "index": "{{ route('api.masters.index') }}",
-                    "show": "{{ route('users.show', ['user' => ':id']) }}"
+                    {{-- "show": "{{ route('users.show', ['user' => ':id']) }}" --}}
                 }'>
             </table>
         </div>
