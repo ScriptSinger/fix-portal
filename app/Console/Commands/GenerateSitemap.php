@@ -49,7 +49,7 @@ class GenerateSitemap extends Command
     {
         $sitemap->add($this->makeUrl(route('articles.index'), now(), 1.0, Url::CHANGE_FREQUENCY_DAILY));
         $sitemap->add($this->makeUrl(route('about'), now(), 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
-        $sitemap->add($this->makeUrl(route('users.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
+        // $sitemap->add($this->makeUrl(route('users.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
         $sitemap->add($this->makeUrl(route('categories.index'), now(), 0.7, Url::CHANGE_FREQUENCY_WEEKLY));
         $sitemap->add($this->makeUrl(route('tags.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
         $sitemap->add($this->makeUrl(route('questions.index'), now(), 0.8, Url::CHANGE_FREQUENCY_DAILY));
@@ -154,21 +154,21 @@ class GenerateSitemap extends Command
                 }
             });
 
-        User::query()
-            ->select(['id', 'updated_at'])
-            ->orderBy('id')
-            ->chunk(500, function ($users) use ($sitemap) {
-                foreach ($users as $user) {
-                    $sitemap->add(
-                        $this->makeUrl(
-                            route('users.show', ['user' => $user->id]),
-                            $user->updated_at,
-                            0.4,
-                            Url::CHANGE_FREQUENCY_MONTHLY
-                        )
-                    );
-                }
-            });
+        // User::query()
+        //     ->select(['id', 'updated_at'])
+        //     ->orderBy('id')
+        //     ->chunk(500, function ($users) use ($sitemap) {
+        //         foreach ($users as $user) {
+        //             $sitemap->add(
+        //                 $this->makeUrl(
+        //                     route('users.show', ['user' => $user->id]),
+        //                     $user->updated_at,
+        //                     0.4,
+        //                     Url::CHANGE_FREQUENCY_MONTHLY
+        //                 )
+        //             );
+        //         }
+        //     });
     }
 
     private function makeUrl(string $location, $lastModificationDate, float $priority, string $changeFrequency): Url
