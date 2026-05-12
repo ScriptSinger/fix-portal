@@ -21,6 +21,7 @@
 @section('sidebar')
     <div class="sidebar">
         @include('public.layouts.widgets.sidebar.telegram_group')
+        @include('public.layouts.widgets.sidebar.fridge_home_repair')
         @include('public.layouts.widgets.sidebar.advertising')
     </div>
 @endsection
