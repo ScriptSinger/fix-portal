@@ -11,6 +11,9 @@
     </div>
     <div class="card">
         <div class="card-body login-card-body">
+            <div class="alert alert-info small">
+                <strong>Внимание:</strong> Вход через Google отключен. Если вы ранее регистрировались через Google, пожалуйста, воспользуйтесь функцией <a href="{{ route('password.request') }}">«Забыли пароль?»</a>, чтобы установить пароль для входа в свой аккаунт.
+            </div>
             @if (session('status'))
             <p role="alert" class="login-box-msg"> {{ session('status') }}</p>
             @else

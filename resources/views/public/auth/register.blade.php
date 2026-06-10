@@ -10,6 +10,9 @@
     </div>
     <div class="card">
         <div class="card-body register-card-body">
+            <div class="alert alert-info small">
+                <strong>Внимание:</strong> Вход через Google отключен. Если у вас уже есть аккаунт, созданный через Google, воспользуйтесь функцией <a href="{{ route('password.request') }}">«Забыли пароль?»</a> на странице входа.
+            </div>
             <p class="login-box-msg">Зарегистрировать новый аккаунт</p>
             <form action="{{ route('register') }}" method="post">
                 @csrf
