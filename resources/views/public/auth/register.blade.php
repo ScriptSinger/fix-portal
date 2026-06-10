@@ -10,8 +10,8 @@
     </div>
     <div class="card">
         <div class="card-body register-card-body">
-            <div class="alert alert-info small">
-                <strong>Внимание:</strong> Вход через Google отключен. Если у вас уже есть аккаунт, созданный через Google, воспользуйтесь функцией <a href="{{ route('password.request') }}">«Забыли пароль?»</a> на странице входа.
+            <div class="alert alert-warning small">
+                <strong>Внимание:</strong> Вход через Google отключен. Если у вас уже есть аккаунт, созданный через Google, воспользуйтесь функцией <a href="{{ route('password.request') }}" class="alert-link" style="color: #000; text-decoration: underline;">«Забыли пароль?»</a> на странице входа.
             </div>
             <p class="login-box-msg">Зарегистрировать новый аккаунт</p>
             <form action="{{ route('register') }}" method="post">
@@ -91,7 +91,9 @@
                 </a>
             </div>
             --}}
-            <a href="{{ route('login') }}" class="text-center">У меня уже есть аккаунт</a>
+            <p class="mt-3 mb-0">
+                <a href="{{ route('login') }}" class="text-center">У меня уже есть аккаунт</a>
+            </p>
         </div>
 
     </div>
