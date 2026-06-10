@@ -61,6 +61,7 @@ class UserController extends Controller
 
 
 
+    /*
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->redirect();
@@ -89,4 +90,5 @@ class UserController extends Controller
         // Перенаправляем пользователя после авторизации
         return redirect()->route('admin.index')->with('success', 'Регистрация пройдена');
     }
+    */
 }

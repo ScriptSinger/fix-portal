@@ -50,14 +50,13 @@
                 <button type="submit" class="btn btn-block btn-dark btn-flat">Войти</button>
 
             </form>
+            {{--
             <div class="social-auth-links text-center mt-2 mb-3">
-                <!-- <a href="#" class="btn btn-block btn-primary btn-flat">
-                        <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
-                    </a> -->
                 <a href="{{ route('auth.redirect', ['provider' => 'google']) }}" class="btn btn-block btn-primary btn-flat">
                     <i class="fab fa-google mr-2"></i> Continue with Google
                 </a>
             </div>
+            --}}
 
             <p class="mb-1">
                 <a href="{{ route('password.request') }}">Забыли пароль?</a>

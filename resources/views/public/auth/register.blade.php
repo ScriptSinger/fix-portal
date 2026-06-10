@@ -81,15 +81,13 @@
                 <button id="registerButton" type="submit"
                     class="btn btn-block btn-dark btn-flat">Зарегистрироваться</button>
             </form>
+            {{--
             <div class="social-auth-links text-center">
-                <!-- <a href="#" class="btn btn-block btn-primary btn-flat">
-                    <i class="fab fa-facebook mr-2"></i>
-                    Sign up using Facebook
-                </a> -->
                 <a href="{{ route('auth.redirect', ['provider' => 'google']) }}" class="btn btn-block btn-primary btn-flat">
                     <i class="fab fa-google mr-2"></i> Continue with Google
                 </a>
             </div>
+            --}}
             <a href="{{ route('login') }}" class="text-center">У меня уже есть аккаунт</a>
         </div>
 

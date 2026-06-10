@@ -37,11 +37,11 @@ Route::middleware('guest')->group(function () {
 
 
     Route::get('auth/{provider}', [OAuthController::class, 'redirect'])
-        ->where('provider', 'google|github|vkontakte')
+        ->where('provider', 'github|vkontakte') // 'google|github|vkontakte'
         ->name('auth.redirect');
 
     Route::get('auth/{provider}/callback', [OAuthController::class, 'callback'])
-        ->where('provider', 'google|github|vkontakte')
+        ->where('provider', 'github|vkontakte') // 'google|github|vkontakte'
         ->name('auth.callback');
 });
 
