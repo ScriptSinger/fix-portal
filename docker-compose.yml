@@ -14,10 +14,19 @@ services:
             - ufamasters_laravel
         labels:
             - "traefik.enable=true"
-            # HTTPS роутер
-            - "traefik.http.routers.laravel.rule=Host(`ufamasters.ru`,`www.ufamasters.ru`)"
+            # Основной HTTPS-роутер (без www)
+            - "traefik.http.routers.laravel.rule=Host(`ufamasters.ru`)"
             - "traefik.http.routers.laravel.entrypoints=websecure"
             - "traefik.http.routers.laravel.tls.certresolver=myresolver"
+
+            # www — только постоянное перенаправление на основное зеркало
+            - "traefik.http.routers.laravel-www.rule=Host(`www.ufamasters.ru`)"
+            - "traefik.http.routers.laravel-www.entrypoints=websecure"
+            - "traefik.http.routers.laravel-www.tls.certresolver=myresolver"
+            - "traefik.http.routers.laravel-www.middlewares=redirect-www"
+            - "traefik.http.middlewares.redirect-www.redirectregex.regex=^https?://www\\.ufamasters\\.ru/(.*)"
+            - "traefik.http.middlewares.redirect-www.redirectregex.replacement=https://ufamasters.ru/$$1"
+            - "traefik.http.middlewares.redirect-www.redirectregex.permanent=true"
 
               # HTTP → HTTPS редирект
             - "traefik.http.routers.laravel-insecure.rule=Host(`ufamasters.ru`,`www.ufamasters.ru`)"
