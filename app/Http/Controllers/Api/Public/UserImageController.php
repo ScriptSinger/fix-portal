@@ -11,12 +11,6 @@ use Illuminate\Support\Facades\Storage;
 
 class UserImageController extends Controller
 {
-    public function index()
-    {
-        $images = Image::with('user')->get();
-        return response()->json($images);
-    }
-
     public function upload(Request $request)
     {
         $validated = $request->validate([
@@ -39,7 +33,8 @@ class UserImageController extends Controller
         try {
             $image = Image::findOrFail($id);
             $this->authorize('delete', $image);
-            Storage::disk('public')->delete($image->url);
+            // В БД лежит публичный URL (/storage/...), а диску нужен путь внутри него
+            Storage::disk('public')->delete(preg_replace('#^/?storage/#', '', $image->url));
             $image->delete();
             return response()->json(['message' => 'Файл успешно удален']);
         } catch (ModelNotFoundException $e) {

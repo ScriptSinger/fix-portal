@@ -38,8 +38,10 @@ Route::group(
             Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
         });
 
-        Route::get('users-images', [UserImageController::class, 'index'])->name('api.users.images.index');
-        Route::post('users-images', [UserImageController::class, 'upload'])->name('api.users.images.upload');
+        // Загружать могут только пользователи с подтверждённой почтой и не чаще 20 файлов в минуту
+        Route::post('users-images', [UserImageController::class, 'upload'])
+            ->middleware(['verified', 'throttle:20,1'])
+            ->name('api.users.images.upload');
         Route::delete('users-images/{image}', [UserImageController::class, 'destroy'])->name('api.users.images.destroy');
 
         Route::get('/avatars', [AvatarController::class, 'show'])->name('api.avatars.show');
