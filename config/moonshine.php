@@ -95,9 +95,9 @@ return [
     ],
 
     // Localizations
-    'locale' => 'en',
+    'locale' => env('MOONSHINE_LOCALE', 'ru'),
     'locale_key' => ChangeLocale::KEY,
     'locales' => [
-        // en
+        'ru',
     ],
 ];

@@ -52,6 +52,8 @@ final class TinyMceUpload
         JS;
 
         return $field
+            ->addOption('language', 'ru')
+            ->addOption('language_url', asset('vendor/moonshine-tinymce/langs/ru.js'))
             ->addOption('automatic_uploads', true)
             ->addCallback('images_upload_handler', $uploadHandler)
             ->addOption('forced_root_block', 'p')
