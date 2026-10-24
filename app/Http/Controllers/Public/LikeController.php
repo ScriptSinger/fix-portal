@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
+use App\Models\Reply;
+use Illuminate\Database\Eloquent\Model;
 use App\Services\LikeService;
 
 class LikeController extends Controller
@@ -15,10 +18,24 @@ class LikeController extends Controller
         $this->likeService = $likeService;
     }
 
+    /**
+     * Типы, которые можно лайкать. Класс модели нельзя собирать из URL.
+     */
+    private const LIKEABLE = [
+        'comment' => Comment::class,
+        'reply' => Reply::class,
+    ];
+
+    private function resolve(string $type, int|string $id): Model
+    {
+        $class = self::LIKEABLE[$type] ?? abort(404);
+
+        return $class::findOrFail($id);
+    }
+
     public function like($type, $id)
     {
-        $model = "App\\Models\\" . ucfirst($type);
-        $instance = $model::findOrFail($id);
+        $instance = $this->resolve($type, $id);
         $user = auth()->user();
         $this->likeService->toggleLike($instance, $user);
         $counter = $this->likeService->counter($instance);
@@ -27,7 +44,7 @@ class LikeController extends Controller
 
     public function dislike($type, $id)
     {
-        $instance = ("App\\Models\\" . ucfirst($type))::findOrFail($id);
+        $instance = $this->resolve($type, $id);
         $user = auth()->user();
         $this->likeService->toggleDisLike($instance, $user);
         $counter = $this->likeService->counter($instance);

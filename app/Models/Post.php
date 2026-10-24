@@ -50,6 +50,11 @@ class Post extends Model
     }
 
 
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return $this->thumbnail?->blog;
+    }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(Tag::class);
