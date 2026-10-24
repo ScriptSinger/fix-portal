@@ -19,6 +19,7 @@ class Firmware extends Model
         'extension',
         'platform',
         'crc32',
+        'file_path',
         'data',
         'views_count',
         'downloads_count',
@@ -36,6 +37,15 @@ class Firmware extends Model
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /**
+     * Путь к файлу на диске public. file_path заполняется командой firmware:relink,
+     * для записей без него остаётся прежнее правило title + extension.
+     */
+    public function getStoragePathAttribute(): string
+    {
+        return 'firmwares/' . ($this->file_path ?: $this->title . ($this->extension ?? ''));
     }
 
     public function getParsedDataAttribute(): array

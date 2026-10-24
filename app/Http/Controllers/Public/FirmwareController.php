@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Models\Firmware;
 
@@ -77,10 +78,9 @@ class FirmwareController extends Controller
     public function download(int $id)
     {
         $firmware = Firmware::findOrFail($id);
-        $filename = $firmware->title . ($firmware->extension ?? '');
-        $path = storage_path('app/public/firmwares/' . $filename);
+        $path = Storage::disk('public')->path($firmware->storage_path);
 
-        if (file_exists($path)) {
+        if (is_file($path)) {
             $firmware->increment('downloads_count');
             return response()->download($path);
         } else {

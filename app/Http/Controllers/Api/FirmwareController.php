@@ -76,7 +76,6 @@ class FirmwareController extends Controller
         $firmwares = $query->get();
 
         $data = $firmwares->map(function (Firmware $firmware) {
-            $firmwarePath = 'firmwares/' . $firmware->title . ($firmware->extension ?? '');
             return [
                 'id' => $firmware->id,
                 'title' => $firmware->title,
@@ -88,7 +87,7 @@ class FirmwareController extends Controller
                 'platform' => $firmware->platform,
                 'crc32' => $firmware->crc32,
                 'data' => $firmware->data,
-                'has_file' => Storage::disk('public')->exists($firmwarePath),
+                'has_file' => Storage::disk('public')->exists($firmware->storage_path),
                 'deleted_at' => $firmware->deleted_at,
             ];
         });
