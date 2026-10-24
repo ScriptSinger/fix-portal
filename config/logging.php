@@ -54,7 +54,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => explode(',', (string) env('LOG_STACK', 'daily')),
             'ignore_exceptions' => false,
         ],
 
@@ -69,8 +69,18 @@ return [
             'driver' => 'daily',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
+            'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
+        ],
+
+        // Лог запросов: по строке JSON на запрос, ротация по дням (читает админка MoonShine)
+        'access' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/access.log'),
+            'level' => env('LOG_ACCESS_LEVEL', 'info'),
+            'days' => env('LOG_ACCESS_DAYS', 14),
+            'replace_placeholders' => true,
+            'tap' => [App\Logging\JsonFormatter::class],
         ],
 
         'slack' => [

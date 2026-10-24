@@ -24,6 +24,12 @@ jobs:
       - name: Install composer dependencies (no-dev)
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
+      # Без этого кэша MoonShine при каждом запросе перебирает все классы vendor
+      # и падает на классах с отсутствующими dev-зависимостями (Carbon\PHPStan).
+      # Кэш содержит только имена классов, поэтому его можно собрать в CI.
+      - name: Cache MoonShine types
+        run: php artisan moonshine:optimize
+
       - name: Setup Node.js
         if: ${{ hashFiles('package.json') != '' }}
         uses: actions/setup-node@v5
@@ -125,5 +131,6 @@ jobs:
             docker compose run --rm php php artisan route:clear
             docker compose run --rm php php artisan view:clear
             docker compose run --rm php php artisan optimize
+            docker compose run --rm php php artisan moonshine:optimize
             docker compose run --rm php php artisan sitemap:generate
           EOF

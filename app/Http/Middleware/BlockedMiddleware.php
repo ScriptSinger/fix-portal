@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\BlockedUserAgent;
 use App\Models\Blocker;
 use Closure;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,13 +21,14 @@ class BlockedMiddleware
 
         $userAgent = $request->header('User-Agent');
 
-        $blockedUserAgent = BlockedUserAgent::where('user_agent', $userAgent)->exists();
-        if ($blockedUserAgent) {
+        // Списки небольшие и меняются редко: держим их в кэше минуту вместо двух запросов в БД на каждый хит
+        $blockedAgents = Cache::remember('blocked.user_agents', 60, fn () => BlockedUserAgent::pluck('user_agent')->all());
+        if ($userAgent !== null && in_array($userAgent, $blockedAgents, true)) {
             abort(403);
         }
 
-        $blockedIp = Blocker::where('ip_address', $request->ip())->exists();
-        if ($blockedIp) {
+        $blockedIps = Cache::remember('blocked.ips', 60, fn () => Blocker::pluck('ip_address')->all());
+        if (in_array($request->ip(), $blockedIps, true)) {
             abort(403);
         }
         return $next($request);

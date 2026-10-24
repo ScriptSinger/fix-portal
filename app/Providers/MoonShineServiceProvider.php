@@ -16,7 +16,7 @@ use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
 use App\MoonShine\Resources\QuestionResource;
 use App\MoonShine\Resources\ReplyResource;
-use App\MoonShine\Resources\RequestLogResource;
+use App\MoonShine\Resources\AccessLog\AccessLogResource;
 use App\MoonShine\Resources\TagResource;
 use App\MoonShine\Resources\UserResource;
 use App\Http\Controllers\MoonShine\TinyMceImageUploadController;
@@ -57,7 +57,7 @@ class MoonShineServiceProvider extends ServiceProvider
                 FirmwareResource::class,
                 UserResource::class,
                 ImageResource::class,
-                RequestLogResource::class,
+                AccessLogResource::class,
                 BlockerResource::class,
                 BlockedUserAgentResource::class,
                 CustomizationResource::class,
