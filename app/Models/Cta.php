@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Support\CtaHtmlSanitizer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,6 +29,11 @@ class Cta extends Model
     protected $casts = [
         'is_active' => 'boolean',
     ];
+
+    public function setTextAttribute(?string $value): void
+    {
+        $this->attributes['text'] = CtaHtmlSanitizer::sanitize($value);
+    }
 
     public function post(): BelongsTo
     {

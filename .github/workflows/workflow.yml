@@ -53,6 +53,7 @@ jobs:
             public \
             resources \
             routes \
+            vendor \
            .env.example \
             artisan \
             composer.json \
@@ -91,6 +92,10 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
 
             cd ~/ufamasters
+
+            # vendor приезжает целиком из CI: убираем старый, чтобы не осталось
+            # пакетов (например, Passport) и кэша провайдеров от прошлых версий
+            rm -rf vendor bootstrap/cache/*.php
 
             tar -xzf /tmp/release.tar.gz -C ~/ufamasters
 

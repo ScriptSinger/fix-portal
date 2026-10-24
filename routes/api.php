@@ -104,7 +104,8 @@ Route::get('/masters', [MasterController::class, 'index'])->name('api.masters.in
 
 Route::group(
     [
-        'middleware' => 'auth:web,admin',
+        // Только пользователи сайта: контент привязывается по user_id, админам тут делать нечего.
+        'middleware' => 'auth:web',
     ],
     function () {
         Route::prefix('/{type}/{id}/')->group(function () {

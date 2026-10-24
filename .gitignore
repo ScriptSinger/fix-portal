@@ -21,3 +21,6 @@ firmware_dump.sql
 thumbnails_dump.sql
 docker-compose.override.yml
 posts_dump
+
+# Traefik / Let's Encrypt: хранит закрытые ключи
+/letsencrypt/acme.json
