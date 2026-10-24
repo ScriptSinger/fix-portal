@@ -47,6 +47,20 @@ return [
             'throw' => false,
         ],
 
+        // Приватный бакет Yandex Object Storage для файлов прошивок.
+        // Скачивание только по временной подписанной ссылке (контроллер проверяет права).
+        'firmware_s3' => [
+            'driver' => 's3',
+            'key' => env('YANDEX_S3_KEY'),
+            'secret' => env('YANDEX_S3_SECRET'),
+            'region' => env('YANDEX_S3_REGION', 'ru-central1'),
+            'bucket' => env('YANDEX_FIRMWARE_BUCKET'),
+            'endpoint' => env('YANDEX_S3_ENDPOINT', 'https://storage.yandexcloud.net'),
+            'use_path_style_endpoint' => env('YANDEX_S3_PATH_STYLE', true),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

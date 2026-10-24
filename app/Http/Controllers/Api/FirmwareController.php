@@ -87,7 +87,8 @@ class FirmwareController extends Controller
                 'platform' => $firmware->platform,
                 'crc32' => $firmware->crc32,
                 'data' => $firmware->data,
-                'has_file' => Storage::disk('public')->exists($firmware->storage_path),
+                // Для облака не делаем по HEAD-запросу на строку: файл проверен при переносе
+                'has_file' => $firmware->file_disk ? true : Storage::disk('public')->exists($firmware->storage_path),
                 'deleted_at' => $firmware->deleted_at,
             ];
         });

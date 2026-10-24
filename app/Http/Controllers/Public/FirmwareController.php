@@ -78,14 +78,24 @@ class FirmwareController extends Controller
     public function download(int $id)
     {
         $firmware = Firmware::findOrFail($id);
-        $path = Storage::disk('public')->path($firmware->storage_path);
+        $disk = Storage::disk($firmware->disk_name);
+        $key = $firmware->storage_path;
 
-        if (is_file($path)) {
-            $firmware->increment('downloads_count');
-            return response()->download($path);
-        } else {
+        if (! $disk->exists($key)) {
             return redirect()->back()->with('error', 'Файл не найден');
         }
+
+        $firmware->increment('downloads_count');
+
+        // Локальный файл отдаём сами, из облака перенаправляем на временную подписанную ссылку:
+        // трафик идёт мимо сервера, а права мы уже проверили выше (маршрут под auth и verified)
+        if ($firmware->file_disk) {
+            return redirect()->away($disk->temporaryUrl($key, now()->addMinutes(10), [
+                'ResponseContentDisposition' => "attachment; filename*=UTF-8''" . rawurlencode($firmware->download_name),
+            ]));
+        }
+
+        return response()->download($disk->path($key), $firmware->download_name);
     }
 
     private function applyStructuredDataSearch($query, string $search): void

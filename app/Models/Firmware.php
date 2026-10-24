@@ -20,6 +20,7 @@ class Firmware extends Model
         'platform',
         'crc32',
         'file_path',
+        'file_disk',
         'data',
         'views_count',
         'downloads_count',
@@ -40,12 +41,33 @@ class Firmware extends Model
     }
 
     /**
-     * Путь к файлу на диске public. file_path заполняется командой firmware:relink,
-     * для записей без него остаётся прежнее правило title + extension.
+     * Имя диска, на котором лежит файл. null в БД означает локальный диск public.
+     */
+    public function getDiskNameAttribute(): string
+    {
+        return $this->file_disk ?: 'public';
+    }
+
+    /**
+     * Путь (ключ) файла на его диске. На локальном диске это firmwares/{file_path}
+     * (для записей без file_path осталось прежнее правило title + extension),
+     * в облаке file_path уже содержит полный ключ.
      */
     public function getStoragePathAttribute(): string
     {
+        if ($this->file_disk) {
+            return (string) $this->file_path;
+        }
+
         return 'firmwares/' . ($this->file_path ?: $this->title . ($this->extension ?? ''));
+    }
+
+    /**
+     * Имя, под которым файл скачивает пользователь (на диске имя может быть хешем).
+     */
+    public function getDownloadNameAttribute(): string
+    {
+        return $this->title . ($this->extension ?? '');
     }
 
     public function getParsedDataAttribute(): array
