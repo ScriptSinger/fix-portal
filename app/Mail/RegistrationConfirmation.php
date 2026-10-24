@@ -10,9 +10,18 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\URL;
 
-class RegistrationConfirmation extends Mailable
+class RegistrationConfirmation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
+
+    /**
+     * Письмо уходит через очередь, чтобы сбой SMTP не ломал регистрацию (раньше это был 500),
+     * а неудачные отправки повторялись.
+     */
+    public int $tries = 3;
+
+    /** @var array<int, int> */
+    public array $backoff = [60, 300];
 
     /**
      * Create a new message instance.

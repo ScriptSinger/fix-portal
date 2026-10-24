@@ -43,6 +43,21 @@ services:
             - ./:/var/www/html
         networks:
             - laravel
+    # Воркер очереди: отправляет письма подтверждения (QUEUE_CONNECTION=database).
+    # Перезапускается сам после --max-time, а при деплое пересоздаётся вместе с остальными.
+    queue:
+        build:
+            context: .
+            dockerfile: docker/php/php.dockerfile
+        restart: unless-stopped
+        user: "${UID}:${GID}"
+        command: php artisan queue:work --tries=3 --sleep=3 --max-time=3600 --memory=96
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - mysql
+        networks:
+            - laravel
     composer:
         build:
             context: .
