@@ -16,6 +16,12 @@
             <p class="login-box-msg">Зарегистрировать новый аккаунт</p>
             <form action="{{ route('register') }}" method="post">
                 @csrf
+                {{-- Ловушка для ботов: людям не видна, боты её заполняют --}}
+                <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                    <label for="website">Не заполняйте это поле</label>
+                    <input id="website" name="{{ \App\Support\SignupGuard::HONEYPOT_FIELD }}" type="text" tabindex="-1" autocomplete="off">
+                </div>
+                <input type="hidden" name="{{ \App\Support\SignupGuard::TOKEN_FIELD }}" value="{{ app(\App\Support\SignupGuard::class)->token() }}">
                 <div class="input-group mb-3">
                     <input name="name" type="text" class="@error('name') is-invalid @enderror form-control"
                         placeholder="Имя" value="{{ old('name') }}">
