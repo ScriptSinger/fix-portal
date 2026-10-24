@@ -21,12 +21,16 @@ use Illuminate\Pipeline\Pipeline;
 
 class FirmwareController extends Controller
 {
+    private const MAX_PAGE_SIZE = 100;
+
 
     public function index(Request $request)
     {
         $draw = (int) $request->input('draw', 0);
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
+        // Эндпоинт публичный: без потолка один запрос с length=13000 отдаёт десятки МБ
+        // (-1 в DataTables значит «все записи»). Сайт сам просит 10 строк.
+        $start = max(0, min((int) $request->input('start', 0), 1000000));
+        $length = max(1, min((int) $request->input('length', 10), self::MAX_PAGE_SIZE));
 
         $baseQuery = Firmware::query();
         $totalRecords = $baseQuery->count();
@@ -67,9 +71,7 @@ class FirmwareController extends Controller
             $query->orderBy('id', 'desc');
         }
 
-        if ($length > 0) {
-            $query->skip($start)->take($length);
-        }
+        $query->skip($start)->take($length);
 
         $firmwares = $query->get();
 
