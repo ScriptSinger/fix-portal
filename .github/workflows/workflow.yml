@@ -120,17 +120,18 @@ jobs:
 
             docker compose down
             docker compose up -d --build
+            # stdin команд docker закрыт (</dev/null), иначе они читают остаток этого скрипта и он обрывается.
             # Ждём MySQL: переменные должны раскрываться внутри контейнера, поэтому \$
             for i in {1..30}; do
-              if docker compose exec -T mysql sh -c 'mysqladmin ping -h localhost -u"\$MYSQL_USER" -p"\$MYSQL_PASSWORD" --silent'; then
+              if docker compose exec -T mysql sh -c 'mysqladmin ping -h localhost -u"\$MYSQL_USER" -p"\$MYSQL_PASSWORD" --silent' </dev/null; then
                 break
               fi
               sleep 2
             done
-            docker compose run --rm php php artisan migrate --force
-            docker compose run --rm php php artisan route:clear
-            docker compose run --rm php php artisan view:clear
-            docker compose run --rm php php artisan optimize
-            docker compose run --rm php php artisan moonshine:optimize
-            docker compose run --rm php php artisan sitemap:generate
+            docker compose run --rm -T php php artisan migrate --force </dev/null
+            docker compose run --rm -T php php artisan route:clear </dev/null
+            docker compose run --rm -T php php artisan view:clear </dev/null
+            docker compose run --rm -T php php artisan optimize </dev/null
+            docker compose run --rm -T php php artisan moonshine:optimize </dev/null
+            docker compose run --rm -T php php artisan sitemap:generate </dev/null
           EOF
