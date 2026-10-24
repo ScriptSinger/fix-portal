@@ -2,19 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
 
-class Administrator extends Authenticatable
+/**
+ * Автор статей. Вход в админку теперь через MoonShine (moonshine_users),
+ * эта модель нужна только для имени автора у постов и изображений.
+ */
+class Administrator extends Model
 {
-    use HasApiTokens;
-
     protected $fillable = [
         'name',
         'email',
-        'password',
     ];
 
     public function posts(): HasMany

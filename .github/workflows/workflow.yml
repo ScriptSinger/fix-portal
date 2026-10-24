@@ -87,25 +87,36 @@ jobs:
 
       - name: Deploy to server
         run: |
-          scp -i ~/.ssh/id_ed25519 release.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/release.tar.gz
+          mkdir release && tar -xzf release.tar.gz -C release
+          SSH="ssh -i ~/.ssh/id_ed25519"
+          TARGET=${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:ufamasters/
 
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
+          # кэш провайдеров от прошлых версий должен исчезнуть до копирования
+          $SSH ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'rm -f ~/ufamasters/bootstrap/cache/*.php'
+
+          # код и vendor: передаём только изменившиеся файлы, удалённое в репозитории
+          # (старые контроллеры, пакеты вроде Passport) удаляем и на сервере
+          rsync -rlptzc --delete -e "$SSH" \
+            release/app release/config release/database release/lang \
+            release/resources release/routes release/vendor "$TARGET"
+
+          # без --delete: в public лежат symlink storage и sitemap.xml, созданные на сервере
+          rsync -rlptzc -e "$SSH" \
+            release/public release/bootstrap release/docker release/artisan \
+            release/composer.json release/composer.lock release/docker-compose.yml \
+            release/package.json release/package-lock.json release/.env.example "$TARGET"
+
+          $SSH ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << EOF
 
             cd ~/ufamasters
-
-            # vendor приезжает целиком из CI: убираем старый, чтобы не осталось
-            # пакетов (например, Passport) и кэша провайдеров от прошлых версий
-            rm -rf vendor bootstrap/cache/*.php
-
-            tar -xzf /tmp/release.tar.gz -C ~/ufamasters
 
             echo "${{ secrets.ENV_FILE }}" > .env
 
             docker compose down
             docker compose up -d --build
-            # Wait for MySQL to be ready
+            # Ждём MySQL: переменные должны раскрываться внутри контейнера, поэтому \$
             for i in {1..30}; do
-              if docker compose exec -T mysql mysqladmin ping -h "localhost" -u"${DB_USERNAME}" -p"${DB_PASSWORD}" --silent; then
+              if docker compose exec -T mysql sh -c 'mysqladmin ping -h localhost -u"\$MYSQL_USER" -p"\$MYSQL_PASSWORD" --silent'; then
                 break
               fi
               sleep 2
