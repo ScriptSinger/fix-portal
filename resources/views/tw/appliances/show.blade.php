@@ -1,7 +1,6 @@
 @extends('tw.layouts.app')
 @section('title', "$appliance->title | " . config('app.name', 'Ufamasters'))
 @section('description', 'Вопросы и ответы по технике: ' . $appliance->title . '. Решения, советы и опыт пользователей.')
-@section('robots', 'noindex, follow')
 
 @section('hero')
     <x-tw.page-header :title="$appliance->title" :items="[

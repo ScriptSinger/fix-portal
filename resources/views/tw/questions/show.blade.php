@@ -1,7 +1,6 @@
 @extends('tw.layouts.app')
 @section('title', "$question->title | " . config('app.name', 'Ufamasters'))
 @section('description', Str::limit(strip_tags($question->description ?? ''), 160))
-@section('robots', 'noindex, follow')
 @section('main-pt', 'pt-[51px]')
 
 @php
@@ -32,7 +31,7 @@
                     <span class="inline-flex items-center gap-1"><x-tw.icon name="eye" class="size-3" />{{ $question->views }}</span>
                     @can('update', $question)
                         <span aria-hidden="true">/</span>
-                        <a href="{{ route('pilot.questions.edit', ['question' => $question->slug]) }}" class="text-ink hover:text-link">Редактировать</a>
+                        <a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="text-ink hover:text-link">Редактировать</a>
                     @endcan
                     @can('delete', $question)
                         <span aria-hidden="true">/</span>

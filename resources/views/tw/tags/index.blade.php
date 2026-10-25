@@ -1,7 +1,6 @@
 @extends('tw.layouts.app')
 @section('title', 'Теги статей | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Список тегов статей по ремонту бытовой техники.')
-@section('robots', 'noindex, follow')
 
 @section('hero')
     <x-tw.page-header title="Теги статей" :items="[['Главная', route('articles.index')], ['Теги', null]]" />

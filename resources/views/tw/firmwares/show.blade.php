@@ -2,7 +2,11 @@
 @section('title', $firmware->meta_title . ' | ' . config('app.name', 'Ufamasters'))
 @section('description', $firmware->meta_description)
 @section('canonical', route('firmwares.show', ['firmware' => $firmware->canonical_id]))
-@section('robots', 'noindex, follow')
+@if (! $firmware->has_file)
+    @section('robots', 'noindex, nofollow')
+@elseif ($firmware->is_thin)
+    @section('robots', 'noindex, follow')
+@endif
 @section('wide', true)
 
 @php
@@ -12,9 +16,9 @@
         'softwareVersion' => $firmware->model_name, 'identifier' => (string) $firmware->id, 'description' => $firmware->meta_description,
     ], fn ($v) => $v !== null && $v !== '');
     $title = $firmware->model_name ? $firmware->display_name : $firmware->title;
-    $crumbs = [['Главная', route('articles.index')], ['Прошивки', route('pilot.firmwares.index')]];
+    $crumbs = [['Главная', route('articles.index')], ['Прошивки', route('firmwares.index')]];
     if ($firmware->hub_url && $firmware->brand) {
-        $crumbs[] = [$firmware->brand, route('pilot.firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)])];
+        $crumbs[] = [$firmware->brand, route('firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)])];
     }
     $crumbs[] = [Str::limit($firmware->model_name ?: ($firmware->title ?: ('Прошивка #' . $firmware->id)), 30, '...'), null];
 @endphp
@@ -41,10 +45,10 @@
             @if ($firmware->hub_url)
                 <p>Другие прошивки серии <a href="{{ $firmware->hub_url }}" class="text-black hover:text-link">{{ $firmware->brand }} {{ $firmware->series }}</a>
                     (в каталоге: {{ $firmware->seriesCount() }}).
-                    Все серии марки: <a href="{{ route('pilot.firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)]) }}" class="text-black hover:text-link">{{ $firmware->brand }}</a>.</p>
+                    Все серии марки: <a href="{{ route('firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)]) }}" class="text-black hover:text-link">{{ $firmware->brand }}</a>.</p>
             @elseif ($firmware->seriesCount() > 1)
                 <p>Другие прошивки серии {{ $firmware->series }}:
-                    <a href="{{ route('pilot.firmwares.index', ['brand' => $firmware->brand, 'series' => $firmware->series]) }}" class="text-black hover:text-link">{{ $firmware->seriesCount() }} файлов в каталоге</a>.</p>
+                    <a href="{{ route('firmwares.index', ['brand' => $firmware->brand, 'series' => $firmware->series]) }}" class="text-black hover:text-link">{{ $firmware->seriesCount() }} файлов в каталоге</a>.</p>
             @endif
             <p class="mb-0 text-[13px] text-muted">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
         </x-tw.box>

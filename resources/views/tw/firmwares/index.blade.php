@@ -10,7 +10,7 @@
 @endphp
 @section('title', 'Прошивки для бытовой техники | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Каталог прошивок для бытовой техники: поиск и просмотр файлов по моделям и платформам.')
-@section('robots', 'noindex, follow')
+@section('robots', ($isFiltered || $isPaginated) ? 'noindex, follow' : 'index, follow')
 @section('wide', true)
 
 @section('hero')
@@ -27,13 +27,13 @@
             <p class="mb-6">
                 <strong>Прошивки по маркам:</strong>
                 @foreach ($catalogBrands as $b)
-                    <a href="{{ $pr('firmwares.brand', ['brand' => $b['slug']]) }}" class="text-black hover:text-link">{{ $b['name'] }}</a>
+                    <a href="{{ route('firmwares.brand', ['brand' => $b['slug']]) }}" class="text-black hover:text-link">{{ $b['name'] }}</a>
                     ({{ $b['pages'] }}){{ ! $loop->last ? ' · ' : '' }}
                 @endforeach
             </p>
         @endif
 
-        <form method="GET" action="{{ $pr('firmwares.index') }}" class="mb-6"
+        <form method="GET" action="{{ route('firmwares.index') }}" class="mb-6"
             x-data="{ brand: @js(request('brand', '')), byBrand: @js($seriesByBrand), all: @js($seriesAll),
                       series: @js(mb_strtoupper((string) request('series'))),
                       get seriesList() { return this.brand ? (this.byBrand[this.brand] ?? []) : this.all; } }">
@@ -74,7 +74,7 @@
                 <x-tw.select-plain name="per_page" label="На странице" :options="[25, 50, 100, 200]" :value="$perPage" :blank="null" />
                 <div class="flex items-end justify-center gap-3 md:col-span-4">
                     <button type="submit" class="bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Применить</button>
-                    <a href="{{ $pr('firmwares.index') }}" class="bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Сбросить</a>
+                    <a href="{{ route('firmwares.index') }}" class="bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Сбросить</a>
                 </div>
             </div>
         </form>
@@ -92,7 +92,7 @@
                     @foreach ($firmwares as $firmware)
                         <tr>
                             <td>{{ $firmware->id }}</td>
-                            <td><a href="{{ $pr('firmwares.show', ['firmware' => $firmware->id]) }}" title="{{ $firmware->title }}">{{ Str::limit($firmware->title, 40) }}</a></td>
+                            <td><a href="{{ route('firmwares.show', ['firmware' => $firmware->id]) }}" title="{{ $firmware->title }}">{{ Str::limit($firmware->title, 40) }}</a></td>
                             <td>{{ $firmware->brand }} @if ($firmware->model)<span class="text-muted">{{ $firmware->model }}</span>@endif</td>
                             <td class="whitespace-nowrap">{{ $firmware->size >= 1024 ? number_format($firmware->size / 1024, 1, ',', ' ') . ' КБ' : $firmware->size . ' Б' }}</td>
                             <td class="whitespace-nowrap">{{ $firmware->date }}</td>

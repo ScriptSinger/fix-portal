@@ -2,7 +2,6 @@
 @section('title', "$tag->title | " . config('app.name', 'Ufamasters'))
 @section('description', 'Статьи по тегу: ' . $tag->title . '.')
 @section('canonical', route('tags.show', $tag->slug))
-@section('robots', 'noindex, follow')
 
 @section('hero')
     <x-tw.page-header :title="$tag->title" :items="[

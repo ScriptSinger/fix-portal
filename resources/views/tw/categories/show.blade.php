@@ -2,7 +2,7 @@
 @section('title', "$category->title | " . config('app.name', 'Ufamasters'))
 @section('description', $category->description ?? 'Категория статей: ' . $category->title)
 @section('canonical', route('categories.show', $category->slug))
-@section('robots', 'noindex, follow')
+@section('robots', request('page', 1) > 1 ? 'noindex, follow' : 'index, follow')
 
 @section('hero')
     <x-tw.page-header :title="$category->title" :items="[

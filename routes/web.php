@@ -32,7 +32,8 @@ Route::get('/', function () {
     return redirect('/articles');
 });
 
-Route::view('/about', 'public.about.show')->name('about');
+Route::view('/about', 'tw.pages.about')->name('about');
+Route::view('/personal-data-consent', 'tw.pages.consent')->name('consent');
 
 Route::group(
     ['prefix' => 'articles'],
@@ -42,30 +43,6 @@ Route::group(
     }
 );
 
-// Пилот перехода на Vite + Tailwind: та же логика, другой шаблон, закрыто от индексации.
-Route::get('/pilot/articles', [PostController::class, 'index'])->name('pilot.articles');
-Route::get('/pilot/articles/{article}', [PostController::class, 'show'])->name('pilot.articles.show');
-Route::get('/pilot/categories', [CategoryController::class, 'index'])->name('pilot.categories.index');
-Route::get('/pilot/categories/{category}', [CategoryController::class, 'show'])->name('pilot.categories.show');
-Route::view('/pilot/consent', 'tw.pages.consent')->name('pilot.consent');
-Route::view('/pilot/about', 'tw.pages.about')->name('pilot.about');
-Route::get('/pilot/appliances/{appliance}', [ApplianceController::class, 'show'])->name('pilot.appliances.show');
-Route::get('/pilot/questions', [QuestionController::class, 'index'])->name('pilot.questions.index');
-Route::middleware(['auth:web', 'verified'])->group(function () {
-    Route::get('/pilot/questions/create', [QuestionController::class, 'create'])->name('pilot.questions.create');
-    Route::get('/pilot/questions/{question}/edit', [QuestionController::class, 'edit'])->name('pilot.questions.edit');
-});
-Route::get('/pilot/questions/{question}', [QuestionController::class, 'show'])->name('pilot.questions.show');
-Route::middleware('guest')->group(function () {
-    Route::get('/pilot/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('pilot.login');
-    Route::get('/pilot/register', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])->name('pilot.register');
-    Route::get('/pilot/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])->name('pilot.password.request');
-    Route::get('/pilot/reset-password/{token}', [\App\Http\Controllers\Auth\NewPasswordController::class, 'create'])->name('pilot.password.reset');
-});
-Route::get('/pilot/verify-email', \App\Http\Controllers\Auth\EmailVerificationPromptController::class)->middleware('auth')->name('pilot.verification.notice');
-Route::get('/pilot/profile/edit', [UserController::class, 'edit'])->middleware(['auth:web', 'verified'])->name('pilot.profile.edit');
-Route::get('/pilot/tags', [TagController::class, 'index'])->name('pilot.tags.index');
-Route::get('/pilot/tag/{tag}', [TagController::class, 'show'])->name('pilot.tags.show');
 
 Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 
@@ -97,11 +74,6 @@ Route::get('/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series
 
 Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('firmwares.show');
 
-// Пилот перехода на Vite + Tailwind
-Route::get('/pilot/firmwares', [FirmwareController::class, 'index'])->name('pilot.firmwares.index');
-Route::get('/pilot/firmwares/{brand}', [FirmwareHubController::class, 'brand'])->where('brand', $firmwareBrands)->name('pilot.firmwares.brand');
-Route::get('/pilot/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series'])->where(['brand' => $firmwareBrands, 'series' => '[a-z]+'])->name('pilot.firmwares.series');
-Route::get('/pilot/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('pilot.firmwares.show');
 
 
 

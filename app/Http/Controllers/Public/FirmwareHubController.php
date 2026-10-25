@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Concerns\ResolvesPilotView;
 use App\Http\Controllers\Controller;
 use App\Models\Firmware;
 use App\Services\FirmwareCatalog;
@@ -12,7 +11,6 @@ use App\Services\FirmwareCatalog;
  */
 class FirmwareHubController extends Controller
 {
-    use ResolvesPilotView;
 
     public function __construct(private readonly FirmwareCatalog $catalog)
     {
@@ -28,7 +26,7 @@ class FirmwareHubController extends Controller
         $series = $this->catalog->seriesList($name);
         $summary = $this->catalog->brandSummary($name);
 
-        return view($this->pilotView('firmwares.hub_brand'), [
+        return view('tw.firmwares.hub_brand', [
             'brand' => $info,
             'series' => $series,
             'summary' => $summary,
@@ -54,7 +52,7 @@ class FirmwareHubController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view($this->pilotView('firmwares.hub_series'), [
+        return view('tw.firmwares.hub_series', [
             'brand' => $info,
             'seriesName' => $seriesName,
             'summary' => $summary,

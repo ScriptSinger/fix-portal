@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Public;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Concerns\ResolvesPilotView;
 use App\Http\Controllers\Controller;
 use App\Models\Firmware;
 
 class FirmwareController extends Controller
 {
-    use ResolvesPilotView;
 
     public function index()
     {
@@ -113,7 +111,7 @@ class FirmwareController extends Controller
             ->orderBy('extension')
             ->pluck('extension');
 
-        return view($this->pilotView('firmwares.index'), array_merge(compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'), ['catalogBrands' => app(\App\Services\FirmwareCatalog::class)->brands()]));
+        return view('tw.firmwares.index', array_merge(compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'), ['catalogBrands' => app(\App\Services\FirmwareCatalog::class)->brands()]));
     }
 
     public function show(string $slug)
@@ -127,12 +125,10 @@ class FirmwareController extends Controller
             return redirect()->route('firmwares.show', ['firmware' => $firmware->merged_into], 301);
         }
 
-        if (! $this->isPilot()) {
-            $firmware->increment('views_count');
-            $firmware->refresh();
-        }
+        $firmware->increment('views_count');
+        $firmware->refresh();
 
-        return view($this->pilotView('firmwares.show'), compact('firmware'));
+        return view('tw.firmwares.show', compact('firmware'));
     }
 
     public function download(int $id)

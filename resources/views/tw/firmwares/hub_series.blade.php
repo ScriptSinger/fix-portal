@@ -10,13 +10,13 @@
 @section('title', 'Прошивки ' . $brand['name'] . ' ' . $seriesName . ': ' . $summary['pages'] . ' файлов' . ($pageNumber > 1 ? ', страница ' . $pageNumber : '') . ' | ' . config('app.name', 'Ufamasters'))
 @section('description', $description)
 @section('canonical', route('firmwares.series', ['brand' => $brand['slug'], 'series' => strtolower($seriesName)]))
-@section('robots', 'noindex, follow')
+@section('robots', $pageNumber > 1 ? 'noindex, follow' : 'index, follow')
 @section('wide', true)
 
 @section('hero')
     <x-tw.page-header :title="'Прошивки ' . $brand['name'] . ' ' . $seriesName" :items="[
-        ['Главная', route('articles.index')], ['Прошивки', route('pilot.firmwares.index')],
-        [$brand['name'], route('pilot.firmwares.brand', ['brand' => $brand['slug']])], [$seriesName, null]]" />
+        ['Главная', route('articles.index')], ['Прошивки', route('firmwares.index')],
+        [$brand['name'], route('firmwares.brand', ['brand' => $brand['slug']])], [$seriesName, null]]" />
 @endsection
 
 @section('sidebar')
@@ -40,7 +40,7 @@
             <x-tw.box :title="'Модели серии ' . $seriesName">
                 <p class="mb-0">
                     @foreach ($summary['models'] as $model => $count)
-                        <a href="{{ route('pilot.firmwares.index', ['search' => $model, 'brand' => $brand['name']]) }}" class="text-black hover:text-link">{{ $model }}</a>
+                        <a href="{{ route('firmwares.index', ['search' => $model, 'brand' => $brand['name']]) }}" class="text-black hover:text-link">{{ $model }}</a>
                         ({{ $count }}){{ ! $loop->last ? ' · ' : '' }}
                     @endforeach
                 </p>
@@ -55,7 +55,7 @@
                         @foreach ($firmwares as $firmware)
                             <tr>
                                 <td class="whitespace-nowrap">{{ $firmware->model }}</td>
-                                <td><a href="{{ route('pilot.firmwares.show', ['firmware' => $firmware->id]) }}">{{ Str::limit($firmware->title, 45) }}</a></td>
+                                <td><a href="{{ route('firmwares.show', ['firmware' => $firmware->id]) }}">{{ Str::limit($firmware->title, 45) }}</a></td>
                                 <td>{{ $firmware->platform_norm ?: $firmware->platform }}</td>
                                 <td>{{ $firmware->extension }}</td>
                                 <td class="whitespace-nowrap">{{ $firmware->human_size }}</td>
@@ -69,8 +69,8 @@
         </x-tw.box>
 
         <p>
-            <a href="{{ route('pilot.firmwares.brand', ['brand' => $brand['slug']]) }}" class="text-black hover:text-link">Все серии {{ $brand['name'] }}</a> ·
-            <a href="{{ route('pilot.firmwares.index') }}" class="text-black hover:text-link">Весь каталог прошивок</a>
+            <a href="{{ route('firmwares.brand', ['brand' => $brand['slug']]) }}" class="text-black hover:text-link">Все серии {{ $brand['name'] }}</a> ·
+            <a href="{{ route('firmwares.index') }}" class="text-black hover:text-link">Весь каталог прошивок</a>
         </p>
         <p class="mb-0 text-[13px] text-muted">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
     </div>

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Public;
 
-use App\Http\Controllers\Concerns\ResolvesPilotView;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
@@ -12,25 +11,13 @@ use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
-    use ResolvesPilotView;
-
-    public function index()
-    {
-        return view('public.users.index');
-    }
-
-    public function show($id)
-    {
-        $user = User::findOrFail($id);
-        return view('public.users.show', compact('user'));
-    }
 
     public function edit()
     {
         $id = auth()->user()->id;
         $user = User::findOrFail($id);
         $roles = Role::pluck('name', 'id');
-        return view($this->pilotView('users.edit'), compact('user', 'roles'));
+        return view('tw.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request)
@@ -46,7 +33,7 @@ class UserController extends Controller
 
         $user = $request->user();
         $user->update($data);
-        return redirect()->route('users.index')->with('success', 'Изменения сохранены');
+        return redirect()->route('profile.edit')->with('success', 'Изменения сохранены');
     }
 
 

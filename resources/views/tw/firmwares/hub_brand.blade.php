@@ -2,11 +2,10 @@
 @section('title', 'Прошивки ' . $brand['name'] . ': ' . $brand['pages'] . ' файлов, ' . $series->count() . ' серий | ' . config('app.name', 'Ufamasters'))
 @section('description', $description)
 @section('canonical', route('firmwares.brand', ['brand' => $brand['slug']]))
-@section('robots', 'noindex, follow')
 @section('wide', true)
 
 @section('hero')
-    <x-tw.page-header :title="'Прошивки ' . $brand['name']" :items="[['Главная', route('articles.index')], ['Прошивки', route('pilot.firmwares.index')], [$brand['name'], null]]" />
+    <x-tw.page-header :title="'Прошивки ' . $brand['name']" :items="[['Главная', route('articles.index')], ['Прошивки', route('firmwares.index')], [$brand['name'], null]]" />
 @endsection
 
 @section('sidebar')
@@ -38,7 +37,7 @@
                     <tbody>
                         @foreach ($series as $row)
                             <tr>
-                                <td><a href="{{ route('pilot.firmwares.series', ['brand' => $brand['slug'], 'series' => $row['slug']]) }}">{{ $brand['name'] }} {{ $row['series'] }}</a></td>
+                                <td><a href="{{ route('firmwares.series', ['brand' => $brand['slug'], 'series' => $row['slug']]) }}">{{ $brand['name'] }} {{ $row['series'] }}</a></td>
                                 <td>{{ $row['pages'] }}</td>
                                 <td>{{ $row['models'] }}</td>
                                 <td>{{ implode(', ', $row['platforms']) }}</td>
@@ -50,7 +49,7 @@
             <p class="mb-0 text-[13px] text-muted">
                 Показаны серии, в которых не меньше {{ \App\Services\FirmwareCatalog::MIN_SERIES_PAGES }} файлов.
                 Остальные прошивки {{ $brand['name'] }} можно найти
-                <a href="{{ route('pilot.firmwares.index', ['brand' => $brand['name']]) }}" class="text-black hover:text-link">в общем каталоге с фильтрами</a>.
+                <a href="{{ route('firmwares.index', ['brand' => $brand['name']]) }}" class="text-black hover:text-link">в общем каталоге с фильтрами</a>.
             </p>
         </x-tw.box>
 
@@ -58,7 +57,7 @@
             <x-tw.box title="Другие марки">
                 <p class="mb-0">
                     @foreach ($otherBrands as $other)
-                        <a href="{{ route('pilot.firmwares.brand', ['brand' => $other['slug']]) }}" class="text-black hover:text-link">{{ $other['name'] }}</a>
+                        <a href="{{ route('firmwares.brand', ['brand' => $other['slug']]) }}" class="text-black hover:text-link">{{ $other['name'] }}</a>
                         ({{ $other['pages'] }}){{ ! $loop->last ? ' · ' : '' }}
                     @endforeach
                 </p>

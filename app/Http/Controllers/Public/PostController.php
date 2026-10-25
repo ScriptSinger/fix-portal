@@ -25,9 +25,7 @@ class PostController extends Controller
             ->paginate(10);
 
 
-        $view = request()->routeIs('pilot.articles') ? 'tw.posts.index' : 'public.posts.index';
-
-        return view($view, compact('posts'));
+        return view('tw.posts.index', compact('posts'));
     }
 
     public function show($slug)
@@ -41,12 +39,10 @@ class PostController extends Controller
                     ->orderByDesc('id'),
             ])
             ->firstOrFail();
-        $pilot = request()->routeIs('pilot.articles.show');
+        
 
-        if (! $pilot) {
-            $post->views += 1;
-            $post->update();
-        }
+        $post->views += 1;
+        $post->update();
 
         $cta = $post->ctas->firstWhere('placement', 'end');
 
@@ -60,6 +56,6 @@ class PostController extends Controller
             ->with('category') // Загрузка связанной категории
             ->get();
 
-        return view($pilot ? 'tw.posts.show' : 'public.posts.show', compact('post', 'relatedPosts', 'cta'));
+        return view('tw.posts.show', compact('post', 'relatedPosts', 'cta'));
     }
 }

@@ -54,7 +54,7 @@ class RegistrationConfirmation extends Mailable implements ShouldQueue
             : $this->generateVerificationUrl($this->user);
 
         return new Content(
-            view: 'public.emails.confirmation',
+            view: 'emails.confirmation',
             with: [
                 'verificationUrl' => $verificationUrl,
             ],

@@ -6,10 +6,10 @@
         "watch": "mix watch",
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
-        "prod": "npm run production",
+        "prod": "npm run production && vite build",
         "production": "mix --production",
-        "vite:dev": "vite",
-        "vite:build": "vite build"
+        "build": "vite build",
+        "dev:front": "vite"
     },
     "devDependencies": {
         "@popperjs/core": "^2.10.2",

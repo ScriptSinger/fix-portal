@@ -1,7 +1,6 @@
 @extends('tw.layouts.app')
 @section('title', 'О нас | ' . config('app.name', 'Ufamasters'))
 @section('description', 'О нас: платформа с статьями, вопросами и ответами, базой прошивок и каталогом мастеров по ремонту бытовой техники.')
-@section('robots', 'noindex, follow')
 
 @section('hero')
     <x-tw.page-header title="О нас" />

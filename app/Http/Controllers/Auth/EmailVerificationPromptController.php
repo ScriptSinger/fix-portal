@@ -10,7 +10,6 @@ use Illuminate\View\View;
 
 class EmailVerificationPromptController extends Controller
 {
-    use \App\Http\Controllers\Concerns\ResolvesPilotView;
 
     /**
      * Display the email verification prompt.
@@ -19,6 +18,6 @@ class EmailVerificationPromptController extends Controller
     {
         return $request->user()->hasVerifiedEmail()
             ? redirect()->intended(RouteServiceProvider::HOME)
-            : view($this->pilotView('auth.verify-email'));
+            : view('tw.auth.verify-email');
     }
 }

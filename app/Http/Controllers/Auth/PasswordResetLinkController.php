@@ -10,14 +10,13 @@ use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
 {
-    use \App\Http\Controllers\Concerns\ResolvesPilotView;
 
     /**
      * Display the password reset link request view.
      */
     public function create(): View
     {
-        return view($this->pilotView('auth.forgot-password'));
+        return view('tw.auth.forgot-password');
     }
 
     /**

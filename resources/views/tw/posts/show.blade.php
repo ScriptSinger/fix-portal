@@ -2,7 +2,6 @@
 @section('title', "$post->title | " . config('app.name', 'Ufamasters'))
 @section('description', $post->description)
 @section('canonical', url('/articles/' . $post->slug))
-@section('robots', 'noindex, follow')
 @section('main-pt', 'pt-[51px]')
 
 @section('content')

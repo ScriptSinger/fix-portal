@@ -5,7 +5,7 @@
         ['Прошивки', route('firmwares.index'), 'firmwares*'],
         ['О нас', route('about'), 'about'],
     ];
-    $isActive = fn ($pattern) => request()->is($pattern, 'pilot/' . $pattern);
+    $isActive = fn ($pattern) => request()->is($pattern);
     $link = 'block px-[9.6px] py-6 text-[14px] font-bold uppercase leading-[14px] text-[#121212] hover:text-white';
 @endphp
 <header x-data="{ menu: false }"

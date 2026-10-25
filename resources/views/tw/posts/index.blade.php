@@ -2,12 +2,16 @@
 @section('title', 'Статьи | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Коллекция статей от мастеров по ремонту бытовой техники')
 @section('canonical', url('/articles'))
-@section('robots', 'noindex, follow')
+@php
+    $isPaginated = request('page', 1) > 1;
+    $hasFilter = request()->hasAny(['text']);
+@endphp
+@section('robots', $isPaginated || $hasFilter ? 'noindex, follow' : 'index, follow')
 
 @section('hero')
     <x-tw.hero :customization="$customization" search-title="Поиск статей" search-text="Возможно, нужная информация уже есть в статьях. Попробуйте поиск"
         placeholder="Что вы хотели бы узнать?" label="Поиск статей"
-        :action="request()->is('pilot/*') ? route('pilot.articles') : route('articles.index')" />
+        :action="route('articles.index')" />
 @endsection
 
 @section('content')
