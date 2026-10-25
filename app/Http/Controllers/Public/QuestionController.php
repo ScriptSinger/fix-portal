@@ -12,6 +12,7 @@ use App\Services\FileUploader;
 
 use Illuminate\Http\Request;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Validation\Rule;
 
 class QuestionController extends Controller
 {
@@ -40,11 +41,7 @@ class QuestionController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'title' => 'required|string',
-            'appliance_id' => 'required|exists:appliances,id',
-            'description' => 'required|string',
-        ]);
+        $data = $request->validate($this->rules(), $this->messages());
         $data['user_id'] = auth()->user()->id;
         Question::create($data);
         return redirect()->route('questions.index')->with('success', 'Вопрос создан');
@@ -69,16 +66,9 @@ class QuestionController extends Controller
 
     public function update(Request $request, string $slug)
     {
-        $data = $request->validate([
-            'title' => 'required|string',
-            'appliance_id' => 'required|exists:appliances,id',
-            'description' => 'required|string',
-            // 'photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048', // Проверка на изображения и ограничение размера до 2 МБ
-            // 'photos' => 'nullable|array|max:4', // Максимальное количество файлов в массиве photos: 4
-        ]);
-
         $question = Question::where('slug', $slug)->firstOrFail();
         $this->authorize('update', $question);
+        $data = $request->validate($this->rules($question->id), $this->messages());
         $data['user_id'] = $request->user()->id;
         $question->update($data);
         return redirect()->route('questions.index')->with('success', 'Изменения сохранены');
@@ -91,5 +81,34 @@ class QuestionController extends Controller
         $question->comments()->delete();
         $question->delete();
         return redirect()->route('questions.index')->with('success', 'Вопрос удален');
+    }
+
+    /** Правила формы: заголовок с симптомом, содержательное описание, необязательные модель и код ошибки. */
+    private function rules(?int $ignoreId = null): array
+    {
+        return [
+            'title' => ['required', 'string', 'min:12', 'max:150', Rule::unique('questions', 'title')->whereNull('deleted_at')->ignore($ignoreId)],
+            'appliance_id' => ['required', 'exists:appliances,id'],
+            'model' => ['nullable', 'string', 'max:120'],
+            'error_code' => ['nullable', 'string', 'max:60'],
+            'description' => ['required', 'string', function (string $attribute, mixed $value, \Closure $fail) {
+                $text = trim(html_entity_decode(strip_tags((string) $value), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                if (mb_strlen($text) < 40 && ! str_contains((string) $value, '<img')) {
+                    $fail('Опишите проблему подробнее: когда началось и что уже проверяли (хотя бы 40 знаков) или приложите фото.');
+                }
+            }],
+        ];
+    }
+
+    private function messages(): array
+    {
+        return [
+            'title.required' => 'Напишите, что случилось.',
+            'title.min' => 'Заголовок слишком короткий: опишите симптом и прибор (не меньше 12 знаков).',
+            'title.max' => 'Заголовок длиннее 150 знаков: сократите, подробности перенесите в описание.',
+            'title.unique' => 'Вопрос с таким заголовком уже есть. Уточните его (модель, код ошибки) или найдите существующий вопрос.',
+            'appliance_id.required' => 'Выберите тип прибора.',
+            'description.required' => 'Опишите проблему подробнее.',
+        ];
     }
 }

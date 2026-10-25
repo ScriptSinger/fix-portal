@@ -23,6 +23,8 @@ class Question extends Model
         'title',
         'description',
         'appliance_id',
+        'model',
+        'error_code',
         'photos',
         'user_id'
     ];
