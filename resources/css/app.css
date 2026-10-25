@@ -6,7 +6,10 @@
 @source '../js/**/*.js';
 
 @theme {
-    --breakpoint-lg: 62rem; /* как в Bootstrap 4 (992px), чтобы сетка совпала со старой */
+    /* Брейкпоинты Bootstrap 4, чтобы сетка совпала со старой: 576 / 768 / 992 / 1200 */
+    --breakpoint-sm: 36rem;
+    --breakpoint-lg: 62rem;
+    --breakpoint-xl: 75rem;
     --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
     --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
 

@@ -6,8 +6,8 @@
             class="block w-full transition-transform duration-300 ease-in-out group-hover:scale-110">
         <span class="absolute inset-0 bg-[linear-gradient(0deg,#000_0%,rgba(0,0,0,.1)_50%)] opacity-50" aria-hidden="true"></span>
     </a>
-    <div class="relative z-10 mx-12 -mt-16 rounded-[5px] bg-white pb-[59px] pt-12 text-center">
-        <div class="mb-6"><x-tw.share :url="$url" /></div>
+    <div class="relative z-10 mx-12 -mt-16 rounded-[5px] bg-white pb-[51px] pt-12 text-center">
+        <div class="mb-8"><x-tw.share :url="$url" /></div>
         <h2 class="pb-4 text-[28px] font-bold leading-[39.2px] text-black">
             <a href="{{ $url }}">{{ $title }}</a>
         </h2>

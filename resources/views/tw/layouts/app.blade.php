@@ -35,7 +35,7 @@
     @yield('hero')
 
     <main id="content" class="bg-surface pb-16 @yield('main-pt', 'pt-16')">
-        <div @class(['mx-auto px-[15px]', 'max-w-[1140px]' => ! View::hasSection('wide')])>
+        <div @class(['mx-auto px-[15px]', 'sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px]' => ! View::hasSection('wide')])>
             @hasSection('no-sidebar')
                 <div class="min-w-0">@yield('content')</div>
             @elseif (View::hasSection('wide'))
@@ -44,9 +44,10 @@
                     <div class="min-w-0">@yield('content')</div>
                 </div>
             @else
-                <div class="grid gap-[30px] lg:grid-cols-[minmax(0,1fr)_350px]">
-                    <div class="min-w-0">@yield('content')</div>
-                    <aside>@yield('sidebar')</aside>
+                {{-- Колонки как в Bootstrap: 8/12 + 4/12 с отступами по 15 px --}}
+                <div class="-mx-[15px] grid lg:grid-cols-[2fr_1fr]">
+                    <div class="min-w-0 px-[15px]">@yield('content')</div>
+                    <aside class="px-[15px]">@yield('sidebar')</aside>
                 </div>
             @endif
         </div>

@@ -2,13 +2,13 @@
     $currentYear = now()->year;
     $copyrightText = optional($customization)->copyright ?? "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
     $copyrightText = preg_replace('/(\b\d{4}-)\d{4}\b/u', '${1}' . $currentYear, $copyrightText);
-    $title = 'mb-8 text-lg font-bold capitalize leading-[18px] text-white';
+    $title = 'mb-8 pb-2 text-lg font-bold capitalize leading-[18px] text-white';
 @endphp
 <footer class="border-[6px] border-black bg-black py-16 shadow-[inset_0_0_0_1px_#333]">
-    <div class="mx-auto max-w-[1140px] px-[15px]">
-        <div class="grid gap-[30px] lg:grid-cols-3">
+    <div class="mx-auto sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px] px-[15px]">
+        <div class="-mx-[15px] grid lg:grid-cols-3">
             @foreach ([['Последние статьи', $latest_posts, false], ['Популярные статьи', $popular_posts, true]] as [$heading, $posts, $showViews])
-                <section>
+                <section class="px-[15px] max-lg:mb-12 max-lg:mt-8">
                     <h2 class="{{ $title }}">{{ $heading }}</h2>
                     <ul class="space-y-4">
                         @foreach ($posts as $post)
@@ -33,7 +33,7 @@
                 </section>
             @endforeach
 
-            <section>
+            <section class="px-[15px] max-lg:mb-12 max-lg:mt-8">
                 <h2 class="{{ $title }}">Популярные категории</h2>
                 <ul>
                     @foreach ($popular_categories as $category)

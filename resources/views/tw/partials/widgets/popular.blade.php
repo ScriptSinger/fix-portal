@@ -1,7 +1,7 @@
 <x-tw.widget title="Популярные статьи">
-    <ul class="space-y-5">
+    <ul>
         @foreach ($popular_posts as $post)
-            <li>
+            <li class="pb-4">
                 <a href="{{ route('articles.show', ['article' => $post->slug]) }}" class="block overflow-hidden">
                     <img src="{{ $post->thumbnail?->small }}" alt="" loading="lazy" class="float-left mr-[15px] size-[55px] bg-[#333] object-cover">
                     <h3 class="text-[15px] font-bold leading-[22.5px] text-black">{{ $post->title }}</h3>
