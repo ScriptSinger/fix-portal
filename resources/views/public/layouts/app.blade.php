@@ -64,7 +64,7 @@
             @elseif (View::hasSection('sidebar-left'))
                 {{-- Три колонки: слева навигация по разделу, в центре контент, справа реклама и действия --}}
                 <div class="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)_300px]">
-                    <aside aria-label="Навигация по разделу" class="min-w-0 lg:sticky lg:top-[112px] lg:self-start">@yield('sidebar-left')</aside>
+                    <aside aria-label="Навигация по разделу" @class(['min-w-0 lg:sticky lg:top-[112px] lg:self-start', 'max-lg:contents' => View::hasSection('left-drawer')])>@yield('sidebar-left')</aside>
                     <div class="min-w-0">@yield('content')</div>
                     <aside aria-label="Сервисы и популярное" class="min-w-0 lg:col-span-2 xl:col-span-1">@yield('sidebar')</aside>
                 </div>

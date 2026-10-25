@@ -13,30 +13,7 @@ class FirmwareController extends Controller
 
     public function index()
     {
-        $query = Firmware::query();
-
-        if (request()->filled('brand')) {
-            $query->where('brand', request('brand'));
-        }
-        if (request()->filled('series')) {
-            $query->where('series', mb_strtoupper(trim((string) request('series'))));
-        }
-        if (request()->filled('platform')) {
-            // platform_norm склеивает Arcadia / ARCADIA / arcadia; старое поле оставляем для записей без обогащения
-            $platform = request('platform');
-            $query->where(function ($q) use ($platform) {
-                $q->where('platform_norm', $platform)->orWhere('platform', $platform);
-            });
-        }
-        if (request()->filled('extension')) {
-            $query->where('extension', request('extension'));
-        }
-        if (request()->filled('crc32')) {
-            $query->where('crc32', request('crc32'));
-        }
-        if (request()->filled('search')) {
-            $this->applySearch($query, trim(request('search')));
-        }
+        $query = $this->filteredQuery();
 
         $sort = request('sort', 'id');
         $dir = request('dir', 'desc');
@@ -97,6 +74,43 @@ class FirmwareController extends Controller
             ->pluck('extension');
 
         return view('public.firmwares.index', array_merge(compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'), ['catalogBrands' => app(\App\Services\FirmwareCatalog::class)->brands()]));
+    }
+
+    /** Выборка по фильтрам каталога; общая для списка и для счётчика «Показать N» в панели фильтров. */
+    private function filteredQuery()
+    {
+        $query = Firmware::query();
+
+        if (request()->filled('brand')) {
+            $query->where('brand', request('brand'));
+        }
+        if (request()->filled('series')) {
+            $query->where('series', mb_strtoupper(trim((string) request('series'))));
+        }
+        if (request()->filled('platform')) {
+            // platform_norm склеивает Arcadia / ARCADIA / arcadia; старое поле оставляем для записей без обогащения
+            $platform = request('platform');
+            $query->where(function ($q) use ($platform) {
+                $q->where('platform_norm', $platform)->orWhere('platform', $platform);
+            });
+        }
+        if (request()->filled('extension')) {
+            $query->where('extension', request('extension'));
+        }
+        if (request()->filled('crc32')) {
+            $query->where('crc32', request('crc32'));
+        }
+        if (request()->filled('search')) {
+            $this->applySearch($query, trim(request('search')));
+        }
+
+        return $query;
+    }
+
+    /** Сколько прошивок найдётся при текущих фильтрах: панель фильтров показывает число до применения. */
+    public function count()
+    {
+        return response()->json(['count' => $this->filteredQuery()->count()]);
     }
 
     public function show(string $slug)

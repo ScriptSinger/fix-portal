@@ -10,6 +10,7 @@ import anchorScroll from './components/anchorScroll';
 import carousel from './components/carousel';
 import lightbox from './components/lightbox';
 import scrollRegions from './components/scrollRegions';
+import firmwareFilter from './components/firmwareFilter';
 
 Alpine.plugin(collapse);
 Alpine.data('copyLink', copyLink);
@@ -17,6 +18,7 @@ Alpine.data('likeBox', likeBox);
 Alpine.data('richEditor', richEditor);
 Alpine.data('avatarUpload', avatarUpload);
 Alpine.data('phoneMask', phoneMask);
+Alpine.data('firmwareFilter', firmwareFilter);
 
 anchorScroll();
 document.addEventListener('DOMContentLoaded', carousel);
