@@ -7,6 +7,6 @@
 <footer class="border-[6px] border-black bg-black py-6 text-center text-[13px] text-[#9a9a9a] shadow-[inset_0_0_0_1px_#333]">
     <div class="mx-auto flex max-w-[1140px] flex-col items-center justify-between gap-2 px-[15px] sm:flex-row">
         <span>&copy; {{ $copyrightText }}</span>
-        <a href="{{ route('consent') }}" class="text-[#9a9a9a]">Согласие на обработку персональных данных</a>
+        <a href="{{ route('consent') }}" class="inline-block py-3 text-[#9a9a9a]">Согласие на обработку персональных данных</a>
     </div>
 </footer>

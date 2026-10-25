@@ -9,5 +9,5 @@
         {{ $posts->withQueryString()->onEachSide(1)->links('public.partials.pagination') }}
     </div>
 @else
-    <p class="rounded-xl border border-line bg-white p-8 text-center text-muted">Статей пока нет</p>
+    <p class="rounded-xl border border-line bg-white p-8 text-center text-subtle">Статей пока нет</p>
 @endif

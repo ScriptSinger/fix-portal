@@ -14,7 +14,7 @@
         <p class="mb-2 pb-[11.2px] pt-[4.8px]">{!! $excerpt !!}</p>
         <div class="flex flex-wrap items-center justify-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-ink">
             @if ($category)
-                <a href="{{ $categoryUrl }}" class="font-normal text-subtle hover:text-ink">{{ $category }}</a>
+                <a href="{{ $categoryUrl }}" class="-my-2 inline-block py-2 font-normal text-subtle hover:text-ink">{{ $category }}</a>
                 {!! $sep !!}
             @endif
             <time datetime="{{ $date->toDateString() }}">{{ $date->diffForHumans() }}</time>

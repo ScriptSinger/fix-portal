@@ -50,7 +50,7 @@
                 <p>Другие прошивки серии {{ $firmware->series }}:
                     <a href="{{ route('firmwares.index', ['brand' => $firmware->brand, 'series' => $firmware->series]) }}" class="text-black hover:text-link">{{ $firmware->seriesCount() }} файлов в каталоге</a>.</p>
             @endif
-            <p class="mb-0 text-[13px] text-muted">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
+            <p class="mb-0 text-[13px] text-subtle">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
         </x-ui.box>
 
         <x-ui.box title="Метаданные">
@@ -70,7 +70,7 @@
             @if (! empty($firmware->title))
                 <x-ui.button variant="dark" :href="route('firmwares.download', ['firmware' => $firmware->id])">Скачать файл</x-ui.button>
             @else
-                <span class="text-muted">Файл недоступен</span>
+                <span class="text-subtle">Файл недоступен</span>
             @endif
         </x-ui.box>
 

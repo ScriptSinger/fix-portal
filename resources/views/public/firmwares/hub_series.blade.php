@@ -72,6 +72,6 @@
             <a href="{{ route('firmwares.brand', ['brand' => $brand['slug']]) }}" class="text-black hover:text-link">Все серии {{ $brand['name'] }}</a> ·
             <a href="{{ route('firmwares.index') }}" class="text-black hover:text-link">Весь каталог прошивок</a>
         </p>
-        <p class="mb-0 text-[13px] text-muted">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
+        <p class="mb-0 text-[13px] text-subtle">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
     </div>
 @endsection

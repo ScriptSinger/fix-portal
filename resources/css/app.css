@@ -24,7 +24,7 @@
     --color-surface: #f1f1f1;
     --color-footer: #000000;
     --color-link: #3197d6;
-    --color-telegram: #0088cc;
+    --color-telegram: #0074b3;
 
     /* Второстепенный текст на светлом фоне (контраст не ниже 4,5:1) и служебные цвета */
     --color-subtle: #6b6b6b;
@@ -57,6 +57,8 @@
     overflow-wrap: anywhere;
 }
 .article-content p { margin-bottom: 26px; }
+/* Ссылка в тексте не должна отличаться от текста одним цветом */
+.article-content p a, .article-content li a { text-decoration: underline; text-underline-offset: 2px; }
 .article-content h1, .article-content h2, .article-content h3,
 .article-content h4, .article-content h5, .article-content h6 {
     font-weight: 700; color: #000; line-height: 1.4;
@@ -137,7 +139,7 @@ html { scroll-padding-top: 100px; }
 /* Единое поле формы сайта (текст, список, многострочное). Высота 38 px, прямые углы, рамка #ced4da. */
 @layer components {
     .field {
-        display: block; width: 100%; height: 38px; padding: 0 12px;
+        display: block; width: 100%; height: 40px; padding: 0 12px;
         border: 1px solid #ced4da; background: #fff; color: #464a4c; font-size: 16px; line-height: 24px;
     }
     textarea.field { height: auto; min-height: 114px; padding: 8px 12px; }

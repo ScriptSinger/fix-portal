@@ -3,7 +3,7 @@
     $type = strtolower(class_basename($instance));
     $likes = isset($instance->likes) ? count($instance->likes) : 0;
     $dislikes = isset($instance->dislikes) ? count($instance->dislikes) : 0;
-    $pill = 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm text-muted';
+    $pill = 'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-sm text-subtle';
     $up = '<path stroke-linecap="round" stroke-linejoin="round" d="M7 11v9H4v-9h3zm0 0l4-7a2 2 0 012 2v3h5.5a1.5 1.5 0 011.46 1.84l-1.5 6A2 2 0 0116 20H7" />';
     $down = '<path stroke-linecap="round" stroke-linejoin="round" d="M7 13V4H4v9h3zm0 0l4 7a2 2 0 002-2v-3h5.5a1.5 1.5 0 001.46-1.84l-1.5-6A2 2 0 0016 4H7" />';
 @endphp

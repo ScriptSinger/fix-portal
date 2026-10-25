@@ -10,18 +10,18 @@
     <div class="rounded-[5px] bg-white p-12 max-sm:px-4">
         <article>
             <header class="mb-12">
-                <x-ui.breadcrumbs :items="[
+                <x-ui.breadcrumbs light :items="[
                     ['Главная', route('articles.index')],
                     ['Категории', route('categories.index')],
                     [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
                 ]" />
                 <div class="my-2">
                     <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
-                        class="keep inline-block rounded-[3px] bg-brand-400 px-4 text-white hover:text-black">{{ $post->category->title }}</a>
+                        class="keep inline-block rounded-[3px] bg-brand-400 px-4 text-black hover:underline">{{ $post->category->title }}</a>
                 </div>
                 <h1 class="mb-[7px] text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $post->title }}</h1>
 
-                <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-muted">
+                <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-subtle">
                     <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->diffForHumans() }}</time>
                     <span aria-hidden="true">/</span>
                     <span>{{ $post->administrator->name }}</span>
@@ -37,7 +37,7 @@
             @endif
 
             <div class="article-content">
-                {!! $post->content !!}
+                {!! \App\Support\ContentImages::withAlt($post->content, $post->title) !!}
             </div>
 
             @if (!empty($cta))
@@ -56,7 +56,7 @@
                         @foreach ($post->tags as $tag)
                             <li class="my-2 mr-2 inline-block h-7 rounded-[3px] bg-brand-400 px-4">
                                 <a href="{{ route('tags.show', ['tag' => $tag->slug]) }}"
-                                    class="keep mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-white hover:text-black">{{ $tag->title }}</a>
+                                    class="keep mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-black hover:underline">{{ $tag->title }}</a>
                             </li>
                         @endforeach
                     </ul>
@@ -72,7 +72,7 @@
             <div class="grid gap-8 sm:grid-cols-2">
                 @foreach ($relatedPosts as $related)
                     <article>
-                        <a href="{{ route('articles.show', ['article' => $related->slug]) }}" class="block overflow-hidden">
+                        <a href="{{ route('articles.show', ['article' => $related->slug]) }}" class="block overflow-hidden" aria-hidden="true" tabindex="-1">
                             <img src="{{ $related->thumbnail?->blog ?? asset('assets/front/upload/market_blog_01.jpg') }}" alt="" loading="lazy" class="block w-full">
                         </a>
                         <h3 class="mt-4 text-lg font-bold leading-7 text-black"><a href="{{ route('articles.show', ['article' => $related->slug]) }}">{{ $related->title }}</a></h3>

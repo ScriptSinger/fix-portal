@@ -46,7 +46,7 @@
                     </tbody>
                 </table>
             </div>
-            <p class="mb-0 text-[13px] text-muted">
+            <p class="mb-0 text-[13px] text-subtle">
                 Показаны серии, в которых не меньше {{ \App\Services\FirmwareCatalog::MIN_SERIES_PAGES }} файлов.
                 Остальные прошивки {{ $brand['name'] }} можно найти
                 <a href="{{ route('firmwares.index', ['brand' => $brand['name']]) }}" class="text-black hover:text-link">в общем каталоге с фильтрами</a>.
@@ -64,6 +64,6 @@
             </x-ui.box>
         @endif
 
-        <p class="mb-0 text-[13px] text-muted">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
+        <p class="mb-0 text-[13px] text-subtle">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
     </div>
 @endsection

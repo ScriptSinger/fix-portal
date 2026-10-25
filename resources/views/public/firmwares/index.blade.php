@@ -84,7 +84,7 @@
                 <thead>
                     <tr>
                         @foreach ($columns as $field => $label)
-                            <th><a href="{{ $sortUrl($field) }}">{{ $label }}{{ $mark($field) }}</a></th>
+                            <th><a href="{{ $sortUrl($field) }}" class="-my-3 inline-block py-3">{{ $label }}{{ $mark($field) }}</a></th>
                         @endforeach
                     </tr>
                 </thead>
@@ -93,7 +93,7 @@
                         <tr>
                             <td>{{ $firmware->id }}</td>
                             <td><a href="{{ route('firmwares.show', ['firmware' => $firmware->id]) }}" title="{{ $firmware->title }}">{{ Str::limit($firmware->title, 40) }}</a></td>
-                            <td>{{ $firmware->brand }} @if ($firmware->model)<span class="text-muted">{{ $firmware->model }}</span>@endif</td>
+                            <td>{{ $firmware->brand }} @if ($firmware->model)<span class="text-subtle">{{ $firmware->model }}</span>@endif</td>
                             <td class="whitespace-nowrap">{{ $firmware->size >= 1024 ? number_format($firmware->size / 1024, 1, ',', ' ') . ' КБ' : $firmware->size . ' Б' }}</td>
                             <td class="whitespace-nowrap">{{ $firmware->date }}</td>
                             <td>{{ $firmware->extension }}</td>

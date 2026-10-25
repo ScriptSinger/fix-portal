@@ -15,7 +15,7 @@
             @csrf
             <x-ui.field name="email" type="email" label="Email" placeholder="name@example.com" autocomplete="email" required large />
             <x-ui.password name="password" label="Пароль">
-                <x-slot:aside><a href="{{ route('password.request') }}" class="text-[13px] font-bold">Забыли пароль?</a></x-slot:aside>
+                <x-slot:aside><a href="{{ route('password.request') }}" class="-my-2.5 inline-block py-2.5 text-[13px] font-bold">Забыли пароль?</a></x-slot:aside>
             </x-ui.password>
             <x-ui.button variant="dark" class="w-full !py-0 h-12" x-bind:disabled="busy"><span x-text="busy ? 'Входим…' : 'Войти'">Войти</span></x-ui.button>
         </form>
