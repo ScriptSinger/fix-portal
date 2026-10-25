@@ -41,8 +41,12 @@ class PostController extends Controller
                     ->orderByDesc('id'),
             ])
             ->firstOrFail();
-        $post->views += 1;
-        $post->update();
+        $pilot = request()->routeIs('pilot.articles.show');
+
+        if (! $pilot) {
+            $post->views += 1;
+            $post->update();
+        }
 
         $cta = $post->ctas->firstWhere('placement', 'end');
 
@@ -56,6 +60,6 @@ class PostController extends Controller
             ->with('category') // Загрузка связанной категории
             ->get();
 
-        return view('public.posts.show', compact('post', 'relatedPosts', 'cta'));
+        return view($pilot ? 'tw.posts.show' : 'public.posts.show', compact('post', 'relatedPosts', 'cta'));
     }
 }

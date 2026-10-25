@@ -1,6 +1,8 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 @source '../views/tw/**/*.blade.php';
+@source '../views/components/tw/**/*.blade.php';
 @source '../js/**/*.js';
 
 @theme {
@@ -20,4 +22,22 @@
 
 [x-cloak] {
     display: none !important;
+}
+
+/* Текст статьи приходит из редактора: держим его внутри колонки. */
+.prose {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.prose :where(img, video, iframe) {
+    max-width: 100%;
+    height: auto;
+}
+
+.prose :where(table) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
 }
