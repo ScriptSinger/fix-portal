@@ -1,11 +1,31 @@
 @extends('public.layouts.app')
 @section('title', "$question->title | " . config('app.name', 'Ufamasters'))
-@section('description', Str::limit(strip_tags($question->description ?? ''), 160))
+@section('description', Str::limit(trim(html_entity_decode(strip_tags($question->description ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8')), 160))
+@section('canonical', route('questions.show', ['question' => $question->slug]))
+@section('og-type', 'article')
 @section('main-pt', 'pt-8')
 
 @php
     $url = route('questions.show', ['question' => $question->slug]);
-    $photos = $question->photos ? (json_decode($question->photos, true) ?: []) : [];
+    [$bodyHtml, $inline] = \App\Support\ContentImages::extract($question->description);
+    $legacy = $question->photos ? (json_decode($question->photos, true) ?: []) : [];
+    $photos = array_merge(array_map(fn ($p) => ['src' => asset('storage/' . $p), 'full' => asset('storage/' . $p)], $legacy), $inline);
+    $answers = $question->comments;
+    $plain = fn (?string $html) => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    // Разметка «вопрос-ответ» для сниппета в выдаче: сам вопрос и ответы участников
+    $qaPage = [
+        '@context' => 'https://schema.org', '@type' => 'QAPage',
+        'mainEntity' => array_filter([
+            '@type' => 'Question', 'name' => $question->title, 'text' => $plain($question->description),
+            'answerCount' => $answers->count(), 'upvoteCount' => 0, 'dateCreated' => $question->created_at?->toIso8601String(),
+            'author' => ['@type' => 'Person', 'name' => optional($question->user)->name ?: 'Посетитель'],
+            'suggestedAnswer' => $answers->map(fn ($a) => [
+                '@type' => 'Answer', 'text' => $plain($a->text) ?: 'Ответ с фотографией', 'dateCreated' => $a->created_at?->toIso8601String(),
+                'url' => $url . '#comments', 'upvoteCount' => (int) ($a->likes_count ?? 0),
+                'author' => ['@type' => 'Person', 'name' => optional($a->user)->name ?: 'Посетитель'],
+            ])->values()->all() ?: null,
+        ], fn ($v) => $v !== null),
+    ];
 @endphp
 
 @section('hero')
@@ -16,44 +36,49 @@
     ]" />
 @endsection
 
+@section('sidebar-left')
+    @include('public.partials.appliance-nav', ['active' => $question->appliance->slug])
+    @include('public.partials.ask-cta')
+@endsection
+
 @section('content')
-    <div class="rounded-[5px] bg-white p-12 max-sm:px-4">
-        <article>
-            <header class="mb-12">
-                <h1 class="mb-[7px] mt-3 text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $question->title }}</h1>
-
-                <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-subtle">
-                    <time datetime="{{ $question->dateAsCarbon->toDateString() }}">{{ $question->dateAsCarbon->diffForHumans() }}</time>
-                    <span aria-hidden="true">/</span>
-                    <span>{{ optional($question->user)->name }}</span>
-                    <span aria-hidden="true">/</span>
-                    <span class="inline-flex items-center gap-1"><x-ui.icon name="eye" class="size-3" />{{ $question->views }}</span>
-                    @can('update', $question)
-                        <span aria-hidden="true">/</span>
-                        <a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="text-ink hover:text-link">Редактировать</a>
-                    @endcan
-                    @can('delete', $question)
-                        <span aria-hidden="true">/</span>
-                        <form method="POST" action="{{ route('questions.destroy', ['question' => $question->id]) }}"
-                            @submit="if (! confirm('Удалить вопрос?')) $event.preventDefault()" x-data>
-                            @csrf @method('DELETE')
-                            <button type="submit" class="font-bold uppercase text-ink hover:text-link">Удалить</button>
-                        </form>
-                    @endcan
+    <script type="application/ld+json">@json($qaPage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)</script>
+    <div>
+        <article class="overflow-hidden rounded-2xl bg-white shadow-sm">
+            <header class="px-4 pt-3 sm:px-5">
+                <div class="mb-2 flex flex-wrap gap-2">
+                    <a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
+                        class="keep rounded bg-brand-400 px-2 py-0.5 text-xs font-bold leading-4 text-black hover:underline">{{ $question->appliance->title }}</a>
+                    @if ($question->model)<span class="rounded border border-line px-2 py-0.5 text-xs leading-4 text-black">{{ $question->model }}</span>@endif
+                    @if ($question->error_code)<span class="rounded border border-line px-2 py-0.5 text-xs leading-4 text-black">Ошибка {{ $question->error_code }}</span>@endif
                 </div>
-
-                <div class="mt-4"><x-ui.share :url="$url" align="start" /></div>
+                <h1 class="mb-3 text-[22px] font-bold leading-7 text-black sm:text-2xl sm:leading-8">{{ $question->title }}</h1>
             </header>
 
-            @foreach ($photos as $photo)
-                <img src="{{ asset('storage/' . $photo) }}" alt="" data-lightbox-cover class="mb-10 block w-full cursor-pointer">
-            @endforeach
+            <x-ui.photo-grid :photos="$photos" :alt="$question->title" />
 
-            <div class="article-content mb-12">{!! \App\Support\ContentImages::withAlt($question->description, $question->title) !!}</div>
+            <div class="article-content px-4 pt-3 text-[15px] leading-[1.5] sm:px-5">{!! $bodyHtml !!}</div>
+
+            <footer class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 px-4 pb-2 pt-1 text-xs leading-5 text-subtle sm:px-5">
+                @can('update', $question)
+                    <a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="hover:text-ink">Редактировать</a>
+                @endcan
+                @can('delete', $question)
+                    <form method="POST" action="{{ route('questions.destroy', ['question' => $question->id]) }}"
+                        @submit="if (! confirm('Удалить вопрос?')) $event.preventDefault()" x-data class="inline">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="hover:text-red-600">Удалить</button>
+                    </form>
+                @endcan
+                <span class="inline-flex items-center gap-1"><x-ui.icon name="eye" class="size-3" />{{ $question->views }}</span>
+                <span>{{ optional($question->user)->name }}</span>
+                <time datetime="{{ $question->dateAsCarbon->toIso8601String() }}">{{ $question->dateAsCarbon->translatedFormat('j F Y, H:i') }}</time>
+            </footer>
         </article>
 
-        @include('public.partials.comments', ['instance' => $question])
+        @include('public.partials.chat', ['instance' => $question])
     </div>
+
 @endsection
 
 @section('sidebar')

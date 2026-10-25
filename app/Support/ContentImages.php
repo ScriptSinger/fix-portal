@@ -33,4 +33,29 @@ class ContentImages
             return '<img' . $m[1] . 'src="' . e($small) . '" data-full="' . e($m[2]) . '"' . $m[3] . '>';
         }, $html) ?? $html;
     }
+
+    /**
+     * Картинки из текста для галереи над ним, как медиа в посте Telegram.
+     *
+     * @return array{0: string, 1: list<array{src: string, full: string}>} текст без картинок и список фото
+     */
+    public static function extract(?string $html): array
+    {
+        $html = self::withVariants((string) $html);
+        $photos = [];
+        $html = preg_replace_callback('~<img\b[^>]*>~i', function (array $m) use (&$photos) {
+            if (! preg_match('~\bsrc="([^"]+)"~i', $m[0], $src)) {
+                return $m[0];
+            }
+            $full = preg_match('~\bdata-full="([^"]+)"~i', $m[0], $f) ? $f[1] : $src[1];
+            $photos[] = ['src' => html_entity_decode($src[1]), 'full' => html_entity_decode($full)];
+
+            return '';
+        }, $html) ?? $html;
+        // абзацы и ссылки, оставшиеся пустыми после вынесения картинок
+        $html = preg_replace('~<a\b[^>]*>(\s|&nbsp;|<br\s*/?>)*</a>~iu', '', $html) ?? $html;
+        $html = preg_replace('~<p\b[^>]*>(\s|&nbsp;|<br\s*/?>)*</p>~iu', '', $html) ?? $html;
+
+        return [trim($html), $photos];
+    }
 }

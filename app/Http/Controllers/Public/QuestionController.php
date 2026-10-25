@@ -49,7 +49,7 @@ class QuestionController extends Controller
 
     public function show(string $slug)
     {
-        $question = Question::where('slug', $slug)->firstOrFail();
+        $question = Question::where('slug', $slug)->with(['comments.user.avatar', 'comments.replies.user.avatar'])->firstOrFail();
         $question->views += 1;
         $question->update();
 
