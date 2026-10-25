@@ -3,18 +3,18 @@
 @section('description', 'Получите советы по решению проблем с бытовой техникой. Присоединяйтесь к обсуждению и делитесь своими вопросами')
 
 @section('hero')
-    <x-ui.page-header title="Вопросы" :items="[ ['Вопросы', null]]" />
+    <x-ui.page-header title="Вопросы" :items="[['Вопросы', null]]">
+        <x-slot:actions><x-ui.button variant="accent" size="lg" :href="route('questions.create')" class="max-sm:w-full">Задать вопрос</x-ui.button></x-slot:actions>
+    </x-ui.page-header>
 @endsection
 
 @section('content')
-    <div class="mb-6 flex justify-end">
-        <x-ui.button variant="accent" :href="route('questions.create')" class="!h-10 !py-0 max-sm:w-full">Задать вопрос</x-ui.button>
-    </div>
     <x-ui.question-list :questions="$questions" />
 @endsection
 
 @section('sidebar-left')
     @include('public.partials.appliance-nav', ['active' => null])
+    @include('public.partials.ask-cta')
 @endsection
 
 @section('sidebar')
