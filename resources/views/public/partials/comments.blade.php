@@ -29,7 +29,7 @@
                         </div>
                     </div>
 
-                    <div class="article-content mt-6 whitespace-pre-line">{!! $comment->text !!}</div>
+                    <div class="article-content mt-6 whitespace-pre-line">{!! \App\Support\ContentImages::withAlt($comment->text, 'Комментарий') !!}</div>
 
                     <div class="mt-6 flex flex-wrap items-center gap-4 text-xs">
                         <x-ui.likes :instance="$comment" />
@@ -71,7 +71,7 @@
                                             @endcan
                                         </div>
                                     </div>
-                                    <div class="article-content mt-3 whitespace-pre-line">{!! $reply->text !!}</div>
+                                    <div class="article-content mt-3 whitespace-pre-line">{!! \App\Support\ContentImages::withAlt($reply->text, 'Ответ') !!}</div>
                                     <div class="mt-3"><x-ui.likes :instance="$reply" /></div>
                                 </li>
                             @endforeach

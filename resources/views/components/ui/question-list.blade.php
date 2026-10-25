@@ -5,7 +5,7 @@
             @php($excerpt = e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'), 150)))
             <x-ui.entry-card placeholder
                 :url="route('questions.show', ['question' => $question->slug])"
-                :image="$question->srcFromContent ?: null"
+                :image="\App\Support\UserImages::url($question->srcFromContent, 480) ?: null"
                 :title="$question->title"
                 :excerpt="$excerpt"
                 :date="$question->dateAsCarbon"

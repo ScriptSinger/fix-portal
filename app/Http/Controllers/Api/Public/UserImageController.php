@@ -7,6 +7,7 @@ use App\Models\Image;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use App\Support\UserImages;
 use Illuminate\Support\Facades\Storage;
 
 class UserImageController extends Controller
@@ -17,7 +18,7 @@ class UserImageController extends Controller
             'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
         $folder = 'user_' . auth()->user()->id;
-        $path = $validated['file']->store("images/users/$folder", 'public');
+        $path = UserImages::store($validated['file'], "images/users/$folder");
         $url = Storage::url($path);
         $image = new Image();
         $image->url = $url;
@@ -34,7 +35,11 @@ class UserImageController extends Controller
             $image = Image::findOrFail($id);
             $this->authorize('delete', $image);
             // В БД лежит публичный URL (/storage/...), а диску нужен путь внутри него
-            Storage::disk('public')->delete(preg_replace('#^/?storage/#', '', $image->url));
+            $original = preg_replace('#^/?storage/#', '', $image->url);
+            Storage::disk('public')->delete($original);
+            foreach (UserImages::WIDTHS as $width) {
+                Storage::disk('public')->delete(UserImages::variantPath($original, $width));
+            }
             $image->delete();
             return response()->json(['message' => 'Файл успешно удален']);
         } catch (ModelNotFoundException $e) {

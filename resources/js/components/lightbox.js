@@ -37,12 +37,12 @@ export default () => {
         const link = image.closest('a');
         if (link && link.getAttribute('href') && !link.getAttribute('href').startsWith('#')) return; // реальная ссылка
         event.preventDefault();
-        open(image.currentSrc || image.src, image.alt);
+        open(image.dataset.full || image.currentSrc || image.src, image.alt);
     });
     document.addEventListener('keydown', (event) => {
         if (root.classList.contains('hidden')) {
             const image = event.target.closest?.('.article-content img[tabindex], [data-lightbox-cover][tabindex]');
-            if (image && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); open(image.currentSrc || image.src, image.alt); }
+            if (image && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); open(image.dataset.full || image.currentSrc || image.src, image.alt); }
             return;
         }
         if (event.key === 'Escape') close();
