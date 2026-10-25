@@ -1,5 +1,5 @@
 @php($variant = $variant ?? 'full')
-{{-- Правая колонка: сервис, реклама, Telegram. «Свежие вопросы» и «Популярные статьи» здесь не показываем --}}
+{{-- Правая колонка: сервис, реклама, Telegram. «Свежие вопросы», «Популярные статьи» и «Популярные категории» здесь не показываем --}}
 @if ($variant !== 'tags')
     @include('public.partials.widgets.repair')
 @endif
@@ -7,6 +7,3 @@
 @if ($variant !== 'tags' && $variant !== 'catalog')
     @include('public.partials.widgets.telegram')
 @endif
-@unless (View::hasSection('sidebar-left'))
-    @include('public.partials.widgets.categories')
-@endunless
