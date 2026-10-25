@@ -1,7 +1,7 @@
 @extends('public.layouts.bar')
 @section('title', $firmware->meta_title . ' | ' . config('app.name', 'Ufamasters'))
 @section('description', $firmware->meta_description)
-@section('canonical', route('firmwares.show', ['firmware' => $firmware->id]))
+@section('canonical', route('firmwares.show', ['firmware' => $firmware->canonical_id]))
 @if (!$firmware->has_file)
     @section('robots', 'noindex, nofollow')
 @elseif ($firmware->is_thin)
@@ -17,7 +17,7 @@
         <div class="page-title-hero-inner">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                    <h2>{{ $firmware->model_name ?? $firmware->title }}</h2>
+                    <h2>{{ $firmware->model_name ? $firmware->display_name : $firmware->title }}</h2>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 hidden-xs-down hidden-sm-down">
 
@@ -61,6 +61,18 @@
     <div class="page-wrapper">
         <div class="blog-title-area">
             @include('public.layouts.widgets.sharing', ['reference' => $firmware->id])
+        </div>
+        <div class="custombox clearfix">
+            <h4 class="small-title">О прошивке</h4>
+            @foreach ($firmware->about_lines as $line)
+                <p>{{ $line }}</p>
+            @endforeach
+            @if ($firmware->seriesCount() > 1)
+                <p>Другие прошивки серии {{ $firmware->series }}:
+                    <a href="{{ route('firmwares.index', ['brand' => $firmware->brand, 'series' => $firmware->series]) }}">{{ $firmware->seriesCount() }} файлов в каталоге</a>.
+                </p>
+            @endif
+            <p class="text-muted small">Перед прошивкой сверьте код платы и версию с вашим модулем: файл не от той платы может вывести модуль из строя.</p>
         </div>
         <div class="custombox clearfix">
             <h4 class="small-title">Метаданные</h4>

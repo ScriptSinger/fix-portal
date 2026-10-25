@@ -42,7 +42,8 @@ class FirmwareController extends Controller
                 $q->where('title', 'like', '%' . $search . '%')
                     ->orWhere('model', 'like', '%' . $this->escapeLike(mb_strtoupper($search)) . '%')
                     ->orWhere('model', 'like', '%' . $this->escapeLike($compact) . '%')
-                    ->orWhere('series', $compact);
+                    ->orWhere('series', $compact)
+                    ->orWhere('aliases', 'like', '%' . $this->escapeLike($search) . '%');
                 $this->applyStructuredDataSearch($q, $search);
 
                 if (ctype_digit($search)) {
@@ -114,7 +115,15 @@ class FirmwareController extends Controller
 
     public function show(string $slug)
     {
-        $firmware = Firmware::findOrFail($slug);
+        $firmware = Firmware::withTrashed()->findOrFail($slug);
+
+        // Дубль слит в другую запись: постоянный редирект, чтобы старые ссылки и поисковики вели на основную страницу
+        if ($firmware->trashed()) {
+            abort_unless($firmware->merged_into, 404);
+
+            return redirect()->route('firmwares.show', ['firmware' => $firmware->merged_into], 301);
+        }
+
         $firmware->increment('views_count');
         $firmware->refresh();
 
@@ -123,25 +132,39 @@ class FirmwareController extends Controller
 
     public function download(int $id)
     {
-        $firmware = Firmware::findOrFail($id);
+        $firmware = Firmware::withTrashed()->findOrFail($id);
+
+        if ($firmware->trashed()) {
+            abort_unless($firmware->merged_into, 404);
+
+            return redirect()->route('firmwares.download', ['firmware' => $firmware->merged_into], 301);
+        }
+
         $disk = Storage::disk($firmware->disk_name);
         $key = $firmware->storage_path;
 
-        if (! $disk->exists($key)) {
-            return redirect()->back()->with('error', 'Файл не найден');
+        try {
+            if (! $disk->exists($key)) {
+                return redirect()->back()->with('error', 'Файл не найден');
+            }
+
+            $firmware->increment('downloads_count');
+
+            // Локальный файл отдаём сами, из облака перенаправляем на временную подписанную ссылку:
+            // трафик идёт мимо сервера, а права мы уже проверили выше (маршрут под auth и verified)
+            if ($firmware->file_disk) {
+                return redirect()->away($disk->temporaryUrl($key, now()->addMinutes(10), [
+                    'ResponseContentDisposition' => "attachment; filename*=UTF-8''" . rawurlencode($firmware->download_name),
+                ]));
+            }
+
+            return response()->download($disk->path($key), $firmware->download_name);
+        } catch (\Throwable $e) {
+            // Хранилище недоступно: показываем понятное сообщение вместо 500 и пишем причину в лог
+            report($e);
+
+            return redirect()->back()->with('error', 'Хранилище файлов временно недоступно, попробуйте через несколько минут.');
         }
-
-        $firmware->increment('downloads_count');
-
-        // Локальный файл отдаём сами, из облака перенаправляем на временную подписанную ссылку:
-        // трафик идёт мимо сервера, а права мы уже проверили выше (маршрут под auth и verified)
-        if ($firmware->file_disk) {
-            return redirect()->away($disk->temporaryUrl($key, now()->addMinutes(10), [
-                'ResponseContentDisposition' => "attachment; filename*=UTF-8''" . rawurlencode($firmware->download_name),
-            ]));
-        }
-
-        return response()->download($disk->path($key), $firmware->download_name);
     }
 
     private function applyStructuredDataSearch($query, string $search): void

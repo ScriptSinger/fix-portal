@@ -138,13 +138,20 @@ class GenerateSitemap extends Command
                 }
             });
 
+        // Дубли (тот же MD5) указывают canonical на первую запись, в sitemap оставляем только её
+        $firstByHash = Firmware::query()
+            ->whereNotNull('crc32')
+            ->selectRaw('crc32, min(id) as first_id')
+            ->groupBy('crc32')
+            ->pluck('first_id', 'crc32');
+
         // Страницы прошивок без содержательных параметров закрыты от индекса, в sitemap им не место
         Firmware::query()
-            ->select(['id', 'title', 'extension', 'data', 'updated_at'])
+            ->select(['id', 'title', 'extension', 'data', 'crc32', 'updated_at'])
             ->orderBy('id')
-            ->chunk(500, function ($firmwares) use ($sitemap) {
+            ->chunk(500, function ($firmwares) use ($sitemap, $firstByHash) {
                 foreach ($firmwares as $firmware) {
-                    if ($firmware->is_thin) {
+                    if ($firmware->is_thin || (($firstByHash[$firmware->crc32] ?? $firmware->id) !== $firmware->id)) {
                         continue;
                     }
 
