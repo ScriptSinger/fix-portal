@@ -35,22 +35,7 @@ class FirmwareController extends Controller
             $query->where('crc32', request('crc32'));
         }
         if (request()->filled('search')) {
-            $search = trim(request('search'));
-            $query->where(function ($q) use ($search) {
-                // «wisl 105», «WISL-105» и «WISL105» должны находить одну и ту же модель
-                $compact = mb_strtoupper(preg_replace('/[\s\-_]+/u', '', $search) ?? $search);
-
-                $q->where('title', 'like', '%' . $search . '%')
-                    ->orWhere('model', 'like', '%' . $this->escapeLike(mb_strtoupper($search)) . '%')
-                    ->orWhere('model', 'like', '%' . $this->escapeLike($compact) . '%')
-                    ->orWhere('series', $compact)
-                    ->orWhere('aliases', 'like', '%' . $this->escapeLike($search) . '%');
-                $this->applyStructuredDataSearch($q, $search);
-
-                if (ctype_digit($search)) {
-                    $q->orWhere('id', (int) $search);
-                }
-            });
+            $this->applySearch($query, trim(request('search')));
         }
 
         $sort = request('sort', 'id');
@@ -166,6 +151,47 @@ class FirmwareController extends Controller
 
             return redirect()->back()->with('error', 'Хранилище файлов временно недоступно, попробуйте через несколько минут.');
         }
+    }
+
+    /**
+     * Поиск идёт в два шага. Сначала по коротким полям (название, модель, серия, алиасы): это миллисекунды.
+     * Разбор HTML-описания (поле data, 12 LIKE по каждой записи) занимает около секунды, поэтому
+     * подключаем его только если короткие поля ничего не нашли. Наличие совпадений кэшируем,
+     * чтобы повторяющиеся запросы (в основном от краулеров) не ходили в базу заново.
+     */
+    private function applySearch($query, string $search): void
+    {
+        $fast = function ($q) use ($search) {
+            // «wisl 105», «WISL-105» и «WISL105» должны находить одну и ту же модель
+            $compact = mb_strtoupper(preg_replace('/[\s\-_]+/u', '', $search) ?? $search);
+
+            $q->where('title', 'like', '%' . $search . '%')
+                ->orWhere('model', 'like', '%' . $this->escapeLike(mb_strtoupper($search)) . '%')
+                ->orWhere('model', 'like', '%' . $this->escapeLike($compact) . '%')
+                ->orWhere('series', $compact)
+                ->orWhere('aliases', 'like', '%' . $this->escapeLike($search) . '%');
+
+            if (ctype_digit($search)) {
+                $q->orWhere('id', (int) $search);
+            }
+        };
+
+        $found = Cache::remember(
+            'firmware.search.' . md5(mb_strtolower($search)),
+            600,
+            fn () => Firmware::query()->where($fast)->exists()
+        );
+
+        if ($found) {
+            $query->where($fast);
+
+            return;
+        }
+
+        $query->where(function ($q) use ($fast, $search) {
+            $q->where($fast);
+            $this->applyStructuredDataSearch($q, $search);
+        });
     }
 
     private function applyStructuredDataSearch($query, string $search): void
