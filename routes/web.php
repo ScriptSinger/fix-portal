@@ -63,6 +63,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/pilot/reset-password/{token}', [\App\Http\Controllers\Auth\NewPasswordController::class, 'create'])->name('pilot.password.reset');
 });
 Route::get('/pilot/verify-email', \App\Http\Controllers\Auth\EmailVerificationPromptController::class)->middleware('auth')->name('pilot.verification.notice');
+Route::get('/pilot/profile/edit', [UserController::class, 'edit'])->middleware(['auth:web', 'verified'])->name('pilot.profile.edit');
 Route::get('/pilot/tags', [TagController::class, 'index'])->name('pilot.tags.index');
 Route::get('/pilot/tag/{tag}', [TagController::class, 'show'])->name('pilot.tags.show');
 

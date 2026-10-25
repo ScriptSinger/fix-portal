@@ -53,6 +53,7 @@
     </main>
 
     @include('tw.partials.footer')
+    <x-tw.flash />
 
     <button type="button" x-data="{ show: false }" x-show="show" x-cloak
         @scroll.window="show = window.scrollY > 300"
