@@ -16,6 +16,7 @@
 
 @section('sidebar-left')
     @include('public.partials.appliance-nav', ['active' => $appliance->slug])
+    @include('public.partials.ask-cta')
 @endsection
 
 @section('sidebar')

@@ -4,11 +4,9 @@
     @include('public.partials.widgets.repair')
     @include('public.partials.widgets.ad')
 @else
-    @if (request()->routeIs('questions.*', 'public.appliances.*'))
-        @include('public.partials.ask-cta')
-    @else
+    @unless (request()->routeIs('questions.*', 'public.appliances.*'))
         @include('public.partials.widgets.questions')
-    @endif
+    @endunless
     @if ($variant !== 'tags')
         @include('public.partials.widgets.repair')
     @endif
