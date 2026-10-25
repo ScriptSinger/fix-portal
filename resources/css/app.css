@@ -63,7 +63,7 @@
 .article-content ul { list-style: disc; }
 .article-content ol { list-style: decimal; }
 .article-content ul ul, .article-content ol ol, .article-content ul ol, .article-content ol ul { margin-bottom: 0; }
-.article-content a { color: #111; }
+.article-content a:not(.btn) { color: #111; }
 .article-content a:hover { color: var(--color-link); }
 .article-content b, .article-content strong { font-weight: 700; }
 .article-content hr { margin: 1rem 0; border-top: 1px solid rgba(0, 0, 0, .1); }
@@ -125,3 +125,16 @@ html { scroll-padding-top: 100px; }
 .article-content .carousel-indicators li.active { opacity: 1; }
 .article-content .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 @media (max-width: 767px) { .article-content .carousel-caption { display: none; } }
+
+/* Единое поле формы сайта (текст, список, многострочное). Высота 38 px, прямые углы, рамка #ced4da. */
+@layer components {
+    .field {
+        display: block; width: 100%; height: 38px; padding: 0 12px;
+        border: 1px solid #ced4da; background: #fff; color: #464a4c; font-size: 16px; line-height: 24px;
+    }
+    textarea.field { height: auto; min-height: 114px; padding: 8px 12px; }
+    .field::placeholder { color: #767676; opacity: 1; }
+    .field:focus { border-color: var(--color-brand-500); outline: none; }
+    .field:disabled { background: #eceeef; }
+    .field[aria-invalid='true'] { border-color: #dc2626; }
+}

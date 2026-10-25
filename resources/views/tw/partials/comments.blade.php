@@ -1,6 +1,6 @@
 @php
     $count = $instance->comments->count();
-    $field = 'w-full border border-[#dbdde0] bg-white px-4 py-3 text-sm text-[#464a4c] focus:outline-none focus:ring-2 focus:ring-brand-400/50';
+    $field = 'field';
     $box = 'relative border border-dashed border-[#dadada] px-8 py-12 max-sm:px-4';
     $trash = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3" />';
     $when = 'ml-3 text-[11px] uppercase tracking-[2px] text-[#999]';

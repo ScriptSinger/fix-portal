@@ -33,14 +33,14 @@
                 <x-tw.select name="role_id" label="Статус" :options="$roles" :value="$user->role_id" />
                 <div class="mb-6">
                     <label class="mb-2 block">Email</label>
-                    <input disabled type="text" placeholder="{{ $user->email }}" class="block h-[38px] w-full border border-[#ced4da] bg-[#eceeef] px-3 text-base">
+                    <input disabled type="text" placeholder="{{ $user->email }}" class="field">
                 </div>
                 <x-tw.field name="phone" label="Телефон" :value="$user->phone" x-data="phoneMask" />
                 <x-tw.field name="location" label="Город" :value="$user->location" placeholder="Местоположение" />
                 <div class="mb-6">
                     <label for="f-bio" class="mb-2 block">О себе</label>
                     <textarea id="f-bio" name="bio" rows="4" placeholder="не более 512 символов"
-                        class="block w-full border border-[#ced4da] bg-white px-3 py-2 text-base text-[#464a4c] focus:border-brand-500 focus:outline-none">{{ old('bio', $user->bio) }}</textarea>
+                        class="field">{{ old('bio', $user->bio) }}</textarea>
                     @error('bio')<p class="mt-1 text-[13px] text-red-600">{{ $message }}</p>@enderror
                 </div>
                 <x-tw.button variant="dark">Обновить</x-tw.button>

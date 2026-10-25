@@ -46,8 +46,7 @@
                     @if (!empty($cta->text))
                         <div>{!! $cta->text !!}</div>
                     @endif
-                    <a href="{{ $cta->trackedUrl() }}" rel="nofollow sponsored"
-                        class="btn inline-block bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] !text-white">{{ $cta->anchor ?: 'Подробнее' }}</a>
+                    <x-tw.button variant="dark" :href="$cta->trackedUrl()" rel="nofollow sponsored">{{ $cta->anchor ?: 'Подробнее' }}</x-tw.button>
                 </div>
             @endif
 

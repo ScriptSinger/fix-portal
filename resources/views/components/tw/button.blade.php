@@ -1,18 +1,22 @@
 @props([
-    'variant' => 'primary', // primary | dark | outline | telegram | telegram-outline
+    'variant' => 'dark', // dark | accent | telegram | outline
     'href' => null,
-    'size' => 'md', // sm | md
+    'size' => 'md', // sm | md | lg
 ])
+{{-- Единая кнопка сайта: прямые углы, Roboto Slab 14 px bold. Вид (variant) задаёт только цвет. --}}
 @php
     $variants = [
-        'primary' => 'bg-brand-400 text-ink',
-        'dark' => 'bg-ink text-white',
-        'outline' => 'border border-line bg-white text-ink',
-        'telegram' => 'bg-[#0088cc] text-white',
-        'telegram-outline' => 'border border-[#0088cc] bg-white text-[#0077b3]',
+        'dark' => 'bg-black text-white border border-black',
+        'accent' => 'bg-brand-400 text-ink border border-brand-400',
+        'telegram' => 'bg-telegram text-white border border-telegram',
+        'outline' => 'bg-white text-black border border-black',
     ];
-    $sizes = ['sm' => 'px-3 py-1.5 text-sm', 'md' => 'px-5 py-2.5'];
-    $classes = 'btn inline-flex items-center justify-center gap-2 rounded-lg font-bold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ' . $variants[$variant] . ' ' . $sizes[$size];
+    $sizes = [
+        'sm' => 'px-4 py-2 text-[13px] leading-[17px]',
+        'md' => 'px-8 py-[11.8px] text-sm leading-[17.5px]',
+        'lg' => 'h-[54px] px-8 text-sm leading-[17.5px]',
+    ];
+    $classes = 'btn inline-flex items-center justify-center gap-2 text-center font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ' . $variants[$variant] . ' ' . $sizes[$size];
 @endphp
 @if ($href)
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>{{ $slot }}</a>

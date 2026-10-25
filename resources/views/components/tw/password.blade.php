@@ -4,7 +4,7 @@
     <label for="f-{{ $name }}" class="mb-2 block">{{ $label }}</label>
     <div class="relative">
         <input id="f-{{ $name }}" name="{{ $name }}" :type="shown ? 'text' : 'password'" autocomplete="{{ $autocomplete }}" required
-            @class(['block h-[38px] w-full border bg-white pl-3 pr-11 text-base text-[#464a4c] focus:border-brand-500 focus:outline-none', 'border-[#ced4da]' => ! $errors->has($name), 'border-red-600' => $errors->has($name)])
+            class="field pr-11"
             @error($name) aria-invalid="true" aria-describedby="e-{{ $name }}" @enderror>
         <button type="button" @click="shown = !shown" :aria-label="shown ? 'Скрыть пароль' : 'Показать пароль'" :aria-pressed="shown"
             class="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-[#6b6b6b] hover:text-black">

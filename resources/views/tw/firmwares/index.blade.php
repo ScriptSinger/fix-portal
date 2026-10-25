@@ -42,13 +42,13 @@
                     <label for="f-search" class="mb-2 block">Поиск</label>
                     <input id="f-search" type="search" name="search" value="{{ request('search') }}"
                         placeholder="Модель (например, WISL 105), серия или серийный номер"
-                        class="block h-[38px] w-full border border-black/15 bg-white px-3 text-base text-[#464a4c] placeholder:text-[#a3a5a8] focus:border-brand-500 focus:outline-none">
+                        class="field">
                 </div>
                 @if ($brands->isNotEmpty())
                     <div>
                         <label for="f-brand" class="mb-2 block">Марка</label>
                         <select id="f-brand" name="brand" x-model="brand" @change="series = ''"
-                            class="block h-[38px] w-full border border-[#ced4da] bg-white px-2 text-[15px] text-body focus:border-brand-500 focus:outline-none">
+                            class="field">
                             <option value="">Все</option>
                             @foreach ($brands as $brand => $pages)
                                 <option value="{{ $brand }}">{{ $brand }} ({{ $pages }})</option>
@@ -58,7 +58,7 @@
                     <div>
                         <label for="f-series" class="mb-2 block">Серия</label>
                         <select id="f-series" name="series" x-model="series"
-                            class="block h-[38px] w-full border border-[#ced4da] bg-white px-2 text-[15px] text-body focus:border-brand-500 focus:outline-none">
+                            class="field">
                             <option value="">Все</option>
                             <template x-for="name in seriesList" :key="name"><option :value="name" x-text="name" :selected="name === series"></option></template>
                         </select>
@@ -69,12 +69,12 @@
                 <div>
                     <label for="f-crc32" class="mb-2 block">Хеш файла (MD5)</label>
                     <input id="f-crc32" type="text" name="crc32" value="{{ request('crc32') }}"
-                        class="block h-[38px] w-full border border-black/15 bg-white px-3 text-base text-[#464a4c] focus:border-brand-500 focus:outline-none">
+                        class="field">
                 </div>
                 <x-tw.select-plain name="per_page" label="На странице" :options="[25, 50, 100, 200]" :value="$perPage" :blank="null" />
                 <div class="flex items-end justify-center gap-3 md:col-span-4">
-                    <button type="submit" class="bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Применить</button>
-                    <a href="{{ route('firmwares.index') }}" class="btn bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Сбросить</a>
+                    <x-tw.button variant="dark">Применить</x-tw.button>
+                    <x-tw.button variant="outline" :href="route('firmwares.index')">Сбросить</x-tw.button>
                 </div>
             </div>
         </form>
