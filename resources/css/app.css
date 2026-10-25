@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+
+@source '../views/tw/**/*.blade.php';
+@source '../js/**/*.js';
+
+@theme {
+    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+
+    --color-brand-50: #fefce8;
+    --color-brand-400: #f9ca27;
+    --color-brand-500: #e5b50f;
+    --color-brand-700: #a16207;
+
+    --color-ink: #111827;
+    --color-muted: #6b7280;
+    --color-line: #e5e7eb;
+    --color-surface: #f4f5f7;
+    --color-link: #1d6fa5;
+}
+
+[x-cloak] {
+    display: none !important;
+}

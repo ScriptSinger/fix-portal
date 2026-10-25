@@ -39,7 +39,10 @@ class ViewServiceProvider extends ServiceProvider
             'public.layouts.widgets.footer.popular_categories',
 
 
-            'public.layouts.includes.footer'
+            'public.layouts.includes.footer',
+
+            // Пилот перехода на Vite + Tailwind
+            'tw.*',
         ], PublicComposer::class);
     }
 }

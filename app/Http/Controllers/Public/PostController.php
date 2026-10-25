@@ -25,7 +25,9 @@ class PostController extends Controller
             ->paginate(10);
 
 
-        return view('public.posts.index', compact('posts'));
+        $view = request()->routeIs('pilot.articles') ? 'tw.posts.index' : 'public.posts.index';
+
+        return view($view, compact('posts'));
     }
 
     public function show($slug)

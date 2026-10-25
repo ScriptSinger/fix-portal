@@ -42,6 +42,9 @@ Route::group(
     }
 );
 
+// Пилот перехода на Vite + Tailwind: та же логика, другой шаблон, закрыто от индексации.
+Route::get('/pilot/articles', [PostController::class, 'index'])->name('pilot.articles');
+
 Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 
 
