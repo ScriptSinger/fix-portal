@@ -11,7 +11,7 @@
         @foreach ($items as $item)
             <li class="shrink-0 lg:block">
                 <a href="{{ $item['url'] }}" @if ($item['active']) aria-current="page" @endif
-                    class="{{ $chip }} {{ $row }} {{ $item['active'] ? 'bg-black text-brand-400' : 'bg-white text-ink hover:bg-brand-400 lg:bg-transparent lg:hover:bg-brand-400' }}">
+                    class="{{ $chip }} {{ $row }} {{ $item['active'] ? 'bg-black text-brand-400' : 'bg-white text-ink hover:text-link lg:bg-transparent' }}">
                     <span>{{ $item['title'] }}</span>
                     @isset($item['count'])<span class="max-lg:hidden {{ $item['active'] ? 'text-brand-400' : 'text-subtle' }}">{{ $item['count'] }}</span>@endisset
                 </a>
