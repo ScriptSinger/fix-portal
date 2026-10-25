@@ -22,7 +22,7 @@ class PostController extends Controller
             ->thenReturn()
             ->with('category', 'thumbnail')
             ->orderBy('id', 'desc')
-            ->paginate(11);
+            ->paginate(10);
 
 
         return view('public.posts.index', compact('posts'));
