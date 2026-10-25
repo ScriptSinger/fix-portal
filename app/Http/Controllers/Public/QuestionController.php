@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Http\Controllers\Concerns\ResolvesPilotView;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Questions\TextFilter;
 
@@ -15,6 +16,8 @@ use Illuminate\Pipeline\Pipeline;
 
 class QuestionController extends Controller
 {
+    use ResolvesPilotView;
+
     public function index()
     {
         $questions = app(Pipeline::class)
@@ -28,13 +31,13 @@ class QuestionController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(50);
 
-        return view('public.questions.index', compact('questions'));
+        return view($this->pilotView('questions.index'), compact('questions'));
     }
 
     public function create()
     {
         $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
-        return view('public.questions.create', compact('appliances'));
+        return view($this->pilotView('questions.create'), compact('appliances'));
     }
 
     public function store(Request $request)
@@ -52,9 +55,12 @@ class QuestionController extends Controller
     public function show(string $slug)
     {
         $question = Question::where('slug', $slug)->firstOrFail();
-        $question->views += 1;
-        $question->update();
-        return view('public.questions.show', compact('question'));
+        if (! $this->isPilot()) {
+            $question->views += 1;
+            $question->update();
+        }
+
+        return view($this->pilotView('questions.show'), compact('question'));
     }
 
     public function edit(string $slug)
@@ -62,7 +68,7 @@ class QuestionController extends Controller
         $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
         $question = Question::where('slug', $slug)->firstOrFail();
         $this->authorize('update', $question);
-        return view('public.questions.edit', compact('question', 'appliances'));
+        return view($this->pilotView('questions.edit'), compact('question', 'appliances'));
     }
 
     public function update(Request $request, string $slug)

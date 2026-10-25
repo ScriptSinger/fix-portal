@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Http\Controllers\Concerns\ResolvesPilotView;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Questions\TextFilter;
 use App\Models\Appliance;
@@ -11,6 +12,8 @@ use Illuminate\Pipeline\Pipeline;
 
 class ApplianceController extends Controller
 {
+    use ResolvesPilotView;
+
     public function show($slug)
     {
         $appliance = Appliance::where('slug', $slug)->firstOrFail();
@@ -27,7 +30,8 @@ class ApplianceController extends Controller
 
 
 
-        $questions = $appliance->questions()->orderBy('id', 'desc')->paginate(15);
-        return view('public.appliances.show', compact('appliance', 'questions'));
+        $questions = $appliance->questions()->with('appliance', 'user')->orderBy('id', 'desc')->paginate(15);
+
+        return view($this->pilotView('appliances.show'), compact('appliance', 'questions'));
     }
 }

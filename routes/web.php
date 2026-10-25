@@ -48,6 +48,14 @@ Route::get('/pilot/articles/{article}', [PostController::class, 'show'])->name('
 Route::get('/pilot/categories', [CategoryController::class, 'index'])->name('pilot.categories.index');
 Route::get('/pilot/categories/{category}', [CategoryController::class, 'show'])->name('pilot.categories.show');
 Route::view('/pilot/consent', 'tw.pages.consent')->name('pilot.consent');
+Route::view('/pilot/about', 'tw.pages.about')->name('pilot.about');
+Route::get('/pilot/appliances/{appliance}', [ApplianceController::class, 'show'])->name('pilot.appliances.show');
+Route::get('/pilot/questions', [QuestionController::class, 'index'])->name('pilot.questions.index');
+Route::middleware(['auth:web', 'verified'])->group(function () {
+    Route::get('/pilot/questions/create', [QuestionController::class, 'create'])->name('pilot.questions.create');
+    Route::get('/pilot/questions/{question}/edit', [QuestionController::class, 'edit'])->name('pilot.questions.edit');
+});
+Route::get('/pilot/questions/{question}', [QuestionController::class, 'show'])->name('pilot.questions.show');
 Route::get('/pilot/tags', [TagController::class, 'index'])->name('pilot.tags.index');
 Route::get('/pilot/tag/{tag}', [TagController::class, 'show'])->name('pilot.tags.show');
 
