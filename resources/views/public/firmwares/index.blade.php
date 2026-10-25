@@ -105,10 +105,10 @@
                     </div>
                 </div>
 
-                <div class="flex gap-2 border-t border-line bg-white p-3 lg:border-0 lg:px-5 lg:pb-5 lg:pt-0">
-                    <a href="{{ route('firmwares.index') }}" class="keep inline-flex h-12 items-center border border-black px-4 text-sm font-bold text-black">Сбросить</a>
-                    <button type="submit" :disabled="changed && count === null" x-text="submitLabel"
-                        class="h-12 flex-1 bg-black px-3 text-sm font-bold text-brand-400 disabled:bg-subtle disabled:text-white">Применить</button>
+                <div class="flex flex-col gap-2 border-t border-line bg-white p-3 lg:border-0 lg:px-5 lg:pb-5 lg:pt-0">
+                    <button type="submit" x-text="submitLabel"
+                        class="h-12 w-full whitespace-nowrap bg-black px-3 text-sm font-bold text-brand-400">Применить</button>
+                    <a href="{{ route('firmwares.index') }}" class="keep py-2 text-center text-[13px] font-bold text-ink underline">Сбросить фильтр</a>
                 </div>
             </form>
         </div>
