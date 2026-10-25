@@ -1,5 +1,8 @@
 @php($variant = $variant ?? 'full')
 {{-- Правая колонка: действие, реклама, популярное. Категории показываем здесь, только если слева нет своей навигации --}}
+@unless (request()->routeIs('questions.*'))
+    @include('public.partials.widgets.questions')
+@endunless
 @if ($variant !== 'tags')
     @include('public.partials.widgets.repair')
 @endif

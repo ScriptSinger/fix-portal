@@ -21,13 +21,16 @@
 @section('main-pt', 'pt-8')
 
 @section('above')
-    <header class="mb-6">
+    <header class="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+        <div>
         <h1 class="text-[28px] font-bold leading-9 text-black max-sm:text-2xl">
             @if ($hasFilter)Поиск: «{{ request('text') }}»@else{{ optional($customization)->title ?? 'Ремонт бытовой техники' }}@endif
         </h1>
         @unless ($hasFilter)
             <p class="mt-1 max-w-[70ch]">{{ optional($customization)->description ?? 'Инструкции, схемы и прошивки от опытных мастеров. Вещи должны чиниться, а не выбрасываться.' }}</p>
         @endunless
+        </div>
+        <x-ui.button variant="accent" :href="route('questions.create')" class="!h-10 !py-0">Задать вопрос</x-ui.button>
     </header>
     @if ($featured->count() === 3)
         <div class="mb-10 grid gap-4 lg:grid-cols-[2fr_1fr] lg:grid-rows-2 lg:gap-6 lg:h-[480px]">
