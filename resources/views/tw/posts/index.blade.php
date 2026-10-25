@@ -5,12 +5,12 @@
 @section('robots', 'noindex, follow')
 
 @section('hero')
-    <section class="bg-cover bg-center pb-[139px] pt-[115px]"
+    <section class="bg-cover bg-center pb-32 pt-[119px] lg:pb-[139px] lg:pt-[115px]"
         style="background-image: url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}')">
         <div class="mx-auto max-w-[1140px] px-[15px]">
-            <div class="grid items-center gap-[30px] lg:grid-cols-[minmax(0,1fr)_350px]">
+            <div class="grid items-center gap-8 lg:gap-[30px] lg:grid-cols-[minmax(0,1fr)_350px]">
                 <div>
-                    <h1 class="mb-8 text-[48px] font-bold leading-[44px] text-white max-sm:text-4xl">
+                    <h1 class="mb-8 text-[48px] font-bold leading-[44px] text-white max-sm:text-[34px]">
                         {{ optional($customization)->title ?? 'Ремонт бытовой техники' }}</h1>
                     <p class="mb-8 text-base leading-7 text-white lg:mr-16">
                         {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}

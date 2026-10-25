@@ -6,7 +6,7 @@
 @section('main-pt', 'pt-[51px]')
 
 @section('content')
-    <div class="rounded-[5px] bg-white p-12 max-sm:p-5">
+    <div class="rounded-[5px] bg-white p-12 max-sm:px-4">
         <article>
             <header class="mb-12">
                 <x-tw.breadcrumbs :items="[

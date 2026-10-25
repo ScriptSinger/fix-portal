@@ -6,6 +6,7 @@
 @source '../js/**/*.js';
 
 @theme {
+    --breakpoint-lg: 62rem; /* как в Bootstrap 4 (992px), чтобы сетка совпала со старой */
     --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
     --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
 

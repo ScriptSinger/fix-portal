@@ -1,5 +1,5 @@
 @props(['posts', 'showCategory' => false])
-<div class="rounded-[5px] bg-white p-12 max-sm:p-5">
+<div class="rounded-[5px] bg-white p-12 max-sm:px-4">
     @forelse ($posts as $post)
         <x-tw.post-card :post="$post" :show-category="$showCategory" />
     @empty

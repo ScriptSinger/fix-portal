@@ -10,7 +10,7 @@
 @endphp
 <header x-data="{ menu: false }"
     class="sticky top-0 z-40 border-[6px] border-brand-400 bg-brand-400 text-ink shadow-[inset_0_0_0_1px_#000]">
-    <div class="flex min-h-[78px] flex-wrap items-center px-4 py-2 lg:px-12">
+    <div class="flex min-h-[74px] flex-wrap items-center px-4 py-2 lg:min-h-[78px] lg:px-12">
         <a href="{{ route('articles.index') }}" class="mr-4 flex shrink-0 items-center">
             <img src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo.png') }}"
                 alt="UfaMasters" class="h-[50px] w-[200px]">
@@ -40,9 +40,9 @@
             </ul>
         </nav>
 
-        <button type="button" class="ml-auto p-2 text-ink lg:hidden" @click="menu = !menu" :aria-expanded="menu"
+        <button type="button" class="ml-auto flex h-10 w-14 items-center justify-center rounded bg-black text-white lg:hidden border border-white/10" @click="menu = !menu" :aria-expanded="menu"
             aria-controls="mobile-menu" aria-label="Меню">
-            <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
                 aria-hidden="true">
                 <path x-show="!menu" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
                 <path x-show="menu" x-cloak stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
