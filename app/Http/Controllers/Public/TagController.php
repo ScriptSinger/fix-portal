@@ -8,16 +8,24 @@ use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
+    // Пилот перехода на Vite + Tailwind: маршруты pilot.* рисуются шаблонами tw.*
+    private function view(string $name): string
+    {
+        return (request()->routeIs('pilot.*') ? 'tw.' : 'public.') . $name;
+    }
+
     public function index()
     {
-        $tags = Tag::all();
-        return view('public.tags.index', compact('tags'));
+        $tags = Tag::withCount('posts')->get();
+
+        return view($this->view('tags.index'), compact('tags'));
     }
 
     public function show($slug)
     {
         $tag = Tag::where('slug', $slug)->firstOrFail();
-        $posts = $tag->posts()->orderBy('id', 'desc')->paginate(10);
-        return view('public.tags.show', compact('tag', 'posts'));
+        $posts = $tag->posts()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->paginate(10);
+
+        return view($this->view('tags.show'), compact('tag', 'posts'));
     }
 }

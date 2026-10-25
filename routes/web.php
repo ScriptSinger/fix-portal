@@ -45,6 +45,10 @@ Route::group(
 // Пилот перехода на Vite + Tailwind: та же логика, другой шаблон, закрыто от индексации.
 Route::get('/pilot/articles', [PostController::class, 'index'])->name('pilot.articles');
 Route::get('/pilot/articles/{article}', [PostController::class, 'show'])->name('pilot.articles.show');
+Route::get('/pilot/categories', [CategoryController::class, 'index'])->name('pilot.categories.index');
+Route::get('/pilot/categories/{category}', [CategoryController::class, 'show'])->name('pilot.categories.show');
+Route::get('/pilot/tags', [TagController::class, 'index'])->name('pilot.tags.index');
+Route::get('/pilot/tag/{tag}', [TagController::class, 'show'])->name('pilot.tags.show');
 
 Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 
