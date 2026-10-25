@@ -102,3 +102,23 @@ a:hover:not(.btn, .keep) { color: var(--color-brand-400); }
 /* Якоря не прячутся под залипающей шапкой (90 px) */
 html { scroll-padding-top: 100px; }
 .article-content .title__link { cursor: pointer; }
+
+/* Карусель из статей (Bootstrap 4): показываем один слайд, стрелки по краям, точки снизу. */
+.article-content .carousel { position: relative; margin-bottom: 1rem; }
+.article-content .carousel-inner { display: grid; overflow: hidden; }
+.article-content .carousel-item { grid-area: 1 / 1; position: relative; opacity: 0; visibility: hidden; transition: opacity .6s ease-in-out; }
+.article-content .carousel-item.active { opacity: 1; visibility: visible; }
+.article-content .carousel-caption { position: absolute; right: 15%; bottom: 20px; left: 15%; z-index: 10; text-align: center; color: #fff; }
+.article-content .carousel-caption h5 { margin: 0; color: #fff; font-size: 17px; }
+.article-content .carousel-control-prev, .article-content .carousel-control-next { position: absolute; top: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: center; width: 15%; padding: 0; color: #fff; background: none; border: 0; opacity: .5; cursor: pointer; transition: opacity .15s; }
+.article-content .carousel-control-prev { left: 0; }
+.article-content .carousel-control-next { right: 0; }
+.article-content .carousel-control-prev:hover, .article-content .carousel-control-next:hover { opacity: .9; }
+.article-content .carousel-control-prev-icon, .article-content .carousel-control-next-icon { display: inline-block; width: 20px; height: 20px; background: no-repeat 50% / 100% 100%; }
+.article-content .carousel-control-prev-icon { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M4 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E"); }
+.article-content .carousel-control-next-icon { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E"); }
+.article-content .carousel-indicators { position: absolute; right: 0; bottom: 10px; left: 0; z-index: 15; display: flex; justify-content: center; margin: 0 15%; padding: 0; list-style: none; }
+.article-content .carousel-indicators li { width: 30px; height: 3px; margin: 0 3px; cursor: pointer; background: #fff; opacity: .5; transition: opacity .6s; }
+.article-content .carousel-indicators li.active { opacity: 1; }
+.article-content .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (max-width: 767px) { .article-content .carousel-caption { display: none; } }

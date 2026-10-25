@@ -7,6 +7,7 @@ import richEditor from './components/richEditor';
 import avatarUpload from './components/avatarUpload';
 import phoneMask from './components/phoneMask';
 import anchorScroll from './components/anchorScroll';
+import carousel from './components/carousel';
 
 Alpine.plugin(collapse);
 Alpine.data('copyLink', copyLink);
@@ -16,6 +17,7 @@ Alpine.data('avatarUpload', avatarUpload);
 Alpine.data('phoneMask', phoneMask);
 
 anchorScroll();
+document.addEventListener('DOMContentLoaded', carousel);
 
 window.Alpine = Alpine;
 Alpine.start();
