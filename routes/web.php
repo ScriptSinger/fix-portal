@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Public\FirmwareController;
+use App\Http\Controllers\Public\FirmwareHubController;
+use App\Services\FirmwareCatalog;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Public\ApplianceController;
 use App\Http\Controllers\Public\CategoryController;
@@ -56,7 +58,19 @@ Route::resource('questions', QuestionController::class);
 Route::get('/appliances/{appliance}', [ApplianceController::class, 'show'])->name('public.appliances.show');
 
 Route::get('/firmwares', [FirmwareController::class, 'index'])->name('firmwares.index');
-Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->name('firmwares.show');
+
+// Страницы-хабы каталога: /firmwares/indesit и /firmwares/indesit/wisl. Список марок берётся из правил
+// config/firmware_brands.php, поэтому адреса не пересекаются с /firmwares/285 (прошивка по номеру).
+$firmwareBrands = implode('|', array_map('preg_quote', array_keys(FirmwareCatalog::brandSlugs())));
+
+Route::get('/firmwares/{brand}', [FirmwareHubController::class, 'brand'])
+    ->where('brand', $firmwareBrands)
+    ->name('firmwares.brand');
+Route::get('/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series'])
+    ->where(['brand' => $firmwareBrands, 'series' => '[a-z]+'])
+    ->name('firmwares.series');
+
+Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('firmwares.show');
 
 
 

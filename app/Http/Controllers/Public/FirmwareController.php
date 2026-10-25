@@ -110,7 +110,7 @@ class FirmwareController extends Controller
             ->orderBy('extension')
             ->pluck('extension');
 
-        return view('public.firmwares.index_server', compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'));
+        return view('public.firmwares.index_server', array_merge(compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'), ['catalogBrands' => app(\App\Services\FirmwareCatalog::class)->brands()]));
     }
 
     public function show(string $slug)

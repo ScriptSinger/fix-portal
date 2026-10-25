@@ -40,6 +40,17 @@
 
 @section('content')
     <div class="page-wrapper">
+        @isset($catalogBrands)
+            @if ($catalogBrands->isNotEmpty())
+                <p class="mb-3">
+                    <strong>Прошивки по маркам:</strong>
+                    @foreach ($catalogBrands as $catalogBrand)
+                        <a href="{{ route('firmwares.brand', ['brand' => $catalogBrand['slug']]) }}">{{ $catalogBrand['name'] }}</a>
+                        ({{ $catalogBrand['pages'] }}){{ ! $loop->last ? ' · ' : '' }}
+                    @endforeach
+                </p>
+            @endif
+        @endisset
         <form class="mb-3 firmware-filter-form" method="GET" action="{{ route('firmwares.index') }}">
             <div class="row">
                 <div class="col-md-6 col-sm-12 col-xs-12 mb-2">

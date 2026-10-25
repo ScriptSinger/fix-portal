@@ -67,7 +67,13 @@
             @foreach ($firmware->about_lines as $line)
                 <p>{{ $line }}</p>
             @endforeach
-            @if ($firmware->seriesCount() > 1)
+            @if ($firmware->hub_url)
+                <p>
+                    Другие прошивки серии <a href="{{ $firmware->hub_url }}">{{ $firmware->brand }} {{ $firmware->series }}</a>
+                    (в каталоге: {{ $firmware->seriesCount() }}).
+                    Все серии марки: <a href="{{ route('firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)]) }}">{{ $firmware->brand }}</a>.
+                </p>
+            @elseif ($firmware->seriesCount() > 1)
                 <p>Другие прошивки серии {{ $firmware->series }}:
                     <a href="{{ route('firmwares.index', ['brand' => $firmware->brand, 'series' => $firmware->series]) }}">{{ $firmware->seriesCount() }} файлов в каталоге</a>.
                 </p>

@@ -9,6 +9,7 @@ use App\Models\Post;
 use App\Models\Question;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\FirmwareCatalog;
 use Illuminate\Console\Command;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
@@ -137,6 +138,26 @@ class GenerateSitemap extends Command
                     );
                 }
             });
+
+        // Страницы-хабы: марки и серии (в серию попадают только достаточно крупные)
+        $catalog = app(FirmwareCatalog::class);
+        foreach ($catalog->brands() as $brand) {
+            $sitemap->add($this->makeUrl(
+                route('firmwares.brand', ['brand' => $brand['slug']]),
+                now(),
+                0.8,
+                Url::CHANGE_FREQUENCY_WEEKLY
+            ));
+
+            foreach ($catalog->seriesList($brand['name']) as $row) {
+                $sitemap->add($this->makeUrl(
+                    route('firmwares.series', ['brand' => $brand['slug'], 'series' => $row['slug']]),
+                    now(),
+                    0.7,
+                    Url::CHANGE_FREQUENCY_WEEKLY
+                ));
+            }
+        }
 
         // Дубли (тот же MD5) указывают canonical на первую запись, в sitemap оставляем только её
         $firstByHash = Firmware::query()

@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Question;
 use App\Models\Tag;
 use App\Models\User;
+use App\Services\FirmwareCatalog;
 use Illuminate\Support\Str;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
@@ -64,8 +65,24 @@ Breadcrumbs::for('firmwares', function (BreadcrumbTrail $trail) {
     $trail->push('Прошивки', route('firmwares.index'));
 });
 
-Breadcrumbs::for('firmware', function (BreadcrumbTrail $trail, Firmware $firmware) {
+Breadcrumbs::for('firmware.brand', function (BreadcrumbTrail $trail, string $brand) {
     $trail->parent('firmwares');
+    $trail->push($brand, route('firmwares.brand', ['brand' => FirmwareCatalog::slug($brand)]));
+});
+
+Breadcrumbs::for('firmware.series', function (BreadcrumbTrail $trail, string $brand, string $series) {
+    $trail->parent('firmware.brand', $brand);
+    $trail->push($series, route('firmwares.series', ['brand' => FirmwareCatalog::slug($brand), 'series' => strtolower($series)]));
+});
+
+Breadcrumbs::for('firmware', function (BreadcrumbTrail $trail, Firmware $firmware) {
+    // Цепочка Прошивки > Марка > Серия, если у серии есть своя страница
+    if ($firmware->hub_url) {
+        $trail->parent('firmware.series', $firmware->brand, $firmware->series);
+    } else {
+        $trail->parent('firmwares');
+    }
+
     $title = $firmware->model_name ?: ($firmware->title ?: ('Прошивка #' . $firmware->id));
     $trail->push(Str::limit($title, 30, '...'), route('firmwares.show', $firmware));
 });

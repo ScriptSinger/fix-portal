@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\FirmwareCatalog;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
@@ -170,6 +171,18 @@ class Firmware extends Model
         }
 
         return (int) (static::query()->where('crc32', $this->crc32)->min('id') ?: $this->id);
+    }
+
+    /**
+     * Адрес страницы серии (/firmwares/indesit/wisl) или null, если у серии нет своей страницы.
+     */
+    public function getHubUrlAttribute(): ?string
+    {
+        if (! $this->brand || ! $this->series || ! app(FirmwareCatalog::class)->hasSeriesHub($this->brand, $this->series)) {
+            return null;
+        }
+
+        return route('firmwares.series', ['brand' => FirmwareCatalog::slug($this->brand), 'series' => strtolower($this->series)]);
     }
 
     /**
