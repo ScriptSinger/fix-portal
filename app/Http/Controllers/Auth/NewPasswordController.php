@@ -14,12 +14,14 @@ use Illuminate\View\View;
 
 class NewPasswordController extends Controller
 {
+    use \App\Http\Controllers\Concerns\ResolvesPilotView;
+
     /**
      * Display the password reset view.
      */
     public function create(Request $request): View
     {
-        return view('public.auth.reset-password', ['request' => $request]);
+        return view($this->pilotView('auth.reset-password'), ['request' => $request]);
     }
 
     /**

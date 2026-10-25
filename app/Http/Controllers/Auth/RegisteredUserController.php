@@ -17,12 +17,14 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+    use \App\Http\Controllers\Concerns\ResolvesPilotView;
+
     /**
      * Display the registration view.
      */
     public function create(): View
     {
-        return view('public.auth.register');
+        return view($this->pilotView('auth.register'));
     }
 
     /**

@@ -56,6 +56,13 @@ Route::middleware(['auth:web', 'verified'])->group(function () {
     Route::get('/pilot/questions/{question}/edit', [QuestionController::class, 'edit'])->name('pilot.questions.edit');
 });
 Route::get('/pilot/questions/{question}', [QuestionController::class, 'show'])->name('pilot.questions.show');
+Route::middleware('guest')->group(function () {
+    Route::get('/pilot/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('pilot.login');
+    Route::get('/pilot/register', [\App\Http\Controllers\Auth\RegisteredUserController::class, 'create'])->name('pilot.register');
+    Route::get('/pilot/forgot-password', [\App\Http\Controllers\Auth\PasswordResetLinkController::class, 'create'])->name('pilot.password.request');
+    Route::get('/pilot/reset-password/{token}', [\App\Http\Controllers\Auth\NewPasswordController::class, 'create'])->name('pilot.password.reset');
+});
+Route::get('/pilot/verify-email', \App\Http\Controllers\Auth\EmailVerificationPromptController::class)->middleware('auth')->name('pilot.verification.notice');
 Route::get('/pilot/tags', [TagController::class, 'index'])->name('pilot.tags.index');
 Route::get('/pilot/tag/{tag}', [TagController::class, 'show'])->name('pilot.tags.show');
 

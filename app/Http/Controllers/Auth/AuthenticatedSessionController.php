@@ -13,12 +13,14 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    use \App\Http\Controllers\Concerns\ResolvesPilotView;
+
     /**
      * Display the login view.
      */
     public function create(): View
     {
-        return view('public.auth.login');
+        return view($this->pilotView('auth.login'));
     }
 
     /**
