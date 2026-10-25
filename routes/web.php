@@ -32,8 +32,8 @@ Route::get('/', function () {
     return redirect('/articles');
 });
 
-Route::view('/about', 'tw.pages.about')->name('about');
-Route::view('/personal-data-consent', 'tw.pages.consent')->name('consent');
+Route::view('/about', 'public.pages.about')->name('about');
+Route::view('/personal-data-consent', 'public.pages.consent')->name('consent');
 
 Route::group(
     ['prefix' => 'articles'],

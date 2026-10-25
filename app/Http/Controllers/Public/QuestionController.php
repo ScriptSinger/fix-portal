@@ -29,13 +29,13 @@ class QuestionController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(50);
 
-        return view('tw.questions.index', compact('questions'));
+        return view('public.questions.index', compact('questions'));
     }
 
     public function create()
     {
         $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
-        return view('tw.questions.create', compact('appliances'));
+        return view('public.questions.create', compact('appliances'));
     }
 
     public function store(Request $request)
@@ -56,7 +56,7 @@ class QuestionController extends Controller
         $question->views += 1;
         $question->update();
 
-        return view('tw.questions.show', compact('question'));
+        return view('public.questions.show', compact('question'));
     }
 
     public function edit(string $slug)
@@ -64,7 +64,7 @@ class QuestionController extends Controller
         $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
         $question = Question::where('slug', $slug)->firstOrFail();
         $this->authorize('update', $question);
-        return view('tw.questions.edit', compact('question', 'appliances'));
+        return view('public.questions.edit', compact('question', 'appliances'));
     }
 
     public function update(Request $request, string $slug)

@@ -24,6 +24,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('tw.*', PublicComposer::class);
+        View::composer('public.*', PublicComposer::class);
     }
 }

@@ -1,8 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@source '../views/tw/**/*.blade.php';
-@source '../views/components/tw/**/*.blade.php';
+@source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 
 @theme {
@@ -26,6 +25,15 @@
     --color-footer: #000000;
     --color-link: #3197d6;
     --color-telegram: #0088cc;
+
+    /* Второстепенный текст на светлом фоне (контраст не ниже 4,5:1) и служебные цвета */
+    --color-subtle: #6b6b6b;
+    --color-dashed: #dadada;
+    --color-soft: #ccc;
+    --color-success: #1e7e34;
+    --color-danger: #dc3545;
+    --color-service: #111827;
+    --color-service-muted: #6b7280;
 }
 
 @layer base {

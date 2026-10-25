@@ -30,6 +30,6 @@ class ApplianceController extends Controller
 
         $questions = $appliance->questions()->with('appliance', 'user')->orderBy('id', 'desc')->paginate(15);
 
-        return view('tw.appliances.show', compact('appliance', 'questions'));
+        return view('public.appliances.show', compact('appliance', 'questions'));
     }
 }

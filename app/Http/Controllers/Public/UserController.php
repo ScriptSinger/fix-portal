@@ -17,7 +17,7 @@ class UserController extends Controller
         $id = auth()->user()->id;
         $user = User::findOrFail($id);
         $roles = Role::pluck('name', 'id');
-        return view('tw.users.edit', compact('user', 'roles'));
+        return view('public.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request)

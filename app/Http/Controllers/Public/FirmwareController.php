@@ -96,7 +96,7 @@ class FirmwareController extends Controller
             ->orderBy('extension')
             ->pluck('extension');
 
-        return view('tw.firmwares.index', array_merge(compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'), ['catalogBrands' => app(\App\Services\FirmwareCatalog::class)->brands()]));
+        return view('public.firmwares.index', array_merge(compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'), ['catalogBrands' => app(\App\Services\FirmwareCatalog::class)->brands()]));
     }
 
     public function show(string $slug)
@@ -113,7 +113,7 @@ class FirmwareController extends Controller
         $firmware->increment('views_count');
         $firmware->refresh();
 
-        return view('tw.firmwares.show', compact('firmware'));
+        return view('public.firmwares.show', compact('firmware'));
     }
 
     public function download(int $id)

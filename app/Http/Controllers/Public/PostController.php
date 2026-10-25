@@ -25,7 +25,7 @@ class PostController extends Controller
             ->paginate(10);
 
 
-        return view('tw.posts.index', compact('posts'));
+        return view('public.posts.index', compact('posts'));
     }
 
     public function show($slug)
@@ -56,6 +56,6 @@ class PostController extends Controller
             ->with('category') // Загрузка связанной категории
             ->get();
 
-        return view('tw.posts.show', compact('post', 'relatedPosts', 'cta'));
+        return view('public.posts.show', compact('post', 'relatedPosts', 'cta'));
     }
 }
