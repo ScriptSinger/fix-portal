@@ -27,3 +27,6 @@ posts_dump
 
 # Генерируется на сервере командой sitemap:generate (в репозитории был устаревший файл со ссылками на localhost)
 /public/sitemap.xml
+
+# Сборка Vite (пилот перехода на Tailwind), пока собирается локально
+/public/build

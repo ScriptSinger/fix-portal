@@ -1,0 +1,127 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@source '../views/tw/**/*.blade.php';
+@source '../views/components/tw/**/*.blade.php';
+@source '../js/**/*.js';
+
+@theme {
+    /* Брейкпоинты Bootstrap 4, чтобы сетка совпала со старой: 576 / 768 / 992 / 1200 */
+    --breakpoint-sm: 36rem;
+    --breakpoint-lg: 62rem;
+    --breakpoint-xl: 75rem;
+    --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
+    --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
+
+    --color-brand-50: #fefce8;
+    --color-brand-400: #f9ca27;
+    --color-brand-500: #e5b50f;
+    --color-brand-700: #a16207;
+
+    --color-ink: #111111;
+    --color-body: #5e5e5e;
+    --color-muted: #a3a5a8;
+    --color-line: #e5e7eb;
+    --color-surface: #f1f1f1;
+    --color-footer: #000000;
+    --color-link: #3197d6;
+    --color-telegram: #0088cc;
+}
+
+@layer base {
+    :focus-visible {
+        outline: 2px solid var(--color-brand-500);
+        outline-offset: 2px;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/*
+ * Текст статьи, вопроса и комментария приходит из редактора и содержит классы старой темы
+ * (Bootstrap 4 alpha: img-fluid, table, table-bordered, table-striped, table-responsive...).
+ * Tailwind preflight сбрасывает стили элементов, поэтому оформление возвращаем здесь.
+ */
+.article-content {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.article-content p { margin-bottom: 26px; }
+.article-content h1, .article-content h2, .article-content h3,
+.article-content h4, .article-content h5, .article-content h6 {
+    font-weight: 700; color: #000; line-height: 1.4;
+}
+.article-content h1 { font-size: 32px; line-height: 40px; margin-bottom: 23px; }
+.article-content h2 { font-size: 27px; line-height: 38px; margin-bottom: 20px; }
+.article-content h3 { font-size: 22px; line-height: 30px; margin-bottom: 17px; }
+.article-content h4 { font-size: 19px; line-height: 29px; margin-bottom: 14px; }
+.article-content h5 { font-size: 17px; line-height: 25px; margin-bottom: 11px; }
+.article-content h6 { font-size: 16px; line-height: 24px; margin-bottom: 11px; }
+.article-content ul, .article-content ol { margin-bottom: 1rem; padding-left: 2rem; }
+.article-content ul { list-style: disc; }
+.article-content ol { list-style: decimal; }
+.article-content ul ul, .article-content ol ol, .article-content ul ol, .article-content ol ul { margin-bottom: 0; }
+.article-content a { color: #111; }
+.article-content a:hover { color: var(--color-link); }
+.article-content b, .article-content strong { font-weight: 700; }
+.article-content hr { margin: 1rem 0; border-top: 1px solid rgba(0, 0, 0, .1); }
+.article-content blockquote { border-left: 4px solid #eceeef; padding: 2rem; margin-bottom: 1.5rem; font-style: italic; }
+.article-content img { max-width: 100%; height: auto; }
+.article-content .img-fluid { max-width: 100%; height: auto; }
+.article-content .w-100 { width: 100%; }
+.article-content .d-block { display: block; }
+.article-content .mb-3 { margin-bottom: 1rem; }
+.article-content .text-center { text-align: center; }
+/* Таблицы из редактора: на узком экране прокручиваются по горизонтали, а не ломают слова (как .table-responsive) */
+.article-content table { display: block; width: 100%; max-width: 100%; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; border-collapse: collapse; overflow-wrap: normal; word-break: normal; }
+.article-content th, .article-content td { overflow-wrap: normal; word-break: normal; min-width: 5.5rem; }
+.article-content th, .article-content td { padding: .75rem; vertical-align: top; border-top: 1px solid #eceeef; }
+.article-content thead th { vertical-align: bottom; border-bottom: 2px solid #eceeef; }
+.article-content caption { padding: .75rem; color: #636c72; text-align: left; caption-side: bottom; }
+.article-content .table-bordered, .article-content .table-bordered th, .article-content .table-bordered td { border: 1px solid #eceeef; }
+.article-content .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(0, 0, 0, .05); }
+.article-content .table-responsive { display: block; width: 100%; overflow-x: auto; }
+.article-content .custombox { position: relative; padding: 3rem 2rem; border: 1px dashed #dadada; margin-bottom: 1rem; }
+
+/* Таблицы каталога прошивок: вид Bootstrap table-bordered table-striped. */
+.data-table { width: 100%; max-width: 100%; margin-bottom: 1rem; border-collapse: collapse; }
+.data-table th, .data-table td { padding: .75rem; vertical-align: top; border: 1px solid #eceeef; text-align: left; }
+.data-table thead th { vertical-align: bottom; border-bottom: 2px solid #eceeef; color: #000; }
+.data-table tbody tr:nth-of-type(odd) { background-color: rgba(0, 0, 0, .05); }
+.data-table a { color: #111; }
+.data-table a:hover { color: var(--color-link); }
+
+/* Как в старой теме: кнопки/иконки курсором-рукой, ссылки при наведении жёлтые, заголовки-ссылки подчёркиваются. */
+@layer base {
+    button:not(:disabled), [role='button'], summary, label[for], select { cursor: pointer; }
+    button:disabled, [aria-disabled='true'] { cursor: not-allowed; }
+}
+
+a:hover:not(.btn, .keep) { color: var(--color-brand-400); }
+:is(h1, h2, h3, h4):hover a:hover { color: inherit; text-decoration: underline; }
+
+/* Якоря не прячутся под залипающей шапкой (90 px) */
+html { scroll-padding-top: 100px; }
+.article-content .title__link { cursor: pointer; }
+
+/* Карусель из статей (Bootstrap 4): показываем один слайд, стрелки по краям, точки снизу. */
+.article-content .carousel { position: relative; margin-bottom: 1rem; }
+.article-content .carousel-inner { display: grid; overflow: hidden; }
+.article-content .carousel-item { grid-area: 1 / 1; position: relative; opacity: 0; visibility: hidden; transition: opacity .6s ease-in-out; }
+.article-content .carousel-item.active { opacity: 1; visibility: visible; }
+.article-content .carousel-caption { position: absolute; right: 15%; bottom: 20px; left: 15%; z-index: 10; text-align: center; color: #fff; }
+.article-content .carousel-caption h5 { margin: 0; color: #fff; font-size: 17px; }
+.article-content .carousel-control-prev, .article-content .carousel-control-next { position: absolute; top: 0; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: center; width: 15%; padding: 0; color: #fff; background: none; border: 0; opacity: .5; cursor: pointer; transition: opacity .15s; }
+.article-content .carousel-control-prev { left: 0; }
+.article-content .carousel-control-next { right: 0; }
+.article-content .carousel-control-prev:hover, .article-content .carousel-control-next:hover { opacity: .9; }
+.article-content .carousel-control-prev-icon, .article-content .carousel-control-next-icon { display: inline-block; width: 20px; height: 20px; background: no-repeat 50% / 100% 100%; }
+.article-content .carousel-control-prev-icon { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M4 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E"); }
+.article-content .carousel-control-next-icon { background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E"); }
+.article-content .carousel-indicators { position: absolute; right: 0; bottom: 10px; left: 0; z-index: 15; display: flex; justify-content: center; margin: 0 15%; padding: 0; list-style: none; }
+.article-content .carousel-indicators li { width: 30px; height: 3px; margin: 0 3px; cursor: pointer; background: #fff; opacity: .5; transition: opacity .6s; }
+.article-content .carousel-indicators li.active { opacity: 1; }
+.article-content .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (max-width: 767px) { .article-content .carousel-caption { display: none; } }

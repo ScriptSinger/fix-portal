@@ -32,7 +32,8 @@ Route::get('/', function () {
     return redirect('/articles');
 });
 
-Route::view('/about', 'public.about.show')->name('about');
+Route::view('/about', 'tw.pages.about')->name('about');
+Route::view('/personal-data-consent', 'tw.pages.consent')->name('consent');
 
 Route::group(
     ['prefix' => 'articles'],
@@ -41,6 +42,7 @@ Route::group(
         Route::get('/{article}', [PostController::class, 'show'])->name('articles.show');
     }
 );
+
 
 Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 
@@ -71,6 +73,7 @@ Route::get('/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series
     ->name('firmwares.series');
 
 Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('firmwares.show');
+
 
 
 

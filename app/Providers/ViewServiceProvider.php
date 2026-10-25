@@ -24,22 +24,6 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer([
-            'public.layouts.includes.header',
-            'public.posts.index',
-            'public.questions.index',
-            'public.questions.search',
-            'public.posts.search',
-
-
-            'public.layouts.widgets.sidebar.prime_categories',
-            'public.layouts.widgets.sidebar.prime_posts',
-
-            'public.layouts.widgets.footer.popular_posts',
-            'public.layouts.widgets.footer.popular_categories',
-
-
-            'public.layouts.includes.footer'
-        ], PublicComposer::class);
+        View::composer('tw.*', PublicComposer::class);
     }
 }

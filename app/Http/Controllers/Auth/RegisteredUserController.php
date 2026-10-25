@@ -17,12 +17,13 @@ use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
+
     /**
      * Display the registration view.
      */
     public function create(): View
     {
-        return view('public.auth.register');
+        return view('tw.auth.register');
     }
 
     /**

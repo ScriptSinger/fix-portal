@@ -11,6 +11,7 @@ use Illuminate\Pipeline\Pipeline;
 
 class ApplianceController extends Controller
 {
+
     public function show($slug)
     {
         $appliance = Appliance::where('slug', $slug)->firstOrFail();
@@ -27,7 +28,8 @@ class ApplianceController extends Controller
 
 
 
-        $questions = $appliance->questions()->orderBy('id', 'desc')->paginate(15);
-        return view('public.appliances.show', compact('appliance', 'questions'));
+        $questions = $appliance->questions()->with('appliance', 'user')->orderBy('id', 'desc')->paginate(15);
+
+        return view('tw.appliances.show', compact('appliance', 'questions'));
     }
 }

@@ -10,12 +10,13 @@ use Illuminate\View\View;
 
 class PasswordResetLinkController extends Controller
 {
+
     /**
      * Display the password reset link request view.
      */
     public function create(): View
     {
-        return view('public.auth.forgot-password');
+        return view('tw.auth.forgot-password');
     }
 
     /**
