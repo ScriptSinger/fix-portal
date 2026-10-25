@@ -8,7 +8,6 @@
 
 @section('hero')
     <x-ui.breadcrumbs :items="[
-        ['Категории', route('categories.index')],
         [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
         [$post->title, null],
     ]" />
