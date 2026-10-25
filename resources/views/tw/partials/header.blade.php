@@ -7,6 +7,7 @@
     ];
     $isActive = fn ($pattern) => request()->is($pattern, 'pilot/' . $pattern);
     $icon = 'size-5';
+    $searchUrl = request()->is('pilot/*') ? route('pilot.articles') : route('articles.index');
 @endphp
 <header x-data="{ menu: false, search: false, account: false }" @keydown.escape.window="search = false; account = false"
     class="sticky top-0 z-40 border-b-[3px] border-brand-400 bg-white">
@@ -78,7 +79,7 @@
 
     @unless (View::hasSection('hide-header-search'))
     <div id="site-search" x-show="search" x-cloak x-transition.opacity class="border-t border-line bg-surface">
-        <form method="GET" action="{{ route('articles.index') }}" role="search"
+        <form method="GET" action="{{ $searchUrl }}" role="search"
             class="mx-auto flex max-w-6xl gap-2 px-4 py-3 sm:px-6">
             <label for="header-search" class="sr-only">Поиск по статьям</label>
             <input id="header-search" x-ref="q" type="search" name="text" value="{{ request('text') }}"

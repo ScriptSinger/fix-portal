@@ -16,7 +16,7 @@
                 {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
             </p>
 
-            <form method="GET" action="{{ route('articles.index') }}" role="search" class="mt-5 flex max-w-2xl gap-2">
+            <form method="GET" action="{{ request()->is('pilot/*') ? route('pilot.articles') : route('articles.index') }}" role="search" class="mt-5 flex max-w-2xl gap-2">
                 <label for="article-search" class="sr-only">Поиск статей</label>
                 <input id="article-search" name="text" type="search" value="{{ request('text') }}"
                     placeholder="Ошибка или модель"
