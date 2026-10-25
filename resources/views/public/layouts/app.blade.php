@@ -52,7 +52,7 @@
         @hasSection('bare')
             @yield('content')
         @else
-        <div @class(['mx-auto px-[15px]', 'sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px]' => ! View::hasSection('wide')])>
+        <div class="site-container">
             @hasSection('no-sidebar')
                 <div class="min-w-0">@yield('content')</div>
             @elseif (View::hasSection('wide'))
