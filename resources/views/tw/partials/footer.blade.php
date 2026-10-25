@@ -48,6 +48,6 @@
             </section>
         </div>
 
-        <p class="mt-16 text-center text-body">&copy; {{ $copyrightText }}</p>
+        <p class="mt-16 text-center text-[#9a9a9a]">&copy; {{ $copyrightText }}</p>
     </div>
 </footer>
