@@ -1,4 +1,4 @@
-@props(['url', 'image' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null, 'placeholder' => false])
+@props(['url', 'image' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null, 'placeholder' => false, 'images' => []])
 {{-- Карточка записи для сетки: на телефоне компактная строка (миниатюра слева), от sm карточка с картинкой сверху.
      placeholder: если у записи нет картинки (или она не загрузилась), вместо неё светлая плитка с жёлтым «?». --}}
 <article class="group flex bg-white sm:flex-col">
@@ -8,7 +8,16 @@
             @if ($placeholder)
                 <span class="absolute inset-0 grid place-items-center text-[44px] font-bold leading-none text-brand-500 sm:text-[56px]">?</span>
             @endif
-            @if ($image)
+            @if (count($images) > 1)
+                {{-- Несколько фото: мозаика как в Telegram, до трёх плиток --}}
+                @php $tiles = array_slice($images, 0, 3); @endphp
+                <div @class(['absolute inset-0 grid gap-0.5', 'grid-cols-2' => count($tiles) === 2, 'grid-cols-[2fr_1fr] grid-rows-2' => count($tiles) === 3])>
+                    @foreach ($tiles as $n => $tile)
+                        <img src="{{ $tile }}" alt="" loading="lazy" onerror="this.remove()"
+                            @class(['block size-full min-h-0 object-cover', 'row-span-2' => count($tiles) === 3 && $n === 0])>
+                    @endforeach
+                </div>
+            @elseif ($image)
                 <img src="{{ $image }}" alt="" loading="lazy" onerror="this.remove()"
                     class="absolute inset-0 block size-full object-cover transition-transform duration-300 group-hover:scale-105">
             @endif
