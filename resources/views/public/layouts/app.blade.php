@@ -38,7 +38,7 @@
     @includeWhen(app()->environment('production'), 'components.analytics.metrika')
 </head>
 
-<body class="bg-white font-sans text-[15px] leading-[26px] text-body antialiased">
+<body class="flex min-h-screen flex-col bg-white font-sans text-[15px] leading-[26px] text-body antialiased">
     <a href="#content"
         class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         К содержимому
@@ -48,7 +48,7 @@
 
     @yield('hero')
 
-    <main id="content" class="bg-surface pb-16 @yield('main-pt', 'pt-16')">
+    <main id="content" class="flex-1 bg-surface pb-16 @yield('main-pt', 'pt-16') @if (View::hasSection('bare')) flex flex-col justify-center @endif">
         @hasSection('bare')
             @yield('content')
         @else

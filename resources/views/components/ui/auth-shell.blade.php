@@ -3,9 +3,6 @@
 <div class="mx-auto grid w-full max-w-[920px] overflow-hidden rounded-[5px] bg-white shadow-[0_2px_20px_rgba(0,0,0,.08)] max-sm:rounded-none md:grid-cols-[1fr_1.15fr]">
     <aside class="relative flex flex-col justify-start gap-10 bg-brand-400 p-10 text-black max-md:p-6">
         <div>
-            <a href="{{ route('articles.index') }}" class="keep inline-block max-md:hidden" aria-label="UfaMasters, на главную">
-                <img src="{{ asset('assets/front/images/version/ufamasters-logo.png') }}" alt="" class="h-[50px] w-[200px] max-md:h-10 max-md:w-40">
-            </a>
             <p class="mb-3 mt-0 text-[13px] font-bold uppercase tracking-[2px] max-md:hidden">{{ $eyebrow }}</p>
             <p class="mb-0 text-[28px] font-bold leading-[36px] max-md:mt-4 max-md:text-[20px] max-md:leading-7">{{ $headline }}</p>
         </div>
