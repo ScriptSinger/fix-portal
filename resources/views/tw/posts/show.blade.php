@@ -64,20 +64,27 @@
                 <x-tw.share :url="route('articles.show', ['article' => $post->slug])" align="start" />
             </footer>
         </article>
-    </div>
+
 
     @if ($relatedPosts->isNotEmpty())
-        <section class="mt-12" aria-labelledby="related-title">
-            <h2 id="related-title" class="mb-4 text-2xl font-bold">Вам также может понравиться</h2>
-            <div class="grid gap-6 sm:grid-cols-2">
+        <section class="mt-12 relative border border-dashed border-[#dadada] px-8 py-12 max-sm:px-4" aria-label="Похожие статьи">
+            <x-tw.legend>Вам также может понравиться</x-tw.legend>
+            <div class="grid gap-8 sm:grid-cols-2">
                 @foreach ($relatedPosts as $related)
-                    <x-tw.post-card :post="$related" />
+                    <article>
+                        <a href="{{ route('articles.show', ['article' => $related->slug]) }}" class="block overflow-hidden">
+                            <img src="{{ $related->thumbnail?->blog ?? asset('assets/front/upload/market_blog_01.jpg') }}" alt="" loading="lazy" class="block w-full">
+                        </a>
+                        <h3 class="mt-4 text-lg font-bold leading-7 text-black"><a href="{{ route('articles.show', ['article' => $related->slug]) }}">{{ $related->title }}</a></h3>
+                        <p class="text-[11px] uppercase leading-[26px] text-[#999]">{{ $related->category->title }} / {{ $related->dateAsCarbon->diffForHumans() }}</p>
+                    </article>
                 @endforeach
             </div>
         </section>
     @endif
 
-    @include('tw.partials.comments', ['instance' => $post])
+        @include('tw.partials.comments', ['instance' => $post])
+    </div>
 @endsection
 
 @section('sidebar')
