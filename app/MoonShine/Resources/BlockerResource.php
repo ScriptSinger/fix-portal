@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources;
 
+use App\MoonShine\Pages\BlocksIndexPage;
+use App\MoonShine\Pages\ResourceFormPage;
+use MoonShine\Laravel\Pages\Crud\DetailPage;
 use App\Models\Blocker;
 use Illuminate\Validation\Rule;
 use MoonShine\MenuManager\Attributes\Group;
@@ -27,11 +30,23 @@ class BlockerResource extends BaseResource
 
     protected bool $simplePaginate = true;
 
+    /**
+     * @return list<class-string>
+     */
+    protected function pages(): array
+    {
+        return [
+            BlocksIndexPage::class,
+            ResourceFormPage::class,
+            DetailPage::class,
+        ];
+    }
+
     protected string $sortColumn = 'id';
 
     public function getTitle(): string
     {
-        return 'Заблокированные IP';
+        return 'Блокировки';
     }
 
     protected function indexFields(): iterable

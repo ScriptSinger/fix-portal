@@ -7,6 +7,7 @@ namespace App\MoonShine\Resources;
 use App\Models\Customization;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
+use MoonShine\MenuManager\Attributes\SkipMenu;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Image;
@@ -15,6 +16,7 @@ use MoonShine\UI\Fields\Textarea;
 
 #[Icon('paint-brush')]
 #[Group('Настройки', 'cog-6-tooth')]
+#[SkipMenu]
 #[Order(12)]
 /**
  * @extends ModelResource<Customization>

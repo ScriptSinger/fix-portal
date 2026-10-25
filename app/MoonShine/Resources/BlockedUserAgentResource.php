@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources;
 
+use App\MoonShine\Pages\BlocksIndexPage;
+use App\MoonShine\Pages\ResourceFormPage;
+use MoonShine\Laravel\Pages\Crud\DetailPage;
 use App\Models\BlockedUserAgent;
 use Illuminate\Validation\Rule;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
+use MoonShine\MenuManager\Attributes\SkipMenu;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
@@ -15,6 +19,7 @@ use MoonShine\UI\Fields\Text;
 
 #[Icon('bug-ant')]
 #[Group('Безопасность', 'shield-check')]
+#[SkipMenu]
 #[Order(11)]
 /**
  * @extends ModelResource<BlockedUserAgent>
@@ -26,6 +31,18 @@ class BlockedUserAgentResource extends BaseResource
     protected string $column = 'user_agent';
 
     protected bool $simplePaginate = true;
+
+    /**
+     * @return list<class-string>
+     */
+    protected function pages(): array
+    {
+        return [
+            BlocksIndexPage::class,
+            ResourceFormPage::class,
+            DetailPage::class,
+        ];
+    }
 
     protected string $sortColumn = 'id';
 

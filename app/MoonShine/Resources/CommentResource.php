@@ -8,6 +8,7 @@ use App\Models\Comment;
 use Illuminate\Support\Str;
 use MoonShine\Support\Enums\Action;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
+use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
@@ -37,7 +38,7 @@ class CommentResource extends BaseResource
 
     public function getTitle(): string
     {
-        return 'Комментарии';
+        return 'Комментарии и ответы';
     }
 
     protected function activeActions(): ListOf
@@ -62,6 +63,8 @@ class CommentResource extends BaseResource
         return [
             ...$this->indexFields(),
             Textarea::make('Полный текст', 'text'),
+            // Ответы показываются внутри комментария, отдельного пункта меню для них нет
+            HasMany::make('Ответы', 'replies', resource: ReplyResource::class),
         ];
     }
 

@@ -6,7 +6,6 @@ namespace App\MoonShine\Layouts;
 
 use MoonShine\Laravel\Layouts\AppLayout;
 use MoonShine\Laravel\Resources\MoonShineUserResource;
-use MoonShine\Laravel\Resources\MoonShineUserRoleResource;
 use MoonShine\MenuManager\MenuGroup;
 use MoonShine\MenuManager\MenuItem;
 use MoonShine\ColorManager\ColorManager;
@@ -46,12 +45,17 @@ final class MoonShineLayout extends AppLayout
 
     protected function menu(): array
     {
+        // Ресурсы пакета («Администраторы» и «Роли») MoonShine сам кладёт в группу «Система» и ставит её первой.
+        // Убираем её: роль у нас одна, отдельный раздел не нужен, а администраторы идут последним пунктом.
+        $groups = collect($this->autoloadMenu())->reject(
+            fn ($element) => $element instanceof MenuGroup
+                && method_exists($element, 'getLabel')
+                && $element->getLabel() === __('moonshine::ui.resource.system')
+        );
+
         return [
-            ...$this->autoloadMenu(),
-            MenuGroup::make('Система', [
-                MenuItem::make(MoonShineUserResource::class, 'Администраторы')->icon('users'),
-                MenuItem::make(MoonShineUserRoleResource::class, 'Роли')->icon('shield-check'),
-            ], 'cog-6-tooth'),
+            ...$groups->values()->all(),
+            MenuItem::make(MoonShineUserResource::class, 'Администраторы')->icon('users'),
         ];
     }
 

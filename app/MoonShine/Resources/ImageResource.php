@@ -9,6 +9,7 @@ use MoonShine\Support\Enums\Action;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
+use MoonShine\MenuManager\Attributes\SkipMenu;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Date;
@@ -18,6 +19,7 @@ use MoonShine\UI\Fields\Text;
 
 #[Icon('photo')]
 #[Group('Пользователи', 'user-group')]
+#[SkipMenu]
 #[Order(8)]
 /**
  * Изображения, загруженные пользователями (только просмотр и удаление).
