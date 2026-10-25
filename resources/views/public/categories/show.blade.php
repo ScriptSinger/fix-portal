@@ -16,6 +16,10 @@
     <x-ui.post-list :posts="$posts" />
 @endsection
 
+@section('sidebar-left')
+    @include('public.partials.category-nav', ['active' => $category->slug])
+@endsection
+
 @section('sidebar')
     @include('public.partials.sidebar')
 @endsection

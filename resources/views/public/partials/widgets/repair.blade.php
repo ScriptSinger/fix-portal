@@ -1,5 +1,5 @@
 @php
-    $card = 'mb-12 rounded-[5px] bg-white px-8 py-12';
+    $card = 'mb-6 rounded-[5px] bg-white p-5';
 @endphp
 @php
 @endphp
@@ -21,7 +21,7 @@
         </div>
     </div>
     <div>
-        <h2 class="mb-8 text-lg font-bold leading-[18px] text-service">Ремонт бытовой техники на дому в Уфе</h2>
+        <h2 class="mb-4 text-lg font-bold leading-[18px] text-service">Ремонт бытовой техники на дому в Уфе</h2>
         <p class="mt-2 text-xs leading-[1.55] text-service-muted">Ремонт на дому без вывоза техники. Согласование цены до начала работ.</p>
     </div>
     <div class="grid gap-2">

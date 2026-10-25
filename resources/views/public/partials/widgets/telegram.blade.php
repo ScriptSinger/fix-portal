@@ -1,10 +1,10 @@
 @php
-    $card = 'mb-12 rounded-[5px] bg-white px-8 py-12';
+    $card = 'mb-6 rounded-[5px] bg-white p-5';
 @endphp
 @php
 @endphp
 <section class="{{ $card }}">
-    <h2 class="mb-8 flex items-center gap-2 text-lg font-bold leading-[18px] text-telegram">
+    <h2 class="mb-4 flex items-center gap-2 text-lg font-bold leading-[18px] text-telegram">
         <x-ui.icon name="telegram" class="size-[18px]" /> Telegram-чат сообщества
     </h2>
     <p class="mb-[27px]">Делитесь опытом, задавайте вопросы, помогайте другим — знание сила!</p>

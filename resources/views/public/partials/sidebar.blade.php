@@ -1,12 +1,13 @@
 @php($variant = $variant ?? 'full')
-@if ($variant === 'tags')
-    @include('public.partials.widgets.popular')
-    @include('public.partials.widgets.ad')
-    @include('public.partials.widgets.categories')
-@else
-    @include('public.partials.widgets.telegram')
+{{-- Правая колонка: действие, реклама, популярное. Категории показываем здесь, только если слева нет своей навигации --}}
+@if ($variant !== 'tags')
     @include('public.partials.widgets.repair')
-    @include('public.partials.widgets.ad')
-    @include('public.partials.widgets.popular')
-    @include('public.partials.widgets.categories')
 @endif
+@include('public.partials.widgets.ad')
+@include('public.partials.widgets.popular')
+@if ($variant !== 'tags')
+    @include('public.partials.widgets.telegram')
+@endif
+@unless (View::hasSection('sidebar-left'))
+    @include('public.partials.widgets.categories')
+@endunless

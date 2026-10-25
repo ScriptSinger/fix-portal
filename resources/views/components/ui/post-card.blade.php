@@ -2,7 +2,6 @@
 <x-ui.entry-card
     :url="route('articles.show', ['article' => $post->slug])"
     :image="$post->thumbnail?->blog ?? asset('assets/front/upload/market_blog_01.jpg')"
-    :full="$post->thumbnail?->original"
     :title="$post->title"
     :excerpt="strip_tags($post->description)"
     :date="$post->dateAsCarbon"
