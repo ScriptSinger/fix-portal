@@ -1,71 +1,53 @@
 @php
     $currentYear = now()->year;
-    $copyright = optional($customization)->copyright ?: "2014-{$currentYear} Ufamasters.ru. Все права защищены.";
-    $copyright = preg_replace('/^\s*(©|\(c\)|copyright)\s*/iu', '', $copyright);
-    $copyright = preg_replace('/(\b\d{4}-)\d{4}\b/u', '${1}' . $currentYear, $copyright);
-    $nav = [
-        ['Статьи', route('articles.index')],
-        ['Вопросы', route('questions.index')],
-        ['Прошивки', route('firmwares.index')],
-        ['О нас', route('about')],
-    ];
-    $materials = [
-        ['Категории', route('categories.index')],
-        ['Теги', route('tags.index')],
-        ['Telegram-чат', 'https://t.me/ufamasters_chat'],
-    ];
-    $heading = 'mb-4 font-sans text-xs font-bold uppercase tracking-[0.12em] text-brand-400';
-    $link = 'text-[15px] text-gray-200 transition-colors hover:text-brand-400';
+    $copyrightText = optional($customization)->copyright ?? "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
+    $copyrightText = preg_replace('/(\b\d{4}-)\d{4}\b/u', '${1}' . $currentYear, $copyrightText);
+    $title = 'mb-8 text-lg font-bold capitalize leading-[18px] text-white';
 @endphp
-<footer class="mt-8 bg-footer text-white">
-    <div class="mx-auto grid max-w-6xl gap-x-10 gap-y-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.2fr_1fr_1.3fr]">
-        <section>
-            <a href="{{ route('articles.index') }}" class="inline-block">
-                <img src="{{ asset('assets/front/images/version/ufamasters-logo-light.png') }}" alt="UfaMasters"
-                    class="-ml-1.5 h-10 w-auto">
-            </a>
-            <p class="mt-4 max-w-xs text-[15px] leading-relaxed text-gray-300">
-                Статьи, вопросы и прошивки для ремонта бытовой техники от опытных мастеров.
-            </p>
-        </section>
+<footer class="border-[6px] border-black bg-black py-16 shadow-[inset_0_0_0_1px_#333]">
+    <div class="mx-auto max-w-[1140px] px-[15px]">
+        <div class="grid gap-[30px] lg:grid-cols-3">
+            @foreach ([['Последние статьи', $latest_posts, false], ['Популярные статьи', $popular_posts, true]] as [$heading, $posts, $showViews])
+                <section>
+                    <h2 class="{{ $title }}">{{ $heading }}</h2>
+                    <ul class="space-y-4">
+                        @foreach ($posts as $post)
+                            <li>
+                                <a href="{{ route('articles.show', ['article' => $post->slug]) }}" class="flex items-start gap-4">
+                                    <img src="{{ optional($post->thumbnail)->small }}" alt="" loading="lazy"
+                                        class="size-20 shrink-0 border-4 border-[#333] object-cover">
+                                    <span class="min-w-0">
+                                        <span class="block text-base font-medium leading-6 text-white">{{ $post->title }}</span>
+                                        <small class="text-[10px] font-medium uppercase tracking-[1px] text-brand-400">
+                                            @if ($showViews)
+                                                <x-tw.icon name="eye" class="inline size-3" /> {{ $post->views }}
+                                            @else
+                                                {{ $post->dateAsCarbon->diffForHumans() }}
+                                            @endif
+                                        </small>
+                                    </span>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+            @endforeach
 
-        <div class="grid grid-cols-2 gap-6">
-            <nav aria-label="Разделы сайта">
-                <h2 class="{{ $heading }}">Разделы</h2>
-                <ul class="space-y-2.5">
-                    @foreach ($nav as [$label, $url])
-                        <li><a href="{{ $url }}" class="{{ $link }}">{{ $label }}</a></li>
-                    @endforeach
-                </ul>
-            </nav>
-
-            <nav aria-label="Материалы">
-                <h2 class="{{ $heading }}">Материалы</h2>
-                <ul class="space-y-2.5">
-                    @foreach ($materials as [$label, $url])
-                        <li>
-                            <a href="{{ $url }}" class="{{ $link }}"
-                                @if (str_starts_with($url, 'http')) target="_blank" rel="noopener" @endif>{{ $label }}</a>
+            <section>
+                <h2 class="{{ $title }}">Популярные категории</h2>
+                <ul>
+                    @foreach ($popular_categories as $category)
+                        <li class="border-b border-dashed border-[#333] pb-[9.6px] pl-[3.2px] pr-[3.2px] pt-[6.4px] first:pt-0 last:border-0">
+                            <a href="{{ route('categories.show', ['category' => $category->slug]) }}"
+                                class="flex justify-between gap-3 text-[15px] font-medium capitalize leading-[15px] text-white hover:text-brand-400">
+                                <span>{{ $category->title }}</span><span>{{ $category->posts_count }}</span>
+                            </a>
                         </li>
                     @endforeach
                 </ul>
-            </nav>
+            </section>
         </div>
 
-        <section class="rounded-xl border border-white/15 bg-white/5 p-5 sm:col-span-2 lg:col-span-1">
-            <h2 class="font-sans text-lg font-bold">Нужен мастер в Уфе?</h2>
-            <p class="mt-2 text-[15px] leading-relaxed text-gray-300">
-                Не получилось починить самостоятельно? Мастера UfaMasters приедут и устранят неисправность.
-            </p>
-            <x-tw.button variant="primary" href="https://service.ufamasters.ru" target="_blank" rel="noopener"
-                class="mt-4">Вызвать мастера</x-tw.button>
-        </section>
-    </div>
-    <div class="border-t border-white/15">
-        <div
-            class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-sm text-gray-400 sm:flex-row sm:px-6">
-            <span>&copy; {{ $copyright }}</span>
-            <a href="{{ route('pilot.consent') }}" class="hover:text-brand-400">Согласие на обработку персональных данных</a>
-        </div>
+        <p class="mt-16 text-center text-body">&copy; {{ $copyrightText }}</p>
     </div>
 </footer>

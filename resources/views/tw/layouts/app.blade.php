@@ -14,7 +14,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Slab:wght@700&display=swap&subset=cyrillic"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap&subset=cyrillic"
         rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32"
         href="{{ asset('assets/front/images/favicon_io/favicon-32x32.png') }}">
@@ -24,7 +24,7 @@
     @includeWhen(app()->environment('production'), 'components.analytics.metrika')
 </head>
 
-<body class="bg-surface font-sans text-ink antialiased">
+<body class="bg-white font-sans text-[15px] leading-[26px] text-body antialiased">
     <a href="#content"
         class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         К содержимому
@@ -34,22 +34,27 @@
 
     @yield('hero')
 
-    <main id="content" class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-        @hasSection('no-sidebar')
-            <div class="min-w-0">@yield('content')</div>
-        @else
-            <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+    <main id="content" class="bg-surface py-16">
+        <div class="mx-auto max-w-[1140px] px-[15px]">
+            @hasSection('no-sidebar')
                 <div class="min-w-0">@yield('content')</div>
-                <aside>
-                    <div class="space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
-                        @yield('sidebar')
-                    </div>
-                </aside>
-            </div>
-        @endif
+            @else
+                <div class="grid gap-[30px] lg:grid-cols-[minmax(0,1fr)_350px]">
+                    <div class="min-w-0">@yield('content')</div>
+                    <aside>@yield('sidebar')</aside>
+                </div>
+            @endif
+        </div>
     </main>
 
     @include('tw.partials.footer')
+
+    <button type="button" x-data="{ show: false }" x-show="show" x-cloak
+        @scroll.window="show = window.scrollY > 300"
+        @click="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Наверх"
+        class="fixed bottom-10 right-6 z-30 flex size-10 items-center justify-center bg-brand-400 text-ink hover:bg-ink hover:text-brand-400">
+        <x-tw.icon name="chevron-up" class="size-5" />
+    </button>
     @stack('scripts')
 </body>
 

@@ -1,22 +1,31 @@
 @props(['post'])
-@php $url = route('articles.show', ['article' => $post->slug]); @endphp
-<article class="group flex flex-col overflow-hidden rounded-xl border border-line bg-white shadow-sm transition-shadow hover:shadow-md">
-    <a href="{{ $url }}" class="block aspect-[16/9] overflow-hidden bg-surface">
+@php
+    $url = route('articles.show', ['article' => $post->slug]);
+    $sep = '<span class="text-[#ccc]" aria-hidden="true">/</span>';
+@endphp
+<article class="mb-8">
+    <a href="{{ $url }}" class="group relative block overflow-hidden">
         <img src="{{ $post->thumbnail?->blog ?? asset('assets/front/upload/market_blog_01.jpg') }}"
             alt="{{ $post->title }}" loading="lazy"
-            class="size-full object-cover transition-transform duration-300 group-hover:scale-105">
+            class="block w-full transition-transform duration-300 ease-in-out group-hover:scale-110">
+        <span class="absolute inset-0 bg-[linear-gradient(0deg,#000_0%,rgba(0,0,0,.1)_50%)] opacity-50" aria-hidden="true"></span>
     </a>
-    <div class="flex flex-1 flex-col p-5">
-        <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
-            class="text-xs font-bold uppercase tracking-wide text-brand-700 hover:underline">{{ $post->category->title }}</a>
-        <h2 class="mt-1 font-sans text-xl font-bold leading-snug">
-            <a href="{{ $url }}" class="hover:underline">{{ $post->title }}</a>
+    <div class="relative z-10 mx-12 -mt-16 rounded-[5px] bg-white pb-[59px] pt-12 text-center">
+        <div class="mb-6"><x-tw.share :url="$url" /></div>
+        <h2 class="pb-4 text-[28px] font-bold leading-[39.2px] text-black">
+            <a href="{{ $url }}">{{ $post->title }}</a>
         </h2>
-        <p class="mt-2 line-clamp-3 text-[15px] leading-relaxed text-muted">{!! strip_tags($post->description) !!}</p>
-        <div class="mt-auto flex flex-wrap items-center pt-4 gap-x-4 gap-y-1 text-[13px] text-muted">
-            <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->translatedFormat('j F Y') }}</time>
+        <p class="mb-2 pb-[11.2px] pt-[4.8px]">{!! strip_tags($post->description) !!}</p>
+        <div class="flex flex-wrap items-center justify-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-[#111]">
+            <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
+                class="font-normal text-[#999] hover:text-ink">{{ $post->category->title }}</a>
+            {!! $sep !!}
+            <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->diffForHumans() }}</time>
+            {!! $sep !!}
             <span>{{ $post->administrator->name }}</span>
-            <x-tw.views :count="$post->views" />
+            {!! $sep !!}
+            <span class="inline-flex items-center gap-1"><x-tw.icon name="eye" class="size-3" />{{ $post->views }}</span>
         </div>
     </div>
+    <hr class="mx-12 mt-8 border-black/10">
 </article>

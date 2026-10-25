@@ -1,17 +1,15 @@
 @props(['url'])
 @php
-    $btn = 'inline-flex items-center rounded-full border border-line bg-white px-3 py-1.5 text-sm font-medium text-muted transition-colors';
+    $btn = 'inline-flex h-10 items-center justify-center gap-2 rounded-[3px] px-4 text-sm font-bold text-white transition-opacity hover:opacity-90';
     $encoded = urlencode($url);
 @endphp
-<div x-data="copyLink(@js($url))" class="flex flex-wrap items-center gap-2" role="group" aria-label="Поделиться">
-    <span class="mr-1 text-sm text-muted">Поделиться:</span>
+<div x-data="copyLink(@js($url))" class="flex flex-wrap justify-center gap-1" role="group" aria-label="Поделиться">
     <a href="https://vk.com/share.php?url={{ $encoded }}" target="_blank" rel="noopener"
-        class="{{ $btn }} hover:border-[#0077ff] hover:text-[#0077ff]">ВКонтакте</a>
+        class="{{ $btn }} bg-[#3b5998]"><x-tw.icon name="vk" class="size-[18px]" />Поделиться</a>
     <a href="https://t.me/share/url?url={{ $encoded }}" target="_blank" rel="noopener"
-        class="{{ $btn }} hover:border-[#0088cc] hover:text-[#0088cc]">Telegram</a>
-    <a href="https://wa.me/?text={{ $encoded }}" target="_blank" rel="noopener"
-        class="{{ $btn }} hover:border-[#25D366] hover:text-[#1da851]">WhatsApp</a>
-    <button type="button" @click="copy()" class="{{ $btn }} hover:border-ink hover:text-ink">
-        <span x-text="copied ? 'Скопировано' : 'Копировать ссылку'">Копировать ссылку</span>
-    </button>
+        class="{{ $btn }} bg-[#00b6f1]"><x-tw.icon name="telegram" class="size-[18px]" />Поделиться</a>
+    <a href="https://wa.me/?text={{ $encoded }}" target="_blank" rel="noopener" aria-label="WhatsApp"
+        class="{{ $btn }} bg-[#25d366]"><x-tw.icon name="whatsapp" class="size-[18px]" /></a>
+    <button type="button" @click="copy()" :title="copied ? 'Скопировано' : 'Копировать ссылку'" aria-label="Копировать ссылку"
+        class="{{ $btn }} bg-[#da5333]"><x-tw.icon name="link" class="size-[18px]" /></button>
 </div>

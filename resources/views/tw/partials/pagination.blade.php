@@ -1,27 +1,25 @@
 @if ($paginator->hasPages())
     @php
-        $item = 'inline-flex min-w-10 items-center justify-center rounded-md border px-3 py-2 text-sm font-medium';
+        $item = 'inline-flex h-10 min-w-[30px] items-center justify-center bg-brand-400 px-[12.8px] text-sm leading-[14px] text-ink transition-colors';
     @endphp
-    <nav role="navigation" aria-label="Пагинация" class="flex flex-wrap justify-center gap-1.5">
+    <nav role="navigation" aria-label="Пагинация" class="flex flex-wrap justify-center">
         @if ($paginator->onFirstPage())
-            <span class="{{ $item }} border-line bg-white text-gray-300" aria-hidden="true">&lsaquo;</span>
+            <span class="{{ $item }} rounded-l-[4px] opacity-60" aria-hidden="true">&lsaquo;</span>
         @else
             <a href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="Назад"
-                class="{{ $item }} border-line bg-white hover:bg-brand-50">&lsaquo;</a>
+                class="{{ $item }} rounded-l-[4px] hover:bg-[#c89700]">&lsaquo;</a>
         @endif
 
         @foreach ($elements as $element)
             @if (is_string($element))
-                <span class="{{ $item }} hidden border-transparent text-muted sm:inline-flex">{{ $element }}</span>
+                <span class="{{ $item }} opacity-60">{{ $element }}</span>
             @endif
             @if (is_array($element))
                 @foreach ($element as $page => $url)
                     @if ($page == $paginator->currentPage())
-                        <span class="{{ $item }} border-brand-400 bg-brand-400 text-ink"
-                            aria-current="page">{{ $page }}</span>
+                        <span class="{{ $item }} border border-black" aria-current="page">{{ $page }}</span>
                     @else
-                        <a href="{{ $url }}"
-                            class="{{ $item }} hidden border-line bg-white hover:bg-brand-50 sm:inline-flex">{{ $page }}</a>
+                        <a href="{{ $url }}" class="{{ $item }} hover:bg-[#c89700] max-sm:hidden">{{ $page }}</a>
                     @endif
                 @endforeach
             @endif
@@ -29,9 +27,9 @@
 
         @if ($paginator->hasMorePages())
             <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="Вперёд"
-                class="{{ $item }} border-line bg-white hover:bg-brand-50">&rsaquo;</a>
+                class="{{ $item }} rounded-r-[4px] hover:bg-[#c89700]">&rsaquo;</a>
         @else
-            <span class="{{ $item }} border-line bg-white text-gray-300" aria-hidden="true">&rsaquo;</span>
+            <span class="{{ $item }} rounded-r-[4px] opacity-60" aria-hidden="true">&rsaquo;</span>
         @endif
     </nav>
 @endif

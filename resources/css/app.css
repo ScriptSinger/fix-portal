@@ -6,7 +6,7 @@
 @source '../js/**/*.js';
 
 @theme {
-    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
     --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
 
     --color-brand-50: #fefce8;
@@ -15,20 +15,16 @@
     --color-brand-700: #a16207;
 
     --color-ink: #111111;
-    --color-footer: #000000;
-    --color-muted: #6b7280;
+    --color-body: #5e5e5e;
+    --color-muted: #a3a5a8;
     --color-line: #e5e7eb;
-    --color-surface: #f4f5f7;
-    --color-link: #1d6fa5;
+    --color-surface: #f1f1f1;
+    --color-footer: #000000;
+    --color-link: #3197d6;
+    --color-telegram: #0088cc;
 }
 
 @layer base {
-    h1,
-    h2,
-    h3 {
-        font-family: var(--font-display);
-    }
-
     :focus-visible {
         outline: 2px solid var(--color-brand-500);
         outline-offset: 2px;
