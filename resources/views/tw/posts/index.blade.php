@@ -7,7 +7,7 @@
 @section('hero')
     <section class="relative isolate overflow-hidden bg-ink text-white"
         style="background-image: linear-gradient(rgba(17,24,39,.78), rgba(17,24,39,.78)), url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}'); background-size: cover; background-position: center;">
-        <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 sm:px-6 lg:grid-cols-[1fr_22rem] lg:py-20">
+        <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_20rem] lg:grid-cols-[1fr_22rem] lg:py-16">
             <div>
                 <h1 class="text-3xl font-bold leading-tight sm:text-4xl">
                     {{ optional($customization)->title ?? 'Ремонт бытовой техники' }}</h1>

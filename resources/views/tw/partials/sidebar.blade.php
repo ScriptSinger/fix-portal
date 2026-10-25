@@ -1,10 +1,11 @@
-<section class="rounded-xl bg-[#0088cc] p-5 text-white">
-    <h2 class="font-bold">Telegram-чат сообщества</h2>
-    <p class="mt-1 text-sm text-white/90">Делитесь опытом, задавайте вопросы, помогайте другим.</p>
-    <a href="https://t.me/ufamasters_chat" target="_blank" rel="noopener"
-        class="mt-4 block rounded-lg bg-white px-4 py-2.5 text-center text-sm font-bold text-[#0088cc] hover:bg-gray-100">Перейти
-        в Telegram</a>
-</section>
+<x-tw.card class="border-l-4 border-l-[#0088cc]">
+    <h2 class="flex items-center gap-2 font-sans font-bold">
+        <svg class="size-5 text-[#0088cc]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.9 4.3 2.7 11.7c-1.3.5-1.3 1.3-.2 1.6l4.9 1.5 1.9 5.8c.2.6.4.8.8.8.5 0 .7-.2 1-.5l2.4-2.3 4.9 3.6c.9.5 1.5.2 1.7-.8l3.2-15.1c.3-1.3-.5-1.9-1.4-1.5zM8.4 13.7l11-6.9c.5-.3 1-.1.6.2l-9 8.1-.4 3.8-2.2-5.2z"/></svg>
+        Telegram-чат сообщества
+    </h2>
+    <p class="mt-1 text-sm text-muted">Делитесь опытом, задавайте вопросы, помогайте другим.</p>
+    <x-tw.button variant="telegram" size="sm" href="https://t.me/ufamasters_chat" target="_blank" rel="noopener" class="mt-4 w-full">Перейти в Telegram</x-tw.button>
+</x-tw.card>
 
 <x-tw.widget title="Популярные статьи">
     <ul class="space-y-4">

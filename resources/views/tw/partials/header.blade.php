@@ -6,7 +6,7 @@
         ['О нас', route('about'), 'about'],
     ];
 @endphp
-<header x-data="{ open: false }" class="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
+<header x-data="{ open: false }" class="sticky top-0 z-40 border-b-4 border-brand-400 bg-white/95 backdrop-blur">
     <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a href="{{ route('articles.index') }}" class="flex items-center">
             <img src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo.png') }}"
@@ -17,8 +17,8 @@
             @foreach ($links as [$label, $url, $pattern])
                 <a href="{{ $url }}" @class([
                     'rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-surface',
-                    'text-ink bg-brand-50' => request()->is($pattern),
-                    'text-muted' => !request()->is($pattern),
+                    'text-ink bg-brand-400' => request()->is($pattern, 'pilot/' . $pattern),
+                    'text-muted' => !request()->is($pattern, 'pilot/' . $pattern),
                 ])>{{ $label }}</a>
             @endforeach
         </nav>
@@ -56,8 +56,8 @@
             @foreach ($links as [$label, $url, $pattern])
                 <a href="{{ $url }}" @class([
                     'rounded-md px-3 py-3 text-base font-medium',
-                    'bg-brand-50 text-ink' => request()->is($pattern),
-                    'text-muted' => !request()->is($pattern),
+                    'bg-brand-400 text-ink' => request()->is($pattern, 'pilot/' . $pattern),
+                    'text-muted' => !request()->is($pattern, 'pilot/' . $pattern),
                 ])>{{ $label }}</a>
             @endforeach
             <div class="mt-2 flex gap-2 border-t border-line py-3">

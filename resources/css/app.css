@@ -7,6 +7,7 @@
 
 @theme {
     --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
 
     --color-brand-50: #fefce8;
     --color-brand-400: #f9ca27;
@@ -18,6 +19,19 @@
     --color-line: #e5e7eb;
     --color-surface: #f4f5f7;
     --color-link: #1d6fa5;
+}
+
+@layer base {
+    h1,
+    h2,
+    h3 {
+        font-family: var(--font-display);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-brand-500);
+        outline-offset: 2px;
+    }
 }
 
 [x-cloak] {

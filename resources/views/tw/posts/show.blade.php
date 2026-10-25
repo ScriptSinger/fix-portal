@@ -27,8 +27,10 @@
         </header>
 
         @if ($post->thumbnail)
-            <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
-                class="mt-8 w-full rounded-xl border border-line bg-white object-contain">
+            <div class="mt-8 flex justify-center overflow-hidden rounded-xl border border-line bg-white">
+                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
+                    class="max-h-72 w-auto max-w-full object-contain sm:max-h-80">
+            </div>
         @endif
 
         <div class="prose prose-lg prose-a:text-link prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg mt-8 max-w-none">

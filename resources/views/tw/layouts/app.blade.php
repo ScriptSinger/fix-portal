@@ -14,7 +14,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap&subset=cyrillic"
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Slab:wght@700&display=swap&subset=cyrillic"
         rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32"
         href="{{ asset('assets/front/images/favicon_io/favicon-32x32.png') }}">
@@ -37,7 +37,11 @@
     <main id="content" class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
         <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <div class="min-w-0">@yield('content')</div>
-            <aside class="space-y-6">@yield('sidebar')</aside>
+            <aside>
+                <div class="space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
+                    @yield('sidebar')
+                </div>
+            </aside>
         </div>
     </main>
 
