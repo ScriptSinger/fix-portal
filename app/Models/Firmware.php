@@ -31,6 +31,25 @@ class Firmware extends Model
         'downloads_count',
     ];
 
+    /**
+     * Параметры прошивки из сохранённой таблицы `data` как пары «название, значение».
+     * Служебные строки из дефисов (разделители в исходных данных) пропускаются.
+     *
+     * @return list<array{0: string, 1: string}>
+     */
+    public function getParameterPairsAttribute(): array
+    {
+        preg_match_all('~<tr[^>]*>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>\s*</tr>~su', (string) $this->data, $rows, PREG_SET_ORDER);
+
+        $clean = fn (string $cell): string => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($cell), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+
+        return collect($rows)
+            ->map(fn (array $row): array => [$clean($row[1]), $clean($row[2])])
+            ->reject(fn (array $pair): bool => $pair[0] === '' || preg_match('/^[-–—_=\s]+$/u', $pair[0]) || preg_match('/^[-–—_=\s]+$/u', $pair[1]))
+            ->values()
+            ->all();
+    }
+
     public function sluggable(): array
     {
         return [
