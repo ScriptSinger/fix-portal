@@ -7,7 +7,7 @@
 @section('main-pt', 'pt-0 sm:pt-12')
 
 @section('content')
-    <x-ui.auth-shell title="Регистрация" eyebrow="Право на ремонт" headline="Ваша техника принадлежит вам. Чините её." :points="['Ремонт экономит деньги', 'Сокращает отходы', 'Учит разбираться в технике']">
+    <x-ui.auth-shell title="Регистрация" eyebrow="Право на ремонт" headline="Присоединяйтесь к тем, кто чинит, а не выбрасывает." :points="['Ремонт экономит деньги', 'Ремонт бережёт ресурсы планеты', 'Ремонт учит разбираться в технике', 'Ремонт продлевает жизнь вещам']">
         <div x-data="{ agree: false, terms: false, busy: false }">
             <form action="{{ route('register') }}" method="post" @submit="busy = true">
                 @csrf
