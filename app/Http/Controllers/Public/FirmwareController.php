@@ -107,12 +107,6 @@ class FirmwareController extends Controller
         return $query;
     }
 
-    /** Сколько прошивок найдётся при текущих фильтрах: панель фильтров показывает число до применения. */
-    public function count()
-    {
-        return response()->json(['count' => $this->filteredQuery()->count()]);
-    }
-
     public function show(string $slug)
     {
         $firmware = Firmware::withTrashed()->findOrFail($slug);

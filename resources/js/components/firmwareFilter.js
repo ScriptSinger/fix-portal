@@ -1,7 +1,6 @@
 /*
  * Фильтр каталога прошивок.
- *  - Отметка не перезагружает страницу: число прошивок считает сервер (firmwares.count),
- *    в кнопке «Применить (N)» показано найденное число, а фильтр применяется по нажатию.
+ *  - Отметка не перезагружает страницу, фильтр применяется по нажатию «Применить».
  *  - На компьютере это панель слева. На телефоне панель выезжает слева по язычку «Фильтр»:
  *    сначала список групп с выбранным значением, нажатие на группу открывает её значения
  *    (как фильтр в проекте start-stop-laravel).
@@ -17,31 +16,21 @@ const plural = (n, [one, few, many]) => {
     return many;
 };
 
-export default ({ url, countUrl, state, byBrand, allSeries }) => ({
+export default ({ url, state, byBrand, allSeries }) => ({
     ...state,
     open: false,
     group: null,
     mobile: window.matchMedia(MOBILE).matches,
-    changed: false,
-    count: null,
-    timer: null,
-    request: 0,
 
     init() {
         const media = window.matchMedia(MOBILE);
         media.addEventListener('change', () => { this.mobile = media.matches; if (!this.mobile) this.close(); });
         // Смена марки сбрасывает серию, которой у новой марки нет
         this.$watch('brand', () => { if (!this.seriesList.includes(this.series)) this.series = ''; });
-        FIELDS.forEach((key) => this.$watch(key, () => this.touch()));
     },
 
     get seriesList() {
         return this.brand ? (byBrand[this.brand] ?? []) : allSeries;
-    },
-
-    // Кнопка всегда доступна; число найденных показываем в скобках, когда сервер его посчитал
-    get submitLabel() {
-        return this.changed && this.count !== null ? `Применить (${this.count.toLocaleString('ru-RU')})` : 'Применить';
     },
 
     summary(key) {
@@ -52,24 +41,6 @@ export default ({ url, countUrl, state, byBrand, allSeries }) => ({
         const params = new URLSearchParams();
         FIELDS.forEach((key) => { const value = String(this[key] ?? '').trim(); if (value) params.set(key, value); });
         return params;
-    },
-
-    touch() {
-        this.changed = true;
-        this.count = null;
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => this.fetchCount(), 250);
-    },
-
-    async fetchCount() {
-        const id = ++this.request;
-        try {
-            const response = await fetch(`${countUrl}?${this.params()}`, { headers: { Accept: 'application/json' } });
-            const data = await response.json();
-            if (id === this.request) this.count = data.count;
-        } catch (e) {
-            if (id === this.request) this.count = null;
-        }
     },
 
     apply() {

@@ -60,7 +60,6 @@ Route::resource('questions', QuestionController::class);
 Route::get('/appliances/{appliance}', [ApplianceController::class, 'show'])->name('public.appliances.show');
 
 Route::get('/firmwares', [FirmwareController::class, 'index'])->name('firmwares.index');
-Route::get('/firmwares/count', [FirmwareController::class, 'count'])->name('firmwares.count');
 
 // Страницы-хабы каталога: /firmwares/indesit и /firmwares/indesit/wisl. Список марок берётся из правил
 // config/firmware_brands.php, поэтому адреса не пересекаются с /firmwares/285 (прошивка по номеру).

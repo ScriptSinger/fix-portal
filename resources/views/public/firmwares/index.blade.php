@@ -25,7 +25,7 @@
 @endsection
 
 @section('sidebar-left')
-    <div x-data="firmwareFilter(@js(['url' => route('firmwares.index'), 'countUrl' => route('firmwares.count'), 'state' => $state, 'byBrand' => $seriesByBrand, 'allSeries' => $seriesAll]))"
+    <div x-data="firmwareFilter(@js(['url' => route('firmwares.index'), 'state' => $state, 'byBrand' => $seriesByBrand, 'allSeries' => $seriesAll]))"
         @keydown.escape.window="close()" class="contents">
         <button type="button" @click="show()" aria-label="Открыть фильтр"
             class="fixed left-0 top-1/2 z-[60] -translate-y-1/2 rotate-180 bg-brand-400 px-[9px] py-4 text-[13px] font-bold uppercase leading-none tracking-[1.5px] text-black shadow-[2px_0_8px_rgba(0,0,0,.35)] [writing-mode:vertical-rl] lg:hidden">Фильтр</button>
@@ -106,7 +106,7 @@
                 </div>
 
                 <div class="flex flex-col gap-2 border-t border-line bg-white p-3 lg:border-0 lg:px-5 lg:pb-5 lg:pt-0">
-                    <button type="submit" x-text="submitLabel"
+                    <button type="submit"
                         class="h-12 w-full whitespace-nowrap bg-black px-3 text-sm font-bold text-brand-400">Применить</button>
                     <a href="{{ route('firmwares.index') }}" class="keep py-2 text-center text-[13px] font-bold text-ink underline">Сбросить фильтр</a>
                 </div>
