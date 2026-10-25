@@ -5,17 +5,17 @@
 @section('robots', 'noindex, follow')
 
 @section('hero')
-    <x-tw.page-header :title="'#' . $tag->title" eyebrow="Тег" :items="[
-        ['Статьи', route('articles.index')],
+    <x-tw.page-header :title="$tag->title" :items="[
+        ['Главная', route('articles.index')],
         ['Теги', route('tags.index')],
         [$tag->title, null],
     ]" />
 @endsection
 
 @section('content')
-    <x-tw.post-grid :posts="$posts" />
+    <x-tw.post-list :posts="$posts" />
 @endsection
 
 @section('sidebar')
-    @include('tw.partials.sidebar')
+    @include('tw.partials.sidebar', ['variant' => 'tags'])
 @endsection

@@ -1,16 +1,11 @@
-@props(['title', 'items' => [], 'description' => null, 'eyebrow' => null])
-<div class="bg-footer text-white">
-    <div class="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-9">
-        @if ($items)
-            <x-tw.breadcrumbs :items="$items" dark />
-        @endif
-        @if ($eyebrow)
-            <p class="mt-4 text-xs font-bold uppercase tracking-[0.12em] text-brand-400">{{ $eyebrow }}</p>
-        @endif
-        <h1 class="{{ $eyebrow ? 'mt-1' : 'mt-3' }} text-3xl font-bold leading-tight sm:text-4xl">{{ $title }}</h1>
-        @if ($description)
-            <p class="mt-3 line-clamp-2 max-w-3xl text-lg text-gray-300 sm:line-clamp-none">{{ $description }}</p>
-        @endif
-        {{ $slot }}
+@props(['title', 'items' => []])
+<div class="bg-black py-[51px] shadow-[inset_0_0_0_1px_#333]">
+    <div class="mx-auto max-w-[1140px] px-[15px]">
+        <div class="grid items-center gap-[30px] lg:grid-cols-[minmax(0,1fr)_350px]">
+            <h1 class="text-2xl font-bold leading-6 text-white">{{ $title }}</h1>
+            @if ($items)
+                <x-tw.breadcrumbs :items="$items" class="max-lg:hidden [&_ol]:justify-end" />
+            @endif
+        </div>
     </div>
 </div>

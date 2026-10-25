@@ -37,16 +37,7 @@
 @endsection
 
 @section('content')
-    <div class="rounded-[5px] bg-white p-12 max-sm:p-5">
-        @forelse ($posts as $post)
-            <x-tw.post-card :post="$post" />
-        @empty
-            <p>Совпадений не найдено</p>
-        @endforelse
-    </div>
-    <div class="mt-8">
-        {{ $posts->withQueryString()->onEachSide(0)->links('tw.partials.pagination') }}
-    </div>
+    <x-tw.post-list :posts="$posts" show-category />
 @endsection
 
 @section('sidebar')

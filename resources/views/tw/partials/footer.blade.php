@@ -17,8 +17,8 @@
                                     <img src="{{ optional($post->thumbnail)->small }}" alt="" loading="lazy"
                                         class="size-20 shrink-0 border-4 border-[#333] object-cover">
                                     <span class="min-w-0">
-                                        <span class="block text-base font-medium leading-6 text-white">{{ $post->title }}</span>
-                                        <small class="text-[10px] font-medium uppercase tracking-[1px] text-brand-400">
+                                        <span class="block text-base leading-6 text-white">{{ $post->title }}</span>
+                                        <small class="text-[10px] uppercase tracking-[1px] text-brand-400">
                                             @if ($showViews)
                                                 <x-tw.icon name="eye" class="inline size-3" /> {{ $post->views }}
                                             @else
@@ -39,7 +39,7 @@
                     @foreach ($popular_categories as $category)
                         <li class="border-b border-dashed border-[#333] pb-[9.6px] pl-[3.2px] pr-[3.2px] pt-[6.4px] first:pt-0 last:border-0">
                             <a href="{{ route('categories.show', ['category' => $category->slug]) }}"
-                                class="flex justify-between gap-3 text-[15px] font-medium capitalize leading-[15px] text-white hover:text-brand-400">
+                                class="flex justify-between gap-3 text-[15px] capitalize leading-[15px] text-white hover:text-brand-400">
                                 <span>{{ $category->title }}</span><span>{{ $category->posts_count }}</span>
                             </a>
                         </li>

@@ -34,7 +34,7 @@
 
     @yield('hero')
 
-    <main id="content" class="bg-surface py-16">
+    <main id="content" class="bg-surface pb-16 @yield('main-pt', 'pt-16')">
         <div class="mx-auto max-w-[1140px] px-[15px]">
             @hasSection('no-sidebar')
                 <div class="min-w-0">@yield('content')</div>

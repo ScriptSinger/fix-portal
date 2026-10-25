@@ -35,20 +35,46 @@
     display: none !important;
 }
 
-/* Текст статьи приходит из редактора: держим его внутри колонки. */
-.prose {
+/*
+ * Текст статьи, вопроса и комментария приходит из редактора и содержит классы старой темы
+ * (Bootstrap 4 alpha: img-fluid, table, table-bordered, table-striped, table-responsive...).
+ * Tailwind preflight сбрасывает стили элементов, поэтому оформление возвращаем здесь.
+ */
+.article-content {
     min-width: 0;
     overflow-wrap: anywhere;
 }
-
-.prose :where(img, video, iframe) {
-    max-width: 100%;
-    height: auto;
+.article-content p { margin-bottom: 26px; }
+.article-content h1, .article-content h2, .article-content h3,
+.article-content h4, .article-content h5, .article-content h6 {
+    font-weight: 700; color: #000; line-height: 1.4;
 }
-
-.prose :where(table) {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
-}
+.article-content h1 { font-size: 32px; line-height: 40px; margin-bottom: 23px; }
+.article-content h2 { font-size: 27px; line-height: 38px; margin-bottom: 20px; }
+.article-content h3 { font-size: 22px; line-height: 30px; margin-bottom: 17px; }
+.article-content h4 { font-size: 19px; line-height: 29px; margin-bottom: 14px; }
+.article-content h5 { font-size: 17px; line-height: 25px; margin-bottom: 11px; }
+.article-content h6 { font-size: 16px; line-height: 24px; margin-bottom: 11px; }
+.article-content ul, .article-content ol { margin-bottom: 1rem; padding-left: 2rem; }
+.article-content ul { list-style: disc; }
+.article-content ol { list-style: decimal; }
+.article-content ul ul, .article-content ol ol, .article-content ul ol, .article-content ol ul { margin-bottom: 0; }
+.article-content a { color: #111; }
+.article-content a:hover { color: var(--color-link); }
+.article-content b, .article-content strong { font-weight: 700; }
+.article-content hr { margin: 1rem 0; border-top: 1px solid rgba(0, 0, 0, .1); }
+.article-content blockquote { border-left: 4px solid #eceeef; padding: 2rem; margin-bottom: 1.5rem; font-style: italic; }
+.article-content img { max-width: 100%; height: auto; }
+.article-content .img-fluid { max-width: 100%; height: auto; }
+.article-content .w-100 { width: 100%; }
+.article-content .d-block { display: block; }
+.article-content .mb-3 { margin-bottom: 1rem; }
+.article-content .text-center { text-align: center; }
+.article-content table { width: 100%; max-width: 100%; margin-bottom: 1rem; border-collapse: collapse; }
+.article-content th, .article-content td { padding: .75rem; vertical-align: top; border-top: 1px solid #eceeef; }
+.article-content thead th { vertical-align: bottom; border-bottom: 2px solid #eceeef; }
+.article-content caption { padding: .75rem; color: #636c72; text-align: left; caption-side: bottom; }
+.article-content .table-bordered, .article-content .table-bordered th, .article-content .table-bordered td { border: 1px solid #eceeef; }
+.article-content .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(0, 0, 0, .05); }
+.article-content .table-responsive { display: block; width: 100%; overflow-x: auto; }
+.article-content .custombox { position: relative; padding: 3rem 2rem; border: 1px dashed #dadada; margin-bottom: 1rem; }

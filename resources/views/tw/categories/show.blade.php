@@ -5,15 +5,15 @@
 @section('robots', 'noindex, follow')
 
 @section('hero')
-    <x-tw.page-header :title="$category->title" eyebrow="Категория" :description="$category->description" :items="[
-        ['Статьи', route('articles.index')],
+    <x-tw.page-header :title="$category->title" :items="[
+        ['Главная', route('articles.index')],
         ['Категории', route('categories.index')],
         [$category->title, null],
     ]" />
 @endsection
 
 @section('content')
-    <x-tw.post-grid :posts="$posts" />
+    <x-tw.post-list :posts="$posts" />
 @endsection
 
 @section('sidebar')

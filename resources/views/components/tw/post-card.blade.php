@@ -1,4 +1,4 @@
-@props(['post'])
+@props(['post', 'showCategory' => false])
 @php
     $url = route('articles.show', ['article' => $post->slug]);
     $sep = '<span class="text-[#ccc]" aria-hidden="true">/</span>';
@@ -17,9 +17,11 @@
         </h2>
         <p class="mb-2 pb-[11.2px] pt-[4.8px]">{!! strip_tags($post->description) !!}</p>
         <div class="flex flex-wrap items-center justify-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-[#111]">
-            <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
-                class="font-normal text-[#999] hover:text-ink">{{ $post->category->title }}</a>
-            {!! $sep !!}
+            @if ($showCategory)
+                <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
+                    class="font-normal text-[#999] hover:text-ink">{{ $post->category->title }}</a>
+                {!! $sep !!}
+            @endif
             <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->diffForHumans() }}</time>
             {!! $sep !!}
             <span>{{ $post->administrator->name }}</span>

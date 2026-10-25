@@ -1,19 +1,15 @@
-@props(['items' => [], 'dark' => false]) {{-- [[title, url|null], ...] --}}
-<nav aria-label="Хлебные крошки" @class(['text-sm', 'text-muted' => !$dark, 'text-gray-400' => $dark])>
-    <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+@props(['items' => []]) {{-- [[title, url|null], ...] --}}
+<nav aria-label="Хлебные крошки" {{ $attributes }}>
+    <ol class="flex flex-wrap items-center gap-x-3 text-xs leading-[26px]">
         @foreach ($items as [$title, $url])
-            <li class="flex items-center gap-2">
+            <li class="flex items-center gap-3">
                 @if ($url)
-                    <a href="{{ $url }}" @class([
-                        'hover:underline',
-                        'hover:text-ink' => !$dark,
-                        'text-brand-400' => $dark,
-                    ])>{{ $title }}</a>
+                    <a href="{{ $url }}" class="text-brand-400 hover:underline">{{ $title }}</a>
                 @else
-                    <span @class(['line-clamp-1', 'text-ink' => !$dark, 'text-gray-200' => $dark]) aria-current="page">{{ $title }}</span>
+                    <span class="text-muted" aria-current="page">{{ $title }}</span>
                 @endif
                 @unless ($loop->last)
-                    <span aria-hidden="true">/</span>
+                    <span class="text-muted" aria-hidden="true">/</span>
                 @endunless
             </li>
         @endforeach

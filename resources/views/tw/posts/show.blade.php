@@ -3,64 +3,68 @@
 @section('description', $post->description)
 @section('canonical', url('/articles/' . $post->slug))
 @section('robots', 'noindex, follow')
+@section('main-pt', 'pt-[51px]')
 
 @section('content')
-    <article>
-        <header>
-            <x-tw.breadcrumbs :items="[
-                ['Статьи', route('articles.index')],
-                [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
-                [$post->title, null],
-            ]" />
+    <div class="rounded-[5px] bg-white p-12 max-sm:p-5">
+        <article>
+            <header class="mb-12">
+                <x-tw.breadcrumbs :items="[
+                    ['Главная', route('articles.index')],
+                    ['Категории', route('categories.index')],
+                    [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
+                ]" />
+                <div class="my-2">
+                    <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
+                        class="inline-block rounded-[3px] bg-brand-400 px-4 text-white hover:text-black">{{ $post->category->title }}</a>
+                </div>
+                <h1 class="mb-[7px] text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $post->title }}</h1>
 
-            <h1 class="mt-5 text-3xl font-bold leading-tight sm:text-4xl">{{ $post->title }}</h1>
+                <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-muted">
+                    <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->diffForHumans() }}</time>
+                    <span aria-hidden="true">/</span>
+                    <span>{{ $post->administrator->name }}</span>
+                    <span aria-hidden="true">/</span>
+                    <span class="inline-flex items-center gap-1"><x-tw.icon name="eye" class="size-3" />{{ $post->views }}</span>
+                </div>
 
-            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[15px] text-muted">
-                <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->translatedFormat('j F Y') }}</time>
-                <span>{{ $post->administrator->name }}</span>
-                <x-tw.views :count="$post->views" />
-            </div>
+                <div class="mt-4"><x-tw.share :url="route('articles.show', ['article' => $post->slug])" align="start" /></div>
+            </header>
 
-            <div class="mt-5"><x-tw.share :url="route('articles.show', ['article' => $post->slug])" /></div>
-        </header>
-
-        @if ($post->thumbnail)
-            <div class="mt-8 flex justify-center overflow-hidden rounded-xl border border-line bg-white">
-                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}"
-                    class="max-h-72 w-auto max-w-full object-contain sm:max-h-80">
-            </div>
-        @endif
-
-        <div class="prose prose-lg prose-a:text-link prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg mt-8 max-w-none">
-            {!! $post->content !!}
-        </div>
-
-        @if (!empty($cta))
-            <x-tw.card class="mt-10 border-brand-400 bg-brand-50">
-                <h2 class="text-xl font-bold">{{ $cta->title ?: 'Нужен мастер в Уфе?' }}</h2>
-                @if (!empty($cta->text))
-                    <div class="prose mt-2 max-w-none">{!! $cta->text !!}</div>
-                @endif
-                <x-tw.button :href="$cta->trackedUrl()" rel="nofollow sponsored" class="mt-4">
-                    {{ $cta->anchor ?: 'Подробнее' }}
-                </x-tw.button>
-            </x-tw.card>
-        @endif
-
-        <footer class="mt-10 space-y-5 border-t border-line pt-6">
-            @if ($post->tags->isNotEmpty())
-                <ul class="flex flex-wrap gap-2">
-                    @foreach ($post->tags as $tag)
-                        <li>
-                            <a href="{{ route('tags.show', ['tag' => $tag->slug]) }}"
-                                class="inline-block rounded-full bg-white px-3 py-1 text-sm text-muted ring-1 ring-line hover:bg-brand-50 hover:text-ink">#{{ $tag->title }}</a>
-                        </li>
-                    @endforeach
-                </ul>
+            @if ($post->thumbnail)
+                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" class="mb-10 block w-full">
             @endif
-            <x-tw.share :url="route('articles.show', ['article' => $post->slug])" />
-        </footer>
-    </article>
+
+            <div class="article-content">
+                {!! $post->content !!}
+            </div>
+
+            @if (!empty($cta))
+                <div class="article-content mt-12 border border-dashed border-[#dadada] px-8 py-12">
+                    <h2 class="mb-4 text-xl font-bold text-black">{{ $cta->title ?: 'Нужен мастер в Уфе?' }}</h2>
+                    @if (!empty($cta->text))
+                        <div>{!! $cta->text !!}</div>
+                    @endif
+                    <a href="{{ $cta->trackedUrl() }}" rel="nofollow sponsored"
+                        class="inline-block bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] !text-white hover:bg-[#222]">{{ $cta->anchor ?: 'Подробнее' }}</a>
+                </div>
+            @endif
+
+            <footer class="mt-12">
+                @if ($post->tags->isNotEmpty())
+                    <ul class="mb-6 flex flex-wrap">
+                        @foreach ($post->tags as $tag)
+                            <li class="my-2 mr-2 inline-block h-7 rounded-[3px] bg-brand-400 px-4">
+                                <a href="{{ route('tags.show', ['tag' => $tag->slug]) }}"
+                                    class="mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-white hover:text-black">{{ $tag->title }}</a>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+                <x-tw.share :url="route('articles.show', ['article' => $post->slug])" align="start" />
+            </footer>
+        </article>
+    </div>
 
     @if ($relatedPosts->isNotEmpty())
         <section class="mt-12" aria-labelledby="related-title">
