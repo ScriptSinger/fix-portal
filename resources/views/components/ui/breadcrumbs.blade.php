@@ -1,5 +1,5 @@
 @props(['items' => []])
-{{-- Хлебные крошки: одна полоса под шапкой на всех страницах. Первое звено «Главная» добавляется здесь, вызывающий передаёт
+{{-- Хлебные крошки: строка под шапкой, на фоне страницы, без отдельной полосы на всех страницах. Первое звено «Главная» добавляется здесь, вызывающий передаёт
      остальные [[название, адрес|null], ...]; последнее звено это текущая страница (адрес null). Видимый список и разметка
      BreadcrumbList для поисковиков строятся из одного массива, поэтому разойтись не могут. --}}
 @php
@@ -16,9 +16,9 @@
     ];
 @endphp
 <script type="application/ld+json">@json($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)</script>
-<div class="border-b border-line bg-white" data-breadcrumbs>
+<div class="bg-surface pt-4" data-breadcrumbs>
     <nav aria-label="Хлебные крошки" class="site-container">
-        <ol class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap py-2.5 text-[13px] leading-6">
+        <ol class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap py-1 text-[13px] leading-6">
             @foreach ($trail as [$title, $url])
                 <li class="flex shrink-0 items-center gap-2 {{ $loop->last ? 'min-w-0 shrink' : '' }}">
                     @if ($url)
