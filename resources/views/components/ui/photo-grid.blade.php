@@ -5,7 +5,7 @@
     $img = fn (array $p, string $class) => '<img src="' . e($p['src']) . '" data-full="' . e($p['full']) . '" alt="' . e($alt) . '" loading="lazy" data-lightbox-cover class="block cursor-pointer object-cover ' . $class . '">';
 @endphp
 @if ($n)
-    <div {{ $attributes->class(['grid gap-0.5 overflow-hidden']) }}>
+    <div data-gallery {{ $attributes->class(['grid gap-0.5 overflow-hidden']) }}>
         @if ($n === 1)
             <div class="max-h-[34rem] overflow-hidden">{!! $img($photos[0], 'w-full') !!}</div>
         @elseif ($n === 2)

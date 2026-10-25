@@ -22,8 +22,10 @@
     $storeUrl = route('comments.store', ['type' => strtolower(class_basename($instance)), 'id' => $instance->id]);
     $day = null;
 @endphp
-<section id="comments" aria-label="Ответы" class="mt-4" x-data="{
-    target: null, base: @js($storeUrl), photos: [], busy: false, error: '',
+<section id="comments" aria-label="Ответы" class="mt-4" @scroll.window.passive="measure()" @resize.window="measure()" x-init="measure()" x-data="{
+    target: null, base: @js($storeUrl), photos: [], busy: false, error: '', far: false,
+    measure() { this.far = this.$el.getBoundingClientRect().bottom - window.innerHeight > 240; },
+    toEnd() { (this.$refs.text ?? this.$el).scrollIntoView({ behavior: 'smooth', block: 'center' }); },
     async attach(files) {
         this.error = '';
         for (const file of [...files].filter((f) => f.type.startsWith('image/')).slice(0, 6 - this.photos.length)) {
@@ -131,6 +133,10 @@
     </div>
 
     <div class="sticky bottom-0 z-20 bg-surface pb-3 pt-3">
+        <button type="button" x-show="far" x-cloak x-transition.opacity @click="toEnd()" aria-label="К последним сообщениям"
+            class="absolute -top-14 right-0 grid size-11 place-items-center rounded-full bg-white text-subtle shadow-md ring-1 ring-black/10 hover:text-ink">
+            <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+        </button>
         @auth('web')
             <form method="POST" class="grid gap-2" @submit="submit($event)"
                 :action="target ? @js(route('comments.replies.store', ['id' => '__ID__'])).replace('__ID__', target.root) : base">
@@ -163,7 +169,7 @@
                         @keydown.ctrl.enter.prevent="$el.form.requestSubmit()" @paste="attach([...$event.clipboardData.files])"
                         class="max-h-40 min-w-0 flex-1 resize-none border-0 bg-transparent px-1 py-[11px] text-[15px] leading-[22px] text-ink outline-none focus:ring-0"></textarea>
                     <button type="submit" aria-label="Отправить" :disabled="busy"
-                        class="grid size-11 shrink-0 place-items-center rounded-full text-blue-600 hover:text-blue-700 disabled:opacity-40">
+                        class="grid size-11 shrink-0 place-items-center rounded-full text-black hover:text-ink disabled:opacity-40">
                         <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.4l17.5-7.5a1 1 0 000-1.8L3.4 3.6a.9.9 0 00-1.3 1.1L4 10.5l9 1.5-9 1.5-1.9 5.8a.9.9 0 001.3 1.1z" /></svg>
                     </button>
                 </div>
