@@ -6,6 +6,7 @@
 
 @section('hero')
     <x-ui.page-header :title="$category->title" :items="[
+        ['Статьи', route('articles.index')],
         [$category->title, null],
     ]" />
 @endsection

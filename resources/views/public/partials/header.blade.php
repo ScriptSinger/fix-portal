@@ -20,7 +20,7 @@
 <header x-data="{ menu: false }" class="frame sticky top-0 z-40 bg-brand-400 text-ink">
     <div class="site-container py-[6px]">
         <div class="flex min-h-[74px] flex-wrap items-center lg:grid lg:min-h-[78px] lg:grid-cols-[1fr_auto_1fr]">
-            <a href="{{ route('articles.index') }}" class="mr-4 flex shrink-0 items-center lg:mr-0">
+            <a href="{{ route('home') }}" class="mr-4 flex shrink-0 items-center lg:mr-0">
                 <img src="{{ $logo }}" alt="UfaMasters" width="174" height="38" class="h-[38px] w-auto">
             </a>
 

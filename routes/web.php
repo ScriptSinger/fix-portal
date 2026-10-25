@@ -28,9 +28,7 @@ use App\Http\Controllers\Public\UserController;
 */
 
 
-Route::get('/', function () {
-    return redirect('/articles');
-});
+Route::get('/', [PostController::class, 'home'])->name('home');
 
 Route::view('/about', 'public.pages.about')->name('about');
 Route::view('/personal-data-consent', 'public.pages.consent')->name('consent');

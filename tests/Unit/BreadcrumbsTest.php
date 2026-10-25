@@ -23,18 +23,9 @@ class BreadcrumbsTest extends TestCase
 
         $this->assertSame(['Главная', 'Вопросы', 'Холодильник не морозит'], array_column($items, 'name'));
         $this->assertSame([1, 2, 3], array_column($items, 'position'));
-        $this->assertSame(route('articles.index'), $items[0]['item']);
+        $this->assertSame(route('home'), $items[0]['item']);
         $this->assertSame(route('questions.index'), $items[1]['item']);
         $this->assertSame(url()->current(), $items[2]['item']);
-    }
-
-    public function test_old_home_item_is_not_duplicated(): void
-    {
-        $html = Blade::render(<<<'BLADE'
-            <x-ui.breadcrumbs :items="[['Статьи', route('articles.index')], ['Категории', null]]" />
-        BLADE);
-
-        $this->assertSame(['Главная', 'Категории'], array_column($this->ld($html)['itemListElement'], 'name'));
     }
 
     public function test_visible_list_matches_the_markup(): void

@@ -7,14 +7,9 @@
     $hasFilter = request()->hasAny(['text']);
 @endphp
 @section('robots', $isPaginated || $hasFilter ? 'noindex, follow' : 'index, follow')
-@section('main-pt', 'pt-8')
 
-@section('above')
-    @if ($hasFilter)
-        <h1 class="mb-6 text-[28px] font-bold leading-9 text-black max-sm:text-2xl">Поиск: «{{ request('text') }}»</h1>
-    @else
-        <x-ui.hero :customization="$customization" />
-    @endif
+@section('hero')
+    <x-ui.page-header title="Статьи" :items="[['Статьи', null]]" />
 @endsection
 
 @section('sidebar-left')
@@ -22,7 +17,10 @@
 @endsection
 
 @section('content')
-    <x-ui.post-list :posts="$posts" show-category :heading="$hasFilter ? null : 'Свежие статьи'" />
+    @if ($hasFilter)
+        <p class="mb-6 text-sm">Результаты поиска: <strong>«{{ request('text') }}»</strong>. <a href="{{ route('articles.index') }}" class="font-bold text-black underline">Сбросить</a></p>
+    @endif
+    <x-ui.post-list :posts="$posts" show-category />
 @endsection
 
 @section('sidebar')

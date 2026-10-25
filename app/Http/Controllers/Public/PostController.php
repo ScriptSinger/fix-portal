@@ -12,6 +12,14 @@ use Illuminate\Pipeline\Pipeline;
 
 class PostController extends Controller
 {
+    /** Главная: баннер и последние статьи; полный список с поиском и страницами живёт на /articles. */
+    public function home()
+    {
+        $posts = Post::query()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->limit(6)->get();
+
+        return view('public.posts.home', compact('posts'));
+    }
+
     public function index()
     {
         $posts = app(Pipeline::class)

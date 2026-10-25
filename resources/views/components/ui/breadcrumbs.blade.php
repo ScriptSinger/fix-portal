@@ -4,8 +4,7 @@
      BreadcrumbList для поисковиков строятся из одного массива, поэтому разойтись не могут. --}}
 @php
     $trail = collect($items)
-        ->reject(fn ($i) => in_array($i[0], ['Главная', 'Статьи'], true) && ($i[1] ?? null) === route('articles.index'))
-        ->prepend(['Главная', route('articles.index')])
+        ->prepend(['Главная', route('home')])
         ->values();
     $ld = [
         '@context' => 'https://schema.org',
