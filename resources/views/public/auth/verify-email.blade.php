@@ -3,7 +3,7 @@
 @section('robots', 'noindex, nofollow')
 
 @section('hero')
-    <x-ui.page-header title="Подтверждение Email" :items="[['Главная', route('articles.index')], ['Подтверждение Email', null]]" />
+    <x-ui.page-header title="Подтверждение Email" :items="[['Статьи', route('articles.index')], ['Подтверждение Email', null]]" />
 @endsection
 
 @section('content')

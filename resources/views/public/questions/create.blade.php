@@ -4,7 +4,7 @@
 
 @section('hero')
     <x-ui.page-header title="Создать вопрос" :items="[
-        ['Главная', route('articles.index')],
+        ['Статьи', route('articles.index')],
         ['Вопросы', route('questions.index')],
         ['Создать вопрос', null],
     ]" />

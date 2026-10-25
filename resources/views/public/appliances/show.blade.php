@@ -4,7 +4,7 @@
 
 @section('hero')
     <x-ui.page-header :title="$appliance->title" :items="[
-        ['Главная', route('articles.index')],
+        ['Статьи', route('articles.index')],
         ['Вопросы', route('questions.index')],
         [$appliance->title, null],
     ]" />

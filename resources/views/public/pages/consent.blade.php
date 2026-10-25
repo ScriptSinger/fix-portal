@@ -5,7 +5,7 @@
 @section('no-sidebar', true)
 
 @section('hero')
-    <x-ui.page-header title="Согласие на обработку персональных данных" :items="[['Главная', route('articles.index')], ['Согласие на обработку данных', null]]" />
+    <x-ui.page-header title="Согласие на обработку персональных данных" :items="[['Статьи', route('articles.index')], ['Согласие на обработку данных', null]]" />
 @endsection
 
 @section('content')

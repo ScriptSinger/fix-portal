@@ -3,7 +3,7 @@
 @section('robots', 'noindex, nofollow')
 
 @section('hero')
-    <x-ui.page-header :title="'Добро пожаловать, ' . $user->name" :items="[['Главная', route('articles.index')], ['Личный кабинет', null]]" />
+    <x-ui.page-header :title="'Добро пожаловать, ' . $user->name" :items="[['Статьи', route('articles.index')], ['Личный кабинет', null]]" />
 @endsection
 
 @section('content')

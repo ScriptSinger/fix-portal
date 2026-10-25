@@ -3,7 +3,7 @@
 @section('description', 'Список тегов статей по ремонту бытовой техники.')
 
 @section('hero')
-    <x-ui.page-header title="Теги статей" :items="[['Главная', route('articles.index')], ['Теги', null]]" />
+    <x-ui.page-header title="Теги статей" :items="[['Статьи', route('articles.index')], ['Теги', null]]" />
 @endsection
 
 @section('content')

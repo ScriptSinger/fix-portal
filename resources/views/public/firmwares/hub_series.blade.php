@@ -15,7 +15,7 @@
 
 @section('hero')
     <x-ui.page-header :title="'Прошивки ' . $brand['name'] . ' ' . $seriesName" :items="[
-        ['Главная', route('articles.index')], ['Прошивки', route('firmwares.index')],
+        ['Статьи', route('articles.index')], ['Прошивки', route('firmwares.index')],
         [$brand['name'], route('firmwares.brand', ['brand' => $brand['slug']])], [$seriesName, null]]" />
 @endsection
 

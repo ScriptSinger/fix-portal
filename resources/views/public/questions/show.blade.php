@@ -13,15 +13,11 @@
         <article>
             <header class="mb-12">
                 <x-ui.breadcrumbs light :items="[
-                    ['Главная', route('articles.index')],
+                    ['Статьи', route('articles.index')],
                     ['Вопросы', route('questions.index')],
                     [$question->appliance->title, route('public.appliances.show', ['appliance' => $question->appliance->slug])],
                 ]" />
-                <div class="my-2">
-                    <a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
-                        class="keep inline-block rounded-[3px] bg-brand-400 px-4 text-black hover:underline">{{ $question->appliance->title }}</a>
-                </div>
-                <h1 class="mb-[7px] text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $question->title }}</h1>
+                <h1 class="mb-[7px] mt-3 text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $question->title }}</h1>
 
                 <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-subtle">
                     <time datetime="{{ $question->dateAsCarbon->toDateString() }}">{{ $question->dateAsCarbon->diffForHumans() }}</time>

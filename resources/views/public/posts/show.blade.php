@@ -11,15 +11,11 @@
         <article>
             <header class="mb-12">
                 <x-ui.breadcrumbs light :items="[
-                    ['Главная', route('articles.index')],
+                    ['Статьи', route('articles.index')],
                     ['Категории', route('categories.index')],
                     [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
                 ]" />
-                <div class="my-2">
-                    <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
-                        class="keep inline-block rounded-[3px] bg-brand-400 px-4 text-black hover:underline">{{ $post->category->title }}</a>
-                </div>
-                <h1 class="mb-[7px] text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $post->title }}</h1>
+                <h1 class="mb-[7px] mt-3 text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $post->title }}</h1>
 
                 <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-subtle">
                     <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->diffForHumans() }}</time>

@@ -16,7 +16,7 @@
         'softwareVersion' => $firmware->model_name, 'identifier' => (string) $firmware->id, 'description' => $firmware->meta_description,
     ], fn ($v) => $v !== null && $v !== '');
     $title = $firmware->model_name ? $firmware->display_name : $firmware->title;
-    $crumbs = [['Главная', route('articles.index')], ['Прошивки', route('firmwares.index')]];
+    $crumbs = [['Статьи', route('articles.index')], ['Прошивки', route('firmwares.index')]];
     if ($firmware->hub_url && $firmware->brand) {
         $crumbs[] = [$firmware->brand, route('firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)])];
     }
