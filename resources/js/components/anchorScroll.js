@@ -5,8 +5,14 @@ export default () => {
         const link = event.target.closest('.title__link[data-scroll]');
         if (!link) return;
 
+        // Идентификаторы вида #1, #1-2 не являются корректными CSS-селекторами, поэтому ищем по id (как делал jQuery)
+        const raw = link.dataset.scroll.trim();
         let target = null;
-        try { target = document.querySelector(link.dataset.scroll); } catch (e) { /* некорректный селектор */ }
+        if (raw.startsWith('#') && !/[\s.>+~\[:,]/.test(raw)) {
+            target = document.getElementById(raw.slice(1));
+        } else {
+            try { target = document.querySelector(raw); } catch (e) { /* некорректный селектор */ }
+        }
         if (!target) return;
 
         event.preventDefault();
