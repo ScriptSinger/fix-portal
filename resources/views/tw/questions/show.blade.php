@@ -47,7 +47,7 @@
             </header>
 
             @foreach ($photos as $photo)
-                <img src="{{ asset('storage/' . $photo) }}" alt="" class="mb-10 block w-full">
+                <img src="{{ asset('storage/' . $photo) }}" alt="" data-lightbox-cover class="mb-10 block w-full cursor-pointer">
             @endforeach
 
             <div class="article-content mb-12">{!! $question->description !!}</div>

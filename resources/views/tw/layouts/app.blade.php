@@ -56,6 +56,15 @@
     @include('tw.partials.footer')
     <x-tw.flash />
 
+    <div id="lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Изображение">
+        <div class="max-h-full w-full max-w-[800px] overflow-y-auto rounded border border-black/20 bg-white">
+            <div class="flex justify-end border-b border-[#e9ecef] p-4">
+                <button type="button" data-lightbox-close class="text-2xl leading-none text-black/50 hover:text-black" aria-label="Закрыть">&times;</button>
+            </div>
+            <div class="p-4"><img src="" alt="" class="w-full"></div>
+        </div>
+    </div>
+
     <button type="button" x-data="{ show: false }" x-show="show" x-cloak
         @scroll.window="show = window.scrollY > 300"
         @click="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Наверх"

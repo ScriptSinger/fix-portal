@@ -31,7 +31,7 @@
             </header>
 
             @if ($post->thumbnail)
-                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" class="mb-10 block w-full">
+                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" data-lightbox-cover class="mb-10 block w-full cursor-pointer">
             @endif
 
             <div class="article-content">

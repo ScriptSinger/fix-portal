@@ -1,7 +1,7 @@
-@props(['url', 'image', 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null])
+@props(['url', 'image', 'full' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null])
 @php $sep = '<span class="text-[#ccc]" aria-hidden="true">/</span>'; @endphp
 <article class="mb-8">
-    <a href="{{ $url }}" class="group relative block overflow-hidden">
+    <a href="{{ $url }}" data-lightbox="{{ $full ?: $image }}" class="group relative block cursor-pointer overflow-hidden">
         <img src="{{ $image }}" alt="{{ $title }}" loading="lazy"
             class="block w-full transition-transform duration-300 ease-in-out group-hover:scale-110">
         <span class="absolute inset-0 bg-[linear-gradient(0deg,#000_0%,rgba(0,0,0,.1)_50%)] opacity-50" aria-hidden="true"></span>
