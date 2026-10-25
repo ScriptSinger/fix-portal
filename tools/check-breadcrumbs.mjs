@@ -2,7 +2,7 @@
 // Нужны playwright-core и Chrome (путь в executablePath). Правило описано в docs/breadcrumbs-audit.md.
 import { chromium } from 'playwright-core';
 const base = process.argv[2] || 'http://localhost';
-const URLS = { 'Лента': '/articles', 'Статья': '/articles/rukovodstvo-po-remontu-holodilnikov-haier-chast-2', 'Категории': '/categories', 'Категория': '/categories/remont-holodilnikov', 'Теги': '/tags', 'Тег': '/tag/bosch', 'Вопросы': '/questions', 'Вопрос': '/questions/holodilnik-ban-35-fnf-d-c00294677-nuzhna-pomoshch-v-proshivki-i-sam-damp', 'Техника': '/appliances/morozilniki', 'Прошивки': '/firmwares', 'Марка': '/firmwares/indesit', 'Серия': '/firmwares/indesit/wisl', 'Прошивка': '/firmwares/12740', 'Прошивка с маркой': '/firmwares/12730', 'О нас': '/about', 'Согласие': '/personal-data-consent' };
+const URLS = { 'Лента': '/articles', 'Статья': '/articles/rukovodstvo-po-remontu-holodilnikov-haier-chast-2', 'Категория': '/categories/remont-holodilnikov', 'Теги': '/tags', 'Тег': '/tag/bosch', 'Вопросы': '/questions', 'Вопрос': '/questions/holodilnik-ban-35-fnf-d-c00294677-nuzhna-pomoshch-v-proshivki-i-sam-damp', 'Техника': '/appliances/morozilniki', 'Прошивки': '/firmwares', 'Марка': '/firmwares/indesit', 'Серия': '/firmwares/indesit/wisl', 'Прошивка': '/firmwares/12740', 'Прошивка с маркой': '/firmwares/12730', 'О нас': '/about', 'Согласие': '/personal-data-consent' };
 const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
 let bad = 0;
 for (const w of [1440, 390]) {

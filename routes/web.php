@@ -50,7 +50,8 @@ Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 // Route::get('/users', [UserController::class, 'index'])->name('users.index');
 // Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
 
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+// Список категорий дублировал левое меню «Разделы»: адрес сохранён постоянным редиректом, чтобы старые ссылки и поисковики попадали на ленту
+Route::redirect('/categories', '/articles', 301)->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
 Route::get('/tag/{tag}', [TagController::class, 'show'])->name('tags.show');
