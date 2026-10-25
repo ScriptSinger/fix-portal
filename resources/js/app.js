@@ -8,6 +8,7 @@ import avatarUpload from './components/avatarUpload';
 import phoneMask from './components/phoneMask';
 import anchorScroll from './components/anchorScroll';
 import carousel from './components/carousel';
+import lightbox from './components/lightbox';
 
 Alpine.plugin(collapse);
 Alpine.data('copyLink', copyLink);
@@ -18,6 +19,7 @@ Alpine.data('phoneMask', phoneMask);
 
 anchorScroll();
 document.addEventListener('DOMContentLoaded', carousel);
+document.addEventListener('DOMContentLoaded', lightbox);
 
 window.Alpine = Alpine;
 Alpine.start();
