@@ -24,3 +24,6 @@ posts_dump
 
 # Traefik / Let's Encrypt: хранит закрытые ключи
 /letsencrypt/acme.json
+
+# Генерируется на сервере командой sitemap:generate (в репозитории был устаревший файл со ссылками на localhost)
+/public/sitemap.xml

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -12,7 +13,12 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Новые статьи, вопросы и прошивки попадают в sitemap.xml без деплоя
+        $schedule->command('sitemap:generate')
+            ->dailyAt('03:15')
+            ->timezone('Asia/Yekaterinburg')
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::error('Не удалось обновить sitemap.xml: см. вывод sitemap:generate.'));
     }
 
     /**

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Firmware extends Model
 {
@@ -60,6 +61,29 @@ class Firmware extends Model
         }
 
         return 'firmwares/' . ($this->file_path ?: $this->title . ($this->extension ?? ''));
+    }
+
+    /**
+     * Есть ли файл. Для облака не ходим за ним по сети на каждый просмотр страницы:
+     * наличие проверено при переносе и при загрузке через админку.
+     */
+    public function getHasFileAttribute(): bool
+    {
+        return $this->file_disk
+            ? true
+            : Storage::disk('public')->exists($this->storage_path);
+    }
+
+    /**
+     * Страница без содержательных параметров (нет модели, серийного номера, PNS и кода прошивки):
+     * кроме имени файла сказать о ней нечего, такие страницы не нужны поисковикам.
+     */
+    public function getIsThinAttribute(): bool
+    {
+        return ! $this->model_name
+            && ! $this->serial_number
+            && ! $this->pns
+            && ! $this->firmware_code;
     }
 
     /**

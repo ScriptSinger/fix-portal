@@ -138,11 +138,16 @@ class GenerateSitemap extends Command
                 }
             });
 
+        // Страницы прошивок без содержательных параметров закрыты от индекса, в sitemap им не место
         Firmware::query()
-            ->select(['id', 'updated_at'])
+            ->select(['id', 'title', 'extension', 'data', 'updated_at'])
             ->orderBy('id')
             ->chunk(500, function ($firmwares) use ($sitemap) {
                 foreach ($firmwares as $firmware) {
+                    if ($firmware->is_thin) {
+                        continue;
+                    }
+
                     $sitemap->add(
                         $this->makeUrl(
                             route('firmwares.show', ['firmware' => $firmware->id]),

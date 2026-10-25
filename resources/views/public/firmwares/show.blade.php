@@ -2,12 +2,11 @@
 @section('title', $firmware->meta_title . ' | ' . config('app.name', 'Ufamasters'))
 @section('description', $firmware->meta_description)
 @section('canonical', route('firmwares.show', ['firmware' => $firmware->id]))
-@php
-    $firmwarePath = 'firmwares/' . $firmware->title . ($firmware->extension ?? '');
-    $firmwareExists = \Illuminate\Support\Facades\Storage::disk('public')->exists($firmwarePath);
-@endphp
-@if (!$firmwareExists)
+@if (!$firmware->has_file)
     @section('robots', 'noindex, nofollow')
+@elseif ($firmware->is_thin)
+    {{-- Файл есть, но кроме имени о нём ничего не известно: не индексируем, ссылки не закрываем --}}
+    @section('robots', 'noindex, follow')
 @endif
 @section('full-width', true)
 @section('sidebar-first', true)

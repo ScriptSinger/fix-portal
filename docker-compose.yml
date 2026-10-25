@@ -34,6 +34,8 @@ services:
             - "traefik.http.routers.laravel-insecure.middlewares=redirect-to-https"
             - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     php:
+        # Явное имя образа: queue и scheduler запускают его же и не собирают свои копии
+        image: ufamasters-php:latest
         build:
             context: .
             dockerfile: docker/php/php.dockerfile
@@ -46,15 +48,27 @@ services:
     # Воркер очереди: отправляет письма подтверждения (QUEUE_CONNECTION=database).
     # Перезапускается сам после --max-time, а при деплое пересоздаётся вместе с остальными.
     queue:
-        build:
-            context: .
-            dockerfile: docker/php/php.dockerfile
+        image: ufamasters-php:latest
         restart: unless-stopped
         user: "${UID}:${GID}"
         command: php artisan queue:work --tries=3 --sleep=3 --max-time=3600 --memory=96
         volumes:
             - ./:/var/www/html
         depends_on:
+            - php
+            - mysql
+        networks:
+            - laravel
+    # Планировщик задач: раз в минуту запускает schedule:run (сейчас обновляет sitemap.xml по ночам).
+    scheduler:
+        image: ufamasters-php:latest
+        restart: unless-stopped
+        user: "${UID}:${GID}"
+        command: sh -c "while true; do php artisan schedule:run --no-interaction; sleep 60; done"
+        volumes:
+            - ./:/var/www/html
+        depends_on:
+            - php
             - mysql
         networks:
             - laravel
