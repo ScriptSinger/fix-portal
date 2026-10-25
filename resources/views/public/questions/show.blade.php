@@ -1,7 +1,7 @@
 @extends('public.layouts.app')
 @section('title', "$question->title | " . config('app.name', 'Ufamasters'))
 @section('description', Str::limit(strip_tags($question->description ?? ''), 160))
-@section('main-pt', 'pt-[51px]')
+@section('main-pt', 'pt-8')
 
 @php
     $url = route('questions.show', ['question' => $question->slug]);

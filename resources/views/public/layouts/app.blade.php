@@ -48,7 +48,7 @@
 
     @yield('hero')
 
-    <main id="content" class="flex-1 bg-surface pb-16 @yield('main-pt', 'pt-16') @if (View::hasSection('bare')) flex flex-col justify-center @endif">
+    <main id="content" class="flex-1 bg-surface pb-16 @yield('main-pt', 'pt-6') @if (View::hasSection('bare')) flex flex-col justify-center @endif">
         @hasSection('bare')
             @yield('content')
         @else
