@@ -103,7 +103,7 @@ class DatabaseBackupTest extends TestCase
         $file = $this->gz('db.sql.gz', 'x');
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('BACKUP_S3_BUCKET');
+        $this->expectExceptionMessage('YANDEX_BACKUP_BUCKET');
 
         (new DatabaseBackup())->upload($file);
     }

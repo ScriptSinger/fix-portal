@@ -79,7 +79,7 @@ class DatabaseBackup
     public function upload(string $file): string
     {
         if (blank(config('filesystems.disks.' . config('backup.cloud_disk') . '.bucket'))) {
-            throw new RuntimeException('Не задан бакет для копий (BACKUP_S3_BUCKET в .env).');
+            throw new RuntimeException('Не задан бакет для копий (YANDEX_BACKUP_BUCKET в .env).');
         }
 
         $disk = $this->cloud();
