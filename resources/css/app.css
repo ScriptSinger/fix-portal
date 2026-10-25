@@ -179,3 +179,18 @@ html { scroll-padding-top: 100px; }
     .ask-pulse { animation: ask-pulse 2.8s ease-out infinite; }
     @media (prefers-reduced-motion: reduce) { .ask-pulse { animation: none; } }
 }
+
+@layer components {
+    /* Карандаш «пишет» строку: линия дорисовывается слева направо, карандаш едет за концом линии, в конце всё гаснет и начинается заново */
+    @keyframes pencil-line {
+        0% { stroke-dashoffset: 1; opacity: 0; } 4% { opacity: 1; }
+        70%, 90% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes pencil-body {
+        0% { transform: translateX(0); opacity: 1; }
+        70%, 90% { transform: translateX(9px); opacity: 1; } 100% { transform: translateX(9px); opacity: 0; }
+    }
+    .pencil-line { stroke-dasharray: 1 2; stroke-dashoffset: 1; opacity: 0; animation: pencil-line 2.8s ease-in-out infinite; }
+    .pencil-body { animation: pencil-body 2.8s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .pencil-line { animation: none; stroke-dashoffset: 0; opacity: 1; } .pencil-body { animation: none; } }
+}

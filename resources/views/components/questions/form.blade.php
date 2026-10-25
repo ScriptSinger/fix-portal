@@ -35,7 +35,12 @@
         @endforeach
 
         <div class="flex items-start gap-3 px-4 sm:px-5" :class="open ? 'pt-4' : 'cursor-pointer items-center py-3'" @click="if (!open) { open = true; $nextTick(() => $refs.title.focus()) }">
-            <span x-show="!open" class="grid size-8 shrink-0 place-items-center rounded-full bg-brand-400 text-black"><svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 20h4L19 9a2.8 2.8 0 00-4-4L4 16v4zM13.5 6.5l4 4" /></svg></span>
+            <span x-show="!open" class="grid size-8 shrink-0 place-items-center rounded-full bg-brand-400 text-black" aria-hidden="true">
+                <svg class="size-5" viewBox="0 0 24 24" aria-hidden="true">
+                    <path class="pencil-line" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" d="M2 20.5c1-1.8 2-1.8 3 0s2 1.8 3 0 2-1.8 3 0" pathLength="1" />
+                    <g class="pencil-body"><path fill="currentColor" transform="translate(2 20)" d="M0 0l1.3-3.4 7.4-7.4a1.3 1.3 0 011.8 0l.7.7a1.3 1.3 0 010 1.8l-7.4 7.4z" /></g>
+                </svg>
+            </span>
             <label for="f-title" class="sr-only">Что случилось?</label>
             <textarea id="f-title" x-ref="title" @focus="open = true" name="title" rows="1" required
                 :placeholder="open ? 'Что случилось? Например: Beko не сливает воду, ошибка E03' : 'Задать вопрос'"
