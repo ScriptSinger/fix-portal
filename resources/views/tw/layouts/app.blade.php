@@ -16,8 +16,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap&subset=cyrillic"
         rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ asset('assets/front/images/favicon_io/android-chrome-192x192.png') }}">
     <link rel="icon" type="image/png" sizes="32x32"
         href="{{ asset('assets/front/images/favicon_io/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="{{ asset('assets/front/images/favicon_io/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('assets/front/images/favicon_io/site.webmanifest') }}">
+    <meta property="og:site_name" content="{{ config('app.name', 'Ufamasters') }}">
+    <meta property="og:locale" content="ru_RU">
+    <meta property="og:type" content="@yield('og-type', 'website')">
+    <meta property="og:title" content="@yield('title')">
+    <meta property="og:description" content="@yield('description')">
+    <meta property="og:url" content="@hasSection('canonical')@yield('canonical')@else{{ url()->current() }}@endif">
+    @php $ogImage = trim($__env->yieldContent('og-image')) ?: asset('assets/front/images/power_unit.jpg'); @endphp
+    <meta property="og:image" content="{{ \Illuminate\Support\Str::startsWith($ogImage, ['http://', 'https://']) ? $ogImage : url($ogImage) }}">
+    <meta name="twitter:card" content="summary_large_image">
     <meta name="yandex-verification" content="7843198b5b2a0b60" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
