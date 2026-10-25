@@ -1,11 +1,18 @@
 @php
+    // Статьи живут в /articles, /categories, /tag; вопросы в /questions и по технике в /appliances
     $links = [
-        ['Статьи', route('articles.index'), 'articles*'],
-        ['Вопросы', route('questions.index'), 'questions*'],
-        ['Прошивки', route('firmwares.index'), 'firmwares*'],
-        ['О нас', route('about'), 'about'],
+        ['Статьи', route('articles.index'), ['articles*', 'categories*', 'tag/*', 'tags*']],
+        ['Вопросы', route('questions.index'), ['questions*', 'appliances/*']],
+        ['Прошивки', route('firmwares.index'), ['firmwares*']],
+        ['О нас', route('about'), ['about']],
     ];
-    $isActive = fn ($pattern) => request()->is($pattern);
+    $isActive = fn ($patterns) => request()->is(...$patterns);
+    // Поиск в шапке ищет в том разделе, где человек сейчас: статьи, вопросы или прошивки
+    [$searchUrl, $searchField, $searchLabel] = match (true) {
+        request()->is('questions*', 'appliances/*') => [route('questions.index'), 'text', 'Поиск по вопросам'],
+        request()->is('firmwares*') => [route('firmwares.index'), 'search', 'Поиск прошивок'],
+        default => [route('articles.index'), 'text', 'Поиск по статьям'],
+    };
     $link = 'keep block px-[9.6px] py-6 text-[14px] font-bold uppercase leading-[14px] text-[#121212] hover:text-black hover:opacity-70';
     $logo = optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo-trim.png');
 @endphp
@@ -27,10 +34,10 @@
             </nav>
 
             <div class="hidden items-center justify-end gap-2 lg:flex">
-                <form method="GET" action="{{ route('articles.index') }}" role="search" aria-label="Поиск по сайту" class="relative">
-                    <label for="site-search" class="sr-only">Поиск по статьям</label>
+                <form method="GET" action="{{ $searchUrl }}" role="search" aria-label="{{ $searchLabel }}" class="relative">
+                    <label for="site-search" class="sr-only">{{ $searchLabel }}</label>
                     <x-ui.icon name="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
-                    <input id="site-search" name="text" type="search" value="{{ request('text') }}" placeholder="Поиск по сайту"
+                    <input id="site-search" name="{{ $searchField }}" type="search" value="{{ request($searchField) }}" placeholder="{{ $searchLabel }}"
                         class="field !h-10 w-[200px] !pl-9 !pr-3 !text-sm">
                 </form>
                 @auth
@@ -56,9 +63,9 @@
         </div>
 
         <nav id="mobile-menu" x-show="menu" x-collapse x-cloak class="w-full lg:hidden" aria-label="Мобильная навигация">
-            <form method="GET" action="{{ route('articles.index') }}" role="search" aria-label="Поиск в меню" class="pt-2">
-                <label for="site-search-m" class="sr-only">Поиск по статьям</label>
-                <input id="site-search-m" name="text" type="search" value="{{ request('text') }}" placeholder="Поиск по сайту" class="field !h-11 !text-sm">
+            <form method="GET" action="{{ $searchUrl }}" role="search" aria-label="{{ $searchLabel }} в меню" class="pt-2">
+                <label for="site-search-m" class="sr-only">{{ $searchLabel }}</label>
+                <input id="site-search-m" name="{{ $searchField }}" type="search" value="{{ request($searchField) }}" placeholder="{{ $searchLabel }}" class="field !h-11 !text-sm">
             </form>
             <ul class="pt-2">
                 @foreach ($links as [$label, $url, $pattern])

@@ -14,6 +14,10 @@
     <x-ui.question-list :questions="$questions" />
 @endsection
 
+@section('sidebar-left')
+    @include('public.partials.appliance-nav', ['active' => $appliance->slug])
+@endsection
+
 @section('sidebar')
     @include('public.partials.sidebar')
 @endsection
