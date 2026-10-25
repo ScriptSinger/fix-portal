@@ -23,9 +23,6 @@
     $sizeText = $firmware->size >= 1024 ? number_format($firmware->size / 1024, 1, ',', ' ') . ' КБ' : $firmware->size . ' Б';
     $platform = $firmware->platform_norm ?: $firmware->platform;
     $pairs = $firmware->parameter_pairs;
-    $brandNav = collect(app(\App\Services\FirmwareCatalog::class)->brands())->map(fn ($b) => [
-        'title' => $b['name'], 'url' => route('firmwares.brand', ['brand' => $b['slug']]), 'count' => $b['pages'], 'active' => $b['name'] === $firmware->brand,
-    ])->prepend(['title' => 'Все прошивки', 'url' => route('firmwares.index'), 'active' => false]);
 @endphp
 
 @section('hero')
@@ -33,7 +30,7 @@
 @endsection
 
 @section('sidebar-left')
-    <x-ui.side-nav heading="Марки" label="Марки прошивок" :items="$brandNav" />
+    <x-ui.brand-nav :active="\App\Services\FirmwareCatalog::slug((string) $firmware->brand)" />
 @endsection
 
 @section('sidebar')
