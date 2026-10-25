@@ -22,7 +22,7 @@
         <section>
             <a href="{{ route('articles.index') }}" class="inline-block">
                 <img src="{{ asset('assets/front/images/version/ufamasters-logo-light.png') }}" alt="UfaMasters"
-                    class="-ml-1.5 h-11 w-auto">
+                    class="-ml-1.5 h-10 w-auto">
             </a>
             <p class="mt-4 max-w-xs text-[15px] leading-relaxed text-gray-300">
                 Статьи, вопросы и прошивки для ремонта бытовой техники от опытных мастеров.
