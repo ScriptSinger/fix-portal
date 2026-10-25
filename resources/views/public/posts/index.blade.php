@@ -10,7 +10,8 @@
 @section('main-pt', 'pt-8')
 
 @section('hero')
-    <x-ui.hero :customization="$customization" />
+    <x-ui.hero :customization="$customization" search-title="Поиск статей" search-text="Возможно, нужная информация уже есть в статьях. Попробуйте поиск"
+        placeholder="Что вы хотели бы узнать?" label="Поиск статей" :action="route('articles.index')" />
 @endsection
 
 @section('above')
