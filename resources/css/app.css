@@ -71,7 +71,9 @@
 .article-content .d-block { display: block; }
 .article-content .mb-3 { margin-bottom: 1rem; }
 .article-content .text-center { text-align: center; }
-.article-content table { width: 100%; max-width: 100%; margin-bottom: 1rem; border-collapse: collapse; }
+/* Таблицы из редактора: на узком экране прокручиваются по горизонтали, а не ломают слова (как .table-responsive) */
+.article-content table { display: block; width: 100%; max-width: 100%; margin-bottom: 1rem; overflow-x: auto; -webkit-overflow-scrolling: touch; border-collapse: collapse; overflow-wrap: normal; word-break: normal; }
+.article-content th, .article-content td { overflow-wrap: normal; word-break: normal; min-width: 5.5rem; }
 .article-content th, .article-content td { padding: .75rem; vertical-align: top; border-top: 1px solid #eceeef; }
 .article-content thead th { vertical-align: bottom; border-bottom: 2px solid #eceeef; }
 .article-content caption { padding: .75rem; color: #636c72; text-align: left; caption-side: bottom; }
