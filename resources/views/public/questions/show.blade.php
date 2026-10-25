@@ -4,6 +4,9 @@
 @section('canonical', route('questions.show', ['question' => $question->slug]))
 @section('og-type', 'article')
 @section('main-pt', 'pt-8')
+@auth('web')
+    @section('has-composer', '1')
+@endauth
 
 @php
     $url = route('questions.show', ['question' => $question->slug]);

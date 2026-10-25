@@ -16,6 +16,7 @@ class ReplyController extends Controller
             'text' => 'required_without:images|nullable|string|max:5000',
             'images' => 'nullable|array|max:6',
             'images.*' => 'string|max:255',
+            'quote_reply_id' => 'nullable|integer',
         ]);
 
         $userId = auth()->user()->id;
@@ -23,7 +24,9 @@ class ReplyController extends Controller
         abort_if($text === '', 422, 'Пустое сообщение');
         $comment = Comment::findOrFail($id);
 
-        $comment->replies()->create(['text' => $text, 'user_id' => $userId]);
+        // цитировать можно только ответ из этой же ветки
+        $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
+        $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
         return redirect()->back();
     }
 

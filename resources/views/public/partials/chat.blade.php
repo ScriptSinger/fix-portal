@@ -4,7 +4,9 @@
     foreach ($instance->comments as $comment) {
         $items->push(['kind' => 'comment', 'model' => $comment, 'root' => $comment->id, 'quote' => null, 'at' => $comment->created_at]);
         foreach ($comment->replies as $reply) {
-            $items->push(['kind' => 'reply', 'model' => $reply, 'root' => $comment->id, 'quote' => $comment, 'at' => $reply->created_at]);
+            // цитата: конкретный ответ, если отвечали на него, иначе сам комментарий
+            $quoted = $reply->quote_reply_id ? $comment->replies->firstWhere('id', $reply->quote_reply_id) : null;
+            $items->push(['kind' => 'reply', 'model' => $reply, 'root' => $comment->id, 'quote' => $quoted ?? $comment, 'at' => $reply->created_at]);
         }
     }
     $items = $items->sortBy('at')->values();
@@ -67,6 +69,7 @@
                 $id = ($item['kind'] === 'comment' ? 'c-' : 'r-') . $m->id;
                 $q = $item['quote'];
                 $qslot = $q ? $q->user_id % 5 : 0;
+                $qid = $q ? ($q instanceof \App\Models\Reply ? 'r-' : 'c-') . $q->id : null;
                 $date = $m->created_at->toDateString();
             @endphp
             @if ($date !== $day)
@@ -90,7 +93,7 @@
                     @endif
 
                     @if ($q)
-                        <a href="#c-{{ $q->id }}" class="keep my-1 block rounded-r-md border-l-[3px] bg-black/5 px-2 py-0.5 text-[13px] leading-snug no-underline {{ $bars[$qslot] }} {{ $names[$qslot] }}">
+                        <a href="#{{ $qid }}" class="keep my-1 block rounded-r-md border-l-[3px] bg-black/5 px-2 py-0.5 text-[13px] leading-snug no-underline {{ $bars[$qslot] }} {{ $names[$qslot] }}">
                             <b class="block">{{ $q->user->name }}</b>
                             <span class="block truncate text-ink/70">{{ $plain($q->text) }}</span>
                         </a>
@@ -103,33 +106,36 @@
                         <div class="article-content {{ $body === strip_tags($body) ? 'whitespace-pre-line' : '' }} text-[15px] leading-[1.45] [overflow-wrap:anywhere]">{!! \App\Support\ContentImages::withAlt($body, $item['kind'] === 'comment' ? 'Комментарий' : 'Ответ') !!}</div>
                     @endif
 
-                    <div class="mt-0.5 flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-[11px] text-subtle">
-                        <x-ui.likes :instance="$m" />
-                        @auth('web')
-                            <button type="button" class="font-medium hover:text-ink"
-                                @click="target = { root: {{ $item['root'] }}, name: @js($m->user->name), text: @js($plain($m->text, 80)) }; $nextTick(() => $refs.text.focus())">Ответить</button>
-                        @endauth
-                        @can('delete', $m)
-                            <form action="{{ route($item['kind'] === 'comment' ? 'comments.destroy' : 'comments.replies.destroy', ['id' => $m->id]) }}" method="POST" class="inline"
-                                @submit="if (!confirm('Подтвердите удаление')) $event.preventDefault()">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="hover:text-red-600" aria-label="Удалить">
-                                    <svg class="inline size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">{!! $trash !!}</svg>
-                                </button>
-                            </form>
-                        @endcan
-                        <time datetime="{{ $m->created_at->toIso8601String() }}" title="{{ $m->created_at->translatedFormat('j F Y, H:i') }}">{{ $m->created_at->format('H:i') }}</time>
+                    <div class="mt-1 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
+                        <x-ui.reactions :instance="$m" />
+                        <div class="ml-auto flex items-center gap-x-3 text-[11px] text-subtle">
+                            @auth('web')
+                                <button type="button" class="font-medium hover:text-ink"
+                                    @click="target = { root: {{ $item['root'] }}, reply: {{ $item['kind'] === 'reply' ? $m->id : 'null' }}, name: @js($m->user->name), text: @js($plain($m->text, 80)) }; $nextTick(() => $refs.text.focus())">Ответить</button>
+                            @endauth
+                            @can('delete', $m)
+                                <form action="{{ route($item['kind'] === 'comment' ? 'comments.destroy' : 'comments.replies.destroy', ['id' => $m->id]) }}" method="POST" class="inline"
+                                    @submit="if (!confirm('Подтвердите удаление')) $event.preventDefault()">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="hover:text-red-600" aria-label="Удалить">
+                                        <svg class="inline size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">{!! $trash !!}</svg>
+                                    </button>
+                                </form>
+                            @endcan
+                            <time datetime="{{ $m->created_at->toIso8601String() }}" title="{{ $m->created_at->translatedFormat('j F Y, H:i') }}">{{ $m->created_at->format('H:i') }}</time>
+                        </div>
                     </div>
                 </div>
             </div>
         @endforeach
     </div>
 
-    <div class="border-t border-black/10 pt-3">
+    <div class="sticky bottom-0 z-20 bg-surface pb-3 pt-3">
         @auth('web')
             <form method="POST" class="grid gap-2" @submit="submit($event)"
                 :action="target ? @js(route('comments.replies.store', ['id' => '__ID__'])).replace('__ID__', target.root) : base">
                 @csrf
+                <input type="hidden" name="quote_reply_id" :value="target && target.reply" :disabled="!target || !target.reply">
                 <div x-show="target" x-cloak class="flex items-center justify-between gap-2 border-l-[3px] border-teal-700 px-2 text-[13px] leading-snug text-teal-700">
                     <div class="min-w-0">
                         <b class="block" x-text="target && target.name"></b>
