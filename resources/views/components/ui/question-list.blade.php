@@ -2,11 +2,12 @@
 @if ($questions->count())
     <div class="grid grid-cols-1 gap-3">
         @foreach ($questions as $question)
+            @php($excerpt = e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'), 150)))
             <x-ui.entry-row
                 :url="route('questions.show', ['question' => $question->slug])"
                 :image="$question->srcFromContent ?: null"
                 :title="$question->title"
-                :excerpt="e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, "UTF-8"), 150))"
+                :excerpt="$excerpt"
                 :date="$question->dateAsCarbon"
                 :author="optional($question->user)->name"
                 :views="$question->views"
