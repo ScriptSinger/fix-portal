@@ -5,71 +5,103 @@
         ['Прошивки', route('firmwares.index'), 'firmwares*'],
         ['О нас', route('about'), 'about'],
     ];
+    $isActive = fn ($pattern) => request()->is($pattern, 'pilot/' . $pattern);
+    $icon = 'size-5';
 @endphp
-<header x-data="{ open: false }" class="sticky top-0 z-40 border-b-4 border-brand-400 bg-white/95 backdrop-blur">
-    <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="{{ route('articles.index') }}" class="flex items-center">
+<header x-data="{ menu: false, search: false, account: false }" @keydown.escape.window="search = false; account = false"
+    class="sticky top-0 z-40 border-b-[3px] border-brand-400 bg-white">
+    <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+        <a href="{{ route('articles.index') }}" class="flex shrink-0 items-center">
             <img src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo.png') }}"
                 alt="UfaMasters" class="h-9 w-auto">
         </a>
 
-        <nav class="hidden items-center gap-1 md:flex" aria-label="Основная навигация">
+        <nav class="ml-4 hidden items-center gap-1 md:flex" aria-label="Основная навигация">
             @foreach ($links as [$label, $url, $pattern])
                 <a href="{{ $url }}" @class([
-                    'rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-surface',
-                    'text-ink bg-brand-400' => request()->is($pattern, 'pilot/' . $pattern),
-                    'text-muted' => !request()->is($pattern, 'pilot/' . $pattern),
-                ])>{{ $label }}</a>
+                    'rounded-md px-3 py-2 text-[15px] font-medium transition-colors',
+                    'bg-brand-400 text-ink' => $isActive($pattern),
+                    'text-ink/80 hover:bg-surface hover:text-ink' => !$isActive($pattern),
+                ]) @if ($isActive($pattern)) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
         </nav>
 
-        <div class="hidden items-center gap-1 text-sm md:flex">
+        <div class="ml-auto flex items-center gap-1 sm:gap-2">
+            <button type="button" @click="search = !search; if (search) $nextTick(() => $refs.q.focus())"
+                :aria-expanded="search" aria-controls="site-search" aria-label="Поиск"
+                class="rounded-md p-2 text-ink hover:bg-surface">
+                <svg class="{{ $icon }}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                    aria-hidden="true">
+                    <circle cx="11" cy="11" r="7" />
+                    <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
+                </svg>
+            </button>
+
+            <x-tw.button :href="route('questions.create')" size="sm" class="max-sm:hidden">Задать вопрос</x-tw.button>
+
             @auth
-                <a href="{{ route('profile.edit') }}"
-                    class="rounded-md px-3 py-2 font-medium text-muted hover:bg-surface">{{ auth()->user()->name }}</a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit"
-                        class="rounded-md px-3 py-2 font-medium text-muted hover:bg-surface">Выход</button>
-                </form>
+                <div class="relative hidden md:block" @click.outside="account = false">
+                    <button type="button" @click="account = !account" :aria-expanded="account" aria-haspopup="menu"
+                        class="flex items-center gap-2 rounded-full p-1 hover:bg-surface" aria-label="Аккаунт">
+                        <x-tw.avatar :user="auth()->user()" size="size-8" />
+                    </button>
+                    <div x-show="account" x-cloak x-transition.opacity role="menu"
+                        class="absolute right-0 mt-2 w-52 rounded-xl border border-line bg-white p-1 text-sm shadow-lg">
+                        <div class="truncate px-3 py-2 font-bold">{{ auth()->user()->name }}</div>
+                        <a href="{{ route('profile.edit') }}" role="menuitem"
+                            class="block rounded-md px-3 py-2 hover:bg-surface">Профиль</a>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" role="menuitem"
+                                class="block w-full rounded-md px-3 py-2 text-left hover:bg-surface">Выход</button>
+                        </form>
+                    </div>
+                </div>
             @endauth
             @guest
                 <a href="{{ route('login') }}"
-                    class="rounded-md px-3 py-2 font-medium text-muted hover:bg-surface">Вход</a>
-                <a href="{{ route('register') }}"
-                    class="rounded-md bg-ink px-3 py-2 font-medium text-white hover:bg-black">Регистрация</a>
+                    class="hidden rounded-md px-3 py-2 text-[15px] font-medium text-ink/80 hover:bg-surface hover:text-ink md:block">Вход</a>
             @endguest
-        </div>
 
-        <button type="button" class="rounded-md p-2 text-ink hover:bg-surface md:hidden" @click="open = !open"
-            :aria-expanded="open" aria-controls="mobile-menu" aria-label="Меню">
-            <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
-                aria-hidden="true">
-                <path x-show="!open" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
-                <path x-show="open" x-cloak stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
-            </svg>
-        </button>
+            <button type="button" class="rounded-md p-2 text-ink hover:bg-surface md:hidden" @click="menu = !menu"
+                :aria-expanded="menu" aria-controls="mobile-menu" aria-label="Меню">
+                <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"
+                    aria-hidden="true">
+                    <path x-show="!menu" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
+                    <path x-show="menu" x-cloak stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+                </svg>
+            </button>
+        </div>
     </div>
 
-    <div id="mobile-menu" x-show="open" x-cloak x-transition.opacity class="border-t border-line bg-white md:hidden">
+    <div id="site-search" x-show="search" x-cloak x-transition.opacity class="border-t border-line bg-surface">
+        <form method="GET" action="{{ route('articles.index') }}" role="search"
+            class="mx-auto flex max-w-6xl gap-2 px-4 py-3 sm:px-6">
+            <label for="header-search" class="sr-only">Поиск по статьям</label>
+            <input id="header-search" x-ref="q" type="search" name="text" value="{{ request('text') }}"
+                placeholder="Поиск по статьям: ошибка, модель, неисправность"
+                class="min-w-0 flex-1 rounded-lg border border-line bg-white px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400/40">
+            <x-tw.button variant="dark">Найти</x-tw.button>
+        </form>
+    </div>
+
+    <div id="mobile-menu" x-show="menu" x-cloak x-transition.opacity class="border-t border-line bg-white md:hidden">
         <nav class="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6" aria-label="Мобильная навигация">
             @foreach ($links as [$label, $url, $pattern])
                 <a href="{{ $url }}" @class([
                     'rounded-md px-3 py-3 text-base font-medium',
-                    'bg-brand-400 text-ink' => request()->is($pattern, 'pilot/' . $pattern),
-                    'text-muted' => !request()->is($pattern, 'pilot/' . $pattern),
+                    'bg-brand-400 text-ink' => $isActive($pattern),
+                    'text-ink/80' => !$isActive($pattern),
                 ])>{{ $label }}</a>
             @endforeach
-            <div class="mt-2 flex gap-2 border-t border-line py-3">
+            <div class="mt-2 flex flex-wrap gap-2 border-t border-line py-3">
+                <x-tw.button :href="route('questions.create')" size="sm" class="flex-1">Задать вопрос</x-tw.button>
                 @auth
-                    <a href="{{ route('profile.edit') }}"
-                        class="flex-1 rounded-md border border-line px-3 py-2 text-center text-sm font-medium">{{ auth()->user()->name }}</a>
+                    <x-tw.button variant="outline" size="sm" :href="route('profile.edit')"
+                        class="flex-1">{{ auth()->user()->name }}</x-tw.button>
                 @endauth
                 @guest
-                    <a href="{{ route('login') }}"
-                        class="flex-1 rounded-md border border-line px-3 py-2 text-center text-sm font-medium">Вход</a>
-                    <a href="{{ route('register') }}"
-                        class="flex-1 rounded-md bg-ink px-3 py-2 text-center text-sm font-medium text-white">Регистрация</a>
+                    <x-tw.button variant="outline" size="sm" :href="route('login')" class="flex-1">Вход</x-tw.button>
                 @endguest
             </div>
         </nav>

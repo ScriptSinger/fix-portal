@@ -47,6 +47,7 @@ Route::get('/pilot/articles', [PostController::class, 'index'])->name('pilot.art
 Route::get('/pilot/articles/{article}', [PostController::class, 'show'])->name('pilot.articles.show');
 Route::get('/pilot/categories', [CategoryController::class, 'index'])->name('pilot.categories.index');
 Route::get('/pilot/categories/{category}', [CategoryController::class, 'show'])->name('pilot.categories.show');
+Route::view('/pilot/consent', 'tw.pages.consent')->name('pilot.consent');
 Route::get('/pilot/tags', [TagController::class, 'index'])->name('pilot.tags.index');
 Route::get('/pilot/tag/{tag}', [TagController::class, 'show'])->name('pilot.tags.show');
 

@@ -12,22 +12,21 @@
     $materials = [
         ['Категории', route('categories.index')],
         ['Теги', route('tags.index')],
+        ['Telegram-чат', 'https://t.me/ufamasters_chat'],
     ];
     $heading = 'mb-4 border-b-2 border-brand-400 pb-2 font-sans text-sm font-bold uppercase tracking-wide text-white';
     $link = 'text-white transition-colors hover:text-brand-400';
 @endphp
 <footer class="mt-8 bg-footer text-white">
-    <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
+    <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
         <section>
             <a href="{{ route('articles.index') }}" class="inline-block rounded-md bg-white px-3 py-2">
                 <img src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo.png') }}"
                     alt="UfaMasters" class="h-8 w-auto">
             </a>
-            <p class="mt-4 max-w-sm text-sm leading-relaxed text-gray-300">
+            <p class="mt-4 max-w-xs text-sm leading-relaxed text-gray-300">
                 Статьи, вопросы и прошивки для ремонта бытовой техники от опытных мастеров.
             </p>
-            <x-tw.button variant="primary" size="sm" href="https://t.me/ufamasters_chat" target="_blank"
-                rel="noopener" class="mt-5">Telegram-чат сообщества</x-tw.button>
         </section>
 
         <nav aria-label="Разделы сайта">
@@ -43,10 +42,28 @@
             <h2 class="{{ $heading }}">Материалы</h2>
             <ul class="space-y-2 text-sm">
                 @foreach ($materials as [$label, $url])
-                    <li><a href="{{ $url }}" class="{{ $link }}">{{ $label }}</a></li>
+                    <li>
+                        <a href="{{ $url }}" class="{{ $link }}"
+                            @if (str_starts_with($url, 'http')) target="_blank" rel="noopener" @endif>{{ $label }}</a>
+                    </li>
                 @endforeach
             </ul>
         </nav>
+
+        <section>
+            <h2 class="{{ $heading }}">Нужен мастер в Уфе?</h2>
+            <p class="text-sm leading-relaxed text-gray-300">
+                Не получилось починить самостоятельно? Мастера UfaMasters приедут и устранят неисправность.
+            </p>
+            <x-tw.button variant="primary" href="https://service.ufamasters.ru" target="_blank" rel="noopener"
+                class="mt-4">Вызвать мастера</x-tw.button>
+        </section>
     </div>
-    <div class="border-t border-white/15 py-5 text-center text-sm text-gray-300">&copy; {{ $copyright }}</div>
+    <div class="border-t border-white/15">
+        <div
+            class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-sm text-gray-300 sm:flex-row sm:px-6">
+            <span>&copy; {{ $copyright }}</span>
+            <a href="{{ route('pilot.consent') }}" class="hover:text-brand-400">Согласие на обработку персональных данных</a>
+        </div>
+    </div>
 </footer>
