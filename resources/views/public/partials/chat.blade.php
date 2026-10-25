@@ -133,9 +133,10 @@
     </div>
 
     <div class="sticky bottom-0 z-20 bg-surface pb-3 pt-3">
-        <button type="button" x-show="far" x-cloak x-transition.opacity @click="toEnd()" aria-label="К последним сообщениям"
-            class="absolute -top-14 right-0 grid size-11 place-items-center rounded-full bg-white text-subtle shadow-md ring-1 ring-black/10 hover:text-ink">
-            <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" /></svg>
+        {{-- Стрелка вниз занимает нижнее место, «Наверх» поднимается над ней (store jump, см. layouts/app.blade.php) --}}
+        <button type="button" x-show="far" x-cloak x-transition.opacity x-effect="$store.jump.show = far" @click="toEnd()" aria-label="К последним сообщениям"
+            class="fixed {{ View::hasSection('has-composer') ? 'max-lg:bottom-20' : 'max-lg:bottom-4' }} right-4 z-30 flex size-12 items-center justify-center bg-brand-400 text-ink shadow-[0_2px_10px_rgba(0,0,0,.3)] lg:bottom-10 lg:right-6 lg:size-10 lg:shadow-none">
+            <x-ui.icon name="chevron-down" class="size-5" />
         </button>
         @auth('web')
             <form method="POST" class="grid gap-2" @submit="submit($event)"

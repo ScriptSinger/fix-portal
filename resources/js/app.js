@@ -16,6 +16,8 @@ import firmwareFilter from './components/firmwareFilter';
 import articleToc from './components/articleToc';
 
 Alpine.plugin(collapse);
+// Показана ли стрелка «вниз» в ленте ответов: стрелка «Наверх» тогда встаёт над ней
+Alpine.store('jump', { show: false });
 Alpine.data('copyLink', copyLink);
 Alpine.data('likeBox', likeBox);
 Alpine.data('reactions', reactions);

@@ -99,7 +99,8 @@
     <button type="button" x-data="{ show: false }" x-show="show" x-cloak
         @scroll.window="show = window.scrollY > 300"
         @click="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Наверх"
-        class="fixed {{ View::hasSection('has-composer') ? 'max-lg:bottom-36' : 'max-lg:bottom-4' }} right-4 z-30 flex size-12 items-center lg:bottom-10 lg:right-6 lg:size-10 justify-center bg-brand-400 text-ink shadow-[0_2px_10px_rgba(0,0,0,.3)] lg:shadow-none">
+        x-bind:class="$store.jump.show ? '{{ View::hasSection('has-composer') ? 'max-lg:!bottom-[8.5rem]' : 'max-lg:!bottom-[5rem]' }} lg:!bottom-[5.5rem]' : ''"
+        class="fixed {{ View::hasSection('has-composer') ? 'max-lg:bottom-20' : 'max-lg:bottom-4' }} right-4 z-30 flex size-12 items-center lg:bottom-10 lg:right-6 lg:size-10 justify-center bg-brand-400 text-ink shadow-[0_2px_10px_rgba(0,0,0,.3)] lg:shadow-none">
         <x-ui.icon name="chevron-up" class="size-5" />
     </button>
     @stack('scripts')
