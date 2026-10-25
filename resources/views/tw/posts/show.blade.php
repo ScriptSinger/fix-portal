@@ -17,8 +17,8 @@
                 class="mt-5 inline-block text-xs font-bold uppercase tracking-wide text-brand-700 hover:underline">{{ $post->category->title }}</a>
             <h1 class="mt-1 text-3xl font-bold leading-tight sm:text-4xl">{{ $post->title }}</h1>
 
-            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
-                <span>{{ $post->dateAsCarbon->diffForHumans() }}</span>
+            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-[15px] text-muted">
+                <time datetime="{{ $post->dateAsCarbon->toDateString() }}">{{ $post->dateAsCarbon->translatedFormat('j F Y') }}</time>
                 <span>{{ $post->administrator->name }}</span>
                 <x-tw.views :count="$post->views" />
             </div>

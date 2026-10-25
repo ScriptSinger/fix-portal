@@ -35,14 +35,18 @@
     @yield('hero')
 
     <main id="content" class="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        @hasSection('no-sidebar')
             <div class="min-w-0">@yield('content')</div>
-            <aside>
-                <div class="space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
-                    @yield('sidebar')
-                </div>
-            </aside>
-        </div>
+        @else
+            <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+                <div class="min-w-0">@yield('content')</div>
+                <aside>
+                    <div class="space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1">
+                        @yield('sidebar')
+                    </div>
+                </aside>
+            </div>
+        @endif
     </main>
 
     @include('tw.partials.footer')

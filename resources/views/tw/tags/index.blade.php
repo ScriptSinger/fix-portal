@@ -7,6 +7,8 @@
     <x-tw.page-header title="Теги статей" :items="[['Статьи', route('articles.index')], ['Теги', null]]" />
 @endsection
 
+@section('no-sidebar', true)
+
 @section('content')
     <ul class="flex flex-wrap gap-2">
         @foreach ($tags as $tag)
@@ -21,6 +23,3 @@
     </ul>
 @endsection
 
-@section('sidebar')
-    @include('tw.partials.sidebar')
-@endsection

@@ -4,7 +4,7 @@
         Telegram-чат сообщества
     </h2>
     <p class="mt-1 text-sm text-muted">Делитесь опытом, задавайте вопросы, помогайте другим.</p>
-    <x-tw.button variant="telegram" size="sm" href="https://t.me/ufamasters_chat" target="_blank" rel="noopener" class="mt-4 w-full">Перейти в Telegram</x-tw.button>
+    <x-tw.button variant="telegram-outline" size="sm" href="https://t.me/ufamasters_chat" target="_blank" rel="noopener" class="mt-4 w-full">Перейти в Telegram</x-tw.button>
 </x-tw.card>
 
 <x-tw.widget title="Популярные статьи">
@@ -16,7 +16,7 @@
                 <div class="min-w-0">
                     <a href="{{ route('articles.show', ['article' => $post->slug]) }}"
                         class="line-clamp-2 text-sm font-medium leading-snug hover:underline">{{ $post->title }}</a>
-                    <div class="mt-1 text-xs text-muted">{{ $post->dateAsCarbon->diffForHumans() }} ·
+                    <div class="mt-1 text-[13px] text-muted">{{ $post->dateAsCarbon->translatedFormat('j F Y') }} ·
                         {{ $post->views }} просм.</div>
                 </div>
             </li>

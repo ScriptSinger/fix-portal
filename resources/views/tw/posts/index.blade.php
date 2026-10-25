@@ -7,11 +7,11 @@
 @section('hero')
     <section class="relative isolate overflow-hidden bg-ink text-white"
         style="background-image: linear-gradient(rgba(17,24,39,.78), rgba(17,24,39,.78)), url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}'); background-size: cover; background-position: center;">
-        <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1fr_20rem] lg:grid-cols-[1fr_22rem] lg:py-16">
+        <div class="mx-auto grid max-w-6xl items-center gap-8 px-4 py-8 sm:px-6 sm:py-10 md:grid-cols-[1fr_20rem] lg:grid-cols-[1fr_22rem] lg:py-16">
             <div>
                 <h1 class="text-3xl font-bold leading-tight sm:text-4xl">
                     {{ optional($customization)->title ?? 'Ремонт бытовой техники' }}</h1>
-                <p class="mt-4 max-w-xl text-lg text-gray-200">
+                <p class="mt-4 hidden max-w-xl text-lg text-gray-200 sm:block">
                     {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
                 </p>
                 <x-tw.button :href="route('questions.create')" class="mt-6 py-3">Создать вопрос</x-tw.button>
@@ -20,7 +20,7 @@
             <form method="GET" action="{{ route('articles.index') }}" role="search"
                 class="rounded-xl bg-white p-5 text-ink shadow-lg">
                 <label for="article-search" class="text-lg font-bold">Поиск статей</label>
-                <p class="mt-1 text-sm text-muted">Возможно, нужная информация уже есть в статьях.</p>
+                <p class="mt-1 hidden text-sm text-muted sm:block">Возможно, нужная информация уже есть в статьях.</p>
                 <input id="article-search" name="text" type="search" value="{{ request('text') }}"
                     placeholder="Что вы хотели бы узнать?"
                     class="mt-3 w-full rounded-lg border border-line px-3 py-2.5 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-400/40">
