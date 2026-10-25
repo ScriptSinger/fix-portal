@@ -41,7 +41,6 @@
 
 @section('sidebar-left')
     @include('public.partials.appliance-nav', ['active' => $question->appliance->slug])
-    @include('public.partials.ask-cta')
 @endsection
 
 @section('content')
@@ -60,7 +59,7 @@
 
             <x-ui.photo-grid :photos="$photos" :alt="$question->title" />
 
-            <div class="article-content px-4 pt-3 text-[15px] leading-[1.5] sm:px-5">{!! $bodyHtml !!}</div>
+            <div class="article-content {{ $bodyHtml === strip_tags($bodyHtml) ? 'whitespace-pre-line' : '' }} px-4 pt-3 text-[15px] leading-[1.5] [overflow-wrap:anywhere] sm:px-5">{!! $bodyHtml !!}</div>
 
             <footer class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 px-4 pb-2 pt-1 text-xs leading-5 text-subtle sm:px-5">
                 @can('update', $question)

@@ -5,21 +5,37 @@ namespace App\Support;
 use App\Models\Image;
 
 /**
- * Текст сообщения в обсуждении: набранный текст экранируется, загруженные фото добавляются тегами img.
- * Берутся только фото, которые загрузил сам автор (таблица images), чужие адреса игнорируются.
+ * Текст сообщения или вопроса: набранный текст экранируется, загруженные фото добавляются тегами img.
+ * Берутся только фото, которые загрузил сам автор (таблица images); адреса из $keep (фото, уже стоявшие в сохранённом тексте) тоже остаются.
  */
 class MessageBody
 {
-    /** @param list<string> $urls */
-    public static function make(?string $text, array $urls, int $userId): string
+    /**
+     * @param list<string> $urls
+     * @param list<string> $keep
+     */
+    public static function make(?string $text, array $urls, int $userId, array $keep = []): string
     {
-        $text = e(trim((string) $text));
+        $out = e(trim((string) $text));
 
-        $images = $urls === [] ? collect() : Image::query()->where('user_id', $userId)->whereIn('url', $urls)->get()->sortBy(fn (Image $i) => array_search($i->url, $urls, true));
-        foreach ($images as $image) {
-            $text .= '<img src="' . e($image->url) . '" class="img-fluid" data-id="' . $image->id . '">';
+        $owned = $urls === [] ? collect() : Image::query()->where('user_id', $userId)->whereIn('url', $urls)->get()->keyBy('url');
+        foreach (array_unique($urls) as $url) {
+            if ($image = $owned->get($url)) {
+                $out .= '<img src="' . e($url) . '" class="img-fluid" data-id="' . $image->id . '">';
+            } elseif (in_array($url, $keep, true)) {
+                $out .= '<img src="' . e($url) . '" class="img-fluid">';
+            }
         }
 
-        return $text;
+        return $out;
+    }
+
+    /** Текст сохранённого описания для поля ввода: абзацы и переносы остаются переводами строк, остальная разметка отбрасывается. */
+    public static function toPlain(?string $html): string
+    {
+        $text = preg_replace('~<(br\s*/?|/p|/div|/li)>~i', "\n", (string) $html);
+        $text = html_entity_decode(strip_tags($text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        return trim(preg_replace("/\n{3,}/", "\n\n", str_replace("\r", '', $text)));
     }
 }

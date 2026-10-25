@@ -7,6 +7,8 @@ use App\Http\Filters\Questions\TextFilter;
 
 use App\Models\Appliance;
 use App\Models\Question;
+use App\Support\ContentImages;
+use App\Support\MessageBody;
 use App\Services\FileUploader;
 
 
@@ -30,19 +32,23 @@ class QuestionController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(50);
 
-        return view('public.questions.index', compact('questions'));
+        $appliances = Appliance::pluck('title', 'id');
+
+        return view('public.questions.index', compact('questions', 'appliances'));
     }
 
+    /** Отдельной страницы нет: форма стоит над списком вопросов, кнопки «Задать вопрос» ведут к ней. */
     public function create()
     {
-        $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
-        return view('public.questions.create', compact('appliances'));
+        return redirect(route('questions.index') . '#ask');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate($this->rules(), $this->messages());
         $data['user_id'] = auth()->user()->id;
+        $data['description'] = MessageBody::make($data['description'] ?? null, $data['images'] ?? [], $data['user_id']);
+        unset($data['images']);
         Question::create($data);
         return redirect()->route('questions.index')->with('success', 'Вопрос создан');
     }
@@ -70,6 +76,9 @@ class QuestionController extends Controller
         $this->authorize('update', $question);
         $data = $request->validate($this->rules($question->id), $this->messages());
         $data['user_id'] = $request->user()->id;
+        $kept = array_column(ContentImages::extract($question->description)[1], 'full');
+        $data['description'] = MessageBody::make($data['description'] ?? null, $data['images'] ?? [], $data['user_id'], $kept);
+        unset($data['images']);
         $question->update($data);
         return redirect()->route('questions.index')->with('success', 'Изменения сохранены');
     }
@@ -91,9 +100,10 @@ class QuestionController extends Controller
             'appliance_id' => ['required', 'exists:appliances,id'],
             'model' => ['nullable', 'string', 'max:120'],
             'error_code' => ['nullable', 'string', 'max:60'],
-            'description' => ['required', 'string', function (string $attribute, mixed $value, \Closure $fail) {
-                $text = trim(html_entity_decode(strip_tags((string) $value), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                if (mb_strlen($text) < 40 && ! str_contains((string) $value, '<img')) {
+            'images' => ['nullable', 'array', 'max:10'],
+            'images.*' => ['string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:10000', function (string $attribute, mixed $value, \Closure $fail) {
+                if (mb_strlen(trim((string) $value)) < 40 && ! request()->filled('images')) {
                     $fail('Опишите проблему подробнее: когда началось и что уже проверяли (хотя бы 40 знаков) или приложите фото.');
                 }
             }],
@@ -108,7 +118,6 @@ class QuestionController extends Controller
             'title.max' => 'Заголовок длиннее 150 знаков: сократите, подробности перенесите в описание.',
             'title.unique' => 'Вопрос с таким заголовком уже есть. Уточните его (модель, код ошибки) или найдите существующий вопрос.',
             'appliance_id.required' => 'Выберите тип прибора.',
-            'description.required' => 'Опишите проблему подробнее.',
         ];
     }
 }

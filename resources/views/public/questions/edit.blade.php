@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <div class="rounded-[5px] bg-white p-12 max-sm:px-4">
+    <div>
         <x-questions.form :action="route('questions.update', ['question' => $question->slug])" method="PUT" :question="$question" :appliances="$appliances" />
     </div>
 @endsection
