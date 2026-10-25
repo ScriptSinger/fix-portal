@@ -89,6 +89,12 @@ Route::get('/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series
 
 Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('firmwares.show');
 
+// Пилот перехода на Vite + Tailwind
+Route::get('/pilot/firmwares', [FirmwareController::class, 'index'])->name('pilot.firmwares.index');
+Route::get('/pilot/firmwares/{brand}', [FirmwareHubController::class, 'brand'])->where('brand', $firmwareBrands)->name('pilot.firmwares.brand');
+Route::get('/pilot/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series'])->where(['brand' => $firmwareBrands, 'series' => '[a-z]+'])->name('pilot.firmwares.series');
+Route::get('/pilot/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('pilot.firmwares.show');
+
 
 
 Route::middleware(['auth:web', 'verified'])->group(

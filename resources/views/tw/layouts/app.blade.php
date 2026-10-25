@@ -35,9 +35,14 @@
     @yield('hero')
 
     <main id="content" class="bg-surface pb-16 @yield('main-pt', 'pt-16')">
-        <div class="mx-auto max-w-[1140px] px-[15px]">
+        <div @class(['mx-auto px-[15px]', 'max-w-[1140px]' => ! View::hasSection('wide')])>
             @hasSection('no-sidebar')
                 <div class="min-w-0">@yield('content')</div>
+            @elseif (View::hasSection('wide'))
+                <div class="grid gap-[30px] lg:grid-cols-[210px_minmax(0,1fr)]">
+                    <aside>@yield('sidebar')</aside>
+                    <div class="min-w-0">@yield('content')</div>
+                </div>
             @else
                 <div class="grid gap-[30px] lg:grid-cols-[minmax(0,1fr)_350px]">
                     <div class="min-w-0">@yield('content')</div>

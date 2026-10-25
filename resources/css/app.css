@@ -79,3 +79,11 @@
 .article-content .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(0, 0, 0, .05); }
 .article-content .table-responsive { display: block; width: 100%; overflow-x: auto; }
 .article-content .custombox { position: relative; padding: 3rem 2rem; border: 1px dashed #dadada; margin-bottom: 1rem; }
+
+/* Таблицы каталога прошивок: вид Bootstrap table-bordered table-striped. */
+.data-table { width: 100%; max-width: 100%; margin-bottom: 1rem; border-collapse: collapse; }
+.data-table th, .data-table td { padding: .75rem; vertical-align: top; border: 1px solid #eceeef; text-align: left; }
+.data-table thead th { vertical-align: bottom; border-bottom: 2px solid #eceeef; color: #000; }
+.data-table tbody tr:nth-of-type(odd) { background-color: rgba(0, 0, 0, .05); }
+.data-table a { color: #111; }
+.data-table a:hover { color: var(--color-link); }

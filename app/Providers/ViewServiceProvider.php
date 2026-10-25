@@ -24,6 +24,12 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Пилот: ссылка на pilot.* вариант маршрута, если он есть и мы внутри пилота; после переключения удаляется
+        View::share('pr', fn (string $name, array $params = []) => route(
+            request()->routeIs('pilot.*') && \Illuminate\Support\Facades\Route::has('pilot.' . $name) ? 'pilot.' . $name : $name,
+            $params
+        ));
+
         View::composer([
             'public.layouts.includes.header',
             'public.posts.index',
