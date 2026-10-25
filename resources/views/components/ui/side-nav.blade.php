@@ -12,7 +12,7 @@
         @foreach ($items as $item)
             <li class="shrink-0 lg:block lg:border-b lg:border-dashed lg:border-line lg:first:pt-0 lg:last:border-0">
                 <a href="{{ $item['url'] }}" @if ($item['active']) aria-current="page" @endif
-                    class="{{ $chip }} {{ $row }} {{ $item['active'] ? 'bg-black text-brand-400 lg:-mx-3 lg:px-3' : 'bg-white text-ink hover:text-link lg:bg-transparent' }}">
+                    class="{{ $chip }} {{ $row }} {{ $item['active'] ? 'bg-black text-brand-400 lg:-mx-3 lg:px-3' : 'bg-white text-ink hover:text-brand-700 lg:bg-transparent' }}">
                     <span>{{ $item['title'] }}</span>
                 </a>
             </li>
