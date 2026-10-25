@@ -61,6 +61,21 @@ return [
             'throw' => true,
         ],
 
+        // Приватный бакет для дампов базы (php artisan db:backup). В дампе e-mail и хеши паролей
+        // пользователей, поэтому бакет отдельный от бакета с прошивками.
+        // Отдельный ключ можно завести через BACKUP_S3_KEY, иначе берётся общий ключ Yandex.
+        'backups' => [
+            'driver' => 's3',
+            'key' => env('BACKUP_S3_KEY', env('YANDEX_S3_KEY')),
+            'secret' => env('BACKUP_S3_SECRET', env('YANDEX_S3_SECRET')),
+            'region' => env('BACKUP_S3_REGION', env('YANDEX_S3_REGION', 'ru-central1')),
+            'bucket' => env('BACKUP_S3_BUCKET'),
+            'endpoint' => env('BACKUP_S3_ENDPOINT', env('YANDEX_S3_ENDPOINT', 'https://storage.yandexcloud.net')),
+            'use_path_style_endpoint' => env('YANDEX_S3_PATH_STYLE', true),
+            'visibility' => 'private',
+            'throw' => true,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

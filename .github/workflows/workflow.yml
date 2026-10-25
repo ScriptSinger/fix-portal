@@ -119,6 +119,10 @@ jobs:
 
             echo "${{ secrets.ENV_FILE }}" > .env
 
+            # Образ собираем ДО остановки сайта: при изменении Dockerfile сборка идёт минуты,
+            # и пока она идёт, старые контейнеры продолжают отвечать. Без изменений это секунды из кэша.
+            docker compose build php </dev/null
+
             docker compose down
             docker compose up -d --build
             # stdin команд docker закрыт (</dev/null), иначе они читают остаток этого скрипта и он обрывается.
