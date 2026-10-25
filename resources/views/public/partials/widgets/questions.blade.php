@@ -1,9 +1,11 @@
 <x-ui.widget title="Свежие вопросы">
     <ul class="mb-4">
         @foreach ($latest_questions as $question)
-            <li class="border-b border-dashed border-line py-3 first:pt-0 last:border-0">
-                <a href="{{ route('questions.show', ['question' => $question->slug]) }}" class="block text-[15px] font-bold leading-[22px] text-black">{{ $question->title }}</a>
-                <span class="mt-1 block text-xs leading-5 text-subtle">{{ $question->appliance->title }} · {{ $question->dateAsCarbon->diffForHumans() }}</span>
+            <li class="border-b border-dashed border-line last:border-0">
+                <div class="-mx-5 px-5 py-3 transition-colors hover:bg-brand-50 hover:shadow-[inset_4px_0_0_var(--color-brand-400)]">
+                    <a href="{{ route('questions.show', ['question' => $question->slug]) }}" class="keep block text-[15px] font-bold leading-[22px] text-black">{{ $question->title }}</a>
+                    <span class="mt-1 block text-xs leading-5 text-subtle">{{ $question->appliance->title }} · {{ $question->dateAsCarbon->diffForHumans() }}</span>
+                </div>
             </li>
         @endforeach
     </ul>
