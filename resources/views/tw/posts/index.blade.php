@@ -26,7 +26,7 @@
 
             @if ($popular_categories->isNotEmpty())
                 <ul class="mt-4 flex flex-wrap gap-2" aria-label="Популярные категории">
-                    @foreach ($popular_categories->take(5) as $category)
+                    @foreach ($popular_categories->take(4) as $category)
                         <li @class(['max-sm:hidden' => $loop->index >= 3])>
                             <a href="{{ route('categories.show', ['category' => $category->slug]) }}"
                                 class="inline-block rounded-full bg-white/10 px-3 py-1 text-sm text-white ring-1 ring-white/25 transition-colors hover:bg-brand-400 hover:text-ink hover:ring-brand-400">{{ $category->title }}</a>

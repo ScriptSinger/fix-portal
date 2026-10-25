@@ -17,12 +17,12 @@
                 alt="UfaMasters" class="h-9 w-auto">
         </a>
 
-        <nav class="ml-4 hidden items-center gap-1 md:flex" aria-label="Основная навигация">
+        <nav class="ml-4 hidden items-stretch gap-1 self-stretch md:flex" aria-label="Основная навигация">
             @foreach ($links as [$label, $url, $pattern])
                 <a href="{{ $url }}" @class([
-                    'rounded-md px-3 py-2 text-[15px] font-medium transition-colors',
-                    'bg-brand-400 text-ink' => $isActive($pattern),
-                    'text-ink/80 hover:bg-surface hover:text-ink' => !$isActive($pattern),
+                    'relative flex items-center px-3 text-[15px] transition-colors',
+                    'font-bold text-ink after:absolute after:inset-x-3 after:-bottom-[3px] after:h-[3px] after:bg-ink' => $isActive($pattern),
+                    'font-medium text-ink/70 hover:text-ink' => !$isActive($pattern),
                 ]) @if ($isActive($pattern)) aria-current="page" @endif>{{ $label }}</a>
             @endforeach
         </nav>
@@ -94,9 +94,9 @@
         <nav class="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6" aria-label="Мобильная навигация">
             @foreach ($links as [$label, $url, $pattern])
                 <a href="{{ $url }}" @class([
-                    'rounded-md px-3 py-3 text-base font-medium',
-                    'bg-brand-400 text-ink' => $isActive($pattern),
-                    'text-ink/80' => !$isActive($pattern),
+                    'border-l-4 px-3 py-3 text-base',
+                    'border-ink bg-surface font-bold text-ink' => $isActive($pattern),
+                    'border-transparent font-medium text-ink/80' => !$isActive($pattern),
                 ])>{{ $label }}</a>
             @endforeach
             <div class="mt-2 flex flex-wrap gap-2 border-t border-line py-3">
