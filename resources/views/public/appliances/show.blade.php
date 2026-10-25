@@ -7,7 +7,6 @@
         ['Вопросы', route('questions.index')],
         [$appliance->title, null],
     ]">
-        <x-slot:actions><x-ui.button variant="accent" size="lg" :href="route('questions.create')" class="max-sm:w-full">Задать вопрос</x-ui.button></x-slot:actions>
     </x-ui.page-header>
 @endsection
 
@@ -17,7 +16,6 @@
 
 @section('sidebar-left')
     @include('public.partials.appliance-nav', ['active' => $appliance->slug])
-    @include('public.partials.ask-cta')
 @endsection
 
 @section('sidebar')
