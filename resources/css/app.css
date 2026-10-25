@@ -74,6 +74,8 @@
     overflow-wrap: anywhere;
 }
 .article-content p { margin-bottom: 26px; }
+/* Заголовки не прячутся под липкой шапкой при переходе по содержанию */
+.article-content h2, .article-content h3 { scroll-margin-top: 130px; }
 /* Ссылка в тексте не должна отличаться от текста одним цветом */
 .article-content p a, .article-content li a { text-decoration: underline; text-underline-offset: 2px; }
 .article-content h1, .article-content h2, .article-content h3,
