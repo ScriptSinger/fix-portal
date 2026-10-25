@@ -49,6 +49,9 @@
     @yield('hero')
 
     <main id="content" class="bg-surface pb-16 @yield('main-pt', 'pt-16')">
+        @hasSection('bare')
+            @yield('content')
+        @else
         <div @class(['mx-auto px-[15px]', 'sm:max-w-[540px] md:max-w-[720px] lg:max-w-[960px] xl:max-w-[1140px]' => ! View::hasSection('wide')])>
             @hasSection('no-sidebar')
                 <div class="min-w-0">@yield('content')</div>
@@ -65,9 +68,14 @@
                 </div>
             @endif
         </div>
+        @endif
     </main>
 
-    @include('public.partials.footer')
+    @hasSection('slim-footer')
+        @include('public.partials.footer-slim')
+    @else
+        @include('public.partials.footer')
+    @endif
     <x-ui.flash />
 
     <div id="lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Изображение">
