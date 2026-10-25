@@ -74,7 +74,7 @@
                 <x-tw.select-plain name="per_page" label="На странице" :options="[25, 50, 100, 200]" :value="$perPage" :blank="null" />
                 <div class="flex items-end justify-center gap-3 md:col-span-4">
                     <button type="submit" class="bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Применить</button>
-                    <a href="{{ route('firmwares.index') }}" class="bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Сбросить</a>
+                    <a href="{{ route('firmwares.index') }}" class="btn bg-[#0275d8] px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:brightness-110">Сбросить</a>
                 </div>
             </div>
         </form>

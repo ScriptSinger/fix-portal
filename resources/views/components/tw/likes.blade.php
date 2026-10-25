@@ -13,13 +13,13 @@
         dislikeUrl: @js(route('dislike', ['type' => $type, 'id' => $instance->id])) })"
         class="inline-flex items-center gap-1">
         <button type="button" @click="send('like')" :disabled="busy" aria-label="Нравится"
-            class="{{ $pill }} hover:bg-brand-50 hover:text-ink disabled:opacity-60">
+            class="{{ $pill }}  disabled:opacity-60">
             <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
                 aria-hidden="true">{!! $up !!}</svg>
             <span x-text="like">{{ $likes }}</span>
         </button>
         <button type="button" @click="send('dislike')" :disabled="busy" aria-label="Не нравится"
-            class="{{ $pill }} hover:bg-brand-50 hover:text-ink disabled:opacity-60">
+            class="{{ $pill }}  disabled:opacity-60">
             <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"
                 aria-hidden="true">{!! $down !!}</svg>
             <span x-text="dislike">{{ $dislikes }}</span>

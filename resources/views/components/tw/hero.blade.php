@@ -10,7 +10,7 @@
                     {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
                 </p>
                 <a href="{{ route('questions.create') }}"
-                    class="inline-block bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:bg-[#222]">Создать вопрос</a>
+                    class="btn inline-block bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white">Создать вопрос</a>
             </div>
 
             <form method="GET" role="search" action="{{ $action }}"
@@ -21,7 +21,7 @@
                 <input id="hero-search" name="{{ $field }}" type="search" value="{{ request($field) }}" placeholder="{{ $placeholder }}"
                     class="mb-4 block h-14 w-full border border-[#dbdde0] bg-white py-2 pl-6 pr-3 text-sm text-[#464a4c] placeholder:text-[#464a4c] focus:outline-none">
                 <button type="submit"
-                    class="block w-full bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white hover:bg-[#222]">Найти</button>
+                    class="block w-full bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] text-white">Найти</button>
             </form>
         </div>
     </div>

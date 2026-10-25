@@ -15,7 +15,7 @@
                 ]" />
                 <div class="my-2">
                     <a href="{{ route('categories.show', ['category' => $post->category->slug]) }}"
-                        class="inline-block rounded-[3px] bg-brand-400 px-4 text-white hover:text-black">{{ $post->category->title }}</a>
+                        class="keep inline-block rounded-[3px] bg-brand-400 px-4 text-white hover:text-black">{{ $post->category->title }}</a>
                 </div>
                 <h1 class="mb-[7px] text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $post->title }}</h1>
 
@@ -45,7 +45,7 @@
                         <div>{!! $cta->text !!}</div>
                     @endif
                     <a href="{{ $cta->trackedUrl() }}" rel="nofollow sponsored"
-                        class="inline-block bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] !text-white hover:bg-[#222]">{{ $cta->anchor ?: 'Подробнее' }}</a>
+                        class="btn inline-block bg-black px-8 py-[12.8px] text-sm font-bold leading-[17.5px] !text-white">{{ $cta->anchor ?: 'Подробнее' }}</a>
                 </div>
             @endif
 
@@ -55,7 +55,7 @@
                         @foreach ($post->tags as $tag)
                             <li class="my-2 mr-2 inline-block h-7 rounded-[3px] bg-brand-400 px-4">
                                 <a href="{{ route('tags.show', ['tag' => $tag->slug]) }}"
-                                    class="mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-white hover:text-black">{{ $tag->title }}</a>
+                                    class="keep mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-white hover:text-black">{{ $tag->title }}</a>
                             </li>
                         @endforeach
                     </ul>

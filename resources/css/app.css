@@ -87,3 +87,12 @@
 .data-table tbody tr:nth-of-type(odd) { background-color: rgba(0, 0, 0, .05); }
 .data-table a { color: #111; }
 .data-table a:hover { color: var(--color-link); }
+
+/* Как в старой теме: кнопки/иконки курсором-рукой, ссылки при наведении жёлтые, заголовки-ссылки подчёркиваются. */
+@layer base {
+    button:not(:disabled), [role='button'], summary, label[for], select { cursor: pointer; }
+    button:disabled, [aria-disabled='true'] { cursor: not-allowed; }
+}
+
+a:hover:not(.btn, .keep) { color: var(--color-brand-400); }
+:is(h1, h2, h3, h4):hover a:hover { color: inherit; text-decoration: underline; }

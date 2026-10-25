@@ -19,7 +19,7 @@
                 ]" />
                 <div class="my-2">
                     <a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
-                        class="inline-block rounded-[3px] bg-brand-400 px-4 text-white hover:text-black">{{ $question->appliance->title }}</a>
+                        class="keep inline-block rounded-[3px] bg-brand-400 px-4 text-white hover:text-black">{{ $question->appliance->title }}</a>
                 </div>
                 <h1 class="mb-[7px] text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $question->title }}</h1>
 

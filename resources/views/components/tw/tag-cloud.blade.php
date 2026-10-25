@@ -4,7 +4,7 @@
         @foreach ($items as [$title, $url])
             <li class="my-2 mr-2 inline-block h-7 rounded-[3px] bg-brand-400 px-4">
                 <a href="{{ $url }}"
-                    class="mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-white hover:text-black">{{ $title }}</a>
+                    class="keep mt-[1px] inline-block px-4 text-[11px] uppercase leading-7 tracking-[2px] text-white hover:text-black">{{ $title }}</a>
             </li>
         @endforeach
     </ul>

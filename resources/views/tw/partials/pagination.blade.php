@@ -1,6 +1,6 @@
 @if ($paginator->hasPages())
     @php
-        $item = 'inline-flex h-10 min-w-[30px] items-center justify-center bg-brand-400 px-[12.8px] text-sm leading-[14px] text-ink transition-colors';
+        $item = 'keep inline-flex h-10 min-w-[30px] items-center justify-center bg-brand-400 px-[12.8px] text-sm leading-[14px] text-ink transition-colors';
     @endphp
     <nav role="navigation" aria-label="Пагинация" class="flex flex-wrap justify-center">
         @if ($paginator->onFirstPage())

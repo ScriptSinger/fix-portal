@@ -4,7 +4,7 @@
         @foreach ($items as [$title, $url])
             <li class="flex items-center gap-3">
                 @if ($url)
-                    <a href="{{ $url }}" class="text-brand-400 hover:underline">{{ $title }}</a>
+                    <a href="{{ $url }}" class="keep text-brand-400 hover:underline">{{ $title }}</a>
                 @else
                     <span class="text-muted" aria-current="page">{{ $title }}</span>
                 @endif

@@ -6,7 +6,7 @@
         ['О нас', route('about'), 'about'],
     ];
     $isActive = fn ($pattern) => request()->is($pattern);
-    $link = 'block px-[9.6px] py-6 text-[14px] font-bold uppercase leading-[14px] text-[#121212] hover:text-white';
+    $link = 'keep block px-[9.6px] py-6 text-[14px] font-bold uppercase leading-[14px] text-[#121212] hover:text-black hover:opacity-70';
 @endphp
 <header x-data="{ menu: false }"
     class="sticky top-0 z-40 border-[6px] border-brand-400 bg-brand-400 text-ink shadow-[inset_0_0_0_1px_#000]">

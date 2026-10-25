@@ -1,6 +1,6 @@
 @props(['url', 'align' => 'center'])
 @php
-    $btn = 'inline-flex h-10 items-center justify-center gap-1.5 rounded-[3px] px-4 text-sm font-bold text-white transition-opacity hover:opacity-90';
+    $btn = 'btn inline-flex h-10 items-center justify-center gap-1.5 rounded-[3px] px-4 text-sm font-bold text-white transition-opacity hover:opacity-90';
     $encoded = urlencode($url);
 @endphp
 <div x-data="copyLink(@js($url))" class="flex flex-wrap gap-1 {{ $align === 'center' ? 'justify-center' : 'justify-start' }}" role="group" aria-label="Поделиться">

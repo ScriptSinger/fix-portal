@@ -58,7 +58,7 @@
     <button type="button" x-data="{ show: false }" x-show="show" x-cloak
         @scroll.window="show = window.scrollY > 300"
         @click="window.scrollTo({ top: 0, behavior: 'smooth' })" aria-label="Наверх"
-        class="fixed bottom-10 right-6 z-30 flex size-10 items-center justify-center bg-brand-400 text-ink hover:bg-ink hover:text-brand-400">
+        class="fixed bottom-10 right-6 z-30 flex size-10 items-center justify-center bg-brand-400 text-ink">
         <x-tw.icon name="chevron-up" class="size-5" />
     </button>
     @stack('scripts')

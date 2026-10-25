@@ -2,7 +2,7 @@
     $card = 'mb-12 rounded-[5px] bg-white px-8 py-12';
 @endphp
 @php
-    $blueBtn = 'block bg-telegram px-8 py-[12.8px] text-center text-sm font-bold leading-[17.5px] text-white hover:bg-[#0077b3]';
+    $blueBtn = 'block bg-telegram px-8 py-[12.8px] text-center text-sm font-bold leading-[17.5px] text-white';
 @endphp
 @php
     $ctaUrl = 'https://service.ufamasters.ru?' . http_build_query(['utm_source' => 'ufamasters', 'utm_medium' => 'sidebar', 'utm_content' => 'more_details']);
@@ -37,6 +37,6 @@
         <img src="{{ asset('assets/front/images/service/verify.svg') }}" alt="" class="size-[18px]">
         <span class="text-xs text-[#6b7280]">Поддерживается проектом Ufamasters</span>
     </div>
-    <a href="{{ $ctaUrl }}" target="_blank" rel="noopener" class="{{ $blueBtn }}"
+    <a href="{{ $ctaUrl }}" target="_blank" rel="noopener" class="btn {{ $blueBtn }}"
         aria-label="Подробнее о ремонте бытовой техники в Уфе">Подробнее ↗</a>
 </section>
