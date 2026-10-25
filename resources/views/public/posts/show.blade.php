@@ -6,6 +6,14 @@
 @section('og-image', $post->thumbnail?->original ?? asset('assets/front/images/power_unit.jpg'))
 @section('main-pt', 'pt-8')
 
+@section('hero')
+    <x-ui.breadcrumbs :items="[
+        ['Категории', route('categories.index')],
+        [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
+        [$post->title, null],
+    ]" />
+@endsection
+
 @section('sidebar-left')
     {{-- Содержание из заголовков статьи (Alpine): показывается, если в тексте есть хотя бы два раздела --}}
     <div x-data="articleToc" x-show="items.length >= 2" x-cloak class="lg:rounded-[5px] lg:bg-white lg:p-5">
@@ -31,11 +39,6 @@
     <div class="bg-white p-5 sm:p-8 lg:p-10">
         <article>
             <header class="mb-8">
-                <x-ui.breadcrumbs light :items="[
-                    ['Статьи', route('articles.index')],
-                    ['Категории', route('categories.index')],
-                    [$post->category->title, route('categories.show', ['category' => $post->category->slug])],
-                ]" />
                 <h1 class="mb-3 mt-3 text-[34px] font-bold leading-[42px] text-black max-sm:text-[26px] max-sm:leading-8">{{ $post->title }}</h1>
 
                 <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 border-b border-line pb-5">

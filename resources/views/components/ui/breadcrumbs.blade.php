@@ -1,31 +1,34 @@
-@props(['items' => [], 'dark' => false, 'light' => false]) {{-- [[title, url|null], ...]; dark - на чёрной подшапке, иначе на белом --}}
+@props(['items' => []])
+{{-- Хлебные крошки: одна полоса под шапкой на всех страницах. Первое звено «Главная» добавляется здесь, вызывающий передаёт
+     остальные [[название, адрес|null], ...]; последнее звено это текущая страница (адрес null). Видимый список и разметка
+     BreadcrumbList для поисковиков строятся из одного массива, поэтому разойтись не могут. --}}
 @php
-    $dark = $dark || ! $light;
-    $link = $dark ? 'text-white/70 hover:text-white' : 'text-subtle hover:text-black';
-    $current = $dark ? 'text-white' : 'font-bold text-black';
-    $sep = $dark ? 'text-white/40' : 'text-subtle/60';
-    $parent = collect($items)->filter(fn ($i) => $i[1])->last();
+    $trail = collect($items)
+        ->reject(fn ($i) => in_array($i[0], ['Главная', 'Статьи'], true) && ($i[1] ?? null) === route('articles.index'))
+        ->prepend(['Главная', route('articles.index')])
+        ->values();
+    $ld = [
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $trail->map(fn ($i, $n) => [
+            '@type' => 'ListItem', 'position' => $n + 1, 'name' => $i[0], 'item' => $i[1] ?? url()->current(),
+        ])->all(),
+    ];
 @endphp
-<nav aria-label="Хлебные крошки" {{ $attributes }}>
-    {{-- Компьютер: полный путь --}}
-    <ol class="flex flex-wrap items-center gap-x-2 text-[13px] leading-6 max-md:hidden">
-        @foreach ($items as [$title, $url])
-            <li class="flex min-w-0 items-center gap-2">
-                @if ($url)
-                    <a href="{{ $url }}" class="keep underline-offset-2 hover:underline {{ $link }}">{{ $title }}</a>
-                @else
-                    <span class="max-w-[40ch] truncate {{ $current }}" aria-current="page">{{ $title }}</span>
-                @endif
-                @unless ($loop->last)
-                    <span class="{{ $sep }}" aria-hidden="true">›</span>
-                @endunless
-            </li>
-        @endforeach
-    </ol>
-    {{-- Телефон: одна ссылка на родителя --}}
-    @if ($parent)
-        <a href="{{ $parent[1] }}" class="keep inline-flex items-center gap-1 text-[13px] leading-6 underline-offset-2 hover:underline md:hidden {{ $link }}">
-            <span aria-hidden="true">‹</span> {{ $parent[0] }}
-        </a>
-    @endif
-</nav>
+<script type="application/ld+json">@json($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)</script>
+<div class="border-b border-line bg-white" data-breadcrumbs>
+    <nav aria-label="Хлебные крошки" class="site-container">
+        <ol class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap py-2.5 text-[13px] leading-6">
+            @foreach ($trail as [$title, $url])
+                <li class="flex shrink-0 items-center gap-2 {{ $loop->last ? 'min-w-0 shrink' : '' }}">
+                    @if ($url)
+                        <a href="{{ $url }}" class="keep text-subtle underline-offset-2 hover:text-black hover:underline">{{ $title }}</a>
+                        <span class="text-subtle/60" aria-hidden="true">›</span>
+                    @else
+                        <span class="block max-w-[46ch] truncate font-bold text-black max-sm:max-w-[28ch]" title="{{ $title }}" aria-current="page">{{ $title }}</span>
+                    @endif
+                </li>
+            @endforeach
+        </ol>
+    </nav>
+</div>

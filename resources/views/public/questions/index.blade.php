@@ -3,7 +3,7 @@
 @section('description', 'Получите советы по решению проблем с бытовой техникой. Присоединяйтесь к обсуждению и делитесь своими вопросами')
 
 @section('hero')
-    <x-ui.page-header title="Вопросы" :items="[['Статьи', route('articles.index')], ['Вопросы', null]]" />
+    <x-ui.page-header title="Вопросы" :items="[ ['Вопросы', null]]" />
 @endsection
 
 @section('content')

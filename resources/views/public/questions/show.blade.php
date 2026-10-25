@@ -8,15 +8,18 @@
     $photos = $question->photos ? (json_decode($question->photos, true) ?: []) : [];
 @endphp
 
+@section('hero')
+    <x-ui.breadcrumbs :items="[
+        ['Вопросы', route('questions.index')],
+        [$question->appliance->title, route('public.appliances.show', ['appliance' => $question->appliance->slug])],
+        [$question->title, null],
+    ]" />
+@endsection
+
 @section('content')
     <div class="rounded-[5px] bg-white p-12 max-sm:px-4">
         <article>
             <header class="mb-12">
-                <x-ui.breadcrumbs light :items="[
-                    ['Статьи', route('articles.index')],
-                    ['Вопросы', route('questions.index')],
-                    [$question->appliance->title, route('public.appliances.show', ['appliance' => $question->appliance->slug])],
-                ]" />
                 <h1 class="mb-[7px] mt-3 text-[41px] font-bold leading-[50px] text-black max-sm:text-3xl max-sm:leading-10">{{ $question->title }}</h1>
 
                 <div class="flex flex-wrap items-center gap-x-2 text-[11px] font-bold uppercase leading-[26px] text-subtle">

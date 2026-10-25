@@ -4,7 +4,7 @@
 @section('canonical', route('firmwares.brand', ['brand' => $brand['slug']]))
 
 @section('hero')
-    <x-ui.page-header :title="'Прошивки ' . $brand['name']" :items="[['Статьи', route('articles.index')], ['Прошивки', route('firmwares.index')], [$brand['name'], null]]" />
+    <x-ui.page-header :title="'Прошивки ' . $brand['name']" :items="[ ['Прошивки', route('firmwares.index')], [$brand['name'], null]]" />
 @endsection
 
 @section('sidebar-left')

@@ -5,7 +5,6 @@
 
 @section('hero')
     <x-ui.page-header :title="$tag->title" :items="[
-        ['Статьи', route('articles.index')],
         ['Теги', route('tags.index')],
         [$tag->title, null],
     ]" />

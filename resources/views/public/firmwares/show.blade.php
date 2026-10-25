@@ -15,11 +15,15 @@
         'softwareVersion' => $firmware->model_name, 'identifier' => (string) $firmware->id, 'description' => $firmware->meta_description,
     ], fn ($v) => $v !== null && $v !== '');
     $title = $firmware->model_name ? $firmware->display_name : $firmware->title;
-    $crumbs = [['Статьи', route('articles.index')], ['Прошивки', route('firmwares.index')]];
-    if ($firmware->hub_url && $firmware->brand) {
-        $crumbs[] = [$firmware->brand, route('firmwares.brand', ['brand' => \App\Services\FirmwareCatalog::slug($firmware->brand)])];
+    $brandSlug = $firmware->brand ? \App\Services\FirmwareCatalog::slug($firmware->brand) : null;
+    $crumbs = [['Прошивки', route('firmwares.index')]];
+    if ($brandSlug && array_key_exists($brandSlug, \App\Services\FirmwareCatalog::brandSlugs())) {
+        $crumbs[] = [$firmware->brand, route('firmwares.brand', ['brand' => $brandSlug])];
+        if ($firmware->hub_url && $firmware->series) {
+            $crumbs[] = [$firmware->series, $firmware->hub_url];
+        }
     }
-    $crumbs[] = [Str::limit($firmware->model_name ?: ($firmware->title ?: ('Прошивка #' . $firmware->id)), 30, '...'), null];
+    $crumbs[] = [$title ?: ('Прошивка #' . $firmware->id), null];
     $sizeText = $firmware->size >= 1024 ? number_format($firmware->size / 1024, 1, ',', ' ') . ' КБ' : $firmware->size . ' Б';
     $platform = $firmware->platform_norm ?: $firmware->platform;
     $pairs = $firmware->parameter_pairs;

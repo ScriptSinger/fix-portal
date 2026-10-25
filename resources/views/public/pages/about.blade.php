@@ -3,7 +3,7 @@
 @section('description', 'О нас: платформа с статьями, вопросами и ответами, базой прошивок и каталогом мастеров по ремонту бытовой техники.')
 
 @section('hero')
-    <x-ui.page-header title="О нас" />
+    <x-ui.page-header title="О нас" :items="[['О нас', null]]" />
 @endsection
 
 @section('content')

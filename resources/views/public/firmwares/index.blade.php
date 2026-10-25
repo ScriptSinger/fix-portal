@@ -21,7 +21,7 @@
 @section('left-drawer', '1')
 
 @section('hero')
-    <x-ui.page-header title="Прошивки для бытовой техники" :items="[['Статьи', route('articles.index')], ['Прошивки', null]]" />
+    <x-ui.page-header title="Прошивки для бытовой техники" :items="[ ['Прошивки', null]]" />
 @endsection
 
 @section('sidebar-left')

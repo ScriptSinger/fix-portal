@@ -13,8 +13,7 @@
 @section('robots', $pageNumber > 1 ? 'noindex, follow' : 'index, follow')
 
 @section('hero')
-    <x-ui.page-header :title="'Прошивки ' . $brand['name'] . ' ' . $seriesName" :items="[
-        ['Статьи', route('articles.index')], ['Прошивки', route('firmwares.index')],
+    <x-ui.page-header :title="'Прошивки ' . $brand['name'] . ' ' . $seriesName" :items="[ ['Прошивки', route('firmwares.index')],
         [$brand['name'], route('firmwares.brand', ['brand' => $brand['slug']])], [$seriesName, null]]" />
 @endsection
 
