@@ -17,6 +17,8 @@ class ApplianceController extends Controller
         $appliance = Appliance::where('slug', $slug)->firstOrFail();
         $questions = $appliance->questions()->with('appliance', 'user')->orderBy('id', 'desc')->paginate(15);
 
-        return view('public.appliances.show', compact('appliance', 'questions'));
+        $appliances = Appliance::pluck('title', 'id');
+
+        return view('public.appliances.show', compact('appliance', 'questions', 'appliances'));
     }
 }

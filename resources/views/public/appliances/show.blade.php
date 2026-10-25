@@ -11,6 +11,7 @@
 @endsection
 
 @section('content')
+    @include('public.partials.ask-form', ['selected' => $appliance->id])
     <x-ui.question-list :questions="$questions" />
 @endsection
 

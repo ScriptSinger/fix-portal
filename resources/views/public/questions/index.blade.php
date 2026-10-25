@@ -7,15 +7,7 @@
 @endsection
 
 @section('content')
-    <div id="ask" class="mb-6 scroll-mt-24">
-        @auth('web')
-            <x-questions.form collapsed :action="route('questions.store')" :appliances="$appliances" />
-        @else
-            <p class="m-0 rounded-2xl bg-white px-5 py-4 shadow-sm">Чтобы задать вопрос, необходимо
-                <a class="font-bold text-black underline" href="{{ route('register') }}">зарегистрироваться</a>
-                или <a class="font-bold text-black underline" href="{{ route('login') }}">войти</a></p>
-        @endauth
-    </div>
+    @include('public.partials.ask-form')
     <x-ui.question-list :questions="$questions" />
 @endsection
 

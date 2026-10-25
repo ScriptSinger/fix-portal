@@ -1,6 +1,6 @@
 {{-- Общая форма вопроса (создание и правка), оформлена как черновик поста в Telegram: пузырь с заголовком, плашками прибора и модели, текстом и фото, внизу кнопка отправки.
      Подсказки направляют к заголовку с симптомом: по нему вопрос находят в поиске --}}
-@props(['action', 'question' => null, 'appliances', 'method' => null, 'collapsed' => false])
+@props(['action', 'question' => null, 'appliances', 'method' => null, 'collapsed' => false, 'selected' => null])
 @php
     $pill = 'h-9 rounded-full border-0 bg-black/5 px-4 text-sm leading-9 text-ink placeholder:text-subtle focus:outline-none focus:ring-2 focus:ring-brand-500';
     $plain = \App\Support\MessageBody::toPlain(\App\Support\ContentImages::extract($question?->description)[0]);
@@ -19,7 +19,7 @@
             <legend class="sr-only">Тип прибора</legend>
             @foreach ($appliances as $key => $title)
                 <label class="cursor-pointer">
-                    <input type="radio" name="appliance_id" value="{{ $key }}" class="peer sr-only" @required($loop->first) @checked((string) old('appliance_id', $question?->appliance_id) === (string) $key)>
+                    <input type="radio" name="appliance_id" value="{{ $key }}" class="peer sr-only" @required($loop->first) @checked((string) old('appliance_id', $question?->appliance_id ?? $selected) === (string) $key)>
                     <span class="inline-flex h-9 items-center rounded-full bg-black/5 px-4 text-sm font-medium text-ink peer-checked:bg-black peer-checked:text-brand-400 peer-focus-visible:ring-2 peer-focus-visible:ring-brand-500">{{ $title }}</span>
                 </label>
             @endforeach
