@@ -1,74 +1,99 @@
 @extends('public.layouts.app')
-@section('title', 'Личный кабинет | ' . config('app.name', 'Ufamasters'))
+@section('title', 'Профиль | ' . config('app.name', 'Ufamasters'))
 @section('robots', 'noindex, nofollow')
+@section('wide', '1')
 
 @section('hero')
-    <x-ui.page-header :title="'Добро пожаловать, ' . $user->name" :items="[ ['Личный кабинет', null]]" />
-@endsection
-
-@section('content')
-    <div class="rounded-[5px] bg-white p-12 max-sm:px-4" x-data="{ tab: 'data' }">
-        <div class="mb-6 flex border-b border-soft" role="tablist">
-            @foreach (['data' => 'Личные данные', 'image' => 'Изображения'] as $key => $label)
-                <button type="button" role="tab" @click="tab = '{{ $key }}'" :aria-selected="tab === '{{ $key }}'"
-                    :class="tab === '{{ $key }}' ? 'border-soft border-b-white bg-white text-black' : 'border-transparent text-body hover:border-[#eceeef]'"
-                    class="-mb-px border px-4 py-2">{{ $label }}</button>
-            @endforeach
-        </div>
-
-        <div x-show="tab === 'data'" role="tabpanel">
-            <div class="mb-6 grid gap-6 md:grid-cols-2">
-                <div>
-                    <h4 class="mb-2 text-[19px] font-bold leading-[29px] text-black">Мастер</h4>
-                    <p class="mb-0">Если вы являетесь специалистом по ремонту бытовой техники, установите статус "мастера", чтобы ваши данные были доступны в разделе мастеров.</p>
-                </div>
-                <div>
-                    <h4 class="mb-2 text-[19px] font-bold leading-[29px] text-black">Участник</h4>
-                    <p class="mb-0">Для ограничения доступа к вашим данным, выберите статус "участника", который не позволит публиковать вашу информацию.</p>
-                </div>
-            </div>
-            <form method="POST" action="{{ route('profile.update') }}">
-                @csrf @method('PUT')
-                <x-ui.field name="name" label="Имя" :value="$user->name" />
-                <x-ui.select name="role_id" label="Статус" :options="$roles" :value="$user->role_id" />
-                <div class="mb-6">
-                    <label class="mb-2 block">Email</label>
-                    <input disabled type="text" placeholder="{{ $user->email }}" class="field">
-                </div>
-                <x-ui.field name="phone" label="Телефон" :value="$user->phone" x-data="phoneMask" />
-                <x-ui.field name="location" label="Город" :value="$user->location" placeholder="Местоположение" />
-                <div class="mb-6">
-                    <label for="f-bio" class="mb-2 block">О себе</label>
-                    <textarea id="f-bio" name="bio" rows="4" placeholder="не более 512 символов"
-                        class="field">{{ old('bio', $user->bio) }}</textarea>
-                    @error('bio')<p class="mt-1 text-[13px] text-red-600">{{ $message }}</p>@enderror
-                </div>
-                <x-ui.button variant="dark">Обновить</x-ui.button>
-            </form>
-        </div>
-
-        <div x-show="tab === 'image'" x-cloak role="tabpanel"
-            x-data="avatarUpload({ showUrl: @js(route('api.avatars.show')), uploadUrl: @js(route('api.avatars.upload')), destroyUrl: @js(route('api.avatars.destroy')) })">
-            <label @dragover.prevent="over = true" @dragleave.prevent="over = false" @drop.prevent="over = false; pick($event.dataTransfer.files)"
-                :class="over ? 'border-black bg-[#f1f1f1]' : 'border-soft'"
-                class="mb-4 flex min-h-[150px] cursor-pointer flex-col items-center justify-center gap-3 border-2 border-dashed p-6 text-center">
-                <template x-if="preview || current">
-                    <img :src="preview || current.uri" alt="Аватар" class="size-28 rounded-full object-cover">
-                </template>
-                <span x-show="!preview && !current">Перетащите файл сюда или нажмите для выбора</span>
-                <span x-show="file" x-text="file?.name" class="text-[13px]"></span>
-                <input type="file" accept="image/jpeg,image/png" class="sr-only" @change="pick($event.target.files)">
-            </label>
-            <p x-show="error" x-cloak x-text="error" class="mb-3 text-sm text-red-600"></p>
-            <p x-show="done" x-cloak class="mb-3 text-sm text-success">Аватар сохранён</p>
-            <div class="flex gap-3">
-                <x-ui.button variant="dark" type="button" x-on:click="send()" x-bind:disabled="!file || busy">Отправить</x-ui.button>
-                <x-ui.button variant="outline" type="button" x-show="file || current" x-on:click="remove()">Удалить</x-ui.button>
-            </div>
-        </div>
-    </div>
+    <x-ui.page-header title="Профиль" :items="[['Личный кабинет', route('cabinet.index')], ['Профиль', null]]" />
 @endsection
 
 @section('sidebar')
-    @include('public.partials.sidebar', ['variant' => 'tags'])
+    @include('public.cabinet.nav', ['active' => 'profile'])
+@endsection
+
+@section('content')
+    @php
+        $passwordErrors = $errors->hasAny(['current_password', 'password']);
+        $avatarUrl = $user->avatar ? Storage::url($user->avatar->uri) : null;
+        $label = 'mb-1.5 block text-sm font-medium text-ink';
+        $input = 'block h-10 w-full rounded-lg border border-line bg-white px-3 text-[15px] text-ink placeholder:text-subtle focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 aria-[invalid=true]:border-red-500';
+        $err = 'mb-0 mt-1 text-[13px] text-red-600';
+    @endphp
+    {{-- Одна форма с двумя вкладками, как в админке: «Основное» и «Пароль», одна кнопка «Сохранить» --}}
+    <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"
+        x-data="{ tab: @js($passwordErrors ? 'password' : 'main'), preview: @js($avatarUrl), remove: false, name: '' }">
+        @csrf @method('PUT')
+        <div class="rounded-xl border border-line bg-white">
+            <div class="flex gap-1 border-b border-line px-3 pt-1 sm:px-4" role="tablist">
+                @foreach (['main' => 'Основное', 'password' => 'Пароль'] as $key => $label)
+                    <button type="button" role="tab" @click="tab = '{{ $key }}'" :aria-selected="tab === '{{ $key }}'"
+                        :class="tab === '{{ $key }}' ? 'border-brand-400 text-black' : 'border-transparent text-subtle'"
+                        class="-mb-px border-b-2 px-3 py-3 text-sm font-medium">{{ $label }}</button>
+                @endforeach
+            </div>
+
+            <div x-show="tab === 'main'" role="tabpanel" class="grid gap-4 p-4">
+                <div>
+                    <label for="f-name" class="{{ $label }}">Имя</label>
+                    <input id="f-name" name="name" type="text" value="{{ old('name', $user->name) }}" class="{{ $input }}" @error('name') aria-invalid="true" @enderror>
+                    @error('name')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                </div>
+                <div>
+                    <label for="f-email" class="{{ $label }}">Логин (email)</label>
+                    <input id="f-email" type="email" value="{{ $user->email }}" readonly class="{{ $input }} bg-surface text-subtle">
+                </div>
+                <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="f-phone" class="{{ $label }}">Телефон</label>
+                        <input id="f-phone" name="phone" type="text" x-data="phoneMask" value="{{ old('phone', $user->phone) }}" placeholder="+7 (900) 000-00-00" class="{{ $input }}" @error('phone') aria-invalid="true" @enderror>
+                        @error('phone')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                    </div>
+                    <div>
+                        <label for="f-location" class="{{ $label }}">Город</label>
+                        <input id="f-location" name="location" type="text" value="{{ old('location', $user->location) }}" placeholder="Например: Уфа" class="{{ $input }}" @error('location') aria-invalid="true" @enderror>
+                        @error('location')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+                <div>
+                    <label for="f-bio" class="{{ $label }}">О себе</label>
+                    <textarea id="f-bio" name="bio" rows="4" maxlength="512" placeholder="Расскажите о себе, не более 512 символов" class="{{ $input }} h-auto resize-y py-2" @error('bio') aria-invalid="true" @enderror>{{ old('bio', $user->bio) }}</textarea>
+                    @error('bio')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                </div>
+
+                <div>
+                    <span class="{{ $label }}">Аватар</span>
+                    <div class="flex items-center gap-3">
+                        <img x-show="preview && !remove" :src="preview" alt="" class="size-10 shrink-0 rounded-full object-cover">
+                        <span x-show="!preview || remove" class="grid size-10 shrink-0 place-items-center rounded-full bg-surface text-sm font-bold text-subtle">{{ mb_strtoupper(mb_substr($user->name, 0, 1)) }}</span>
+                        <div class="flex h-10 min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-line">
+                            <label for="f-avatar" class="flex cursor-pointer items-center whitespace-nowrap bg-brand-400/30 px-4 text-sm text-ink">Выберите файл</label>
+                            <span class="min-w-0 flex-1 truncate px-3 text-sm leading-10 text-ink" x-text="name || 'Файл не выбран'">Файл не выбран</span>
+                            <input id="f-avatar" name="avatar" type="file" accept="image/jpeg,image/png" class="sr-only"
+                                @change="const f = $event.target.files[0]; if (f) { name = f.name; preview = URL.createObjectURL(f); remove = false }">
+                        </div>
+                    </div>
+                    @error('avatar')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                    @if ($avatarUrl)
+                        <label class="mt-3 flex cursor-pointer items-center gap-2 text-sm text-subtle">
+                            <input type="checkbox" name="remove_avatar" value="1" x-model="remove" class="size-4 accent-black"> Удалить текущий аватар
+                        </label>
+                    @endif
+                </div>
+            </div>
+
+            <div x-show="tab === 'password'" x-cloak role="tabpanel" class="grid gap-4 p-4">
+                <p class="m-0 text-[13px] text-subtle">Оставьте поля пустыми, если пароль менять не нужно.</p>
+                @foreach ([['current_password', 'Текущий пароль', 'current-password'], ['password', 'Новый пароль', 'new-password'], ['password_confirmation', 'Повторите новый пароль', 'new-password']] as [$name, $text, $auto])
+                    <div>
+                        <label for="f-{{ $name }}" class="{{ $label }}">{{ $text }}</label>
+                        <input id="f-{{ $name }}" name="{{ $name }}" type="password" autocomplete="{{ $auto }}" class="{{ $input }}" @error($name) aria-invalid="true" @enderror>
+                        @error($name)<p class="{{ $err }}">{{ $message }}</p>@enderror
+                    </div>
+                @endforeach
+            </div>
+
+        </div>
+
+        <button type="submit" class="mt-6 inline-flex h-11 items-center rounded-lg bg-black px-6 text-brand-400">Сохранить</button>
+    </form>
 @endsection

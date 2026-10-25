@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Reply;
+use App\Services\ActivityNotifier;
 use App\Support\MessageBody;
 use Illuminate\Http\Request;
 
@@ -26,7 +27,8 @@ class ReplyController extends Controller
 
         // цитировать можно только ответ из этой же ветки
         $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
-        $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
+        $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
+        app(ActivityNotifier::class)->replied($reply, auth()->user());
         return redirect()->back();
     }
 

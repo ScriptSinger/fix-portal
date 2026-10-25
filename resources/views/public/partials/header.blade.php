@@ -41,11 +41,25 @@
                         class="field !h-10 w-[200px] !pl-9 !pr-3 !text-sm">
                 </form>
                 @auth
-                    <a href="{{ route('profile.edit') }}" class="{{ $link }} !py-3">{{ auth()->user()->name }}</a>
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="{{ $link }} !py-3">Выход</button>
-                    </form>
+                    @php $me = auth()->user(); $unread = $me->unreadNotifications()->count(); @endphp
+                    <a href="{{ route('cabinet.notifications') }}" class="keep relative grid size-10 place-items-center rounded-full text-ink" aria-label="Уведомления{{ $unread ? ': ' . $unread . ' новых' : '' }}">
+                        <x-ui.icon name="bell" class="size-6" />
+                        @if ($unread)<span class="absolute right-0 top-0 min-w-[18px] rounded-full bg-red-600 px-1 text-center text-[11px] font-bold leading-[18px] text-white">{{ $unread > 99 ? '99+' : $unread }}</span>@endif
+                    </a>
+                    <div x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false" class="relative">
+                        <button type="button" @click="open = !open" :aria-expanded="open" class="flex items-center gap-2 rounded-full p-0.5 pr-3 text-sm font-medium">
+                            <x-ui.avatar :user="$me" size="size-9" /><span class="max-w-[120px] truncate">{{ $me->name }}</span>
+                        </button>
+                        <div x-show="open" x-cloak x-transition.opacity class="absolute right-0 top-full z-50 mt-2 w-56 rounded-xl bg-white p-1.5 text-ink shadow-xl ring-1 ring-black/10">
+                            @foreach ([['Кабинет', route('cabinet.index')], ['Уведомления', route('cabinet.notifications')], ['Мои вопросы', route('cabinet.questions')], ['Профиль', route('profile.edit')]] as [$label, $url])
+                                <a href="{{ $url }}" class="keep flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-black/5">{{ $label }}@if ($label === 'Уведомления' && $unread)<span class="rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">{{ $unread }}</span>@endif</a>
+                            @endforeach
+                            <hr class="my-1 border-line">
+                            <form action="{{ route('logout') }}" method="POST">@csrf
+                                <button type="submit" class="w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-black/5">Выйти</button>
+                            </form>
+                        </div>
+                    </div>
                 @endauth
                 @guest
                     <a href="{{ route('register') }}" class="{{ $link }} !py-3">Регистрация</a>
@@ -72,7 +86,8 @@
                     <li><a href="{{ $url }}" class="{{ $link }} !px-0 !py-4 !text-[13px] !leading-[13px]">{{ $label }}</a></li>
                 @endforeach
                 @auth
-                    <li><a href="{{ route('profile.edit') }}" class="{{ $link }} !px-0 !py-4 !text-[13px] !leading-[13px]">{{ auth()->user()->name }}</a></li>
+                    <li><a href="{{ route('cabinet.index') }}" class="{{ $link }} !px-0 !py-4 !text-[13px] !leading-[13px]">Кабинет</a></li>
+                    <li><a href="{{ route('cabinet.notifications') }}" class="{{ $link }} !px-0 !py-4 !text-[13px] !leading-[13px]">Уведомления @if (auth()->user()->unreadNotifications()->count())({{ auth()->user()->unreadNotifications()->count() }})@endif</a></li>
                     <li>
                         <form action="{{ route('logout') }}" method="POST">@csrf
                             <button type="submit" class="{{ $link }} !px-0 !py-4 !text-[13px] !leading-[13px]">Выход</button>

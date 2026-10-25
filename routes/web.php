@@ -8,6 +8,7 @@ use App\Services\FirmwareCatalog;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Public\ApplianceController;
 use App\Http\Controllers\Public\CategoryController;
+use App\Http\Controllers\Public\CabinetController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\PostController;
 use App\Http\Controllers\Public\ReplyController;
@@ -78,7 +79,16 @@ Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereN
 
 Route::middleware(['auth:web', 'verified'])->group(
     function () {
-        Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
+        Route::prefix('/cabinet')->group(function () {
+            Route::get('/', [CabinetController::class, 'index'])->name('cabinet.index');
+            Route::get('/notifications', [CabinetController::class, 'notifications'])->name('cabinet.notifications');
+            Route::post('/notifications/read-all', [CabinetController::class, 'readAll'])->name('cabinet.notifications.read-all');
+            Route::get('/notifications/{id}', [CabinetController::class, 'open'])->name('cabinet.notifications.open');
+            Route::get('/questions', [CabinetController::class, 'questions'])->name('cabinet.questions');
+            Route::get('/answers', [CabinetController::class, 'answers'])->name('cabinet.answers');
+            Route::get('/profile', [UserController::class, 'edit'])->name('profile.edit');
+        });
+        Route::redirect('/profile/edit', '/cabinet/profile');
         Route::put('/profile/update', [UserController::class, 'update'])->name('profile.update');
         Route::post('/{type}/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
         Route::group(['prefix' => '/comments'], function () {

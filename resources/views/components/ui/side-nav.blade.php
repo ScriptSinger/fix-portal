@@ -17,8 +17,9 @@
             @foreach ($items as $item)
                 <li class="border-b border-dashed border-line last:border-0">
                     <a href="{{ $item['url'] }}" @if ($item['active']) aria-current="page" @endif
-                        class="-mx-4 flex px-4 py-3 text-[15px] font-bold leading-[22px] lg:-mx-5 lg:px-5 {{ $item['active'] ? 'keep bg-black text-brand-400' : 'text-ink' }}">
+                        class="-mx-4 flex items-center justify-between gap-3 px-4 py-3 text-[15px] font-bold leading-[22px] lg:-mx-5 lg:px-5 {{ $item['active'] ? 'keep bg-black text-brand-400' : 'text-ink' }}">
                         <span>{{ $item['title'] }}</span>
+                        @if (! empty($item['badge']))<span class="min-w-[22px] rounded-full bg-red-600 px-1.5 text-center text-xs font-bold leading-[22px] text-white">{{ $item['badge'] }}</span>@endif
                     </a>
                 </li>
             @endforeach

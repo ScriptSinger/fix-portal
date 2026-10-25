@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Reaction;
 use App\Models\Reply;
+use App\Services\ActivityNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -28,6 +29,7 @@ class ReactionController extends Controller
         } else {
             Reaction::updateOrCreate($key, ['emoji' => $data['emoji']]);
             $mine = $data['emoji'];
+            app(ActivityNotifier::class)->reacted($target, auth()->user(), $data['emoji']);
         }
 
         $counts = Reaction::where(['reactable_type' => $class, 'reactable_id' => $target->id])
