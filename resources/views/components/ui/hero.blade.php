@@ -1,26 +1,13 @@
-@props(['searchTitle', 'searchText', 'placeholder', 'action', 'field' => 'text', 'label' => 'Поиск', 'customization' => null])
-<section aria-labelledby="hero-title" class="bg-cover bg-center pb-32 pt-[119px] lg:pt-[115px]"
+@props(['customization' => null])
+{{-- Баннер главной в границах полей контента: фото, заголовок и описание из настроек (админка), кнопка «Создать вопрос» --}}
+<section aria-labelledby="hero-title" class="mb-6 flex min-h-[380px] items-center rounded-[5px] bg-cover bg-center px-6 py-14 sm:px-12 lg:min-h-[420px]"
     style="background-image: url('{{ optional($customization)->getImage('banner') ?? asset('assets/front/images/power_unit.jpg') }}')">
-    <div class="site-container">
-        <div class="-mx-[15px] grid items-center lg:grid-cols-[2fr_1fr]">
-            <div class="px-[15px]">
-                <h1 id="hero-title" class="mb-8 text-[48px] font-bold leading-[44px] text-white max-sm:text-[34px]">
-                    {{ optional($customization)->title ?? 'Ремонт бытовой техники' }}</h1>
-                <p class="mb-8 text-base leading-7 text-white lg:mr-16">
-                    {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
-                </p>
-                <x-ui.button variant="dark" :href="route('questions.create')">Создать вопрос</x-ui.button>
-            </div>
-
-            <form method="GET" role="search" aria-label="{{ $searchTitle }}" action="{{ $action }}"
-                class="relative mx-[15px] mt-8 lg:mt-0 border-[6px] border-brand-400 bg-brand-400 px-8 py-12 text-center before:pointer-events-none before:absolute before:inset-0 before:border before:border-black">
-                <h2 class="mb-[17px] text-[22px] font-bold leading-[30.8px] text-black">{{ $searchTitle }}</h2>
-                <p class="mb-8 text-black/90">{{ $searchText }}</p>
-                <label for="hero-search" class="sr-only">{{ $label }}</label>
-                <input id="hero-search" name="{{ $field }}" type="search" value="{{ request($field) }}" placeholder="{{ $placeholder }}"
-                    class="field mb-6 !h-14 !px-6 !text-sm sm:mb-4">
-                <x-ui.button variant="dark" size="lg" class="w-full">Найти</x-ui.button>
-            </form>
-        </div>
+    <div class="max-w-[640px] [text-shadow:0_1px_10px_rgba(0,0,0,.5)]">
+        <h1 id="hero-title" class="mb-6 text-[48px] font-bold leading-[52px] text-white max-sm:text-[34px] max-sm:leading-10">
+            {{ optional($customization)->title ?? 'Ремонт бытовой техники' }}</h1>
+        <p class="mb-8 text-base leading-7 text-white">
+            {{ optional($customization)->description ?? 'Узнайте как решить проблемы с бытовой техникой от опытных пользователей. Регистрируйтесь для создания своего вопроса.' }}
+        </p>
+        <x-ui.button variant="dark" size="lg" :href="route('questions.create')">Создать вопрос</x-ui.button>
     </div>
 </section>
