@@ -27,6 +27,7 @@
         </nav>
 
         <div class="ml-auto flex items-center gap-1 sm:gap-2">
+            @unless (View::hasSection('hide-header-search'))
             <button type="button" @click="search = !search; if (search) $nextTick(() => $refs.q.focus())"
                 :aria-expanded="search" aria-controls="site-search" aria-label="Поиск"
                 class="rounded-md p-2 text-ink hover:bg-surface">
@@ -36,6 +37,7 @@
                     <path stroke-linecap="round" d="M20 20l-3.5-3.5" />
                 </svg>
             </button>
+            @endunless
 
             <x-tw.button :href="route('questions.create')" size="sm" class="max-sm:hidden">Задать вопрос</x-tw.button>
 
@@ -74,6 +76,7 @@
         </div>
     </div>
 
+    @unless (View::hasSection('hide-header-search'))
     <div id="site-search" x-show="search" x-cloak x-transition.opacity class="border-t border-line bg-surface">
         <form method="GET" action="{{ route('articles.index') }}" role="search"
             class="mx-auto flex max-w-6xl gap-2 px-4 py-3 sm:px-6">
@@ -84,6 +87,7 @@
             <x-tw.button variant="dark">Найти</x-tw.button>
         </form>
     </div>
+    @endunless
 
     <div id="mobile-menu" x-show="menu" x-cloak x-transition.opacity class="border-t border-line bg-white md:hidden">
         <nav class="mx-auto flex max-w-6xl flex-col px-4 py-2 sm:px-6" aria-label="Мобильная навигация">
