@@ -2,7 +2,7 @@
 @section('title', 'Прошивки для бытовой техники | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Каталог прошивок для бытовой техники: поиск и просмотр файлов по моделям и платформам.')
 @php
-    $isFiltered = request()->hasAny(['search', 'platform', 'extension', 'crc32']);
+    $isFiltered = request()->hasAny(['search', 'platform', 'extension', 'crc32', 'brand', 'series']);
     $isPaginated = request('page', 1) > 1;
 @endphp
 
@@ -44,9 +44,29 @@
             <div class="row">
                 <div class="col-md-6 col-sm-12 col-xs-12 mb-2">
                     <label>Поиск</label>
-                    <input type="text" name="search" class="form-control" placeholder="Модель или серийный номер"
+                    <input type="text" name="search" class="form-control" placeholder="Модель (например, WISL 105), серия или серийный номер"
                         value="{{ request('search') }}">
                 </div>
+                @if ($brands->isNotEmpty())
+                    <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
+                        <label>Марка</label>
+                        <select id="filterBrand" name="brand" class="form-control">
+                            <option value="">Все</option>
+                            @foreach ($brands as $brand => $pages)
+                                <option value="{{ $brand }}" @selected(request('brand') === $brand)>{{ $brand }} ({{ $pages }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
+                        <label>Серия</label>
+                        <select id="filterSeries" name="series" class="form-control">
+                            <option value="">Все</option>
+                            @foreach ((request('brand') ? ($seriesByBrand[request('brand')] ?? []) : collect($seriesByBrand)->flatten()->unique()->sort()->values()->all()) as $seriesOption)
+                                <option value="{{ $seriesOption }}" @selected(mb_strtoupper((string) request('series')) === $seriesOption)>{{ $seriesOption }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
                 <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
                     <label>Платформа</label>
                     <select id="filterPlatform" name="platform" class="form-control">
@@ -66,7 +86,7 @@
                     </select>
                 </div>
                 <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
-                    <label>CRC32</label>
+                    <label>Хеш файла (MD5)</label>
                     <input type="text" name="crc32" class="form-control" value="{{ request('crc32') }}">
                 </div>
                 <div class="col-md-3 col-sm-6 col-xs-12 mb-2">
@@ -102,6 +122,7 @@
                     <tr>
                         <th><a href="{{ $sortUrl('id') }}">ID{{ $sortIndicator('id') }}</a></th>
                         <th><a href="{{ $sortUrl('title') }}">Название{{ $sortIndicator('title') }}</a></th>
+                        <th><a href="{{ $sortUrl('brand') }}">Марка и модель{{ $sortIndicator('brand') }}</a></th>
                         <th><a href="{{ $sortUrl('size') }}">Размер{{ $sortIndicator('size') }}</a></th>
                         <th><a href="{{ $sortUrl('date') }}">Дата{{ $sortIndicator('date') }}</a></th>
                         <th><a href="{{ $sortUrl('extension') }}">Расширение{{ $sortIndicator('extension') }}</a></th>
@@ -120,10 +141,11 @@
                                         title="{{ $firmware->title }}">{{ \Illuminate\Support\Str::limit($firmware->title, 40) }}</span>
                                 </a>
                             </td>
-                            <td>{{ $firmware->size }} КБ</td>
+                            <td>{{ $firmware->brand }} @if ($firmware->model)<span class="text-muted">{{ $firmware->model }}</span>@endif</td>
+                            <td class="text-nowrap">{{ $firmware->size >= 1024 ? number_format($firmware->size / 1024, 1, ',', ' ') . ' КБ' : $firmware->size . ' Б' }}</td>
                             <td class="text-nowrap">{{ $firmware->date }}</td>
                             <td>{{ $firmware->extension }}</td>
-                            <td>{{ $firmware->platform }}</td>
+                            <td>{{ $firmware->platform_norm ?: $firmware->platform }}</td>
                             <td>{{ $firmware->views_count }}</td>
                             <td>{{ $firmware->downloads_count }}</td>
                         </tr>
@@ -150,6 +172,20 @@
     <script src="{{ asset('assets/front/vendor/select2/select2.min.js') }}"></script>
     <script>
         $(function() {
+            $('#filterBrand').select2({ placeholder: 'Марка', allowClear: true, width: '100%' });
+            $('#filterSeries').select2({ placeholder: 'Серия', allowClear: true, width: '100%' });
+
+            // Список серий зависит от выбранной марки
+            var seriesByBrand = @json($seriesByBrand);
+            var allSeries = Array.from(new Set([].concat.apply([], Object.values(seriesByBrand)))).sort();
+            $('#filterBrand').on('change', function () {
+                var list = this.value ? (seriesByBrand[this.value] || []) : allSeries;
+                var current = $('#filterSeries').val();
+                var $series = $('#filterSeries').empty().append(new Option('Все', '', false, false));
+                list.forEach(function (name) { $series.append(new Option(name, name, false, name === current)); });
+                $series.trigger('change');
+            });
+
             $('#filterPlatform').select2({
                 placeholder: 'Платформа',
                 allowClear: true,

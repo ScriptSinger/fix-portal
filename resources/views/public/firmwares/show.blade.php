@@ -69,7 +69,7 @@
                     <tbody>
                         <tr>
                             <td>Размер</td>
-                            <td>{{ $firmware->size }} КБ</td>
+                            <td>{{ $firmware->size >= 1024 ? number_format($firmware->size / 1024, 1, ',', ' ') . ' КБ' : $firmware->size . ' Б' }}</td>
                         </tr>
                         <tr>
                             <td>Дата</td>

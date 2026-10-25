@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Public;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Models\Firmware;
@@ -12,8 +14,18 @@ class FirmwareController extends Controller
     {
         $query = Firmware::query();
 
+        if (request()->filled('brand')) {
+            $query->where('brand', request('brand'));
+        }
+        if (request()->filled('series')) {
+            $query->where('series', mb_strtoupper(trim((string) request('series'))));
+        }
         if (request()->filled('platform')) {
-            $query->where('platform', request('platform'));
+            // platform_norm склеивает Arcadia / ARCADIA / arcadia; старое поле оставляем для записей без обогащения
+            $platform = request('platform');
+            $query->where(function ($q) use ($platform) {
+                $q->where('platform_norm', $platform)->orWhere('platform', $platform);
+            });
         }
         if (request()->filled('extension')) {
             $query->where('extension', request('extension'));
@@ -24,7 +36,13 @@ class FirmwareController extends Controller
         if (request()->filled('search')) {
             $search = trim(request('search'));
             $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%');
+                // «wisl 105», «WISL-105» и «WISL105» должны находить одну и ту же модель
+                $compact = mb_strtoupper(preg_replace('/[\s\-_]+/u', '', $search) ?? $search);
+
+                $q->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('model', 'like', '%' . $this->escapeLike(mb_strtoupper($search)) . '%')
+                    ->orWhere('model', 'like', '%' . $this->escapeLike($compact) . '%')
+                    ->orWhere('series', $compact);
                 $this->applyStructuredDataSearch($q, $search);
 
                 if (ctype_digit($search)) {
@@ -35,7 +53,7 @@ class FirmwareController extends Controller
 
         $sort = request('sort', 'id');
         $dir = request('dir', 'desc');
-        if (!in_array($sort, ['id', 'title', 'size', 'date', 'extension', 'platform', 'views_count', 'downloads_count'])) {
+        if (!in_array($sort, ['id', 'title', 'size', 'date', 'extension', 'platform', 'brand', 'model', 'views_count', 'downloads_count'])) {
             $sort = 'id';
         }
         if (!in_array($dir, ['asc', 'desc'])) {
@@ -49,12 +67,40 @@ class FirmwareController extends Controller
 
         $firmwares = $query->orderBy($sort, $dir)->paginate($perPage)->withQueryString();
 
-        $platforms = Firmware::query()
-            ->whereNotNull('platform')
-            ->where('platform', '!=', '')
-            ->distinct()
-            ->orderBy('platform')
-            ->pluck('platform');
+        // Списки для фильтров почти не меняются: кэшируем на 10 минут
+        $filters = Cache::remember('firmware.filters', 600, function () {
+            $platforms = Firmware::query()->whereNotNull('platform_norm')->distinct()->orderBy('platform_norm')->pluck('platform_norm');
+
+            if ($platforms->isEmpty()) {
+                // Каталожные поля ещё не заполнены (firmware:enrich): берём платформу как есть
+                $platforms = Firmware::query()->whereNotNull('platform')->where('platform', '!=', '')->distinct()->orderBy('platform')->pluck('platform');
+            }
+
+            $brands = Firmware::query()
+                ->whereNotNull('brand')
+                ->select('brand', DB::raw('count(*) as pages'))
+                ->groupBy('brand')
+                ->orderByDesc('pages')
+                ->pluck('pages', 'brand');
+
+            // Семейства моделей по маркам (только достаточно крупные: мелких сотни и они только мешают в списке)
+            $seriesByBrand = Firmware::query()
+                ->whereNotNull('brand')
+                ->whereNotNull('series')
+                ->select('brand', 'series', DB::raw('count(*) as pages'))
+                ->groupBy('brand', 'series')
+                ->having('pages', '>=', 3)
+                ->orderBy('series')
+                ->get()
+                ->groupBy('brand')
+                ->map(fn ($rows) => $rows->pluck('series')->values()->all())
+                ->all();
+
+            return compact('platforms', 'brands', 'seriesByBrand');
+        });
+        $platforms = $filters['platforms'];
+        $brands = $filters['brands'];
+        $seriesByBrand = $filters['seriesByBrand'];
 
         $extensions = Firmware::query()
             ->whereNotNull('extension')
@@ -63,7 +109,7 @@ class FirmwareController extends Controller
             ->orderBy('extension')
             ->pluck('extension');
 
-        return view('public.firmwares.index_server', compact('firmwares', 'platforms', 'extensions', 'sort', 'dir', 'perPage'));
+        return view('public.firmwares.index_server', compact('firmwares', 'platforms', 'brands', 'seriesByBrand', 'extensions', 'sort', 'dir', 'perPage'));
     }
 
     public function show(string $slug)
