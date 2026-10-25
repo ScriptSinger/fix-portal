@@ -20,9 +20,9 @@
 <footer class="mt-8 bg-footer text-white">
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
         <section>
-            <a href="{{ route('articles.index') }}" class="inline-block rounded-md bg-white px-3 py-2">
-                <img src="{{ optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo.png') }}"
-                    alt="UfaMasters" class="h-8 w-auto">
+            <a href="{{ route('articles.index') }}" class="inline-block">
+                <img src="{{ asset('assets/front/images/version/ufamasters-logo-light.png') }}" alt="UfaMasters"
+                    class="-ml-[14px] h-10 w-auto">
             </a>
             <p class="mt-4 max-w-xs text-sm leading-relaxed text-gray-300">
                 Статьи, вопросы и прошивки для ремонта бытовой техники от опытных мастеров.
