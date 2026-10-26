@@ -6,6 +6,7 @@ use App\Models\SocialAccount;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialUser;
 
@@ -47,7 +48,7 @@ class SocialLogin
         $providerId = (string) $social->getId();
 
         if ($providerId === '') {
-            return null;
+            return $this->refuse($provider, 'no_provider_id', $social);
         }
 
         $link = SocialAccount::where('provider', $provider)->where('provider_user_id', $providerId)->first();
@@ -59,7 +60,7 @@ class SocialLogin
         $email = Str::lower(trim((string) $social->getEmail()));
 
         if ($email === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return null;
+            return $this->refuse($provider, 'no_email', $social);
         }
 
         return DB::transaction(function () use ($provider, $providerId, $email, $social): ?User {
@@ -67,7 +68,7 @@ class SocialLogin
             $user = User::withTrashed()->where('email', $email)->first();
 
             if ($user?->trashed()) {
-                return null;
+                return $this->refuse($provider, 'deleted_account', $social);
             }
 
             if ($user && $user->email_verified_at === null) {
@@ -90,6 +91,20 @@ class SocialLogin
 
             return $user;
         });
+    }
+
+    /**
+     * Отказ без исключения: пишем причину и имена полей, которые вернула соцсеть (без значений, чтобы не хранить личные данные).
+     */
+    private function refuse(string $provider, string $reason, SocialUser $social): ?User
+    {
+        Log::warning('Вход через соцсеть отклонён', [
+            'provider' => $provider,
+            'reason' => $reason,
+            'fields' => array_keys((array) ($social->user ?? [])),
+        ]);
+
+        return null;
     }
 
     private function name(SocialUser $social, string $email): string
