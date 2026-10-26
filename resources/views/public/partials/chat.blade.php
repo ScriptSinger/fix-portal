@@ -29,8 +29,9 @@
 @endphp
 <section id="comments" aria-label="Ответы" class="mt-4" @scroll.window.passive="measure()" @resize.window="measure()" x-init="measure()" x-data="{
     target: null, base: @js($storeUrl), photos: [], busy: false, error: '', far: false,
-    measure() { this.far = this.$el.getBoundingClientRect().bottom - window.innerHeight > 240; },
-    toEnd() { (this.$refs.text ?? this.$el).scrollIntoView({ behavior: 'smooth', block: 'center' }); },
+    measure() { this.far = this.$root.getBoundingClientRect().bottom - window.innerHeight > 240; },
+    // едем к концу ленты: поле ввода закреплено и всегда «в кадре», так что scrollIntoView к нему не работал, а $el в обработчике кнопки это сама кнопка, поэтому берём $root
+    toEnd() { window.scrollBy({ top: this.$root.getBoundingClientRect().bottom - window.innerHeight + 24, behavior: 'smooth' }); },
     async attach(files) {
         this.error = '';
         for (const file of [...files].filter((f) => f.type.startsWith('image/')).slice(0, 6 - this.photos.length)) {
