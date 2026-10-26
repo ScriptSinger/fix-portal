@@ -11,6 +11,7 @@
         @if (session('status'))
             <x-ui.notice type="success">{{ session('status') }}</x-ui.notice>
         @endif
+        <x-ui.social-login />
         <form action="{{ route('login') }}" method="POST" x-data="{ busy: false }" @submit="busy = true">
             @csrf
             <x-ui.field name="email" type="email" label="Email" placeholder="name@example.com" autocomplete="email" required large />

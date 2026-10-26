@@ -3,39 +3,47 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Providers\RouteServiceProvider;
+use App\Services\SocialLogin;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Laravel\Socialite\Facades\Socialite;
+use Throwable;
 
 class OAuthController extends Controller
 {
-
-    public function redirect($provider)
+    public function redirect(string $provider): RedirectResponse
     {
+        abort_unless(array_key_exists($provider, SocialLogin::enabled()), 404);
+
         return Socialite::driver($provider)->redirect();
     }
 
-    public function callback($provider)
+    public function callback(string $provider, SocialLogin $login): RedirectResponse
     {
-        $socialUser = Socialite::driver($provider)->user();
+        abort_unless(array_key_exists($provider, SocialLogin::enabled()), 404);
 
-        $user = User::firstOrCreate(
-            ['email' => $socialUser->getEmail()],
-            [
-                'name' => $socialUser->getName(),
-                'password' => bcrypt(str()->random(16)),
-                // Можно сохранить аватарку, id соцсети и т.д.
-                // $provider . '_id' => $socialUser->getId(),
-            ]
-        );
+        $label = SocialLogin::PROVIDERS[$provider];
 
-        // Если соцсеть подтверждает email — сразу отмечаем как verified
-        if ($user->email_verified_at === null) {
-            $user->markEmailAsVerified();
+        try {
+            $user = $login->resolve($provider, Socialite::driver($provider)->user());
+        } catch (Throwable $e) {
+            // Отказ пользователя, просроченный state или сбой сервиса: без 500, причина в лог
+            Log::warning('Вход через соцсеть не удался', ['provider' => $provider, 'error' => $e->getMessage()]);
+
+            return redirect()->route('login')->withErrors(['email' => "Не удалось войти через {$label}. Попробуйте ещё раз или войдите по почте."]);
         }
-        Auth::login($user);
 
-        return redirect()->intended('/');
+        if (! $user) {
+            return redirect()->route('login')->withErrors([
+                'email' => "{$label} не передал адрес почты или аккаунт с ним недоступен. Войдите или зарегистрируйтесь по почте.",
+            ]);
+        }
+
+        Auth::login($user, true);
+        request()->session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::HOME);
     }
 }

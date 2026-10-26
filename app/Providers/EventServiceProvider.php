@@ -5,7 +5,9 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use App\Socialite\VkIdProvider;
 use Illuminate\Support\Facades\Event;
+use SocialiteProviders\Manager\SocialiteWasCalled;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,10 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
 
+        // Вход через Яндекс ID и VK ID (SocialiteProviders)
+        SocialiteWasCalled::class => [
+            \SocialiteProviders\Yandex\YandexExtendSocialite::class . '@handle',
+        ],
     ];
 
     /**
@@ -26,7 +32,10 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Готовый пакет VK ID требует PHP 8.4, на сайте 8.2: провайдер лежит в app/Socialite
+        Event::listen(function (SocialiteWasCalled $event) {
+            $event->extendSocialite('vkid', VkIdProvider::class);
+        });
     }
 
     /**

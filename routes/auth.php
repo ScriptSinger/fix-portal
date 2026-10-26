@@ -39,12 +39,15 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 
 
+    // Вход через Яндекс ID и VK ID. Кнопки видны, только если в окружении заданы ключи приложения
     Route::get('auth/{provider}', [OAuthController::class, 'redirect'])
-        ->where('provider', 'github|vkontakte') // 'google|github|vkontakte'
+        ->where('provider', 'yandex|vkid')
+        ->middleware('throttle:20,1')
         ->name('auth.redirect');
 
     Route::get('auth/{provider}/callback', [OAuthController::class, 'callback'])
-        ->where('provider', 'github|vkontakte') // 'google|github|vkontakte'
+        ->where('provider', 'yandex|vkid')
+        ->middleware('throttle:20,1')
         ->name('auth.callback');
 });
 

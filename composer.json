@@ -23,6 +23,8 @@
         "moonshine/moonshine": "^4.3",
         "moonshine/tinymce": "^2.0",
         "phpseclib/phpseclib": "^3.0.35",
+        "socialiteproviders/manager": "4.9.2",
+        "socialiteproviders/yandex": "4.2.0",
         "spatie/laravel-sitemap": "^8.0"
     },
     "require-dev": {
