@@ -55,7 +55,16 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'last_seen_at' => 'datetime',
     ];
+
+    /** Сколько минут после последнего запроса пользователь считается «онлайн» */
+    public const ONLINE_MINUTES = 5;
+
+    public function scopeOnline($query)
+    {
+        return $query->where('last_seen_at', '>=', now()->subMinutes(self::ONLINE_MINUTES));
+    }
 
 
     public function comments(): HasMany

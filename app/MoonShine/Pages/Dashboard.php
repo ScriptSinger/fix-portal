@@ -47,6 +47,10 @@ class Dashboard extends Page
                 $this->count('Ответы', Reply::class, 'arrow-uturn-left'),
                 $this->count('Прошивки', Firmware::class, 'cpu-chip'),
                 $this->count('Пользователи', User::class, 'users'),
+                ValueMetric::make('Онлайн сейчас (за ' . User::ONLINE_MINUTES . ' мин)')
+                    ->icon('signal')
+                    ->value(fn () => User::online()->count())
+                    ->columnSpan(4),
                 ValueMetric::make('Регистраций за 30 дней')
                     ->icon('user-plus')
                     ->value(fn () => User::where('created_at', '>=', now()->subDays(30))->count())

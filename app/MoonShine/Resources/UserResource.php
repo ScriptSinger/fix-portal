@@ -52,6 +52,7 @@ class UserResource extends BaseResource
             Text::make('Локация', 'location'),
             Date::make('Подтверждён', 'email_verified_at')->format('d.m.Y'),
             Date::make('Регистрация', 'created_at')->format('d.m.Y')->sortable(),
+            Date::make('Последний визит', 'last_seen_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 
