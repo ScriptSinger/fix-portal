@@ -26,6 +26,13 @@ class Kernel extends ConsoleKernel
             ->timezone('Asia/Yekaterinburg')
             ->withoutOverlapping()
             ->onFailure(fn () => Log::critical('Ночная резервная копия базы не снята или не загружена в облако: см. вывод db:backup.'));
+
+        // Не подтвердил почту за неделю и ничего не делал на сайте: это бот или брошенная регистрация, удаляем навсегда
+        $schedule->command('users:prune-unverified --apply')
+            ->dailyAt('04:00')
+            ->timezone('Asia/Yekaterinburg')
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::error('Не удалось почистить неподтверждённых пользователей: см. вывод users:prune-unverified.'));
     }
 
     /**
