@@ -28,7 +28,7 @@
     <div x-data="firmwareFilter(@js(['url' => route('firmwares.index'), 'state' => $state, 'byBrand' => $seriesByBrand, 'allSeries' => $seriesAll]))"
         @keydown.escape.window="close()" class="contents">
         <button type="button" @click="show()" aria-label="Открыть фильтр"
-            class="fixed left-0 top-1/2 z-[60] -translate-y-1/2 rotate-180 bg-brand-400 px-[9px] py-4 text-[13px] font-bold uppercase leading-none tracking-[1.5px] text-black shadow-[2px_0_8px_rgba(0,0,0,.35)] [writing-mode:vertical-rl] lg:hidden">Фильтр</button>
+            class="fixed left-0 top-1/2 z-30 -translate-y-1/2 rotate-180 bg-brand-400 px-[9px] py-4 text-[13px] font-bold uppercase leading-none tracking-[1.5px] text-black shadow-[2px_0_8px_rgba(0,0,0,.35)] [writing-mode:vertical-rl] lg:hidden">Фильтр</button>
         <div x-show="open" x-cloak @click="close()" class="fixed inset-0 z-[70] bg-black/50 lg:hidden" aria-hidden="true"></div>
 
         <div class="fw-drawer lg:rounded-[5px] lg:bg-white" :class="{ open }">
