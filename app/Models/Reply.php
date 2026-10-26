@@ -18,6 +18,7 @@ class Reply extends Model
         'text',
         'user_id',
         'comment_id',
+        'quote_reply_id',
         'user_id'
     ];
 
@@ -29,6 +30,11 @@ class Reply extends Model
     public function comment(): BelongsTo
     {
         return $this->belongsTo(Comment::class);
+    }
+
+    public function reactions(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
     }
 
     public function likes(): MorphMany

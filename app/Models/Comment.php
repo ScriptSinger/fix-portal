@@ -35,6 +35,11 @@ class Comment extends Model
         return $this->hasMany(Reply::class);
     }
 
+    public function reactions(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(Reaction::class, 'reactable');
+    }
+
     public function likes()
     {
         return $this->morphMany(Like::class, 'likeable');

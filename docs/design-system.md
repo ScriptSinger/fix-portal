@@ -2,7 +2,7 @@
 
 Документ описывает внешний вид сайта, восстановленный в Figma и перенесённый на Vite + Tailwind 4 + Alpine.
 Источник правды по виду — старая тема (Bootstrap 4 alpha, `resources/assets/front/css`), по макетам — файл Figma
-**Legacy Ufamasters** (`cVpIU5zMDXUTryixqevTgA`), по коду — `resources/css/app.css` и компоненты `resources/views/components/tw`.
+**Legacy Ufamasters** (`cVpIU5zMDXUTryixqevTgA`), по коду — `resources/css/app.css` и компоненты `resources/views/components/ui`.
 
 > Принцип: сначала переносим технологии и сохраняем облик «как был», редизайн — отдельным этапом.
 
@@ -88,22 +88,22 @@
 
 ## 5. Компоненты
 
-Имена Figma → Blade-компоненты (`resources/views/components/tw`, partials в `resources/views/tw/partials`).
+Имена Figma → Blade-компоненты (`resources/views/components/ui`, partials в `resources/views/public/partials`).
 
 | Figma | Варианты | Код |
 |---|---|---|
-| Button | Black, Yellow, Blue (Telegram), Action blue | `<x-tw.button variant="…">` |
-| Share button | сеть × «с подписью» / «только иконка» | `<x-tw.share>` |
+| Button | Black, Yellow, Blue (Telegram), Action blue | `<x-ui.button variant="…">` |
+| Share button | сеть × «с подписью» / «только иконка» | `<x-ui.share>` |
 | Pagination item | Default, Active, Disabled | `tw/partials/pagination.blade.php` |
-| Tag, Category chip | — | `<x-tw.tag-cloud>`, чип в странице статьи |
-| Breadcrumbs | — | `<x-tw.breadcrumbs>` |
+| Tag, Category chip | — | `<x-ui.tag-cloud>`, чип в странице статьи |
+| Breadcrumbs | — | `<x-ui.breadcrumbs>` |
 | Header | Guest, Auth; Header compact (до 992) | `tw/partials/header.blade.php` |
 | Hero, Hero search card | десктоп; Hero stacked (планшет, телефон) | `tw/posts/index.blade.php` |
-| Page title bar | десктоп; compact (планшет, телефон, без крошек) | `<x-tw.page-header>` |
-| Post card | категория показана / скрыта; Post card responsive | `<x-tw.post-card>`, `<x-tw.post-list>` |
+| Page title bar | десктоп; compact (планшет, телефон, без крошек) | `<x-ui.page-header>` |
+| Post card | категория показана / скрыта; Post card responsive | `<x-ui.post-card>`, `<x-ui.post-list>` |
 | Widgets | Telegram, Popular posts, Categories, Repair at home, Advertising | `tw/partials/widgets/*` |
 | Footer | десктоп; Footer stacked | `tw/partials/footer.blade.php` |
-| Comment, Comment form, Related posts, Section tab | серый / чёрный язычок | `tw/partials/comments.blade.php`, `<x-tw.legend>` |
+| Comment, Comment form, Related posts, Section tab | серый / чёрный язычок | `tw/partials/comments.blade.php`, `<x-ui.legend>` |
 | Form field | Text, Select, Textarea; Error | формы вопросов, профиля, фильтров прошивок |
 | Data table | каталог прошивок, серии, метаданные, параметры | страницы прошивок |
 | Auth card | Login, Register, Forgot, Reset | отдельный layout входа (AdminLTE) |

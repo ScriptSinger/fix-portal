@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Public\UserImageController;
 
 
 use App\Http\Controllers\Public\LikeController;
+use App\Http\Controllers\Public\ReactionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,8 @@ Route::group(
         'middleware' => 'auth:web',
     ],
     function () {
+        Route::post('/reactions/{type}/{id}', [ReactionController::class, 'toggle'])->whereIn('type', ['comment', 'reply'])->name('reactions.toggle');
+
         Route::prefix('/{type}/{id}/')->group(function () {
             Route::post('/like', [LikeController::class, 'like'])->name('like');
             Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');

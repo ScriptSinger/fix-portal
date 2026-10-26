@@ -26,7 +26,7 @@ class FirmwareHubController extends Controller
         $series = $this->catalog->seriesList($name);
         $summary = $this->catalog->brandSummary($name);
 
-        return view('tw.firmwares.hub_brand', [
+        return view('public.firmwares.hub_brand', [
             'brand' => $info,
             'series' => $series,
             'summary' => $summary,
@@ -52,7 +52,7 @@ class FirmwareHubController extends Controller
             ->paginate(50)
             ->withQueryString();
 
-        return view('tw.firmwares.hub_series', [
+        return view('public.firmwares.hub_series', [
             'brand' => $info,
             'seriesName' => $seriesName,
             'summary' => $summary,

@@ -8,9 +8,11 @@ use App\Services\FirmwareCatalog;
 use App\Http\Controllers\Public\QuestionController;
 use App\Http\Controllers\Public\ApplianceController;
 use App\Http\Controllers\Public\CategoryController;
+use App\Http\Controllers\Public\CabinetController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\PostController;
 use App\Http\Controllers\Public\ReplyController;
+use App\Http\Controllers\Public\SolutionController;
 use App\Http\Controllers\Public\TagController;
 use App\Http\Controllers\Public\UserController;
 
@@ -28,12 +30,10 @@ use App\Http\Controllers\Public\UserController;
 */
 
 
-Route::get('/', function () {
-    return redirect('/articles');
-});
+Route::get('/', [PostController::class, 'home'])->name('home');
 
-Route::view('/about', 'tw.pages.about')->name('about');
-Route::view('/personal-data-consent', 'tw.pages.consent')->name('consent');
+Route::view('/about', 'public.pages.about')->name('about');
+Route::view('/personal-data-consent', 'public.pages.consent')->name('consent');
 
 Route::group(
     ['prefix' => 'articles'],
@@ -50,7 +50,8 @@ Route::redirect('/article/{slug}', '/articles/{slug}', 301);
 // Route::get('/users', [UserController::class, 'index'])->name('users.index');
 // Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
 
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories.index');
+// Список категорий дублировал левое меню «Разделы»: адрес сохранён постоянным редиректом, чтобы старые ссылки и поисковики попадали на ленту
+Route::redirect('/categories', '/articles', 301)->name('categories.index');
 Route::get('/categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
 Route::get('/tag/{tag}', [TagController::class, 'show'])->name('tags.show');
@@ -79,7 +80,16 @@ Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereN
 
 Route::middleware(['auth:web', 'verified'])->group(
     function () {
-        Route::get('/profile/edit', [UserController::class, 'edit'])->name('profile.edit');
+        Route::prefix('/cabinet')->group(function () {
+            Route::get('/', [CabinetController::class, 'index'])->name('cabinet.index');
+            Route::get('/notifications', [CabinetController::class, 'notifications'])->name('cabinet.notifications');
+            Route::post('/notifications/read-all', [CabinetController::class, 'readAll'])->name('cabinet.notifications.read-all');
+            Route::get('/notifications/{id}', [CabinetController::class, 'open'])->name('cabinet.notifications.open');
+            Route::get('/questions', [CabinetController::class, 'questions'])->name('cabinet.questions');
+            Route::get('/answers', [CabinetController::class, 'answers'])->name('cabinet.answers');
+            Route::get('/profile', [UserController::class, 'edit'])->name('profile.edit');
+        });
+        Route::redirect('/profile/edit', '/cabinet/profile');
         Route::put('/profile/update', [UserController::class, 'update'])->name('profile.update');
         Route::post('/{type}/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
         Route::group(['prefix' => '/comments'], function () {
@@ -90,6 +100,9 @@ Route::middleware(['auth:web', 'verified'])->group(
 
         Route::put('/replies/{id}', [ReplyController::class, 'update'])->name('comments.replies.update');
         Route::delete('/replies/{id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
+
+        Route::post('/questions/{id}/solution', [SolutionController::class, 'store'])->whereNumber('id')->name('questions.solution.store');
+        Route::delete('/questions/{id}/solution', [SolutionController::class, 'destroy'])->whereNumber('id')->name('questions.solution.destroy');
 
         Route::prefix('/questions')->group(function () {
             Route::get('/create', [QuestionController::class, 'create'])->name('questions.create');

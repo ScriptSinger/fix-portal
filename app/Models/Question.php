@@ -23,9 +23,34 @@ class Question extends Model
         'title',
         'description',
         'appliance_id',
+        'model',
+        'error_code',
         'photos',
-        'user_id'
+        'user_id',
+        'solved_at',
+        'solution_type',
+        'solution_id',
     ];
+
+    protected $casts = ['solved_at' => 'datetime'];
+
+    /** Отметку «решён» ведём с этой даты: у старых вопросов статуса нет, и «без решения» к ним не относится. */
+    public const SOLUTION_TRACKING_SINCE = '2026-10-26';
+
+    public function isSolved(): bool
+    {
+        return $this->solved_at !== null;
+    }
+
+    /** Ответ, который автор отметил решением (комментарий или ответ), либо null. */
+    public function solution(): Comment|Reply|null
+    {
+        return match ($this->solution_type) {
+            'comment' => Comment::find($this->solution_id),
+            'reply' => Reply::find($this->solution_id),
+            default => null,
+        };
+    }
 
     public function sluggable(): array
     {

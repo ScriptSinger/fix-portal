@@ -1,8 +1,7 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-@source '../views/tw/**/*.blade.php';
-@source '../views/components/tw/**/*.blade.php';
+@source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 
 @theme {
@@ -10,6 +9,8 @@
     --breakpoint-sm: 36rem;
     --breakpoint-lg: 62rem;
     --breakpoint-xl: 75rem;
+    /* Один контейнер для шапки, контента и подвала: левый и правый край у них совпадают на любой ширине */
+    --container-site: 85rem;
     --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
     --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
 
@@ -25,7 +26,31 @@
     --color-surface: #f1f1f1;
     --color-footer: #000000;
     --color-link: #3197d6;
-    --color-telegram: #0088cc;
+    --color-telegram: #0074b3;
+
+    /* Второстепенный текст на светлом фоне (контраст не ниже 4,5:1) и служебные цвета */
+    --color-subtle: #6b6b6b;
+    --color-dashed: #dadada;
+    --color-soft: #ccc;
+    --color-success: #1e7e34;
+    --color-danger: #dc3545;
+    --color-service: #111827;
+    --color-service-muted: #6b7280;
+}
+
+@layer components {
+    .site-container { width: 100%; max-width: var(--container-site); margin-inline: auto; padding-inline: 15px; }
+    /* Рамка шапки и подвала: тонкая линия на 6 px от края. Рисуется поверх, а не border, чтобы не сдвигать содержимое */
+    .frame { position: relative; }
+    .frame::after { content: ''; position: absolute; inset: 6px; border: 1px solid var(--frame-line, #000); pointer-events: none; }
+}
+
+@layer components {
+    /* Панель фильтров прошивок: на компьютере обычная колонка, на телефоне выезжает слева */
+    @media (max-width: 991.98px) {
+        .fw-drawer { position: fixed; inset: 0 auto 0 0; z-index: 80; display: flex; width: 86%; max-width: 340px; flex-direction: column; background: #fff; transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s; }
+        .fw-drawer.open { transform: none; visibility: visible; transition: transform .25s ease; }
+    }
 }
 
 @layer base {
@@ -49,6 +74,10 @@
     overflow-wrap: anywhere;
 }
 .article-content p { margin-bottom: 26px; }
+/* Заголовки не прячутся под липкой шапкой при переходе по содержанию */
+.article-content h2, .article-content h3 { scroll-margin-top: 130px; }
+/* Ссылка в тексте не должна отличаться от текста одним цветом */
+.article-content p a, .article-content li a { text-decoration: underline; text-underline-offset: 2px; }
 .article-content h1, .article-content h2, .article-content h3,
 .article-content h4, .article-content h5, .article-content h6 {
     font-weight: 700; color: #000; line-height: 1.4;
@@ -63,7 +92,7 @@
 .article-content ul { list-style: disc; }
 .article-content ol { list-style: decimal; }
 .article-content ul ul, .article-content ol ol, .article-content ul ol, .article-content ol ul { margin-bottom: 0; }
-.article-content a { color: #111; }
+.article-content a:not(.btn) { color: #111; }
 .article-content a:hover { color: var(--color-link); }
 .article-content b, .article-content strong { font-weight: 700; }
 .article-content hr { margin: 1rem 0; border-top: 1px solid rgba(0, 0, 0, .1); }
@@ -125,3 +154,43 @@ html { scroll-padding-top: 100px; }
 .article-content .carousel-indicators li.active { opacity: 1; }
 .article-content .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
 @media (max-width: 767px) { .article-content .carousel-caption { display: none; } }
+
+/* Единое поле формы сайта (текст, список, многострочное). Высота 38 px, прямые углы, рамка #ced4da. */
+@layer components {
+    .field {
+        display: block; width: 100%; height: 40px; padding: 0 12px;
+        border: 1px solid #ced4da; background: #fff; color: #464a4c; font-size: 16px; line-height: 24px;
+    }
+    textarea.field { height: auto; min-height: 114px; padding: 8px 12px; }
+    .field::placeholder { color: #767676; opacity: 1; }
+    .field:focus { border-color: var(--color-brand-500); outline: none; }
+    .field:disabled { background: #eceeef; }
+    .field[aria-invalid='true'] { border-color: #dc2626; }
+}
+
+@layer components {
+    /* Эмодзи рисуем цветным шрифтом, иначе в слабо оформленных системах часть знаков становится серым контуром */
+    .emoji { font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif; font-style: normal; font-variant-emoji: emoji; line-height: 1; }
+}
+
+@layer components {
+    /* Свёрнутая форма вопроса мягко «дышит» жёлтым кольцом, чтобы её заметили; при раскрытии и при отключённой анимации в системе не двигается */
+    @keyframes ask-pulse { 0% { box-shadow: 0 0 0 0 rgb(249 202 39 / .55); } 70%, 100% { box-shadow: 0 0 0 12px rgb(249 202 39 / 0); } }
+    .ask-pulse { animation: ask-pulse 2.8s ease-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .ask-pulse { animation: none; } }
+}
+
+@layer components {
+    /* Карандаш «пишет» строку: линия дорисовывается слева направо, карандаш едет за концом линии, в конце всё гаснет и начинается заново */
+    @keyframes pencil-line {
+        0% { stroke-dashoffset: 1; opacity: 0; } 4% { opacity: 1; }
+        70%, 90% { stroke-dashoffset: 0; opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+    @keyframes pencil-body {
+        0% { transform: translateX(0); opacity: 1; }
+        70%, 90% { transform: translateX(9px); opacity: 1; } 100% { transform: translateX(9px); opacity: 0; }
+    }
+    .pencil-line { stroke-dasharray: 1 2; stroke-dashoffset: 1; opacity: 0; animation: pencil-line 2.8s ease-in-out infinite; }
+    .pencil-body { animation: pencil-body 2.8s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { .pencil-line { animation: none; stroke-dashoffset: 0; opacity: 1; } .pencil-body { animation: none; } }
+}

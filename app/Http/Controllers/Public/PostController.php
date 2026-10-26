@@ -12,6 +12,14 @@ use Illuminate\Pipeline\Pipeline;
 
 class PostController extends Controller
 {
+    /** Главная: баннер и последние статьи; полный список с поиском и страницами живёт на /articles. */
+    public function home()
+    {
+        $posts = Post::query()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->limit(6)->get();
+
+        return view('public.posts.home', compact('posts'));
+    }
+
     public function index()
     {
         $posts = app(Pipeline::class)
@@ -25,7 +33,7 @@ class PostController extends Controller
             ->paginate(10);
 
 
-        return view('tw.posts.index', compact('posts'));
+        return view('public.posts.index', compact('posts'));
     }
 
     public function show($slug)
@@ -56,6 +64,6 @@ class PostController extends Controller
             ->with('category') // Загрузка связанной категории
             ->get();
 
-        return view('tw.posts.show', compact('post', 'relatedPosts', 'cta'));
+        return view('public.posts.show', compact('post', 'relatedPosts', 'cta'));
     }
 }
