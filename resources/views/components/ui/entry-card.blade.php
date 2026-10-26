@@ -1,4 +1,4 @@
-@props(['url', 'image' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null, 'placeholder' => false, 'images' => [], 'rounded' => false])
+@props(['url', 'image' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null, 'placeholder' => false, 'images' => [], 'rounded' => false, 'solved' => false])
 {{-- Карточка записи для сетки: на телефоне компактная строка (миниатюра слева), от sm карточка с картинкой сверху.
      placeholder: если у записи нет картинки (или она не загрузилась), вместо неё светлая плитка с жёлтым «?». --}}
 <article @class(['group flex bg-white sm:flex-col', 'overflow-hidden rounded-2xl shadow-sm' => $rounded])>
@@ -24,8 +24,11 @@
         </a>
     @endif
     <div class="flex min-w-0 flex-1 flex-col gap-2 p-3 sm:p-5">
-        @if ($category)
-            <a href="{{ $categoryUrl }}" class="-my-1 max-w-full self-start truncate py-1 text-xs leading-4 text-subtle hover:text-ink">{{ $category }}</a>
+        @if ($category || $solved)
+            <div class="-my-1 flex items-center gap-2 py-1 text-xs leading-4">
+                @if ($category)<a href="{{ $categoryUrl }}" class="min-w-0 truncate text-subtle hover:text-ink">{{ $category }}</a>@endif
+                @if ($solved)<span class="shrink-0 font-bold text-green-700">✓ Решён</span>@endif
+            </div>
         @endif
         <h2 class="text-base font-bold leading-[22px] text-black sm:text-[19px] sm:leading-[26px]"><a href="{{ $url }}">{{ $title }}</a></h2>
         <p class="{{ $image || $placeholder ? 'line-clamp-2 max-sm:hidden' : 'line-clamp-6' }} text-sm leading-[22px]">{!! $excerpt !!}</p>

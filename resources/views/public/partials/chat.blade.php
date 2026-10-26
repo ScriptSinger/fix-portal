@@ -21,6 +21,11 @@
     $authorId = $instance->user_id ?? null;
     $storeUrl = route('comments.store', ['type' => strtolower(class_basename($instance)), 'id' => $instance->id]);
     $day = null;
+    $isQuestion = $instance instanceof \App\Models\Question;
+    $solution = $isQuestion ? $instance->solution() : null;
+    $meId = auth('web')->id();
+    $solved = \App\Services\Reputation::counts($items->pluck('model.user_id')->unique()->values()->all());
+    $iAmAuthor = $isQuestion && $meId && $instance->user_id === $meId;
 @endphp
 <section id="comments" aria-label="Ответы" class="mt-4" @scroll.window.passive="measure()" @resize.window="measure()" x-init="measure()" x-data="{
     target: null, base: @js($storeUrl), photos: [], busy: false, error: '', far: false,
@@ -57,6 +62,14 @@
         </h2>
     </div>
 
+    @if ($solution)
+        @php $sid = ($instance->solution_type === 'comment' ? 'c-' : 'r-') . $solution->id; @endphp
+        <a href="#{{ $sid }}" class="keep mt-4 block rounded-2xl bg-green-50 px-4 py-3 text-ink no-underline ring-1 ring-green-600/30">
+            <b class="text-sm text-green-700">✓ Решение · {{ $solution->user->name }}</b>
+            <span class="mt-0.5 block text-[14px] leading-snug text-ink/80"><span class="line-clamp-2">{{ $plain($solution->text, 200) ?: 'Фото' }}</span></span>
+        </a>
+    @endif
+
     <div class="grid gap-[3px] py-5">
         @foreach ($items as $i => $item)
             @php
@@ -73,6 +86,9 @@
                 $qslot = $q ? $q->user_id % 5 : 0;
                 $qid = $q ? ($q instanceof \App\Models\Reply ? 'r-' : 'c-') . $q->id : null;
                 $date = $m->created_at->toDateString();
+                $type = $item['kind'] === 'comment' ? 'comment' : 'reply';
+                $isSolution = $isQuestion && $instance->solution_type === $type && (int) $instance->solution_id === $m->id;
+                $canSolve = $iAmAuthor && ! $isSolution && $m->user_id !== $meId;
             @endphp
             @if ($date !== $day)
                 @php $day = $date; @endphp
@@ -84,10 +100,13 @@
                 @else
                     <span class="size-9" aria-hidden="true"></span>
                 @endif
-                <div id="{{ $id }}" class="relative {{ $pics ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-2xl px-3 py-1.5 shadow-sm {{ $last ? 'rounded-bl-sm' : '' }} {{ $own ? 'bg-white' : 'bg-white' }}">
+                <div id="{{ $id }}" class="relative {{ $pics ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-2xl bg-white px-3 py-1.5 shadow-sm {{ $last ? 'rounded-bl-sm' : '' }} {{ $isSolution ? 'ring-2 ring-green-600' : '' }}">
                     @if ($first)
                         <div class="flex flex-wrap items-baseline gap-x-2 text-sm font-bold leading-snug {{ $names[$slot] }}">
                             {{ $m->user->name }}
+                            @if (($n = $solved[$m->user_id] ?? 0) > 0)
+                                <span class="text-[11px] font-bold text-green-700" title="{{ \App\Services\Reputation::rank($n) }}: {{ $n }} {{ trans_choice('решение|решения|решений', $n, [], 'ru') }}">✓ {{ $n }}</span>
+                            @endif
                             @if ($own)
                                 <span class="rounded bg-brand-400 px-1.5 text-[10px] font-bold uppercase tracking-wider text-black">автор</span>
                             @endif
@@ -111,6 +130,13 @@
                     <div class="mt-1 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
                         <x-ui.reactions :instance="$m" />
                         <div class="ml-auto flex items-center gap-x-3 text-[11px] text-subtle">
+                            @if ($isSolution)<span class="font-bold text-green-700">✓ Решение</span>@endif
+                            @if ($canSolve)
+                                <form method="POST" action="{{ route('questions.solution.store', ['id' => $instance->id]) }}" class="inline">@csrf
+                                    <input type="hidden" name="type" value="{{ $type }}"><input type="hidden" name="message" value="{{ $m->id }}">
+                                    <button type="submit" class="font-medium hover:text-green-700">Это решение</button>
+                                </form>
+                            @endif
                             @auth('web')
                                 <button type="button" class="font-medium hover:text-ink"
                                     @click="target = { root: {{ $item['root'] }}, reply: {{ $item['kind'] === 'reply' ? $m->id : 'null' }}, name: @js($m->user->name), text: @js($plain($m->text, 80)) }; $nextTick(() => $refs.text.focus())">Ответить</button>

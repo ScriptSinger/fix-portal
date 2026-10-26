@@ -58,6 +58,17 @@ class ActivityNotifier
         $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::REACTION, $actor, $question, $anchor, $message->text, $emoji)));
     }
 
+    /** Автору ответа: его ответ отмечен решением. */
+    public function solution(Question $question, Comment|Reply $message, User $actor): void
+    {
+        if (! $message->user || $message->user_id === $actor->id) {
+            return;
+        }
+
+        $anchor = ($message instanceof Comment ? 'c-' : 'r-') . $message->id;
+        $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::SOLUTION, $actor, $question, $anchor, $message->text)));
+    }
+
     private function payload(string $kind, User $actor, Question $question, string $anchor, ?string $text, ?string $emoji = null): array
     {
         $plain = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5, 'UTF-8')));

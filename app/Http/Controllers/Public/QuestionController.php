@@ -28,6 +28,8 @@ class QuestionController extends Controller
             ])
             ->thenReturn()
             ->with('appliance', 'user')
+            ->when(request('status') === 'solved', fn ($q) => $q->whereNotNull('solved_at'))
+            ->when(request('status') === 'open', fn ($q) => $q->whereNull('solved_at')->where('created_at', '>=', Question::SOLUTION_TRACKING_SINCE))
 
             ->orderBy('id', 'desc')
             ->paginate(50);

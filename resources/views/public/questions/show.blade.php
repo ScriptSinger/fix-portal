@@ -22,6 +22,11 @@
             '@type' => 'Question', 'name' => $question->title, 'text' => $plain($question->description),
             'answerCount' => $answers->count(), 'upvoteCount' => 0, 'dateCreated' => $question->created_at?->toIso8601String(),
             'author' => ['@type' => 'Person', 'name' => optional($question->user)->name ?: 'Посетитель'],
+            'acceptedAnswer' => ($accepted = $question->solution()) ? [
+                '@type' => 'Answer', 'text' => $plain($accepted->text) ?: 'Ответ с фотографией', 'dateCreated' => $accepted->created_at?->toIso8601String(),
+                'url' => $url . '#' . ($question->solution_type === 'comment' ? 'c-' : 'r-') . $accepted->id, 'upvoteCount' => 0,
+                'author' => ['@type' => 'Person', 'name' => optional($accepted->user)->name ?: 'Посетитель'],
+            ] : null,
             'suggestedAnswer' => $answers->map(fn ($a) => [
                 '@type' => 'Answer', 'text' => $plain($a->text) ?: 'Ответ с фотографией', 'dateCreated' => $a->created_at?->toIso8601String(),
                 'url' => $url . '#comments', 'upvoteCount' => (int) ($a->likes_count ?? 0),
@@ -51,6 +56,7 @@
                 <div class="mb-2 flex flex-wrap gap-2">
                     <a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"
                         class="keep rounded bg-brand-400 px-2 py-0.5 text-xs font-bold leading-4 text-black hover:underline">{{ $question->appliance->title }}</a>
+                    @if ($question->isSolved())<span class="rounded bg-green-600 px-2 py-0.5 text-xs font-bold leading-4 text-white">✓ Решено</span>@endif
                     @if ($question->model)<span class="rounded border border-line px-2 py-0.5 text-xs leading-4 text-black">{{ $question->model }}</span>@endif
                     @if ($question->error_code)<span class="rounded border border-line px-2 py-0.5 text-xs leading-4 text-black">Ошибка {{ $question->error_code }}</span>@endif
                 </div>
@@ -62,6 +68,17 @@
             <div class="article-content {{ $bodyHtml === strip_tags($bodyHtml) ? 'whitespace-pre-line' : '' }} px-4 pt-3 text-[15px] leading-[1.5] [overflow-wrap:anywhere] sm:px-5">{!! $bodyHtml !!}</div>
 
             <footer class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 px-4 pb-2 pt-1 text-xs leading-5 text-subtle sm:px-5">
+                @if (auth('web')->id() === $question->user_id)
+                    @if ($question->isSolved())
+                        <form method="POST" action="{{ route('questions.solution.destroy', ['id' => $question->id]) }}" class="inline">@csrf @method('DELETE')
+                            <button type="submit" class="hover:text-ink">Снять отметку «Решено»</button>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('questions.solution.store', ['id' => $question->id]) }}" class="inline">@csrf
+                            <button type="submit" class="font-medium hover:text-green-700">Отметить решённым</button>
+                        </form>
+                    @endif
+                @endif
                 @can('update', $question)
                     <a href="{{ route('questions.edit', ['question' => $question->slug]) }}" class="hover:text-ink">Редактировать</a>
                 @endcan

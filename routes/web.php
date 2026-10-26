@@ -12,6 +12,7 @@ use App\Http\Controllers\Public\CabinetController;
 use App\Http\Controllers\Public\CommentController;
 use App\Http\Controllers\Public\PostController;
 use App\Http\Controllers\Public\ReplyController;
+use App\Http\Controllers\Public\SolutionController;
 use App\Http\Controllers\Public\TagController;
 use App\Http\Controllers\Public\UserController;
 
@@ -99,6 +100,9 @@ Route::middleware(['auth:web', 'verified'])->group(
 
         Route::put('/replies/{id}', [ReplyController::class, 'update'])->name('comments.replies.update');
         Route::delete('/replies/{id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
+
+        Route::post('/questions/{id}/solution', [SolutionController::class, 'store'])->whereNumber('id')->name('questions.solution.store');
+        Route::delete('/questions/{id}/solution', [SolutionController::class, 'destroy'])->whereNumber('id')->name('questions.solution.destroy');
 
         Route::prefix('/questions')->group(function () {
             Route::get('/create', [QuestionController::class, 'create'])->name('questions.create');

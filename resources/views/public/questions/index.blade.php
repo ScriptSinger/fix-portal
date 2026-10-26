@@ -8,6 +8,7 @@
 
 @section('content')
     @include('public.partials.ask-form')
+    @include('public.partials.status-filter')
     <x-ui.question-list :questions="$questions" />
 @endsection
 

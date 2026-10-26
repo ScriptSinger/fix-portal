@@ -19,7 +19,7 @@ class CabinetController extends Controller
             'unread' => $user->unreadNotifications()->count(),
             'questions' => $user->questions()->count(),
             'answers' => $this->answersCount($user->id),
-            'reactions' => $this->reactionsCount($user->id),
+            'solutions' => \App\Services\Reputation::countFor($user->id),
         ];
         $questions = $user->questions()->withCount('comments')->latest('id')->limit(5)->get();
 
@@ -77,9 +77,4 @@ class CabinetController extends Controller
             + Reply::where('user_id', $userId)->whereHas('comment', fn ($q) => $q->where('commentable_type', Question::class))->count();
     }
 
-    private function reactionsCount(int $userId): int
-    {
-        return Reaction::where('reactable_type', Comment::class)->whereIn('reactable_id', Comment::where('user_id', $userId)->select('id'))->count()
-            + Reaction::where('reactable_type', Reply::class)->whereIn('reactable_id', Reply::where('user_id', $userId)->select('id'))->count();
-    }
 }

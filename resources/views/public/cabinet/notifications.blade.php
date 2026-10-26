@@ -46,6 +46,7 @@
                 $text = match ($d['kind'] ?? '') {
                     'answer' => $who . ' ответил на ваш вопрос ' . $title,
                     'reply' => $who . ' ответил вам в вопросе ' . $title,
+                    'solution' => $who . ' отметил ваш ответ решением в вопросе ' . $title,
                     'reaction' => $who . ' поставил реакцию <span class="emoji">' . e($d['emoji'] ?? '') . '</span> на ваше сообщение в вопросе ' . $title,
                     default => $who . ' ' . $title,
                 };
