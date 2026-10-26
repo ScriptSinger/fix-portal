@@ -9,7 +9,7 @@
 @section('content')
     <x-ui.auth-shell title="Регистрация" eyebrow="Право на ремонт" headline="Вещи должны чиниться, а не выбрасываться." :points="['Ремонт экономит деньги', 'Ремонт бережёт ресурсы планеты', 'Ремонт учит разбираться в технике', 'Ремонт — право каждого владельца']">
         <div x-data="{ agree: false, terms: false, busy: false }">
-            <x-ui.social-login action="Зарегистрироваться" />
+            <x-ui.social-login />
             <form action="{{ route('register') }}" method="post" @submit="busy = true">
                 @csrf
                 {{-- Ловушка для ботов: людям не видна, боты её заполняют --}}
