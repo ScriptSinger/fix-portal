@@ -48,7 +48,8 @@
 
     @yield('hero')
 
-    <main id="content" class="flex-1 bg-surface pb-16 @yield('main-pt', 'pt-6') @if (View::hasSection('bare')) flex flex-col justify-center @endif">
+    {{-- Минимальная высота основной области (75% окна): на коротких страницах между шапкой и подвалом остаётся пространство, а не пара блоков впритык --}}
+    <main id="content" class="min-h-[75vh] flex-1 bg-surface pb-16 @yield('main-pt', 'pt-6') @if (View::hasSection('bare')) flex flex-col justify-center @endif">
         @hasSection('bare')
             @yield('content')
         @else
