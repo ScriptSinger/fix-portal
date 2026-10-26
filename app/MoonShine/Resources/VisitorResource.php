@@ -43,8 +43,6 @@ class VisitorResource extends BaseResource
 
     protected SortDirection $sortDirection = SortDirection::DESC;
 
-    protected bool $simplePaginate = true;
-
     protected int $itemsPerPage = 50;
 
     public function getTitle(): string

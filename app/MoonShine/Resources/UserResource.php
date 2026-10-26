@@ -13,10 +13,12 @@ use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\UI\Fields\Date;
+use MoonShine\UI\Fields\DateRange;
 use MoonShine\UI\Fields\Email;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Password;
 use MoonShine\UI\Fields\Phone;
+use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
@@ -34,7 +36,7 @@ class UserResource extends BaseResource
 
     protected string $column = 'name';
 
-    protected bool $simplePaginate = true;
+    protected int $itemsPerPage = 50;
 
     protected string $sortColumn = 'id';
 
@@ -50,7 +52,7 @@ class UserResource extends BaseResource
             Text::make('Имя', 'name')->sortable(),
             Email::make('E-mail', 'email')->sortable(),
             Text::make('Локация', 'location'),
-            Date::make('Подтверждён', 'email_verified_at')->format('d.m.Y'),
+            Date::make('Подтверждён', 'email_verified_at')->format('d.m.Y')->sortable(),
             Date::make('Регистрация', 'created_at')->format('d.m.Y')->sortable(),
             Date::make('Последний визит', 'last_seen_at')->format('d.m.Y H:i')->sortable(),
         ];
@@ -95,11 +97,38 @@ class UserResource extends BaseResource
         ];
     }
 
+    protected function filters(): iterable
+    {
+        return [
+            Text::make('Имя', 'name')
+                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('name', 'like', '%' . self::escapeLike((string) $value) . '%')),
+            Text::make('E-mail', 'email')
+                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('email', 'like', '%' . self::escapeLike((string) $value) . '%')),
+            Select::make('Почта', 'email_state')
+                ->options(['verified' => 'Подтверждена', 'unverified' => 'Не подтверждена'])
+                ->nullable()
+                ->onApply(fn (Builder $query, $value) => match ($value) {
+                    'verified' => $query->whereNotNull('email_verified_at'),
+                    'unverified' => $query->whereNull('email_verified_at'),
+                    default => $query,
+                }),
+            DateRange::make('Регистрация', 'created_at'),
+            DateRange::make('Последний визит', 'last_seen_at'),
+        ];
+    }
+
     protected function queryTags(): array
     {
         return [
+            QueryTag::make('Подтверждённые', static fn (Builder $q) => $q->whereNotNull('email_verified_at'))->alias('verified'),
+            QueryTag::make('Не подтверждённые', static fn (Builder $q) => $q->whereNull('email_verified_at'))->alias('unverified'),
             QueryTag::make('Удалённые', static fn (Builder $q) => $q->onlyTrashed())->alias('trashed'),
         ];
+    }
+
+    private static function escapeLike(string $value): string
+    {
+        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
     }
 
     protected function search(): array
