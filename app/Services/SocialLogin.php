@@ -109,7 +109,8 @@ class SocialLogin
 
     private function name(SocialUser $social, string $email): string
     {
-        $name = trim((string) ($social->getName() ?: $social->getNickname() ?: Str::before($email, '@')));
+        // VK отдаёт имена уже с HTML-сущностями («Al&#39;mir»): декодируем, иначе на сайте они видны как есть
+        $name = trim(html_entity_decode((string) ($social->getName() ?: $social->getNickname() ?: Str::before($email, '@')), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 
         // В форме регистрации имя ограничено 30 символами, держим то же правило
         return Str::limit($name, 30, '');

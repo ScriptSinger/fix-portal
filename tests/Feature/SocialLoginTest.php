@@ -81,4 +81,11 @@ class SocialLoginTest extends TestCase
 
         $this->assertSame(30, mb_strlen($user->name));
     }
+
+    public function test_html_entities_in_the_provider_name_are_decoded(): void
+    {
+        $user = app(SocialLogin::class)->resolve('vkid', $this->social('v-3', 'almir@mail.ru', 'Al&#39;mir Nurislamov'));
+
+        $this->assertSame("Al'mir Nurislamov", $user->name);
+    }
 }
