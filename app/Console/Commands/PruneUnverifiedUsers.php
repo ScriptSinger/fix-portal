@@ -58,6 +58,7 @@ class PruneUnverifiedUsers extends Command
 
         // withTrashed: сюда же попадают аккаунты, которые раньше были удалены мягко и всё ещё занимают e-mail
         $query = User::withTrashed()
+            ->whereNotIn('id', config('users.protected_ids', []))
             ->whereNull('email_verified_at')
             ->where('created_at', '<', now()->subDays($days))
             ->whereNotExists($hasActivity('comments'))
