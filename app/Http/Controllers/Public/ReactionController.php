@@ -32,8 +32,8 @@ class ReactionController extends Controller
             app(ActivityNotifier::class)->reacted($target, auth()->user(), $data['emoji']);
         }
 
-        $counts = Reaction::where(['reactable_type' => $class, 'reactable_id' => $target->id])
-            ->selectRaw('emoji, count(*) as n')->groupBy('emoji')->pluck('n', 'emoji');
+        // считаем в PHP: коллация MySQL (utf8mb4_unicode_ci) считает разные эмодзи равными, и GROUP BY склеил бы их
+        $counts = Reaction::where(['reactable_type' => $class, 'reactable_id' => $target->id])->pluck('emoji')->countBy();
 
         return response()->json(['counts' => $counts, 'mine' => $mine]);
     }
