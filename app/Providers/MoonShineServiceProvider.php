@@ -12,6 +12,7 @@ use App\MoonShine\Resources\CommentResource;
 use App\MoonShine\Resources\CtaResource;
 use App\MoonShine\Resources\CustomizationResource;
 use App\MoonShine\Resources\SiteSettingResource;
+use App\MoonShine\Resources\VisitorResource;
 use App\MoonShine\Resources\FirmwareResource;
 use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
@@ -63,6 +64,7 @@ class MoonShineServiceProvider extends ServiceProvider
                 BlockedUserAgentResource::class,
                 CustomizationResource::class,
                 SiteSettingResource::class,
+                VisitorResource::class,
             ])
             ->pages([
                 ...$core->getConfig()->getPages(),
