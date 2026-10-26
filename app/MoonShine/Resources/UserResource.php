@@ -18,7 +18,6 @@ use MoonShine\UI\Fields\Email;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Password;
 use MoonShine\UI\Fields\Phone;
-use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
@@ -104,14 +103,6 @@ class UserResource extends BaseResource
                 ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('name', 'like', '%' . self::escapeLike((string) $value) . '%')),
             Text::make('E-mail', 'email')
                 ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('email', 'like', '%' . self::escapeLike((string) $value) . '%')),
-            Select::make('Почта', 'email_state')
-                ->options(['verified' => 'Подтверждена', 'unverified' => 'Не подтверждена'])
-                ->nullable()
-                ->onApply(fn (Builder $query, $value) => match ($value) {
-                    'verified' => $query->whereNotNull('email_verified_at'),
-                    'unverified' => $query->whereNull('email_verified_at'),
-                    default => $query,
-                }),
             DateRange::make('Регистрация', 'created_at'),
             DateRange::make('Последний визит', 'last_seen_at'),
         ];
