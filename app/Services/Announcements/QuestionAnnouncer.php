@@ -25,6 +25,19 @@ class QuestionAnnouncer
         return $this->channels()[$name] ?? null;
     }
 
+    /** Повторная отправка неудавшейся записи: счётчик попыток обнуляется, задача ставится заново. */
+    public function retry(QuestionAnnouncement $announcement): bool
+    {
+        if ($announcement->status !== QuestionAnnouncement::FAILED) {
+            return false;
+        }
+
+        $announcement->update(['status' => QuestionAnnouncement::PENDING, 'attempts' => 0, 'last_error' => null]);
+        SendQuestionAnnouncement::dispatch($announcement->id);
+
+        return true;
+    }
+
     public function announce(Question $question): void
     {
         foreach ($this->channels() as $name => $channel) {

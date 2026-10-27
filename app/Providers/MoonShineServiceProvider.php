@@ -16,6 +16,7 @@ use App\MoonShine\Resources\VisitorResource;
 use App\MoonShine\Resources\FirmwareResource;
 use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
+use App\MoonShine\Resources\QuestionAnnouncementResource;
 use App\MoonShine\Resources\QuestionResource;
 use App\MoonShine\Resources\ReplyResource;
 use App\MoonShine\Resources\AccessLog\AccessLogResource;
@@ -53,6 +54,7 @@ class MoonShineServiceProvider extends ServiceProvider
                 TagResource::class,
                 CtaResource::class,
                 QuestionResource::class,
+                QuestionAnnouncementResource::class,
                 CommentResource::class,
                 ReplyResource::class,
                 ApplianceResource::class,
