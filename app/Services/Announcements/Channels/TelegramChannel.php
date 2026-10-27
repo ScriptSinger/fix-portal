@@ -6,6 +6,7 @@ use App\Models\Question;
 use App\Support\PlainText;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 /** Сообщение в чат мастеров: заголовок, техника, начало описания и ссылка. Отвечают мастера на сайте. */
@@ -52,30 +53,64 @@ class TelegramChannel implements AnnouncementChannel
 
     public function send(Question $question): ?string
     {
-        $question->loadMissing(['appliance', 'user']);
-        $token = (string) config('services.telegram.bot_token');
-        $url = rtrim((string) config('services.telegram.api_url'), '/') . '/bot' . $token . '/sendMessage';
-
-        try {
-            $response = Http::timeout(15)
-                ->withOptions(array_filter(['proxy' => config('services.telegram.proxy')]))
-                ->post($url, [
-                    'chat_id' => config('services.telegram.chat_id'),
-                    'text' => $this->text($question),
-                    'parse_mode' => 'HTML',
-                    // Карточку ссылки строит краулер Telegram, а он до сайта не доходит: вместо неё кнопка
-                    'link_preview_options' => ['is_disabled' => true],
-                    'reply_markup' => ['inline_keyboard' => [[['text' => 'Открыть вопрос на сайте', 'url' => $this->url($question)]]]],
-                ])
-                ->throw();
-        } catch (RequestException|ConnectionException $e) {
-            // в тексте исключения Guzzle стоят адрес с токеном и логин с паролем прокси: наружу они не уходят
-            throw new \RuntimeException('Telegram: ' . $this->redact($e->getMessage()));
-        }
+        $response = $this->call('sendMessage', $this->payload($question));
 
         $id = $response->json('result.message_id');
 
         return $id === null ? null : (string) $id;
+    }
+
+    /** Меняет текст уже отправленного сообщения: автор поправил вопрос. */
+    public function update(Question $question, string $externalId): void
+    {
+        $this->call('editMessageText', $this->payload($question) + ['message_id' => (int) $externalId], tolerate: [
+            // текст не изменился (правка не затронула то, что показано в чате): это не сбой
+            'message is not modified',
+        ]);
+    }
+
+    /** @return array<string, mixed> */
+    private function payload(Question $question): array
+    {
+        $question->loadMissing(['appliance', 'user']);
+
+        return [
+            'chat_id' => config('services.telegram.chat_id'),
+            'text' => $this->text($question),
+            'parse_mode' => 'HTML',
+            // Карточку ссылки строит краулер Telegram, а он до сайта не доходит: вместо неё кнопка
+            'link_preview_options' => ['is_disabled' => true],
+            'reply_markup' => ['inline_keyboard' => [[['text' => 'Открыть вопрос на сайте', 'url' => $this->url($question)]]]],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     * @param  list<string>  $tolerate  части описания ошибки Telegram, которые считаются успехом
+     */
+    private function call(string $method, array $payload, array $tolerate = []): Response
+    {
+        $url = rtrim((string) config('services.telegram.api_url'), '/') . '/bot' . config('services.telegram.bot_token') . '/' . $method;
+
+        try {
+            return Http::timeout(15)
+                ->withOptions(array_filter(['proxy' => config('services.telegram.proxy')]))
+                ->post($url, $payload)
+                ->throw();
+        } catch (RequestException $e) {
+            $description = (string) $e->response->json('description');
+
+            foreach ($tolerate as $part) {
+                if (str_contains($description, $part)) {
+                    return $e->response;
+                }
+            }
+
+            throw new \RuntimeException('Telegram: ' . $this->redact($e->getMessage()));
+        } catch (ConnectionException $e) {
+            // в тексте исключения Guzzle стоят адрес с токеном и логин с паролем прокси: наружу они не уходят
+            throw new \RuntimeException('Telegram: ' . $this->redact($e->getMessage()));
+        }
     }
 
     private function escape(string $value): string

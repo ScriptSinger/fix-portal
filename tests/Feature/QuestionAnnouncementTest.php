@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Enums\AnnouncementStatus;
 use App\Jobs\SendQuestionAnnouncement;
+use App\Jobs\UpdateQuestionAnnouncement;
 use App\Models\Appliance;
 use App\Models\QuestionAnnouncement;
 use App\Models\User;
@@ -92,6 +93,91 @@ class QuestionAnnouncementTest extends TestCase
         ])->assertRedirect();
 
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
+    }
+
+    private function sentAnnouncementFor(\App\Models\Question $question, AnnouncementStatus $status = AnnouncementStatus::Sent): QuestionAnnouncement
+    {
+        return QuestionAnnouncement::create(['question_id' => $question->id, 'channel' => 'telegram', 'status' => $status, 'external_id' => '55']);
+    }
+
+    private function edit(\App\Models\Question $question, User $author, array $over = []): void
+    {
+        $this->actingAs($author)->put(route('questions.update', ['question' => $question->slug]), $over + [
+            'title' => $question->title,
+            'appliance_id' => $question->appliance_id,
+            'description' => $question->description,
+        ])->assertRedirect();
+    }
+
+    public function test_editing_a_sent_question_queues_a_delayed_update_of_the_message(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $announcement = $this->sentAnnouncementFor($question);
+
+        $this->edit($question, $author, ['description' => 'Дополнение: ' . str_repeat('подробности ', 10)]);
+
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, fn ($job) => $job->announcementId === $announcement->id && $job->delay !== null);
+    }
+
+    public function test_editing_what_the_chat_does_not_show_changes_nothing(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $this->sentAnnouncementFor($question);
+
+        $this->edit($question, $author);
+
+        Queue::assertNotPushed(UpdateQuestionAnnouncement::class);
+    }
+
+    public function test_an_unsent_announcement_is_not_updated_it_goes_out_with_the_new_text(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $this->sentAnnouncementFor($question, AnnouncementStatus::Pending);
+
+        $this->edit($question, $author, ['title' => 'Совсем другой заголовок вопроса ' . uniqid()]);
+
+        Queue::assertNotPushed(UpdateQuestionAnnouncement::class);
+    }
+
+    public function test_update_job_edits_the_message_and_keeps_the_status(): void
+    {
+        $this->telegram();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 55]])]);
+        $announcement = $this->sentAnnouncementFor($this->makeQuestion(User::factory()->create()));
+
+        (new UpdateQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
+
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/editMessageText') && $request['message_id'] === 55);
+        $this->assertSame(AnnouncementStatus::Sent, $announcement->refresh()->status);
+    }
+
+    public function test_update_job_does_nothing_for_an_unsent_announcement(): void
+    {
+        $this->telegram();
+        Http::fake();
+        $announcement = $this->sentAnnouncementFor($this->makeQuestion(User::factory()->create()), AnnouncementStatus::Pending);
+
+        (new UpdateQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
+
+        Http::assertNothingSent();
+    }
+
+    public function test_failed_update_does_not_mark_the_announcement_failed(): void
+    {
+        $announcement = $this->sentAnnouncementFor($this->makeQuestion(User::factory()->create()));
+
+        (new UpdateQuestionAnnouncement($announcement->id))->failed(new \RuntimeException('Telegram: down'));
+
+        $this->assertSame(AnnouncementStatus::Sent, $announcement->refresh()->status);
     }
 
     public function test_job_sends_and_marks_the_record_sent(): void

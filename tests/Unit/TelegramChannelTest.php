@@ -149,6 +149,51 @@ class TelegramChannelTest extends TestCase
         Http::assertSent(fn (Request $request) => $request->url() === 'https://relay.example/tg/bot123456:SECRET-TOKEN/sendMessage');
     }
 
+    public function test_update_edits_the_message_in_the_chat(): void
+    {
+        $this->configure();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 55]])]);
+        $channel = new TelegramChannel();
+        $question = $this->question(['title' => 'Новый заголовок вопроса про насос']);
+
+        $channel->update($question, '55');
+
+        Http::assertSent(function (Request $request) use ($channel, $question) {
+            return $request->url() === 'https://api.telegram.org/bot123456:SECRET-TOKEN/editMessageText'
+                && $request['chat_id'] === '-5494489427'
+                && $request['message_id'] === 55
+                && str_contains($request['text'], 'Новый заголовок вопроса про насос')
+                && $request['reply_markup']['inline_keyboard'][0][0]['url'] === $channel->url($question);
+        });
+    }
+
+    public function test_update_with_unchanged_text_is_not_an_error(): void
+    {
+        $this->configure();
+        Http::fake(['api.telegram.org/*' => Http::response([
+            'ok' => false, 'error_code' => 400,
+            'description' => 'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message',
+        ], 400)]);
+
+        (new TelegramChannel())->update($this->question(), '55');
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function test_update_of_a_message_that_is_gone_throws_without_secrets(): void
+    {
+        $this->configure();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => false, 'error_code' => 400, 'description' => 'Bad Request: message to edit not found'], 400)]);
+
+        try {
+            (new TelegramChannel())->update($this->question(), '55');
+            $this->fail('Исключение не брошено');
+        } catch (\RuntimeException $e) {
+            $this->assertStringContainsString('Telegram:', $e->getMessage());
+            $this->assertStringNotContainsString('SECRET-TOKEN', $e->getMessage());
+        }
+    }
+
     public function test_errors_do_not_leak_token_or_proxy_password(): void
     {
         $this->configure();

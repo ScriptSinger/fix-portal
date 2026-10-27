@@ -31,6 +31,11 @@ class QuestionService
         $kept = array_column(ContentImages::extract($question->description)[1], 'full');
         $question->update($this->fields($editor, $data, $kept));
 
+        // в чате показаны заголовок, техника, модель, код ошибки и начало описания: если они изменились, сообщение обновляется
+        if ($question->wasChanged(['title', 'description', 'model', 'error_code', 'appliance_id'])) {
+            $this->announcer->refresh($question);
+        }
+
         return $question;
     }
 

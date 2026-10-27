@@ -4,6 +4,7 @@ namespace App\Services\Announcements;
 
 use App\Enums\AnnouncementStatus;
 use App\Jobs\SendQuestionAnnouncement;
+use App\Jobs\UpdateQuestionAnnouncement;
 use App\Models\Question;
 use App\Models\QuestionAnnouncement;
 use App\Services\Announcements\Channels\AnnouncementChannel;
@@ -24,6 +25,29 @@ class QuestionAnnouncer
     public function channel(string $name): ?AnnouncementChannel
     {
         return $this->channels()[$name] ?? null;
+    }
+
+    /** Пауза перед обновлением сообщения: серия быстрых правок превращается в один запрос. */
+    public const EDIT_DELAY_SECONDS = 30;
+
+    /** Вопрос отредактировали: уже отправленные сообщения в чатах обновляются. Неотправленные уйдут сразу с новым текстом. */
+    public function refresh(Question $question): void
+    {
+        foreach ($this->channels() as $name => $channel) {
+            if (! $channel->enabled()) {
+                continue;
+            }
+
+            try {
+                $id = QuestionAnnouncement::where(['question_id' => $question->id, 'channel' => $name, 'status' => AnnouncementStatus::Sent])->value('id');
+
+                if ($id) {
+                    UpdateQuestionAnnouncement::dispatch($id)->delay(now()->addSeconds(self::EDIT_DELAY_SECONDS))->afterCommit();
+                }
+            } catch (\Throwable $e) {
+                Log::error("Не удалось поставить обновление вопроса {$question->id} в очередь канала {$name}: {$e->getMessage()}");
+            }
+        }
     }
 
     /** Повторная отправка неудавшейся записи: счётчик попыток обнуляется, задача ставится заново. */
