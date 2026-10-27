@@ -25,7 +25,7 @@ class SearchFilter
 
     private function applyStructuredDataSearch(Builder $query, string $search): void
     {
-        $escaped = $this->escapeLike($search);
+        $escaped = \App\Support\SqlLike::escape($search);
         $labels = ['Модель', 'Model', 'S/N', 'SN', 'Серийный номер', 'PNS', 'PNC', 'P/N', 'Part Number', 'Код прошивки', 'Firmware Code', 'Для S/N'];
 
         foreach ($labels as $label) {
@@ -36,8 +36,4 @@ class SearchFilter
         }
     }
 
-    private function escapeLike(string $value): string
-    {
-        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
-    }
 }

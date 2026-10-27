@@ -14,7 +14,7 @@
     $legacy = $question->photos ? (json_decode($question->photos, true) ?: []) : [];
     $photos = array_merge(array_map(fn ($p) => ['src' => asset('storage/' . $p), 'full' => asset('storage/' . $p)], $legacy), $inline);
     $answers = $question->comments;
-    $plain = fn (?string $html) => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $html), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    $plain = fn (?string $html) => \App\Support\PlainText::from($html, PHP_INT_MAX);
     // Разметка «вопрос-ответ» для сниппета в выдаче: сам вопрос и ответы участников
     $qaPage = [
         '@context' => 'https://schema.org', '@type' => 'QAPage',
@@ -49,7 +49,7 @@
 @endsection
 
 @section('content')
-    <script type="application/ld+json">@json($qaPage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)</script>
+    <script type="application/ld+json">@json($qaPage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
     <div>
         <article class="overflow-hidden rounded-2xl bg-white shadow-sm">
             <header class="px-4 pt-3 sm:px-5">

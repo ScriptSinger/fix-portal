@@ -45,7 +45,7 @@
 @endsection
 
 @section('content')
-    <script type="application/ld+json">@json($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)</script>
+    <script type="application/ld+json">@json($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
 
     {{-- Главное на первом экране: что за файл и кнопка «Скачать» --}}
     <section class="bg-white p-5 sm:p-8" aria-labelledby="fw-title">

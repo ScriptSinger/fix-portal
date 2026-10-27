@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 
 class SolutionController extends Controller
 {
+    public function __construct(private readonly ActivityNotifier $notifier)
+    {
+    }
+
     /** Автор отмечает вопрос решённым, при желании указывает ответ-решение. Можно сменить решение. */
     public function store(Request $request, int $id)
     {
@@ -29,6 +33,9 @@ class SolutionController extends Controller
                 : Reply::whereHas('comment', fn ($q) => $q->where('commentable_type', Question::class)->where('commentable_id', $question->id))->findOrFail($data['message']);
         }
 
+        // свой собственный ответ решением не отметить: репутацию за него всё равно не дают
+        abort_if($message && $message->user_id === $question->user_id, 403);
+
         $changed = $message && ($question->solution_type !== $data['type'] || (int) $question->solution_id !== $message->id);
         $question->forceFill([
             'solved_at' => $question->solved_at ?? now(),
@@ -37,7 +44,7 @@ class SolutionController extends Controller
         ])->save();
 
         if ($changed) {
-            app(ActivityNotifier::class)->solution($question, $message, $request->user());
+            $this->notifier->solution($question, $message, $request->user());
         }
 
         return redirect(route('questions.show', ['question' => $question->slug]) . ($message ? '#' . ($data['type'] === 'comment' ? 'c-' : 'r-') . $message->id : ''));

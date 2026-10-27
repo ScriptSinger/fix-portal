@@ -12,6 +12,10 @@ use Illuminate\Validation\Rule;
 
 class ReactionController extends Controller
 {
+    public function __construct(private readonly ActivityNotifier $notifier)
+    {
+    }
+
     private const REACTABLE = ['comment' => Comment::class, 'reply' => Reply::class];
 
     /** Ставит реакцию, меняет её на другую или снимает, если нажали ту же самую. */
@@ -29,7 +33,7 @@ class ReactionController extends Controller
         } else {
             Reaction::updateOrCreate($key, ['emoji' => $data['emoji']]);
             $mine = $data['emoji'];
-            app(ActivityNotifier::class)->reacted($target, auth()->user(), $data['emoji']);
+            $this->notifier->reacted($target, auth()->user(), $data['emoji']);
         }
 
         // считаем в PHP: коллация MySQL (utf8mb4_unicode_ci) считает разные эмодзи равными, и GROUP BY склеил бы их

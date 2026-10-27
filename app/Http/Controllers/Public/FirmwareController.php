@@ -175,10 +175,10 @@ class FirmwareController extends Controller
             $compact = mb_strtoupper(preg_replace('/[\s\-_]+/u', '', $search) ?? $search);
 
             $q->where('title', 'like', '%' . $search . '%')
-                ->orWhere('model', 'like', '%' . $this->escapeLike(mb_strtoupper($search)) . '%')
-                ->orWhere('model', 'like', '%' . $this->escapeLike($compact) . '%')
+                ->orWhere('model', 'like', '%' . \App\Support\SqlLike::escape(mb_strtoupper($search)) . '%')
+                ->orWhere('model', 'like', '%' . \App\Support\SqlLike::escape($compact) . '%')
                 ->orWhere('series', $compact)
-                ->orWhere('aliases', 'like', '%' . $this->escapeLike($search) . '%');
+                ->orWhere('aliases', 'like', '%' . \App\Support\SqlLike::escape($search) . '%');
 
             if (ctype_digit($search)) {
                 $q->orWhere('id', (int) $search);
@@ -205,7 +205,7 @@ class FirmwareController extends Controller
 
     private function applyStructuredDataSearch($query, string $search): void
     {
-        $escaped = $this->escapeLike($search);
+        $escaped = \App\Support\SqlLike::escape($search);
         $labels = ['Модель', 'Model', 'S/N', 'SN', 'Серийный номер', 'PNS', 'PNC', 'P/N', 'Part Number', 'Код прошивки', 'Firmware Code', 'Для S/N'];
 
         foreach ($labels as $label) {
@@ -216,8 +216,4 @@ class FirmwareController extends Controller
         }
     }
 
-    private function escapeLike(string $value): string
-    {
-        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
-    }
 }

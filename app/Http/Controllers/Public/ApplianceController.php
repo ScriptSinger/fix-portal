@@ -16,8 +16,7 @@ class ApplianceController extends Controller
     {
         $appliance = Appliance::where('slug', $slug)->firstOrFail();
         $questions = $appliance->questions()->with('appliance', 'user')
-            ->when(request('status') === 'solved', fn ($q) => $q->whereNotNull('solved_at'))
-            ->when(request('status') === 'open', fn ($q) => $q->whereNull('solved_at')->where('created_at', '>=', \App\Models\Question::SOLUTION_TRACKING_SINCE))
+            ->status(request('status'))
             ->orderBy('id', 'desc')->paginate(15);
 
         $appliances = Appliance::pluck('title', 'id');

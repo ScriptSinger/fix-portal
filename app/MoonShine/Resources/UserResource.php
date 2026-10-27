@@ -100,9 +100,9 @@ class UserResource extends BaseResource
     {
         return [
             Text::make('Имя', 'name')
-                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('name', 'like', '%' . self::escapeLike((string) $value) . '%')),
+                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('name', 'like', '%' . \App\Support\SqlLike::escape((string) $value) . '%')),
             Text::make('E-mail', 'email')
-                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('email', 'like', '%' . self::escapeLike((string) $value) . '%')),
+                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('email', 'like', '%' . \App\Support\SqlLike::escape((string) $value) . '%')),
             DateRange::make('Регистрация', 'created_at'),
             DateRange::make('Последний визит', 'last_seen_at'),
         ];
@@ -117,10 +117,6 @@ class UserResource extends BaseResource
         ];
     }
 
-    private static function escapeLike(string $value): string
-    {
-        return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
-    }
 
     protected function search(): array
     {

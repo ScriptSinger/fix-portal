@@ -11,18 +11,10 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    // public function store(Request $request, $type, $id)
-    // {
-    //     $this->authorize('create', [Comment::class, $type]);
-    //     $data = $request->validate([
-    //         'text' => 'required|string',
-    //     ]);
+    public function __construct(private readonly ActivityNotifier $notifier)
+    {
+    }
 
-    //     $commentable = ("App\\Models\\" . ucfirst($type))::findOrFail($id);
-    //     $data['user_id'] = auth()->user()->id;
-    //     $commentable->comments()->create($data);
-    //     return redirect()->back();
-    // }
     public function store(StoreCommentRequest $request, $type, $id)
     {
         $data = $request->validated();
@@ -31,7 +23,7 @@ class CommentController extends Controller
         $text = MessageBody::make($data['text'] ?? null, $data['images'] ?? [], $userId);
         abort_if($text === '', 422, 'Пустое сообщение');
         $comment = $commentable->comments()->create(['text' => $text, 'user_id' => $userId]);
-        app(ActivityNotifier::class)->answered($comment, auth()->user());
+        $this->notifier->answered($comment, auth()->user());
         return redirect()->back();
     }
 

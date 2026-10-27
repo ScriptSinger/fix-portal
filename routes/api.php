@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Api\FirmwareController;
-use App\Http\Controllers\Api\Public\AvatarController;
 use App\Http\Controllers\Api\Public\MasterController;
 use App\Http\Controllers\Api\Public\UserImageController;
 
@@ -41,8 +40,5 @@ Route::group(
             ->name('api.users.images.upload');
         Route::delete('users-images/{image}', [UserImageController::class, 'destroy'])->name('api.users.images.destroy');
 
-        Route::get('/avatars', [AvatarController::class, 'show'])->name('api.avatars.show');
-        Route::post('/avatars', [AvatarController::class, 'upload'])->name('api.avatars.upload');
-        Route::delete('/avatars', [AvatarController::class, 'destroy'])->name('api.avatars.destroy');
     }
 );

@@ -9,8 +9,8 @@ use App\Models\Question;
 use App\Models\Reply;
 use App\Models\User;
 use App\Notifications\ActivityNotification;
+use App\Support\PlainText;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 /**
  * Создаёт уведомления кабинета. Обсуждение везде одинаковое (вопросы, статьи, прошивки), поэтому события тоже.
@@ -89,8 +89,6 @@ class ActivityNotifier
     private function payload(string $kind, User $actor, Model $subject, string $anchor, ?string $text, ?string $emoji = null): array
     {
         $info = $this->describe($subject);
-        $plain = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
-
         return array_filter([
             'kind' => $kind,
             'actor_id' => $actor->id,
@@ -99,7 +97,7 @@ class ActivityNotifier
             'in' => $info['in'],
             'url' => $info['url'] . '#' . $anchor,
             'target_id' => $anchor,
-            'snippet' => Str::limit($plain, 140),
+            'snippet' => PlainText::from($text, 140),
             'emoji' => $emoji,
         ], fn ($v) => $v !== null && $v !== '');
     }

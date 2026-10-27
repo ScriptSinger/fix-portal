@@ -11,6 +11,10 @@ use Illuminate\Http\Request;
 
 class ReplyController extends Controller
 {
+    public function __construct(private readonly ActivityNotifier $notifier)
+    {
+    }
+
     public function store(Request $request, $id)
     {
         $data = $request->validate([
@@ -28,7 +32,7 @@ class ReplyController extends Controller
         // цитировать можно только ответ из этой же ветки
         $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
         $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
-        app(ActivityNotifier::class)->replied($reply, auth()->user());
+        $this->notifier->replied($reply, auth()->user());
         return redirect()->back();
     }
 
