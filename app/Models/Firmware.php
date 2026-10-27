@@ -7,12 +7,17 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\FirmwareCatalog;
+use App\Support\Firmware\DumpData;
+use App\Support\Firmware\FirmwareText;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class Firmware extends Model
 {
-    use  SoftDeletes;
+    use SoftDeletes;
+
+    private ?DumpData $dumpCache = null;
+    private ?string $dumpSource = null;
 
     protected $fillable = [
         'title',
@@ -31,23 +36,21 @@ class Firmware extends Model
         'downloads_count',
     ];
 
-    /**
-     * Параметры прошивки из сохранённой таблицы `data` как пары «название, значение».
-     * Служебные строки из дефисов (разделители в исходных данных) пропускаются.
-     *
-     * @return list<array{0: string, 1: string}>
-     */
-    public function getParameterPairsAttribute(): array
+    /** Разобранная таблица параметров дампа; пересоздаётся, если поле data изменили. */
+    public function dump(): DumpData
     {
-        preg_match_all('~<tr[^>]*>\s*<td[^>]*>(.*?)</td>\s*<td[^>]*>(.*?)</td>\s*</tr>~su', (string) $this->data, $rows, PREG_SET_ORDER);
+        if ($this->dumpCache === null || $this->dumpSource !== (string) $this->data) {
+            $this->dumpSource = (string) $this->data;
+            $this->dumpCache = DumpData::from($this->dumpSource);
+        }
 
-        $clean = fn (string $cell): string => trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($cell), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        return $this->dumpCache;
+    }
 
-        return collect($rows)
-            ->map(fn (array $row): array => [$clean($row[1]), $clean($row[2])])
-            ->reject(fn (array $pair): bool => $pair[0] === '' || preg_match('/^[-–—_=\s]+$/u', $pair[0]) || preg_match('/^[-–—_=\s]+$/u', $pair[1]))
-            ->values()
-            ->all();
+    /** Тексты страницы (название, метатеги, «О прошивке»). */
+    public function text(): FirmwareText
+    {
+        return new FirmwareText($this, $this->dump());
     }
 
     public function sluggable(): array
@@ -117,67 +120,85 @@ class Firmware extends Model
         return $this->title . ($this->extension ?? '');
     }
 
+    // Параметры дампа и тексты считают DumpData и FirmwareText; здесь только короткие свойства для шаблонов
+    public function getParameterPairsAttribute(): array
+    {
+        return $this->dump()->pairs();
+    }
+
     public function getParsedDataAttribute(): array
     {
-        if (!$this->data) {
-            return [];
-        }
-
-        $parsed = [];
-        preg_match_all('/<tr[^>]*>\\s*<td[^>]*>(.*?)<\\/td>\\s*<td[^>]*>(.*?)<\\/td>\\s*<\\/tr>/uis', $this->data, $rows, PREG_SET_ORDER);
-
-        foreach ($rows as $row) {
-            $label = $this->sanitizeCellValue($row[1] ?? '');
-            $value = $this->sanitizeCellValue($row[2] ?? '');
-
-            if ($label === '') {
-                continue;
-            }
-
-            if (!array_key_exists($label, $parsed) || $parsed[$label] === '') {
-                $parsed[$label] = $value;
-            }
-        }
-
-        return $parsed;
+        return $this->dump()->fields();
     }
 
     public function getModelNameAttribute(): ?string
     {
-        return $this->getParsedField(['Модель', 'Model']);
+        return $this->dump()->modelName();
     }
 
     public function getSerialNumberAttribute(): ?string
     {
-        return $this->getParsedField(['S/N', 'SN', 'Серийный номер', 'Serial Number']);
+        return $this->dump()->serialNumber();
     }
 
     public function getPnsAttribute(): ?string
     {
-        return $this->getParsedField(['PNS', 'PNC', 'P/N', 'Part Number']);
+        return $this->dump()->pns();
     }
 
     public function getFirmwareCodeAttribute(): ?string
     {
-        return $this->getParsedField(['Код прошивки', 'Firmware Code']);
+        return $this->dump()->firmwareCode();
     }
 
     public function getSerialRangeAttribute(): ?string
     {
-        return $this->getParsedField(['Для S/N']);
+        return $this->dump()->serialRange();
     }
 
-    /**
-     * Название для людей и поисковиков: марка и модель, если они известны.
-     */
-    private function subject(): string
+    public function getStoredErrorAttribute(): ?string
     {
-        return trim(($this->brand ? $this->brand . ' ' : '') . ($this->model_name ?: $this->title));
+        return $this->dump()->storedError();
+    }
+
+    public function getCurrentErrorAttribute(): ?string
+    {
+        return $this->dump()->currentError();
+    }
+
+    public function getChecksumOkAttribute(): ?bool
+    {
+        return $this->dump()->checksumOk();
+    }
+
+    public function getAlgorithmNameAttribute(): ?string
+    {
+        return $this->dump()->algorithm();
     }
 
     public function getDisplayNameAttribute(): string
     {
-        return $this->subject();
+        return $this->text()->displayName();
+    }
+
+    public function getMetaTitleAttribute(): string
+    {
+        return $this->text()->metaTitle();
+    }
+
+    public function getMetaDescriptionAttribute(): string
+    {
+        return $this->text()->metaDescription();
+    }
+
+    public function getHumanSizeAttribute(): string
+    {
+        return $this->text()->humanSize();
+    }
+
+    public function getAboutLinesAttribute(): array
+    {
+        return $this->text()->aboutLines();
     }
 
     /**
@@ -218,202 +239,6 @@ class Firmware extends Model
             600,
             fn () => static::query()->where('brand', $this->brand)->where('series', $this->series)->count()
         );
-    }
-
-    public function getMetaTitleAttribute(): string
-    {
-        if ($this->model_name && $this->serial_number) {
-            return 'Прошивка ' . $this->subject() . ' | S/N ' . $this->serial_number;
-        }
-        if ($this->model_name && $this->pns) {
-            return 'Прошивка ' . $this->subject() . ' | PNS ' . $this->pns;
-        }
-        if ($this->model_name) {
-            return 'Прошивка ' . $this->subject() . ' | ID ' . $this->id;
-        }
-        return 'Прошивка: ' . $this->title . ' | ID ' . $this->id;
-    }
-
-    /**
-     * Метаописание из реальных параметров дампа. Отличается у разных прошивок, потому что включает
-     * идентификаторы (код прошивки, S/N, PNS), а не общие слова.
-     */
-    public function getMetaDescriptionAttribute(): string
-    {
-        $facts = array_filter([
-            ($this->platform_norm ?: $this->platform) ? 'платформа ' . ($this->platform_norm ?: $this->platform) : null,
-            $this->firmware_code ? 'код прошивки ' . $this->firmware_code : null,
-            $this->serial_number ? 'S/N ' . $this->serial_number : null,
-            $this->pns ? 'PNS ' . $this->pns : null,
-            $this->stored_error ? 'сохранённая ошибка ' . $this->stored_error : null,
-            $this->extension ? 'формат ' . $this->extension : null,
-            $this->size ? 'размер ' . $this->human_size : null,
-        ]);
-
-        $text = 'Прошивка ' . $this->subject() . ($facts ? ': ' . implode(', ', $facts) : '') . '. Скачать файл на UfaMasters.';
-
-        if (mb_strlen($text) <= 160) {
-            return $text;
-        }
-
-        // Режем по границе слова, а не посреди значения
-        $cut = mb_substr($text, 0, 158);
-        $space = mb_strrpos($cut, ' ');
-
-        return rtrim(mb_substr($cut, 0, $space ?: 158), ',;: ') . '…';
-    }
-
-    public function getHumanSizeAttribute(): string
-    {
-        $size = (int) $this->size;
-
-        return $size >= 1024 ? number_format($size / 1024, 1, ',', ' ') . ' КБ' : $size . ' Б';
-    }
-
-    /**
-     * Код ошибки из дампа. В данных коды записаны кириллическими «Е», «В» и т. п. (Е94),
-     * а ищут их латиницей (E94), поэтому приводим к латинице. «00» и пустое значение означают «ошибки нет».
-     */
-    private function normalizeErrorCode(?string $value): ?string
-    {
-        $value = trim((string) $value);
-
-        if ($value === '' || in_array(mb_strtolower($value), ['00', '0', 'н.д.', 'нет'], true)) {
-            return null;
-        }
-
-        $lookalikes = [
-            'А' => 'A', 'В' => 'B', 'Е' => 'E', 'К' => 'K', 'М' => 'M', 'Н' => 'H', 'О' => 'O', 'Р' => 'P', 'С' => 'C', 'Т' => 'T', 'Х' => 'X',
-            'а' => 'a', 'в' => 'b', 'е' => 'e', 'к' => 'k', 'м' => 'm', 'н' => 'h', 'о' => 'o', 'р' => 'p', 'с' => 'c', 'т' => 't', 'х' => 'x',
-        ];
-
-        return mb_strtoupper(strtr($value, $lookalikes));
-    }
-
-    public function getStoredErrorAttribute(): ?string
-    {
-        return $this->normalizeErrorCode($this->parsed_data['Сохраненная ошибка'] ?? null);
-    }
-
-    public function getCurrentErrorAttribute(): ?string
-    {
-        return $this->normalizeErrorCode($this->parsed_data['Текущая ошибка'] ?? null);
-    }
-
-    /**
-     * true: контрольная сумма совпадает, false: не совпадает, null: в дампе не указано.
-     */
-    public function getChecksumOkAttribute(): ?bool
-    {
-        $value = (string) ($this->parsed_data['Контрольная сумма'] ?? '');
-
-        if ($value === '') {
-            return null;
-        }
-
-        if (str_contains($value, '!!!') || preg_match('/^\s*не\s/ui', $value) === 1) {
-            return false;
-        }
-
-        return preg_match('/овпадает/u', $value) === 1 ? true : null;
-    }
-
-    public function getAlgorithmNameAttribute(): ?string
-    {
-        $value = trim((string) ($this->parsed_data['Алгоритм'] ?? ''));
-
-        return $value === '' || mb_strtolower($value) === 'не определен' ? null : $value;
-    }
-
-    /**
-     * Связный текст «О прошивке» из параметров дампа. Только факты из данных, без предположений о совместимости.
-     *
-     * @return list<string>
-     */
-    public function getAboutLinesAttribute(): array
-    {
-        $platform = $this->platform_norm ?: $this->platform;
-        $lines = [];
-
-        $intro = 'файл ' . ($this->extension ? 'формата ' . $this->extension : '') . ' размером ' . $this->human_size;
-        $intro = 'Прошивка ' . $this->subject() . ': ' . trim($intro);
-
-        if ($platform) {
-            $intro .= '; платформа модуля ' . $platform;
-            $intro .= $this->brand_group ? ' (' . $this->brand_group . ')' : '';
-        }
-
-        if ($this->algorithm_name && $this->algorithm_name !== $platform) {
-            $intro .= '; алгоритм ' . $this->algorithm_name;
-        }
-
-        $lines[] = $intro . '.';
-
-        $ids = array_filter([
-            $this->firmware_code ? 'код прошивки ' . $this->firmware_code : null,
-            $this->serial_number ? 'серийный номер ' . $this->serial_number : null,
-            $this->pns ? 'PNS ' . $this->pns : null,
-        ]);
-
-        if ($ids) {
-            $lines[] = 'Идентификаторы в дампе: ' . implode(', ', $ids) . '.';
-        }
-
-        $aliases = array_filter(explode("\n", (string) $this->aliases));
-        if ($aliases) {
-            $lines[] = 'Этот же файл встречается под названиями: ' . implode(', ', array_slice($aliases, 0, 8)) . '.';
-        }
-
-        $state = [];
-        if ($this->checksum_ok !== null) {
-            $state[] = 'контрольная сумма ' . ($this->checksum_ok ? 'совпадает' : 'не совпадает (файл мог быть изменён или повреждён)');
-        }
-        if ($this->stored_error) {
-            $state[] = 'сохранённая ошибка ' . $this->stored_error;
-        }
-        if ($this->current_error) {
-            $state[] = 'текущая ошибка ' . $this->current_error;
-        }
-
-        if ($state) {
-            $lines[] = 'Состояние дампа: ' . implode('; ', $state) . '.';
-        }
-
-        return $lines;
-    }
-
-    private function getParsedField(array $candidates): ?string
-    {
-        $data = $this->parsed_data;
-
-        foreach ($candidates as $label) {
-            if (!empty($data[$label]) && $this->isRealValue($data[$label])) {
-                return $data[$label];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * В дампах вместо данных часто стоят заводские заглушки: 0000000000, FFFFFFFF, «н.д.».
-     * Выдавать их за серийный номер или код прошивки нельзя.
-     */
-    private function isRealValue(string $value): bool
-    {
-        $value = trim($value);
-
-        if ($value === '' || in_array(mb_strtolower($value), ['н.д.', 'н/д', 'n/a', '-', '--', '---', 'не определен'], true)) {
-            return false;
-        }
-
-        return preg_match('/^(0+|f+|\.+|-+|x+|\?+)$/i', $value) !== 1;
-    }
-
-    private function sanitizeCellValue(string $value): string
-    {
-        $decoded = html_entity_decode(strip_tags($value), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        return trim(preg_replace('/\\s+/u', ' ', $decoded) ?? '');
     }
 
     protected static function boot()

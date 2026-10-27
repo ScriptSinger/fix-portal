@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,16 +36,6 @@ class Question extends Model
 
     /** Отметку «решён» ведём с этой даты: у старых вопросов статуса нет, и «без решения» к ним не относится. */
     public const SOLUTION_TRACKING_SINCE = '2026-10-26';
-
-    /** Фильтр списка по статусу: solved (решённые), open (без решения, только после запуска отметок), иначе все. */
-    public function scopeStatus(Builder $query, ?string $status): Builder
-    {
-        return match ($status) {
-            'solved' => $query->whereNotNull('solved_at'),
-            'open' => $query->whereNull('solved_at')->where('created_at', '>=', self::SOLUTION_TRACKING_SINCE),
-            default => $query,
-        };
-    }
 
     public function isSolved(): bool
     {

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\FirmwareController;
 use App\Http\Controllers\Api\Public\MasterController;
 use App\Http\Controllers\Api\Public\UserImageController;
 
@@ -23,7 +22,6 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::get('/firmwares', [FirmwareController::class, 'index'])->name('api.firmwares.index');
 Route::get('/masters', [MasterController::class, 'index'])->name('api.masters.index');
 
 Route::group(

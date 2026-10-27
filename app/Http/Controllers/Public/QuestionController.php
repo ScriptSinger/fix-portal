@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Filters\Questions\StatusFilter;
 use App\Http\Filters\Questions\TextFilter;
 
 use App\Models\Appliance;
@@ -20,12 +21,11 @@ class QuestionController extends Controller
         $questions = app(Pipeline::class)
             ->send(Question::query())
             ->through([
-                TextFilter::class
+                TextFilter::class,
+                StatusFilter::class,
             ])
             ->thenReturn()
             ->with('appliance', 'user')
-            ->status(request('status'))
-
             ->orderBy('id', 'desc')
             ->paginate(50);
 
