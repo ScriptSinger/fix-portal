@@ -127,4 +127,25 @@ class CabinetTest extends TestCase
         $this->put(route('profile.update'), $new + ['current_password' => 'Old-pass-12345'])->assertSessionHasNoErrors();
         $this->assertTrue(Hash::check('New-pass-67890', $me->refresh()->password));
     }
+
+    public function test_the_bell_counter_endpoint_returns_unread_for_the_user_only(): void
+    {
+        $this->getJson(route('cabinet.notifications.count'))->assertUnauthorized();
+
+        $me = User::factory()->create();
+        $this->notify($me);
+        $this->notify($me);
+        $this->notify(User::factory()->create());
+
+        $this->actingAs($me)->getJson(route('cabinet.notifications.count'))->assertOk()->assertExactJson(['unread' => 2])->assertHeader('Cache-Control', 'no-store, private');
+    }
+
+    public function test_the_header_bell_is_wired_to_the_counter(): void
+    {
+        $me = User::factory()->create();
+        $this->notify($me);
+
+        $this->actingAs($me)->get(route('cabinet.index'))->assertOk()
+            ->assertSee('data-url="' . route('cabinet.notifications.count') . '"', false)->assertSee('data-bell-badge', false)->assertSee('Уведомления: 1 новых');
+    }
 }

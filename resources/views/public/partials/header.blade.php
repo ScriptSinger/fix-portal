@@ -42,9 +42,9 @@
                 </form>
                 @auth
                     @php $me = auth()->user(); $unread = $me->unreadNotifications()->count(); @endphp
-                    <a href="{{ route('cabinet.notifications') }}" class="keep relative grid size-11 place-items-center rounded-full text-ink" aria-label="Уведомления{{ $unread ? ': ' . $unread . ' новых' : '' }}">
+                    <a href="{{ route('cabinet.notifications') }}" data-bell data-url="{{ route('cabinet.notifications.count') }}" class="keep relative grid size-11 place-items-center rounded-full text-ink" aria-label="Уведомления{{ $unread ? ': ' . $unread . ' новых' : '' }}">
                         <x-ui.icon name="bell" class="size-6" />
-                        @if ($unread)<span class="absolute right-0 top-0 min-w-[18px] rounded-full bg-red-600 px-1 text-center text-[11px] font-bold leading-[18px] text-white">{{ $unread > 99 ? '99+' : $unread }}</span>@endif
+                        <span data-bell-badge @if (! $unread) hidden @endif class="absolute right-0 top-0 min-w-[18px] rounded-full bg-red-600 px-1 text-center text-[11px] font-bold leading-[18px] text-white">{{ $unread > 99 ? '99+' : $unread }}</span>
                     </a>
                     <div x-data="{ open: false }" @click.outside="open = false" @keydown.escape.window="open = false" class="relative">
                         <button type="button" @click="open = !open" :aria-expanded="open" class="flex items-center gap-2 rounded-full p-0.5 pr-3 text-sm font-medium">

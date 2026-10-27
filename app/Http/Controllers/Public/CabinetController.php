@@ -36,6 +36,12 @@ class CabinetController extends Controller
         return view('public.cabinet.notifications', compact('notifications', 'only'));
     }
 
+    /** Число непрочитанных для колокольчика в шапке (его периодически спрашивает bell.js). */
+    public function unreadCount(Request $request)
+    {
+        return response()->json(['unread' => $request->user()->unreadNotifications()->count()])->header('Cache-Control', 'no-store');
+    }
+
     public function open(Request $request, string $id)
     {
         $notification = $request->user()->notifications()->findOrFail($id);

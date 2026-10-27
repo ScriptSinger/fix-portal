@@ -13,6 +13,8 @@
     --container-site: 85rem;
     --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
     --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
+    /* Шрифт сайта сервиса (service.ufamasters.ru): у Instrument Sans нет кириллицы, поэтому русский текст там и тут идёт системным без засечек */
+    --font-service: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
 
     /* Шкала скруглений: блоки и карточки, поля ввода; кнопки и плашки «таблеткой» (rounded-full) */
     --radius-card: 1rem;
@@ -215,4 +217,9 @@ html { scroll-padding-top: 100px; }
     }
     @keyframes submit-spin { to { transform: rotate(360deg); } }
     @media (prefers-reduced-motion: reduce) { .btn[data-sending]::after { animation: none; } }
+}
+
+@layer components {
+    /* Кирпичная раскладка (masonry.js): служебные строки по 4 px, карточка занимает нужное число строк */
+    .masonry-on { grid-auto-rows: 4px; row-gap: 0 !important; align-items: start; }
 }

@@ -7,6 +7,7 @@ use App\Models\Question;
 use App\Models\Reply;
 use App\Services\Reputation;
 use App\Support\ContentImages;
+use App\Support\HtmlCleanup;
 use App\Support\PlainText;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -108,6 +109,7 @@ final class Feed
             $next = $raw[$i + 1]['message'] ?? null;
             $type = $m instanceof Comment ? 'comment' : 'reply';
             [$body, $photos] = ContentImages::extract($m->text);
+            $body = HtmlCleanup::stripInlineStyles($body);
             $isSolution = $this->isQuestion() && $this->subject->solution_type === $type && (int) $this->subject->solution_id === $m->id;
             $iAmAuthor = $this->isQuestion() && $this->viewerId && $this->subject->user_id === $this->viewerId;
 

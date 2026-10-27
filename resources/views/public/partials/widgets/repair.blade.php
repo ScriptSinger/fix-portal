@@ -1,40 +1,39 @@
 @php
-    $card = 'mb-6 rounded-card bg-white p-5';
-@endphp
-@php
-@endphp
-@php
+    // Виджет партнёра оформлен в стиле его сайта service.ufamasters.ru: белый фон, системный шрифт без засечек, заголовки средней жирности
+    // тёмно-серого цвета, янтарная кнопка (Tailwind yellow-500) с радиусом 4 px, фото без рамок.
     $ctaUrl = 'https://service.ufamasters.ru?' . http_build_query(['utm_source' => 'ufamasters', 'utm_medium' => 'sidebar', 'utm_content' => 'more_details']);
     $services = [
         ['Ремонт холодильников', 'GwBsWpe4Y7sEB52lkj1vxQNjnMaNga9itCMLj50g.webp'],
         ['Ремонт стиральных машин', 'QNLUCZoVksk6eIA22C5PoSMWz7r0e9nSk1zaV0od.webp'],
     ];
 @endphp
-<section class="{{ $card }} flex flex-col gap-3"
-    aria-label="Ремонт холодильников и стиральных машин на дому в Уфе">
-    <span class="mb-[10px] mt-0.5 inline-flex min-h-6 items-center self-start bg-[#facc15] px-2.5 text-[11px] font-bold tracking-[0.02em] text-service">Ремонт в день обращения</span>
+<section class="mb-6 rounded-card bg-white p-5 font-service text-gray-600" aria-label="Ремонт холодильников и стиральных машин на дому в Уфе">
     <div class="flex items-center gap-3">
-        <img src="{{ asset('assets/front/images/service/house_logo.png') }}" alt="РемБытТехника" class="size-16 object-contain">
+        <img src="{{ asset('assets/front/images/service/house_logo.png') }}" alt="РемБытТехника" class="size-14 shrink-0 object-contain">
         <div class="min-w-0">
-            <div class="text-sm font-extrabold leading-[1.3] text-service">РемБытТехника</div>
-            <div class="mt-1 text-xs leading-[1.4] text-service-muted">Сервисный центр в Уфе</div>
+            <div class="text-[15px] font-semibold leading-5 text-gray-900">РемБытТехника</div>
+            <div class="mt-0.5 text-[13px] leading-5">Сервисный центр в Уфе</div>
         </div>
     </div>
-    <div>
-        <h2 class="mb-4 text-lg font-bold leading-[18px] text-service">Ремонт бытовой техники на дому в Уфе</h2>
-        <p class="mt-2 text-xs leading-[1.55] text-service-muted">Ремонт на дому без вывоза техники. Согласование цены до начала работ.</p>
-    </div>
-    <div class="grid gap-2">
+
+    <h2 class="mb-2 mt-5 text-xl font-medium leading-7 text-gray-900">Ремонт бытовой техники на дому в Уфе</h2>
+    <p class="m-0 text-sm leading-6">Ремонт на дому без вывоза техники. Согласование цены до начала работ.</p>
+    <p class="mb-0 mt-3 inline-block rounded bg-yellow-500/15 px-2.5 py-1 text-xs font-medium text-yellow-800">Ремонт в день обращения</p>
+
+    <div class="mt-5 grid grid-cols-2 gap-3">
         @foreach ($services as [$name, $img])
-            <div class="flex min-h-[138px] items-end border border-line bg-cover bg-center p-3"
-                style="background-image: linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,.05) 100%), url('{{ asset('assets/front/images/service/' . $img) }}')">
-                <div class="text-lg font-bold leading-[1.3] text-white [text-shadow:0_1px_6px_rgba(0,0,0,.6)]">{{ $name }}</div>
+            <div>
+                <img src="{{ asset('assets/front/images/service/' . $img) }}" alt="{{ $name }}" loading="lazy" class="aspect-[4/3] w-full rounded object-cover">
+                <div class="mt-2 text-[13px] font-medium leading-5 text-gray-900">{{ $name }}</div>
             </div>
         @endforeach
     </div>
-    <div class="flex items-center gap-2">
+
+    <a href="{{ $ctaUrl }}" target="_blank" rel="noopener" aria-label="Заказать ремонт бытовой техники в Уфе на сайте РемБытТехника"
+        class="keep mt-5 flex h-11 w-full items-center justify-center rounded bg-yellow-500 text-[15px] font-medium text-gray-900 no-underline hover:bg-yellow-400">Заказать ремонт</a>
+
+    <div class="mt-4 flex items-center gap-2">
         <img src="{{ asset('assets/front/images/service/verify.svg') }}" alt="" class="size-[18px]">
-        <span class="text-xs text-service-muted">Поддерживается проектом Ufamasters</span>
+        <span class="text-xs leading-4 text-gray-500">Поддерживается проектом Ufamasters</span>
     </div>
-    <x-ui.button variant="telegram" :href="$ctaUrl" target="_blank" rel="noopener" class="w-full" aria-label="Подробнее о ремонте бытовой техники в Уфе">Подробнее ↗</x-ui.button>
 </section>

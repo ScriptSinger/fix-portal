@@ -83,6 +83,7 @@ Route::middleware(['auth:web', 'verified'])->group(
         Route::prefix('/cabinet')->group(function () {
             Route::get('/', [CabinetController::class, 'index'])->name('cabinet.index');
             Route::get('/notifications', [CabinetController::class, 'notifications'])->name('cabinet.notifications');
+            Route::get('/notifications/count', [CabinetController::class, 'unreadCount'])->name('cabinet.notifications.count');
             Route::post('/notifications/read-all', [CabinetController::class, 'readAll'])->name('cabinet.notifications.read-all');
             Route::get('/notifications/{id}', [CabinetController::class, 'open'])->name('cabinet.notifications.open');
             Route::get('/questions', [CabinetController::class, 'questions'])->name('cabinet.questions');

@@ -11,6 +11,7 @@
 @php
     $url = route('questions.show', ['question' => $question->slug]);
     [$bodyHtml, $inline] = \App\Support\ContentImages::extract($question->description);
+    $bodyHtml = \App\Support\HtmlCleanup::stripInlineStyles($bodyHtml);
     $legacy = $question->photos ? (json_decode($question->photos, true) ?: []) : [];
     $photos = array_merge(array_map(fn ($p) => ['src' => asset('storage/' . $p), 'full' => asset('storage/' . $p)], $legacy), $inline);
     $answers = $question->comments;
