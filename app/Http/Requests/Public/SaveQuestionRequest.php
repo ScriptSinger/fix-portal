@@ -20,7 +20,7 @@ class SaveQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'min:12', 'max:150', Rule::unique('questions', 'title')->whereNull('deleted_at')->ignore($this->edited()?->id)],
+            'title' => ['required', 'string', 'min:12', 'max:150', Rule::unique('questions', 'title')->ignore($this->edited()?->id)],
             'appliance_id' => ['required', 'exists:appliances,id'],
             'model' => ['nullable', 'string', 'max:120'],
             'error_code' => ['nullable', 'string', 'max:60'],

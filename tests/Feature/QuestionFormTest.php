@@ -38,6 +38,18 @@ class QuestionFormTest extends TestCase
         return $image;
     }
 
+    public function test_title_of_a_deleted_question_can_be_asked_again(): void
+    {
+        $user = User::factory()->create();
+        $data = $this->valid();
+        $this->makeQuestion($user, ['title' => $data['title']])->delete();
+
+        $this->actingAs($user)->post(route('questions.store'), $data)->assertRedirect();
+
+        $again = Question::where('title', $data['title'])->firstOrFail();
+        $this->get(route('questions.show', ['question' => $again->slug]))->assertOk();
+    }
+
     public function test_guests_cannot_ask(): void
     {
         $this->post(route('questions.store'), $this->valid())->assertRedirect(route('login'));

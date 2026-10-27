@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reply extends Model
 {
-    use HasFactory, SoftDeletes, DateTrait;
+    use HasFactory, DateTrait;
 
 
     protected $fillable = [
@@ -37,5 +36,12 @@ class Reply extends Model
         return $this->morphMany(Reaction::class, 'reactable');
     }
 
+    protected static function boot()
+    {
+        parent::boot();
 
+        static::deleting(function ($reply) {
+            $reply->reactions()->delete();
+        });
+    }
 }

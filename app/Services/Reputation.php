@@ -27,7 +27,6 @@ class Reputation
         foreach ([['comment', 'comments'], ['reply', 'replies']] as [$type, $table]) {
             $rows = DB::table('questions as q')
                 ->join("$table as m", fn ($j) => $j->on('m.id', '=', 'q.solution_id')->where('q.solution_type', '=', $type))
-                ->whereNull('q.deleted_at')->whereNull('m.deleted_at')
                 ->whereColumn('m.user_id', '!=', 'q.user_id')
                 ->when($userIds !== null, fn ($q) => $q->whereIn('m.user_id', $userIds))
                 ->when($since, fn ($q) => $q->where('q.solved_at', '>=', $since))

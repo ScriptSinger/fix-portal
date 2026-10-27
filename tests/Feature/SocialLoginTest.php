@@ -66,13 +66,18 @@ class SocialLoginTest extends TestCase
         $this->assertDatabaseMissing('social_accounts', ['provider_user_id' => 'v-2']);
     }
 
-    public function test_soft_deleted_user_blocks_the_email(): void
+    public function test_deleted_user_can_sign_in_again_as_a_new_account(): void
     {
         $gone = User::factory()->create(['email' => 'gone@mail.ru']);
+        app(SocialLogin::class)->resolve('yandex', $this->social('y-4', 'gone@mail.ru'));
         $gone->delete();
 
-        $this->assertNull(app(SocialLogin::class)->resolve('yandex', $this->social('y-4', 'gone@mail.ru')));
-        $this->assertSame(1, User::withTrashed()->where('email', 'gone@mail.ru')->count());
+        $again = app(SocialLogin::class)->resolve('yandex', $this->social('y-4', 'gone@mail.ru'));
+
+        $this->assertNotNull($again);
+        $this->assertNotSame($gone->id, $again->id);
+        $this->assertSame(1, User::where('email', 'gone@mail.ru')->count());
+        $this->assertDatabaseMissing('social_accounts', ['user_id' => $gone->id]);
     }
 
     public function test_long_names_are_cut_to_the_registration_limit(): void

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Firmware;
+use App\Models\FirmwareRedirect;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
@@ -95,10 +96,9 @@ class FirmwareCatalogPageTest extends TestCase
     public function test_merged_duplicate_redirects_permanently(): void
     {
         $main = $this->row('MAIN_' . uniqid());
-        $dup = $this->row('DUP_' . uniqid(), ['merged_into' => $main->id]);
-        $dup->delete();
+        FirmwareRedirect::create(['old_id' => 987654001, 'new_id' => $main->id]);
 
-        $this->get(route('firmwares.show', ['firmware' => $dup->id]))->assertStatus(301)->assertRedirect(route('firmwares.show', ['firmware' => $main->id]));
+        $this->get(route('firmwares.show', ['firmware' => 987654001]))->assertStatus(301)->assertRedirect(route('firmwares.show', ['firmware' => $main->id]));
         $this->get(route('firmwares.show', ['firmware' => 987654321]))->assertNotFound();
     }
 
@@ -133,10 +133,9 @@ class FirmwareCatalogPageTest extends TestCase
     public function test_download_of_a_merged_duplicate_redirects_to_the_main_record(): void
     {
         $main = $this->row('MAIND_' . uniqid());
-        $dup = $this->row('DUPD_' . uniqid(), ['merged_into' => $main->id]);
-        $dup->delete();
+        FirmwareRedirect::create(['old_id' => 987654002, 'new_id' => $main->id]);
 
-        $this->actingAs(User::factory()->create())->get(route('firmwares.download', ['firmware' => $dup->id]))
+        $this->actingAs(User::factory()->create())->get(route('firmwares.download', ['firmware' => 987654002]))
             ->assertStatus(301)->assertRedirect(route('firmwares.download', ['firmware' => $main->id]));
     }
 }

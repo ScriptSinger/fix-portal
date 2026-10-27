@@ -4,11 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Blocker extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'ip_address'
@@ -23,6 +22,5 @@ class Blocker extends Model
 
         static::saved($forget);
         static::deleted($forget);
-        static::restored($forget);
     }
 }

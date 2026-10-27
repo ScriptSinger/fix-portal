@@ -17,6 +17,6 @@ class QuestionAnnouncement extends Model
 
     public function question(): BelongsTo
     {
-        return $this->belongsTo(Question::class)->withTrashed();
+        return $this->belongsTo(Question::class);
     }
 }

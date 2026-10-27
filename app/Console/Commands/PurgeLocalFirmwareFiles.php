@@ -20,15 +20,15 @@ class PurgeLocalFirmwareFiles extends Command
         $cloud = Storage::disk((string) $this->option('disk'));
         $dir = $local->path('firmwares');
 
-        // Имена файлов, которые ещё нужны записям на локальном диске (в том числе удалённым мягко: их можно восстановить)
-        $stillNeeded = Firmware::withTrashed()
+        // Имена файлов, которые ещё нужны записям на локальном диске
+        $stillNeeded = Firmware::query()
             ->whereNull('file_disk')
             ->whereNotNull('file_path')
             ->pluck('file_path')
             ->flip();
 
         // Имена файлов, чьи записи перенесены: у них должна быть копия в облаке
-        $migratedKeys = Firmware::withTrashed()
+        $migratedKeys = Firmware::query()
             ->where('file_disk', $this->option('disk'))
             ->pluck('file_path');
         $md5ToKey = $migratedKeys->mapWithKeys(fn ($key) => [basename($key) => $key]);

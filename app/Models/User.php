@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\QueuedResetPassword;
 use Illuminate\Notifications\Notifiable;
@@ -20,7 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, DateTrait, ImageHandlerTrait; // Использовать трейт для добавления метода getDate  ;
+    use HasApiTokens, HasFactory, Notifiable, DateTrait, ImageHandlerTrait; // Использовать трейт для добавления метода getDate  ;
 
     /**
      * The attributes that are mass assignable.
@@ -102,20 +101,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         parent::boot();
 
+        // Пользователь стирается окончательно вместе со своими вопросами, комментариями и привязками соцсетей:
+        // иначе занятая «пустая» привязка не пустила бы его войти через ту же соцсеть заново
         static::deleting(function ($user) {
-            $user->comments()->each(function ($comment) {
-                $comment->replies()->delete();
-            });
-            $user->comments()->delete();
-            $user->questions()->delete();
-        });
-
-        static::restoring(function ($user) {
-            $user->comments()->withTrashed()->each(function ($comment) {
-                $comment->replies()->withTrashed()->restore();
-            });
-            $user->comments()->withTrashed()->restore();
-            $user->questions()->withTrashed()->restore();
+            $user->comments()->get()->each->delete();
+            $user->questions()->get()->each->delete();
+            \App\Models\SocialAccount::where('user_id', $user->id)->delete();
+            $user->avatar()->delete();
+            \App\Models\Reaction::where('user_id', $user->id)->delete();
+            $user->notifications()->delete();
         });
     }
 

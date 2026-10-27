@@ -10,14 +10,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Question extends Model
 {
     use HasFactory;
 
 
-    use HasFactory, Sluggable, SoftDeletes, DateTrait, ImageHandlerTrait;
+    use HasFactory, Sluggable, DateTrait, ImageHandlerTrait;
 
     protected $fillable = [
         'title',
@@ -99,17 +98,7 @@ class Question extends Model
         parent::boot();
 
         static::deleting(function ($question) {
-            $question->comments()->each(function ($comment) {
-                $comment->replies()->delete();
-            });
-            $question->comments()->delete();
-        });
-
-        static::restoring(function ($question) {
-            $question->comments()->withTrashed()->each(function ($comment) {
-                $comment->replies()->withTrashed()->restore();
-            });
-            $question->comments()->withTrashed()->restore();
+            $question->comments()->get()->each->delete();
         });
     }
 }

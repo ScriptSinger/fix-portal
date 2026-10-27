@@ -12,7 +12,7 @@ class MergeDuplicateFirmware extends Command
         {--apply : Выполнить слияние (без флага только отчёт)}
         {--sample=5 : Сколько групп показать в примере}';
 
-    protected $description = 'Сливает записи с одинаковым содержимым (MD5) в одну: переносит просмотры, скачивания и комментарии, названия сохраняет как псевдонимы, дубли удаляет мягко с пометкой merged_into (адреса отвечают 301)';
+    protected $description = 'Сливает записи с одинаковым содержимым (MD5) в одну: переносит просмотры, скачивания и комментарии, названия сохраняет как псевдонимы, дубли удаляет, а их адреса записывает в firmware_redirects (отвечают 301)';
 
     public function handle(): int
     {
@@ -52,7 +52,6 @@ class MergeDuplicateFirmware extends Command
             $comments = DB::table('comments')
                 ->where('commentable_type', Firmware::class)
                 ->whereIn('commentable_id', $duplicates->pluck('id'))
-                ->whereNull('deleted_at')
                 ->count();
 
             $stats['groups']++;
@@ -87,16 +86,18 @@ class MergeDuplicateFirmware extends Command
                     'aliases' => $names->isEmpty() ? null : $names->implode("\n"),
                 ]);
 
-                DB::table('firmware')->whereIn('id', $duplicates->pluck('id'))->update([
-                    'merged_into' => $keep->id,
-                    'deleted_at' => now(),
-                ]);
+                // Адреса, которые вели на сливаемые записи, теперь ведут на основную; потом дубли стираются
+                DB::table('firmware_redirects')->whereIn('new_id', $duplicates->pluck('id'))->update(['new_id' => $keep->id]);
+                foreach ($duplicates as $duplicate) {
+                    DB::table('firmware_redirects')->updateOrInsert(['old_id' => $duplicate->id], ['new_id' => $keep->id]);
+                }
+                DB::table('firmware')->whereIn('id', $duplicates->pluck('id'))->delete();
             });
         }
 
         $this->table(['Показатель', 'Значение'], [
             ['групп дублей', $stats['groups']],
-            [$apply ? 'записей слито и удалено мягко' : 'записей будет слито', $stats['removed']],
+            [$apply ? 'записей слито и удалено' : 'записей будет слито', $stats['removed']],
             ['просмотров переносится', $stats['views']],
             ['скачиваний переносится', $stats['downloads']],
             ['комментариев переносится', $stats['comments']],
@@ -107,7 +108,7 @@ class MergeDuplicateFirmware extends Command
         $this->table(['Основная', 'Дубли', 'Другие названия', 'Просм./скач.'], $examples);
 
         if (! $apply) {
-            $this->comment('Пробный прогон. Для слияния добавьте --apply (дубли остаются в базе с deleted_at и merged_into).');
+            $this->comment('Пробный прогон. Для слияния добавьте --apply (дубли будут удалены, их адреса останутся редиректами).');
         }
 
         return self::SUCCESS;

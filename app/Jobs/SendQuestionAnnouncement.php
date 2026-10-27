@@ -34,7 +34,7 @@ class SendQuestionAnnouncement implements ShouldQueue
         $channel = $announcement ? $announcer->channel($announcement->channel) : null;
 
         // отправлено раньше, вопрос удалён, канал выключен: делать нечего
-        if (! $announcement || $announcement->status === AnnouncementStatus::Sent || ! $announcement->question || $announcement->question->trashed() || ! $channel?->enabled()) {
+        if (! $announcement || $announcement->status === AnnouncementStatus::Sent || ! $announcement->question || ! $channel?->enabled()) {
             return;
         }
 

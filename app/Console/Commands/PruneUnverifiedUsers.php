@@ -42,7 +42,7 @@ class PruneUnverifiedUsers extends Command
         // Без events-цепочки на каждый аккаунт: у кандидатов нет комментариев и вопросов, каскадить нечего.
         // Удаляем окончательно: мягко удалённая запись продолжала бы занимать e-mail и человек не смог бы зарегистрироваться заново
         (clone $query)->select('id')->chunkById(500, function ($users) use (&$deleted): void {
-            $deleted += User::withoutEvents(fn () => User::withTrashed()->whereIn('id', $users->pluck('id'))->forceDelete());
+            $deleted += User::withoutEvents(fn () => User::whereIn('id', $users->pluck('id'))->delete());
         });
 
         $this->info("Удалено навсегда: {$deleted}");
@@ -56,8 +56,7 @@ class PruneUnverifiedUsers extends Command
             ->whereColumn("{$table}.{$column}", 'users.id')
             ->select(DB::raw(1));
 
-        // withTrashed: сюда же попадают аккаунты, которые раньше были удалены мягко и всё ещё занимают e-mail
-        $query = User::withTrashed()
+        $query = User::query()
             ->whereNotIn('id', config('users.protected_ids', []))
             ->whereNull('email_verified_at')
             ->where('created_at', '<', now()->subDays($days))

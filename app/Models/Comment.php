@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Comment extends Model
 {
-    use HasFactory, SoftDeletes, DateTrait;
+    use HasFactory, DateTrait;
 
     protected $fillable = [
         'text',
@@ -47,11 +46,8 @@ class Comment extends Model
         parent::boot();
 
         static::deleting(function ($comment) {
-            $comment->replies()->delete();
-        });
-
-        static::restoring(function ($comment) {
-            $comment->replies()->restore();
+            $comment->replies()->get()->each->delete();
+            $comment->reactions()->delete();
         });
     }
 }

@@ -26,5 +26,9 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- Тесты не должны писать в настоящий чат, даже если в .env стоят боевые значения -->
+        <env name="TELEGRAM_BOT_TOKEN" value=""/>
+        <env name="TELEGRAM_CHAT_ID" value=""/>
+        <env name="TELEGRAM_PROXY" value=""/>
     </php>
 </phpunit>

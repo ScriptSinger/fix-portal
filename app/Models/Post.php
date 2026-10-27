@@ -12,13 +12,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 use Intervention\Image\Laravel\Facades\Image;
 
 class Post extends Model
 {
-    use HasFactory, Sluggable, SoftDeletes, DateTrait, ImageHandlerTrait;
+    use HasFactory, Sluggable, DateTrait, ImageHandlerTrait;
 
     protected $fillable = [
         'title',
@@ -80,17 +79,7 @@ class Post extends Model
         parent::boot();
 
         static::deleting(function ($post) {
-            $post->comments()->each(function ($comment) {
-                $comment->replies()->delete();
-            });
-            $post->comments()->delete();
-        });
-
-        static::restoring(function ($post) {
-            $post->comments()->withTrashed()->each(function ($comment) {
-                $comment->replies()->withTrashed()->restore();
-            });
-            $post->comments()->withTrashed()->restore();
+            $post->comments()->get()->each->delete();
         });
     }
 

@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\FirmwareCatalog;
 use App\Support\Firmware\DumpData;
 use App\Support\Firmware\FirmwareText;
@@ -14,8 +13,6 @@ use Illuminate\Support\Facades\Storage;
 
 class Firmware extends Model
 {
-    use SoftDeletes;
-
     private ?DumpData $dumpCache = null;
     private ?string $dumpSource = null;
 
@@ -30,7 +27,6 @@ class Firmware extends Model
         'file_path',
         'file_disk',
         'aliases',
-        'merged_into',
         'data',
         'views_count',
         'downloads_count',
@@ -246,17 +242,7 @@ class Firmware extends Model
         parent::boot();
 
         static::deleting(function ($firmware) {
-            $firmware->comments()->each(function ($comment) {
-                $comment->replies()->delete();
-            });
-            $firmware->comments()->delete();
-        });
-
-        static::restoring(function ($firmware) {
-            $firmware->comments()->withTrashed()->each(function ($comment) {
-                $comment->replies()->withTrashed()->restore();
-            });
-            $firmware->comments()->withTrashed()->restore();
+            $firmware->comments()->get()->each->delete();
         });
     }
 }

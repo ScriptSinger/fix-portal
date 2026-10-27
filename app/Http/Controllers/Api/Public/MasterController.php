@@ -14,7 +14,6 @@ class MasterController extends Controller
         $users = User::whereHas('role', function ($query) {
             $query->where('name', 'мастер');
         })
-            ->whereNull('deleted_at') // Получить только неудаленных пользователей
             ->get();
 
         return response()->json($users);

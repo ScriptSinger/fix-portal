@@ -64,12 +64,7 @@ class SocialLogin
         }
 
         return DB::transaction(function () use ($provider, $providerId, $email, $social): ?User {
-            // withTrashed: удалённый аккаунт занимает почту, заводить второй с тем же адресом нельзя
-            $user = User::withTrashed()->where('email', $email)->first();
-
-            if ($user?->trashed()) {
-                return $this->refuse($provider, 'deleted_account', $social);
-            }
+            $user = User::where('email', $email)->first();
 
             if ($user && $user->email_verified_at === null) {
                 // Аккаунт с этой почтой создали по паролю и не подтвердили. Раз владелец почты вошёл через соцсеть,

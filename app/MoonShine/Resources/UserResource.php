@@ -113,7 +113,6 @@ class UserResource extends BaseResource
         return [
             QueryTag::make('Подтверждённые', static fn (Builder $q) => $q->whereNotNull('email_verified_at'))->alias('verified'),
             QueryTag::make('Не подтверждённые', static fn (Builder $q) => $q->whereNull('email_verified_at'))->alias('unverified'),
-            QueryTag::make('Удалённые', static fn (Builder $q) => $q->onlyTrashed())->alias('trashed'),
         ];
     }
 
