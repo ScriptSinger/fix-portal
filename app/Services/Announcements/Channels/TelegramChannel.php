@@ -41,8 +41,13 @@ class TelegramChannel implements AnnouncementChannel
                 $author ? 'Спрашивает: ' . $this->escape($author) : null,
             ])),
             $this->escape(PlainText::from($question->description, self::EXCERPT)),
-            route('questions.show', ['question' => $question->slug]),
+            $this->url($question),
         ]));
+    }
+
+    public function url(Question $question): string
+    {
+        return route('questions.show', ['question' => $question->slug]);
     }
 
     public function send(Question $question): ?string
@@ -58,6 +63,9 @@ class TelegramChannel implements AnnouncementChannel
                     'chat_id' => config('services.telegram.chat_id'),
                     'text' => $this->text($question),
                     'parse_mode' => 'HTML',
+                    // Карточку ссылки строит краулер Telegram, а он до сайта не доходит: вместо неё кнопка
+                    'link_preview_options' => ['is_disabled' => true],
+                    'reply_markup' => ['inline_keyboard' => [[['text' => 'Открыть вопрос на сайте', 'url' => $this->url($question)]]]],
                 ])
                 ->throw();
         } catch (RequestException|ConnectionException $e) {

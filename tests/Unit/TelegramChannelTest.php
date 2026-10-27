@@ -121,6 +121,24 @@ class TelegramChannelTest extends TestCase
         });
     }
 
+    public function test_message_has_a_button_to_the_question_and_no_link_preview(): void
+    {
+        $this->configure();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
+        $channel = new TelegramChannel();
+        $question = $this->question();
+
+        $channel->send($question);
+
+        Http::assertSent(function (Request $request) use ($channel, $question) {
+            $button = $request['reply_markup']['inline_keyboard'][0][0] ?? [];
+
+            return $request['link_preview_options'] === ['is_disabled' => true]
+                && $button['text'] === 'Открыть вопрос на сайте'
+                && $button['url'] === $channel->url($question);
+        });
+    }
+
     public function test_api_url_can_point_to_a_relay(): void
     {
         $this->configure(['api_url' => 'https://relay.example/tg/']);
