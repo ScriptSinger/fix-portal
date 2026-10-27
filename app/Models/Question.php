@@ -98,6 +98,7 @@ class Question extends Model
         parent::boot();
 
         static::deleting(function ($question) {
+            app(\App\Services\Announcements\QuestionAnnouncer::class)->retract($question);
             $question->comments()->get()->each->delete();
         });
     }

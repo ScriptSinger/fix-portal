@@ -7,11 +7,12 @@ use App\Models\Comment;
 use App\Models\Question;
 use App\Models\Reply;
 use App\Services\ActivityNotifier;
+use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Http\Request;
 
 class SolutionController extends Controller
 {
-    public function __construct(private readonly ActivityNotifier $notifier)
+    public function __construct(private readonly ActivityNotifier $notifier, private readonly QuestionAnnouncer $announcer)
     {
     }
 
@@ -43,6 +44,11 @@ class SolutionController extends Controller
             'solution_id' => $message?->id,
         ])->save();
 
+        // в чате у вопроса появляется пометка «решён»
+        if ($question->wasChanged('solved_at')) {
+            $this->announcer->refresh($question);
+        }
+
         if ($changed) {
             $this->notifier->solution($question, $message, $request->user());
         }
@@ -55,6 +61,10 @@ class SolutionController extends Controller
         $question = Question::findOrFail($id);
         abort_unless($question->user_id === $request->user()->id, 403);
         $question->forceFill(['solved_at' => null, 'solution_type' => null, 'solution_id' => null])->save();
+
+        if ($question->wasChanged('solved_at')) {
+            $this->announcer->refresh($question);
+        }
 
         return redirect(route('questions.show', ['question' => $question->slug]));
     }

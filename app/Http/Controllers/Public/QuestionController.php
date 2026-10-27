@@ -76,7 +76,6 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($id);
         $this->authorize('update', $question);
-        $question->comments()->delete();
         $question->delete();
         return redirect()->route('questions.index')->with('success', 'Вопрос удален');
     }

@@ -3,6 +3,7 @@
 namespace App\Services\Announcements;
 
 use App\Enums\AnnouncementStatus;
+use App\Jobs\RetractQuestionAnnouncement;
 use App\Jobs\SendQuestionAnnouncement;
 use App\Jobs\UpdateQuestionAnnouncement;
 use App\Models\Question;
@@ -46,6 +47,25 @@ class QuestionAnnouncer
                 }
             } catch (\Throwable $e) {
                 Log::error("Не удалось поставить обновление вопроса {$question->id} в очередь канала {$name}: {$e->getMessage()}");
+            }
+        }
+    }
+
+    /**
+     * Вопрос удаляется: его сообщения в чатах убираются. Записи об отправках исчезнут вместе с вопросом,
+     * поэтому в задачу уходят канал и номер сообщения, а не сама запись.
+     */
+    public function retract(Question $question): void
+    {
+        $sent = QuestionAnnouncement::where(['question_id' => $question->id, 'status' => AnnouncementStatus::Sent])->whereNotNull('external_id')->get(['channel', 'external_id']);
+
+        foreach ($sent as $announcement) {
+            try {
+                if ($this->channel($announcement->channel)?->enabled()) {
+                    RetractQuestionAnnouncement::dispatch($announcement->channel, $announcement->external_id)->afterCommit();
+                }
+            } catch (\Throwable $e) {
+                Log::error("Не удалось поставить удаление сообщения вопроса {$question->id} в очередь канала {$announcement->channel}: {$e->getMessage()}");
             }
         }
     }

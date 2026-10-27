@@ -36,6 +36,7 @@ class TelegramChannel implements AnnouncementChannel
         $author = $question->user?->name;
 
         return implode("\n\n", array_filter([
+            $question->isSolved() ? '✅ Вопрос решён' : null,
             '<b>' . $this->escape($question->title) . '</b>',
             implode("\n", array_filter([
                 $facts ? $this->escape(implode(' · ', $facts)) : null,
@@ -66,6 +67,15 @@ class TelegramChannel implements AnnouncementChannel
         $this->call('editMessageText', $this->payload($question) + ['message_id' => (int) $externalId], tolerate: [
             // текст не изменился (правка не затронула то, что показано в чате): это не сбой
             'message is not modified',
+        ]);
+    }
+
+    /** Удаляет сообщение из чата: вопрос удалён, кнопка вела бы на несуществующую страницу. */
+    public function retract(string $externalId): void
+    {
+        $this->call('deleteMessage', ['chat_id' => config('services.telegram.chat_id'), 'message_id' => (int) $externalId], tolerate: [
+            'message to delete not found',
+            "message can't be deleted",
         ]);
     }
 

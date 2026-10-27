@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Enums\AnnouncementStatus;
+use App\Jobs\RetractQuestionAnnouncement;
 use App\Jobs\SendQuestionAnnouncement;
 use App\Jobs\UpdateQuestionAnnouncement;
 use App\Models\Appliance;
 use App\Models\QuestionAnnouncement;
+use App\Models\Reaction;
+use App\Models\Reply;
 use App\Models\User;
 use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -178,6 +181,84 @@ class QuestionAnnouncementTest extends TestCase
         (new UpdateQuestionAnnouncement($announcement->id))->failed(new \RuntimeException('Telegram: down'));
 
         $this->assertSame(AnnouncementStatus::Sent, $announcement->refresh()->status);
+    }
+
+    public function test_deleting_a_sent_question_queues_removal_of_its_message(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $question = $this->makeQuestion(User::factory()->create());
+        $this->sentAnnouncementFor($question);
+
+        $question->delete();
+
+        Queue::assertPushed(RetractQuestionAnnouncement::class, fn ($job) => $job->channel === 'telegram' && $job->externalId === '55');
+        $this->assertDatabaseMissing('question_announcements', ['question_id' => $question->id]);
+    }
+
+    public function test_deleting_a_question_that_was_never_sent_removes_nothing(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $question = $this->makeQuestion(User::factory()->create());
+        $this->sentAnnouncementFor($question, AnnouncementStatus::Pending);
+
+        $question->delete();
+
+        Queue::assertNotPushed(RetractQuestionAnnouncement::class);
+    }
+
+    public function test_retract_job_deletes_the_message(): void
+    {
+        $this->telegram();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
+
+        (new RetractQuestionAnnouncement('telegram', '55'))->handle(app(QuestionAnnouncer::class));
+
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage') && $request['message_id'] === 55);
+    }
+
+    public function test_author_deleting_a_question_erases_replies_and_reactions_too(): void
+    {
+        $author = User::factory()->create();
+        $other = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $comment = $this->commentOn($question, $other);
+        $reply = Reply::forceCreate(['user_id' => $author->id, 'comment_id' => $comment->id, 'text' => 'Спасибо, проверю']);
+        $reaction = Reaction::forceCreate(['user_id' => $author->id, 'reactable_type' => Reply::class, 'reactable_id' => $reply->id, 'emoji' => '👍']);
+
+        $this->actingAs($author)->delete(route('questions.destroy', ['question' => $question->id]))->assertRedirect(route('questions.index'));
+
+        $this->assertDatabaseMissing('comments', ['id' => $comment->id]);
+        $this->assertDatabaseMissing('replies', ['id' => $reply->id]);
+        $this->assertDatabaseMissing('reactions', ['id' => $reaction->id]);
+    }
+
+    public function test_marking_a_question_solved_updates_its_message_once(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $this->sentAnnouncementFor($question);
+
+        $this->actingAs($author)->post(route('questions.solution.store', ['id' => $question->id]))->assertRedirect();
+        $this->actingAs($author)->post(route('questions.solution.store', ['id' => $question->id]))->assertRedirect();
+
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
+    }
+
+    public function test_unmarking_a_solved_question_updates_its_message(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author, ['solved_at' => now()]);
+        $this->sentAnnouncementFor($question);
+
+        $this->actingAs($author)->delete(route('questions.solution.destroy', ['id' => $question->id]))->assertRedirect();
+
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
     }
 
     public function test_job_sends_and_marks_the_record_sent(): void

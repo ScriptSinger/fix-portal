@@ -149,6 +149,35 @@ class TelegramChannelTest extends TestCase
         Http::assertSent(fn (Request $request) => $request->url() === 'https://relay.example/tg/bot123456:SECRET-TOKEN/sendMessage');
     }
 
+    public function test_solved_question_is_marked_in_the_message(): void
+    {
+        $solved = $this->question(['solved_at' => now()]);
+
+        $this->assertStringStartsWith('✅ Вопрос решён', (new TelegramChannel())->text($solved));
+        $this->assertStringNotContainsString('Вопрос решён', (new TelegramChannel())->text($this->question()));
+    }
+
+    public function test_retract_deletes_the_message_from_the_chat(): void
+    {
+        $this->configure();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
+
+        (new TelegramChannel())->retract('55');
+
+        Http::assertSent(fn (Request $request) => $request->url() === 'https://api.telegram.org/bot123456:SECRET-TOKEN/deleteMessage'
+            && $request['chat_id'] === '-5494489427' && $request['message_id'] === 55);
+    }
+
+    public function test_retract_of_a_message_that_is_already_gone_is_not_an_error(): void
+    {
+        $this->configure();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => false, 'error_code' => 400, 'description' => 'Bad Request: message to delete not found'], 400)]);
+
+        (new TelegramChannel())->retract('55');
+
+        $this->addToAssertionCount(1);
+    }
+
     public function test_update_edits_the_message_in_the_chat(): void
     {
         $this->configure();

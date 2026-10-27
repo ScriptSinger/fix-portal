@@ -17,4 +17,7 @@ interface AnnouncementChannel
 
     /** Обновляет уже отправленное сообщение (вопрос отредактировали). Бросает исключение без секретов в тексте. */
     public function update(Question $question, string $externalId): void;
+
+    /** Удаляет отправленное сообщение (вопрос удалили). Сообщение, которого уже нет, не считается ошибкой. */
+    public function retract(string $externalId): void;
 }
