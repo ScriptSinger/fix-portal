@@ -35,7 +35,7 @@ class UpdateQuestionAnnouncement implements ShouldQueue
         $channel = $announcement ? $announcer->channel($announcement->channel) : null;
 
         // сообщения нет, оно ещё не отправлено (тогда уйдёт сразу с новым текстом), вопрос удалён или канал выключен
-        if (! $announcement || $announcement->status !== AnnouncementStatus::Sent || ! $announcement->external_id || ! $announcement->question || ! $channel?->enabled()) {
+        if (! $announcement || $announcement->status !== AnnouncementStatus::Sent || ! $announcement->external_id || ! $announcement->question || ! $channel?->enabled() || ! $channel->canModify()) {
             return;
         }
 

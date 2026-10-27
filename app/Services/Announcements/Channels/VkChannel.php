@@ -27,6 +27,12 @@ class VkChannel implements AnnouncementChannel
         return filled(config('services.vk_group.token')) && filled(config('services.vk_group.group_id'));
     }
 
+    /** Ключ сообщества не может править и удалять записи (wall.edit и wall.delete отвечают кодом 27), только публиковать. */
+    public function canModify(): bool
+    {
+        return false;
+    }
+
     public function text(Question $question): string
     {
         $facts = array_filter([
@@ -37,7 +43,6 @@ class VkChannel implements AnnouncementChannel
         $author = $question->user?->name;
 
         return implode("\n\n", array_filter([
-            $question->isSolved() ? '✅ Вопрос решён' : null,
             $question->title,
             implode("\n", array_filter([
                 $facts ? implode(' · ', $facts) : null,
@@ -63,16 +68,14 @@ class VkChannel implements AnnouncementChannel
         return $id === null ? null : (string) $id;
     }
 
-    /** Меняет уже опубликованную запись: автор поправил вопрос или отметил его решённым. */
+    /** VK не даёт ключу сообщества править записи: правка вопроса на стене не отражается (см. canModify). */
     public function update(Question $question, string $externalId): void
     {
-        $this->call('wall.edit', ['post_id' => (int) $externalId] + $this->content($question));
     }
 
-    /** Удаляет запись со стены: вопрос удалён. */
+    /** VK не даёт ключу сообщества удалять записи: при удалении вопроса запись остаётся на стене (см. canModify). */
     public function retract(string $externalId): void
     {
-        $this->call('wall.delete', ['post_id' => (int) $externalId]);
     }
 
     /** @return array<string, mixed> */

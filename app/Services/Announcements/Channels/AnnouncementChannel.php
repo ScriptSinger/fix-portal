@@ -15,6 +15,9 @@ interface AnnouncementChannel
     /** Отправляет вопрос и возвращает внешний номер сообщения. При сбое бросает исключение без секретов в тексте. */
     public function send(Question $question): ?string;
 
+    /** Можно ли менять и удалять отправленное. Если нет, правка и удаление вопроса канал не трогают. */
+    public function canModify(): bool;
+
     /** Обновляет уже отправленное сообщение (вопрос отредактировали). Бросает исключение без секретов в тексте. */
     public function update(Question $question, string $externalId): void;
 

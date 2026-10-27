@@ -37,7 +37,7 @@ class QuestionAnnouncer
     public function refresh(Question $question): void
     {
         foreach ($this->channels() as $name => $channel) {
-            if (! $channel->enabled()) {
+            if (! $channel->enabled() || ! $channel->canModify()) {
                 continue;
             }
 
@@ -63,7 +63,9 @@ class QuestionAnnouncer
 
         foreach ($sent as $announcement) {
             try {
-                if ($this->channel($announcement->channel)?->enabled()) {
+                $channel = $this->channel($announcement->channel);
+
+                if ($channel?->enabled() && $channel->canModify()) {
                     RetractQuestionAnnouncement::dispatch($announcement->channel, $announcement->external_id)->afterCommit();
                 }
             } catch (\Throwable $e) {

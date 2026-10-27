@@ -56,11 +56,6 @@ class VkChannelTest extends TestCase
         $this->assertStringEndsWith('/questions/stiralka-ne-slivaet', $text);
     }
 
-    public function test_solved_question_is_marked(): void
-    {
-        $this->assertStringStartsWith('✅ Вопрос решён', (new VkChannel())->text($this->question(['solved_at' => now()])));
-    }
-
     public function test_send_posts_to_the_group_wall_with_the_link_in_the_text(): void
     {
         $this->configure();
@@ -82,26 +77,17 @@ class VkChannelTest extends TestCase
             && ! str_contains($request->url(), 'SECRET'));
     }
 
-    public function test_update_edits_the_post(): void
+    public function test_community_key_cannot_edit_or_delete_so_the_channel_does_not_try(): void
     {
         $this->configure();
-        Http::fake(['api.vk.com/*' => Http::response(['response' => 1])]);
+        Http::fake();
+        $channel = new VkChannel();
 
-        (new VkChannel())->update($this->question(['title' => 'Новый заголовок вопроса про насос']), '987');
+        $this->assertFalse($channel->canModify());
+        $channel->update($this->question(), '987');
+        $channel->retract('987');
 
-        Http::assertSent(fn (Request $request) => $request->url() === 'https://api.vk.com/method/wall.edit'
-            && $request['post_id'] === 987 && $request['owner_id'] === -123456
-            && str_contains($request['message'], 'Новый заголовок вопроса про насос'));
-    }
-
-    public function test_retract_deletes_the_post(): void
-    {
-        $this->configure();
-        Http::fake(['api.vk.com/*' => Http::response(['response' => 1])]);
-
-        (new VkChannel())->retract('987');
-
-        Http::assertSent(fn (Request $request) => $request->url() === 'https://api.vk.com/method/wall.delete' && $request['post_id'] === 987);
+        Http::assertNothingSent();
     }
 
     public function test_error_inside_a_200_response_throws(): void

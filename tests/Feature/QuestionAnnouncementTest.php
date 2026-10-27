@@ -286,6 +286,65 @@ class QuestionAnnouncementTest extends TestCase
         Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
     }
 
+    private function bothChannelsSent(\App\Models\Question $question): void
+    {
+        $this->telegram();
+        config(['services.vk_group' => ['token' => 'vk-token', 'group_id' => '123456', 'version' => '5.199']]);
+        QuestionAnnouncement::create(['question_id' => $question->id, 'channel' => 'telegram', 'status' => AnnouncementStatus::Sent, 'external_id' => '55']);
+        QuestionAnnouncement::create(['question_id' => $question->id, 'channel' => 'vk', 'status' => AnnouncementStatus::Sent, 'external_id' => '987']);
+    }
+
+    public function test_editing_a_question_updates_only_channels_that_can_modify(): void
+    {
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $this->bothChannelsSent($question);
+
+        $this->edit($question, $author, ['description' => 'Дополнение: ' . str_repeat('подробности ', 10)]);
+
+        // VK ключом сообщества править записи не даёт: обновляется только Telegram
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
+    }
+
+    public function test_marking_solved_updates_only_channels_that_can_modify(): void
+    {
+        Queue::fake();
+        $author = User::factory()->create();
+        $question = $this->makeQuestion($author);
+        $this->bothChannelsSent($question);
+
+        $this->actingAs($author)->post(route('questions.solution.store', ['id' => $question->id]))->assertRedirect();
+
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
+    }
+
+    public function test_deleting_a_question_removes_its_message_only_where_it_can(): void
+    {
+        Queue::fake();
+        $question = $this->makeQuestion(User::factory()->create());
+        $this->bothChannelsSent($question);
+
+        $question->delete();
+
+        Queue::assertPushed(RetractQuestionAnnouncement::class, 1);
+        Queue::assertPushed(RetractQuestionAnnouncement::class, fn ($job) => $job->channel === 'telegram' && $job->externalId === '55');
+        Queue::assertNotPushed(RetractQuestionAnnouncement::class, fn ($job) => $job->channel === 'vk');
+    }
+
+    public function test_vk_update_and_retract_jobs_do_nothing_even_if_queued_earlier(): void
+    {
+        $this->bothChannelsSent($question = $this->makeQuestion(User::factory()->create()));
+        Http::fake(['api.vk.com/*' => Http::response(['response' => 1]), 'api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
+        $vk = QuestionAnnouncement::where(['question_id' => $question->id, 'channel' => 'vk'])->firstOrFail();
+
+        (new UpdateQuestionAnnouncement($vk->id))->handle(app(QuestionAnnouncer::class));
+        (new RetractQuestionAnnouncement('vk', '987'))->handle(app(QuestionAnnouncer::class));
+
+        // задачи, поставленные до этого изменения, завершаются без обращения к VK и без ошибок
+        Http::assertNothingSent();
+    }
+
     public function test_job_sends_and_marks_the_record_sent(): void
     {
         $this->telegram();

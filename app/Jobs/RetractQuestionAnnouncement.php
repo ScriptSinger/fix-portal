@@ -31,7 +31,7 @@ class RetractQuestionAnnouncement implements ShouldQueue
     {
         $channel = $announcer->channel($this->channel);
 
-        if ($channel?->enabled()) {
+        if ($channel?->enabled() && $channel->canModify()) {
             $channel->retract($this->externalId);
         }
     }

@@ -26,6 +26,11 @@ class TelegramChannel implements AnnouncementChannel
         return filled(config('services.telegram.bot_token')) && filled(config('services.telegram.chat_id'));
     }
 
+    public function canModify(): bool
+    {
+        return true;
+    }
+
     public function text(Question $question): string
     {
         $facts = array_filter([
