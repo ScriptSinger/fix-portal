@@ -25,10 +25,19 @@
         </p>
     </section>
 
+    <section class="mt-4 rounded-card bg-white p-4 shadow-sm sm:p-5" aria-labelledby="how">
+        <h2 id="how" class="m-0 text-lg font-bold text-black">Как здесь всё устроено</h2>
+        <p class="mb-0 mt-2 text-sm leading-6">Знания собраны в трёх местах: статьи с сервисной информацией, база прошивок и вопросы сообщества.</p>
+        <p class="mb-0 mt-2 text-sm leading-6">
+            Вопросы работают так: вы описываете поломку, сообщество отвечает, а вы отмечаете решение.
+            <a href="{{ route('how-it-works') }}" class="keep font-bold text-black underline underline-offset-4">Подробнее →</a>
+        </p>
+    </section>
+
     @php $top = \App\Services\Reputation::top(5, now()->subDays(30)); @endphp
     @if ($top->isNotEmpty())
-        <section class="mt-4 rounded-card bg-white p-4 shadow-sm sm:p-5" aria-labelledby="helpers">
-            <h2 id="helpers" class="m-0 text-lg font-bold text-black">Кто помогает в этом месяце</h2>
+        <section id="helpers" class="mt-4 scroll-mt-28 rounded-card bg-white p-4 shadow-sm sm:p-5" aria-labelledby="helpers-title">
+            <h2 id="helpers-title" class="m-0 text-lg font-bold text-black">Кто помогает в этом месяце</h2>
             <p class="mb-0 mt-1 text-[13px] text-subtle">По числу ответов, которые авторы вопросов отметили решением за последние 30 дней.</p>
             <ol class="m-0 mt-3 grid list-none gap-2 p-0">
                 @foreach ($top as $row)

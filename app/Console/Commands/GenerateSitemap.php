@@ -51,6 +51,7 @@ class GenerateSitemap extends Command
         $sitemap->add($this->makeUrl(route('home'), now(), 1.0, Url::CHANGE_FREQUENCY_DAILY));
         $sitemap->add($this->makeUrl(route('articles.index'), now(), 0.9, Url::CHANGE_FREQUENCY_DAILY));
         $sitemap->add($this->makeUrl(route('about'), now(), 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
+        $sitemap->add($this->makeUrl(route('how-it-works'), now(), 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
         // $sitemap->add($this->makeUrl(route('users.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
         $sitemap->add($this->makeUrl(route('tags.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
         $sitemap->add($this->makeUrl(route('questions.index'), now(), 0.8, Url::CHANGE_FREQUENCY_DAILY));

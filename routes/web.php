@@ -33,6 +33,7 @@ use App\Http\Controllers\Public\UserController;
 Route::get('/', [PostController::class, 'home'])->name('home');
 
 Route::view('/about', 'public.pages.about')->name('about');
+Route::view('/how-it-works', 'public.pages.how-it-works')->name('how-it-works');
 Route::view('/personal-data-consent', 'public.pages.consent')->name('consent');
 
 Route::group(

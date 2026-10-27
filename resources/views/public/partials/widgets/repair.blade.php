@@ -29,8 +29,10 @@
         @endforeach
     </div>
 
-    <a href="{{ $ctaUrl }}" target="_blank" rel="noopener" aria-label="Заказать ремонт бытовой техники в Уфе на сайте РемБытТехника"
-        class="keep mt-5 flex h-11 w-full items-center justify-center rounded bg-yellow-500 text-[15px] font-medium text-gray-900 no-underline hover:bg-yellow-400">Заказать ремонт</a>
+    <a href="{{ $ctaUrl }}" target="_blank" rel="noopener" aria-label="Перейти на сайт РемБытТехника, откроется в новой вкладке"
+        class="keep mt-5 flex h-11 w-full items-center justify-center gap-2 rounded bg-yellow-500 text-[15px] font-medium text-gray-900 no-underline hover:bg-yellow-400">Перейти на сайт
+        <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M7 17L17 7M9 7h8v8" /></svg>
+    </a>
 
     <div class="mt-4 flex items-center gap-2">
         <img src="{{ asset('assets/front/images/service/verify.svg') }}" alt="" class="size-[18px]">

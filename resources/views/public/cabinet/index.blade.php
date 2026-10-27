@@ -46,6 +46,7 @@
             @if ($rank)
                 <span class="mt-1 block text-[13px] font-bold text-green-700">✓ {{ $rank }}</span>
             @endif
+            <a href="{{ route('how-it-works') }}#ranks" class="keep mt-1 block text-[12px] text-subtle underline underline-offset-4">Что это значит?</a>
             @if ($progress !== null)
                 <span class="mt-1.5 block h-1.5 overflow-hidden rounded-full bg-black/10" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ round($progress * 100) }}">
                     <span class="block h-full rounded-full bg-green-600" style="width: {{ round($progress * 100) }}%"></span>
