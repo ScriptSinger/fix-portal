@@ -49,6 +49,8 @@ return [
     'telegram' => [
         'bot_token' => env('TELEGRAM_BOT_TOKEN'),
         'chat_id' => env('TELEGRAM_CHAT_ID'),
+        // Номер темы, если в группе включены темы (форум); без него сообщения идут в «Общее»
+        'thread_id' => env('TELEGRAM_THREAD_ID'),
         'proxy' => env('TELEGRAM_PROXY'),
         'api_url' => env('TELEGRAM_API_URL', 'https://api.telegram.org'),
     ],

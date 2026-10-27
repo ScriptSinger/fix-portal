@@ -174,6 +174,30 @@ class TelegramChannelTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function test_message_goes_to_the_configured_topic_of_a_forum_group(): void
+    {
+        $this->configure(['thread_id' => '42']);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
+
+        (new TelegramChannel())->send($this->question());
+
+        Http::assertSent(fn (Request $request) => $request['message_thread_id'] === 42);
+    }
+
+    public function test_without_a_topic_the_message_has_no_thread_and_edits_never_have_one(): void
+    {
+        $this->configure(['thread_id' => null]);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
+        $channel = new TelegramChannel();
+
+        $channel->send($this->question());
+        $this->configure(['thread_id' => '42']);
+        $channel->update($this->question(), '55');
+
+        Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/sendMessage') && ! isset($request['message_thread_id']));
+        Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/editMessageText') && ! isset($request['message_thread_id']));
+    }
+
     public function test_update_edits_the_message_in_the_chat(): void
     {
         $this->configure();
