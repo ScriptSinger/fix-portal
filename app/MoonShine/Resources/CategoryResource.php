@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\Category;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
@@ -38,7 +38,7 @@ class CategoryResource extends BaseResource
             ID::make()->sortable(),
             Text::make('Название', 'title')->sortable(),
             Text::make('Slug', 'slug'),
-            Date::make('Создана', 'created_at')->format('d.m.Y')->sortable(),
+            LocalDate::make('Создана', 'created_at')->format('d.m.Y')->sortable(),
         ];
     }
 

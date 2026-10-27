@@ -6,6 +6,7 @@ namespace App\MoonShine\Resources;
 
 use App\MoonShine\Pages\BlocksIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use App\Models\BlockedUserAgent;
 use Illuminate\Validation\Rule;
@@ -13,7 +14,6 @@ use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\MenuManager\Attributes\SkipMenu;
 use MoonShine\Support\Attributes\Icon;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
 
@@ -56,7 +56,7 @@ class BlockedUserAgentResource extends BaseResource
         return [
             ID::make()->sortable(),
             Text::make('User-Agent', 'user_agent')->sortable(),
-            Date::make('Добавлен', 'created_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Добавлен', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

@@ -7,6 +7,7 @@ namespace App\MoonShine\Resources;
 use App\Enums\AnnouncementStatus;
 use App\Models\QuestionAnnouncement;
 use App\MoonShine\Pages\AnnouncementsIndexPage;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\MenuManager\Attributes\Group;
@@ -14,7 +15,6 @@ use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\Support\Enums\Action;
 use MoonShine\Support\ListOf;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\Enum;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
@@ -69,8 +69,8 @@ class QuestionAnnouncementResource extends BaseResource
             Text::make('Канал', 'channel'),
             Enum::make('Статус', 'status')->attach(AnnouncementStatus::class),
             Number::make('Попытки', 'attempts'),
-            Date::make('Отправлено', 'sent_at')->format('d.m.Y H:i')->sortable(),
-            Date::make('Создано', 'created_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Отправлено', 'sent_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Создано', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

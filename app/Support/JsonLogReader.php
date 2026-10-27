@@ -219,7 +219,7 @@ abstract class JsonLogReader
         }
 
         try {
-            return Carbon::parse($value)->timezone(config('app.timezone'));
+            return Carbon::parse($value)->timezone(config('app.display_timezone'));
         } catch (\Throwable) {
             return null;
         }
@@ -232,7 +232,7 @@ abstract class JsonLogReader
         }
 
         try {
-            $date = Carbon::parse(trim($value), config('app.timezone'));
+            $date = Carbon::parse(trim($value), config('app.display_timezone'));
         } catch (\Throwable) {
             return null;
         }

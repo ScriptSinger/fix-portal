@@ -59,7 +59,7 @@
         @foreach ($entries as $e)
             @php $m = $e->message; $q = $e->quote; @endphp
             @if ($e->startsDay)
-                <div class="my-2 justify-self-center rounded-full bg-black/5 px-3 py-0.5 text-xs font-medium text-subtle">{{ $m->created_at->translatedFormat('j F Y') }}</div>
+                <div class="my-2 justify-self-center rounded-full bg-black/5 px-3 py-0.5 text-xs font-medium text-subtle">{{ $m->created_at->inDisplayTimezone()->translatedFormat('j F Y') }}</div>
             @endif
             <div class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-end gap-2 {{ $e->firstInSeries ? 'mt-2.5' : '' }}">
                 @if ($e->lastInSeries)
@@ -117,7 +117,7 @@
                                     </button>
                                 </form>
                             @endcan
-                            <time datetime="{{ $m->created_at->toIso8601String() }}" title="{{ $m->created_at->translatedFormat('j F Y, H:i') }}">{{ $m->created_at->format('H:i') }}</time>
+                            <time datetime="{{ $m->created_at->toIso8601String() }}" title="{{ $m->created_at->inDisplayTimezone()->translatedFormat('j F Y, H:i') }}">{{ $m->created_at->inDisplayTimezone()->format('H:i') }}</time>
                         </div>
                     </div>
                 </div>

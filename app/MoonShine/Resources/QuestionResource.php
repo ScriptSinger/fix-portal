@@ -6,12 +6,12 @@ namespace App\MoonShine\Resources;
 
 use App\Models\Question;
 use App\MoonShine\Support\TinyMceUpload;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\TinyMce\Fields\TinyMce;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Text;
@@ -48,7 +48,7 @@ class QuestionResource extends BaseResource
             BelongsTo::make('Техника', 'appliance', 'title', ApplianceResource::class),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class),
             Number::make('Просмотры', 'views')->sortable(),
-            Date::make('Создан', 'created_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Создан', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

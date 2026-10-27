@@ -146,6 +146,6 @@ final class Feed
 
     private function sameDay(Comment|Reply $a, Comment|Reply $b): bool
     {
-        return $a->created_at->toDateString() === $b->created_at->toDateString();
+        return $a->created_at->inDisplayTimezone()->toDateString() === $b->created_at->inDisplayTimezone()->toDateString();
     }
 }

@@ -8,6 +8,6 @@ trait DateTrait
 {
     public function getDateAsCarbonAttribute()
     {
-        return Carbon::parse($this->created_at);
+        return Carbon::parse($this->created_at)->inDisplayTimezone();
     }
 }

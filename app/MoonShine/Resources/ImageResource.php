@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\Image;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Support\Enums\Action;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\MenuManager\Attributes\Group;
@@ -12,7 +13,6 @@ use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\MenuManager\Attributes\SkipMenu;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\Support\ListOf;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Preview;
 use MoonShine\UI\Fields\Text;
@@ -56,7 +56,7 @@ class ImageResource extends BaseResource
             BelongsTo::make('Пользователь', 'user', 'name', UserResource::class),
             Text::make('MIME', 'mime'),
             Preview::make('Размер', 'size', fn (Image $i) => $i->size_mb),
-            Date::make('Загружено', 'created_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Загружено', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

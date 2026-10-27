@@ -6,13 +6,13 @@ namespace App\MoonShine\Resources;
 
 use App\MoonShine\Pages\BlocksIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use App\Models\Blocker;
 use Illuminate\Validation\Rule;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
 
@@ -54,7 +54,7 @@ class BlockerResource extends BaseResource
         return [
             ID::make()->sortable(),
             Text::make('IP-адрес', 'ip_address')->sortable(),
-            Date::make('Добавлен', 'created_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Добавлен', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

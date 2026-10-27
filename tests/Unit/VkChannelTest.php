@@ -53,7 +53,7 @@ class VkChannelTest extends TestCase
         $this->assertStringContainsString("Стиральная машина · Beko WKL 13540 K · ошибка E03\nСпрашивает: Иван", $text);
         $this->assertStringContainsString('Вода остаётся в баке', $text);
         $this->assertStringNotContainsString('<', $text);
-        $this->assertStringNotContainsString('http', $text);
+        $this->assertStringEndsWith('/questions/stiralka-ne-slivaet', $text);
     }
 
     public function test_solved_question_is_marked(): void
@@ -61,7 +61,7 @@ class VkChannelTest extends TestCase
         $this->assertStringStartsWith('✅ Вопрос решён', (new VkChannel())->text($this->question(['solved_at' => now()])));
     }
 
-    public function test_send_posts_to_the_group_wall_with_the_link_as_attachment(): void
+    public function test_send_posts_to_the_group_wall_with_the_link_in_the_text(): void
     {
         $this->configure();
         Http::fake(['api.vk.com/*' => Http::response(['response' => ['post_id' => 987]])]);
@@ -76,8 +76,9 @@ class VkChannelTest extends TestCase
             && $request['owner_id'] === -123456
             && $request['from_group'] === 1
             && $request['v'] === '5.199'
-            && $request['attachments'] === $channel->url($question)
+            && ! isset($request['attachments'])
             && str_contains($request['message'], 'Стиралка не сливает воду')
+            && str_contains($request['message'], $channel->url($question))
             && ! str_contains($request->url(), 'SECRET'));
     }
 

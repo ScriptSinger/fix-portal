@@ -14,7 +14,7 @@
 @section('content')
     @php
         // реакции одного человека-эмодзи на одно сообщение склеиваем: «Сергей и ещё 2»
-        $groups = $notifications->groupBy(fn ($n) => $n->created_at->toDateString());
+        $groups = $notifications->groupBy(fn ($n) => $n->created_at->inDisplayTimezone()->toDateString());
         $actors = \App\Models\User::with('avatar')->whereIn('id', $notifications->map(fn ($n) => $n->data['actor_id'] ?? null)->filter()->unique())->get()->keyBy('id');
         $unread = auth()->user()->unreadNotifications()->count();
         $tab = 'inline-flex h-9 items-center rounded-full px-4 text-sm font-medium ';
@@ -30,7 +30,7 @@
     </div>
 
     @forelse ($groups as $date => $items)
-        @php $day = \Illuminate\Support\Carbon::parse($date); @endphp
+        @php $day = \Illuminate\Support\Carbon::parse($date, config('app.display_timezone')); @endphp
         <div class="mx-auto my-4 w-max rounded-full bg-black/5 px-3 py-0.5 text-xs font-medium text-subtle">
             {{ $day->isToday() ? 'Сегодня' : ($day->isYesterday() ? 'Вчера' : $day->translatedFormat('j F Y')) }}
         </div>
@@ -62,7 +62,7 @@
                     @if (! empty($d['snippet']))
                         <div class="my-1 rounded-r-md border-l-[3px] border-subtle bg-black/5 px-2.5 py-0.5 text-[13px] text-ink/80"><span class="line-clamp-2">{{ $d['snippet'] }}</span></div>
                     @endif
-                    <div class="mt-1 text-xs text-subtle">{{ $n->created_at->format('H:i') }}</div>
+                    <div class="mt-1 text-xs text-subtle">{{ $n->created_at->inDisplayTimezone()->format('H:i') }}</div>
                 </div>
                 @if ($isNew)<span class="absolute right-3.5 top-4 size-2.5 rounded-full bg-red-600" aria-label="Новое"></span>@endif
             </a>

@@ -8,11 +8,11 @@ use App\Models\User;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\QueryTags\QueryTag;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\DateRange;
 use MoonShine\UI\Fields\Email;
 use MoonShine\UI\Fields\ID;
@@ -51,9 +51,9 @@ class UserResource extends BaseResource
             Text::make('Имя', 'name')->sortable(),
             Email::make('E-mail', 'email')->sortable(),
             Text::make('Локация', 'location'),
-            Date::make('Подтверждён', 'email_verified_at')->format('d.m.Y')->sortable(),
-            Date::make('Регистрация', 'created_at')->format('d.m.Y')->sortable(),
-            Date::make('Последний визит', 'last_seen_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Подтверждён', 'email_verified_at')->format('d.m.Y')->sortable(),
+            LocalDate::make('Регистрация', 'created_at')->format('d.m.Y')->sortable(),
+            LocalDate::make('Последний визит', 'last_seen_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

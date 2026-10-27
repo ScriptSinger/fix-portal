@@ -24,5 +24,11 @@ class AppServiceProvider extends ServiceProvider
     {
         // Paginator::useBootstrapFour();
         Paginator::useBootstrapFive();
+
+        // Время хранится в UTC; для показа людям: $date->inDisplayTimezone()
+        \Carbon\Carbon::macro('inDisplayTimezone', function () {
+            /** @var \Carbon\Carbon $this */
+            return $this->copy()->timezone(config('app.display_timezone'));
+        });
     }
 }

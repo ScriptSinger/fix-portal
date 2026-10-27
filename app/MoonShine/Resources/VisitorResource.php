@@ -7,6 +7,7 @@ namespace App\MoonShine\Resources;
 use App\Models\User;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Crud\QueryTags\QueryTag;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\MenuManager\Attributes\Group;
@@ -15,7 +16,6 @@ use MoonShine\Support\Attributes\Icon;
 use MoonShine\Support\Enums\SortDirection;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Components\Badge;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\Email;
 use MoonShine\UI\Fields\Preview;
 use MoonShine\UI\Fields\Text;
@@ -79,9 +79,9 @@ class VisitorResource extends BaseResource
             Preview::make('Статус', 'last_seen_at', fn (User $user) => $this->isOnline($user)
                 ? (string) Badge::make('онлайн', 'success')
                 : ''),
-            Date::make('Последний визит', 'last_seen_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Последний визит', 'last_seen_at')->format('d.m.Y H:i')->sortable(),
             Preview::make('Это было', 'last_seen_at', fn (User $user) => $user->last_seen_at?->diffForHumans() ?? ''),
-            Date::make('Регистрация', 'created_at')->format('d.m.Y')->sortable(),
+            LocalDate::make('Регистрация', 'created_at')->format('d.m.Y')->sortable(),
         ];
     }
 

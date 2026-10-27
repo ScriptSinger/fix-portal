@@ -8,6 +8,7 @@ use App\Models\Administrator;
 use App\Models\Post;
 use App\MoonShine\Support\TinyMceUpload;
 use App\Services\ThumbnailService;
+use App\MoonShine\Fields\LocalDate;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\TinyMce\Fields\TinyMce;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
@@ -16,7 +17,6 @@ use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\Image;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
@@ -54,7 +54,7 @@ class PostResource extends BaseResource
             Text::make('Заголовок', 'title')->sortable(),
             BelongsTo::make('Категория', 'category', 'title', CategoryResource::class),
             Number::make('Просмотры', 'views')->sortable(),
-            Date::make('Создана', 'created_at')->format('d.m.Y H:i')->sortable(),
+            LocalDate::make('Создана', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }
 

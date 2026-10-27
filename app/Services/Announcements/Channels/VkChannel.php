@@ -8,7 +8,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 
-/** Запись на стене VK-группы от имени сообщества: заголовок, техника, начало описания; ссылка идёт вложением, VK сам строит карточку. */
+/** Запись на стене VK-группы от имени сообщества: заголовок, техника, начало описания и ссылка в тексте. */
 class VkChannel implements AnnouncementChannel
 {
     public const NAME = 'vk';
@@ -44,6 +44,8 @@ class VkChannel implements AnnouncementChannel
                 $author ? 'Спрашивает: ' . $author : null,
             ])),
             PlainText::from($question->description, self::EXCERPT),
+            // Ссылкой-вложением VK требует картинку определённого размера со страницы (link_photo_sizing_rule) и иначе отказывает во всей записи
+            $this->url($question),
         ]));
     }
 
@@ -78,7 +80,7 @@ class VkChannel implements AnnouncementChannel
     {
         $question->loadMissing(['appliance', 'user']);
 
-        return ['message' => $this->text($question), 'attachments' => $this->url($question)];
+        return ['message' => $this->text($question)];
     }
 
     /**
