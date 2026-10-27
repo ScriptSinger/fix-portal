@@ -51,7 +51,7 @@
                     default => $who . ' ' . $title,
                 };
             @endphp
-            <a href="{{ route('cabinet.notifications.open', ['id' => $n->id]) }}" class="keep relative mb-2 grid grid-cols-[2.5rem_minmax(0,1fr)] gap-3 rounded-2xl bg-white py-3 pl-3.5 pr-4 shadow-sm">
+            <a href="{{ route('cabinet.notifications.open', ['id' => $n->id]) }}" class="keep relative mb-2 grid grid-cols-[2.5rem_minmax(0,1fr)] gap-3 rounded-card bg-white py-3 pl-3.5 pr-4 shadow-sm">
                 @if ($actor)
                     <x-ui.avatar :user="$actor" size="size-10" />
                 @else
@@ -68,7 +68,7 @@
             </a>
         @endforeach
     @empty
-        <p class="rounded-2xl bg-white p-5 text-subtle shadow-sm">{{ $only ? 'Новых уведомлений нет.' : 'Пока нет уведомлений. Здесь появятся ответы на ваши вопросы и реакции на сообщения.' }}</p>
+        <p class="rounded-card bg-white p-5 text-subtle shadow-sm">{{ $only ? 'Новых уведомлений нет.' : 'Пока нет уведомлений. Здесь появятся ответы на ваши вопросы и реакции на сообщения.' }}</p>
     @endforelse
 
     <div class="mt-6">{{ $notifications->links('public.partials.pagination') }}</div>

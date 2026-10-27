@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-    <div class="rounded-[5px] bg-white p-12 max-sm:px-4">
+    <div class="rounded-card bg-white p-12 max-sm:px-4">
         @if (session('status') == 'verification-link-sent')
             <div class="mb-6 rounded bg-[#d4edda] px-5 py-3 text-[#155724]" role="alert">На ваш адрес электронной почты отправлена новая ссылка для подтверждения.</div>
         @endif

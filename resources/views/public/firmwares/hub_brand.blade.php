@@ -20,7 +20,7 @@
         $platformsText = collect($summary['platforms'])->map(fn ($count, $name) => "{$name} ({$count})")->implode(', ');
         $extensionsText = collect($summary['extensions'])->map(fn ($count, $name) => "{$name} ({$count})")->implode(', ');
     @endphp
-    <section class="bg-white p-5 sm:p-8">
+    <section class="rounded-card bg-white p-5 sm:p-8">
         <p class="mb-0 text-[15px]">
             Прошивки {{ $brand['name'] }} в каталоге UfaMasters: дампы модулей управления для ремонта и восстановления.
             Прошивок в каталоге: <strong>{{ number_format($brand['pages'], 0, ',', ' ') }}</strong>,
@@ -31,7 +31,7 @@
         </p>
     </section>
 
-    <section class="mt-6 bg-white" aria-labelledby="series-title">
+    <section class="mt-6 overflow-hidden rounded-card bg-white" aria-labelledby="series-title">
         <h2 id="series-title" class="border-b border-line px-5 py-4 text-[13px] font-bold uppercase tracking-[1.5px] text-ink sm:px-8">Серии моделей {{ $brand['name'] }}</h2>
         <div class="overflow-x-auto">
             <table class="w-full border-collapse text-sm">

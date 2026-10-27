@@ -3,8 +3,8 @@
     {{-- Колонки вместо сетки: карточки разной высоты (с фото, без фото) встают вплотную, без пустых белых полей --}}
     <div class="columns-1 gap-3 sm:columns-2 sm:gap-6">
         @foreach ($questions as $question)
-            @php($photos = array_map(fn ($p) => \App\Support\UserImages::url($p['full'], 480), \App\Support\ContentImages::extract($question->description)[1]))
-            @php($excerpt = e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'), $photos ? 150 : 320)))
+            @php $photos = array_map(fn ($p) => \App\Support\UserImages::url($p['full'], 480), \App\Support\ContentImages::extract($question->description)[1]); @endphp
+            @php $excerpt = e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'), $photos ? 150 : 320)); @endphp
             <div class="mb-3 break-inside-avoid sm:mb-6">
             <x-ui.entry-card rounded :solved="$question->isSolved()"
                 :url="route('questions.show', ['question' => $question->slug])"
@@ -21,7 +21,21 @@
         @endforeach
     </div>
 @else
-    <p class="bg-white p-8 text-center">Совпадений не найдено</p>
+    @php
+        // что именно ничего не нашло: фильтр статуса, поиск по тексту или в разделе просто нет вопросов
+        $status = in_array(request('status'), ['solved', 'open'], true) ? request('status') : null;
+        $text = trim((string) request('text'));
+        $reset = url()->current();
+    @endphp
+    @if ($status === 'solved')
+        <x-ui.empty-state title="Решённых вопросов пока нет" text="Когда автор вопроса отметит ответ решением, вопрос появится здесь." action="Показать все вопросы" :url="$reset" />
+    @elseif ($status === 'open')
+        <x-ui.empty-state title="Вопросов без решения нет" text="У всех недавних вопросов уже есть отмеченное решение." action="Показать все вопросы" :url="$reset" />
+    @elseif ($text !== '')
+        <x-ui.empty-state :title="'По запросу «' . \Illuminate\Support\Str::limit($text, 60) . '» ничего не нашлось'" text="Попробуйте другие слова или опишите проблему новым вопросом." action="Задать вопрос" :url="route('questions.create')" secondary="Сбросить поиск" :secondary-url="$reset" />
+    @else
+        <x-ui.empty-state title="Здесь пока нет вопросов" text="Опишите свою проблему: ответят участники сообщества, а вопрос поможет следующим." action="Задать вопрос" :url="route('questions.create')" />
+    @endif
 @endif
 <div class="mt-10">
     {{ $questions->withQueryString()->onEachSide(1)->links('public.partials.pagination') }}

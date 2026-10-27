@@ -51,7 +51,7 @@
 @section('content')
     <script type="application/ld+json">@json($qaPage, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
     <div>
-        <article class="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <article class="overflow-hidden rounded-card bg-white shadow-sm">
             <header class="px-4 pt-3 sm:px-5">
                 <div class="mb-2 flex flex-wrap gap-2">
                     <a href="{{ route('public.appliances.show', ['appliance' => $question->appliance->slug]) }}"

@@ -57,4 +57,12 @@ class ListFiltersTest extends TestCase
         $this->get(route('articles.index', ['text' => '%']))->assertOk()->assertViewHas('posts', fn ($posts) => $posts->total() === 0);
         $this->assertInstanceOf(Post::class, $post);
     }
+
+    public function test_empty_lists_explain_what_to_do(): void
+    {
+        $this->get(route('questions.index', ['status' => 'solved', 'text' => 'zzzzнетакогослова']))->assertOk()->assertSee('Решённых вопросов пока нет');
+        $this->get(route('questions.index', ['text' => 'zzzzнетакогослова']))->assertOk()
+            ->assertSee('По запросу «zzzzнетакогослова» ничего не нашлось')->assertSee('Сбросить поиск')->assertSee('Задать вопрос');
+        $this->get(route('articles.index', ['text' => 'zzzzнетакогослова']))->assertOk()->assertSee('По запросу «zzzzнетакогослова» ничего не нашлось', false);
+    }
 }

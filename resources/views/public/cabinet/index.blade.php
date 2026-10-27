@@ -22,7 +22,7 @@
         $next = \App\Services\Reputation::next($stats['solutions']);
         $progress = \App\Services\Reputation::progress($stats['solutions']);
     @endphp
-    <div class="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-white p-5 shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-4 rounded-card bg-white p-5 shadow-sm">
         <div>
             <h2 class="m-0 text-xl font-bold text-black">Здравствуйте, {{ auth()->user()->name }}</h2>
             <p class="mb-0 mt-1 text-subtle">
@@ -34,13 +34,13 @@
 
     <div class="my-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         @foreach ($tiles as [$label, $value, $url, $hot])
-            <a href="{{ $url }}" class="keep block rounded-2xl p-4 shadow-sm {{ $hot && $value ? 'bg-brand-400 text-black' : 'bg-white text-ink' }}">
+            <a href="{{ $url }}" class="keep block rounded-card p-4 shadow-sm {{ $hot && $value ? 'bg-brand-400 text-black' : 'bg-white text-ink' }}">
                 <b class="block font-serif text-[28px] leading-none tabular-nums">{{ $value }}</b>
                 <span class="text-[13px] {{ $hot && $value ? 'text-black' : 'text-subtle' }}">{{ $label }}</span>
             </a>
         @endforeach
         {{-- Решений: репутация, считается по ответам, которые авторы вопросов отметили решением --}}
-        <div class="rounded-2xl bg-white p-4 text-ink shadow-sm">
+        <div class="rounded-card bg-white p-4 text-ink shadow-sm">
             <b class="block font-serif text-[28px] leading-none tabular-nums">{{ $stats['solutions'] }}</b>
             <span class="text-[13px] text-subtle">Решений</span>
             @if ($rank)
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <section class="rounded-2xl bg-white px-5 py-2 shadow-sm" aria-labelledby="my-q">
+    <section class="rounded-card bg-white px-5 py-2 shadow-sm" aria-labelledby="my-q">
         <div class="flex items-baseline justify-between pt-3">
             <h2 id="my-q" class="m-0 text-lg font-bold text-black">Ваши вопросы</h2>
             @if ($questions->isNotEmpty())<a href="{{ route('cabinet.questions') }}" class="text-sm font-bold text-black underline">Все</a>@endif

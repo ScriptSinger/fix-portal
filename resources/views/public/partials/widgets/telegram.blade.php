@@ -1,5 +1,5 @@
 @php
-    $card = 'mb-6 rounded-[5px] bg-white p-5';
+    $card = 'mb-6 rounded-card bg-white p-5';
 @endphp
 @php
 @endphp

@@ -9,6 +9,7 @@ import anchorScroll from './components/anchorScroll';
 import carousel from './components/carousel';
 import lightbox from './components/lightbox';
 import scrollRegions from './components/scrollRegions';
+import submitLock from './components/submitLock';
 import firmwareFilter from './components/firmwareFilter';
 import articleToc from './components/articleToc';
 
@@ -26,6 +27,7 @@ anchorScroll();
 document.addEventListener('DOMContentLoaded', carousel);
 document.addEventListener('DOMContentLoaded', lightbox);
 document.addEventListener('DOMContentLoaded', scrollRegions);
+submitLock();
 
 window.Alpine = Alpine;
 Alpine.start();

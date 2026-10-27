@@ -12,7 +12,7 @@
 @endsection
 
 @section('content')
-    <section class="rounded-2xl bg-white px-5 py-2 shadow-sm">
+    <section class="rounded-card bg-white px-5 py-2 shadow-sm">
         @forelse ($answers as $answer)
             @php
                 $plain = \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $answer['text']), ENT_QUOTES | ENT_HTML5, 'UTF-8'))), 160) ?: 'Фото';

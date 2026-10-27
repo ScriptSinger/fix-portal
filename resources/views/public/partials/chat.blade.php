@@ -13,7 +13,7 @@
     $trash = '<path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3" />';
 @endphp
 <section id="comments" aria-label="{{ $words['title'] }}" class="mt-4" @scroll.window.passive="measure()" @resize.window="measure()" x-init="measure()" x-data="{
-    target: null, base: @js($storeUrl), photos: [], busy: false, error: '', far: false,
+    target: null, base: @js($storeUrl), photos: [], busy: false, error: '', far: false, sending: false,
     measure() { this.far = this.$root.getBoundingClientRect().bottom - window.innerHeight > 240; },
     // едем к концу ленты: поле ввода закреплено и всегда «в кадре», так что scrollIntoView к нему не работал, а $el в обработчике кнопки это сама кнопка, поэтому берём $root
     toEnd() { window.scrollBy({ top: this.$root.getBoundingClientRect().bottom - window.innerHeight + 24, behavior: 'smooth' }); },
@@ -36,7 +36,7 @@
         fetch(@js(route('api.users.images.destroy', ['image' => ':id'])).replace(':id', p.id), { method: 'DELETE', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]')?.content ?? '', Accept: 'application/json' }, credentials: 'same-origin' });
     },
     grow(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 160) + 'px'; },
-    submit(e) { if (this.busy || (!this.$refs.text.value.trim() && !this.photos.length)) e.preventDefault(); }
+    submit(e) { if (this.busy || this.sending || (!this.$refs.text.value.trim() && !this.photos.length)) { e.preventDefault(); return; } this.sending = true; }
 }">
     <div class="flex justify-center">
         <h2 class="m-0 rounded-full bg-black/5 px-3 py-0.5 text-xs font-medium leading-5 text-subtle">
@@ -49,7 +49,7 @@
     </div>
 
     @if ($solution)
-        <a href="#{{ $solution['anchor'] }}" class="keep mt-4 block rounded-2xl bg-green-50 px-4 py-3 text-ink no-underline ring-1 ring-green-600/30">
+        <a href="#{{ $solution['anchor'] }}" class="keep mt-4 block rounded-card bg-green-50 px-4 py-3 text-ink no-underline ring-1 ring-green-600/30">
             <b class="text-sm text-green-700">✓ Решение · {{ $solution['author'] }}</b>
             <span class="mt-0.5 block text-[14px] leading-snug text-ink/80"><span class="line-clamp-2">{{ $solution['text'] }}</span></span>
         </a>
@@ -67,7 +67,7 @@
                 @else
                     <span class="size-9" aria-hidden="true"></span>
                 @endif
-                <div id="{{ $e->anchor }}" class="relative {{ $e->photos ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-2xl bg-white px-3 py-1.5 shadow-sm {{ $e->lastInSeries ? 'rounded-bl-sm' : '' }} {{ $e->isSolution ? 'ring-2 ring-green-600' : '' }}">
+                <div id="{{ $e->anchor }}" class="relative {{ $e->photos ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-card bg-white px-3 py-1.5 shadow-sm {{ $e->lastInSeries ? 'rounded-bl-sm' : '' }} {{ $e->isSolution ? 'ring-2 ring-green-600' : '' }}">
                     @if ($e->firstInSeries)
                         <div class="flex flex-wrap items-baseline gap-x-2 text-sm font-bold leading-snug {{ $names[$e->colorSlot] }}">
                             {{ $m->user->name }}
@@ -96,23 +96,23 @@
 
                     <div class="mt-1 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
                         <x-ui.reactions :instance="$m" />
-                        <div class="ml-auto flex items-center gap-x-3 text-[11px] text-subtle">
+                        <div class="ml-auto flex items-center gap-x-3 text-xs text-subtle">
                             @if ($e->isSolution)<span class="font-bold text-green-700">✓ Решение</span>@endif
                             @if ($e->canMarkSolution)
                                 <form method="POST" action="{{ route('questions.solution.store', ['id' => $feed->subjectId()]) }}" class="inline">@csrf
                                     <input type="hidden" name="type" value="{{ $e->type }}"><input type="hidden" name="message" value="{{ $m->id }}">
-                                    <button type="submit" class="font-medium hover:text-green-700">Это решение</button>
+                                    <button type="submit" class="hit font-medium hover:text-green-700">Это решение</button>
                                 </form>
                             @endif
                             @auth('web')
-                                <button type="button" class="font-medium hover:text-ink"
+                                <button type="button" class="hit font-medium hover:text-ink"
                                     @click="target = { root: {{ $e->rootId }}, reply: {{ $e->isReply() ? $m->id : 'null' }}, name: @js($m->user->name), text: @js($e->preview) }; $nextTick(() => $refs.text.focus())">Ответить</button>
                             @endauth
                             @can('delete', $m)
                                 <form action="{{ route($e->isReply() ? 'comments.replies.destroy' : 'comments.destroy', ['id' => $m->id]) }}" method="POST" class="inline"
                                     @submit="if (!confirm('Подтвердите удаление')) $event.preventDefault()">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="hover:text-red-600" aria-label="Удалить">
+                                    <button type="submit" class="hit p-0.5 hover:text-red-600" aria-label="Удалить">
                                         <svg class="inline size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">{!! $trash !!}</svg>
                                     </button>
                                 </form>
@@ -162,9 +162,10 @@
                     <textarea id="chat-text" x-ref="text" name="text" rows="1" placeholder="{{ $words['placeholder'] }}" @input="grow($el)"
                         @keydown.ctrl.enter.prevent="$el.form.requestSubmit()" @paste="attach([...$event.clipboardData.files])"
                         class="max-h-40 min-w-0 flex-1 resize-none border-0 bg-transparent px-1 py-[11px] text-[15px] leading-[22px] text-ink outline-none focus:ring-0"></textarea>
-                    <button type="submit" aria-label="Отправить" :disabled="busy"
-                        class="grid size-11 shrink-0 place-items-center rounded-full text-black hover:text-ink disabled:opacity-40">
-                        <svg class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.4l17.5-7.5a1 1 0 000-1.8L3.4 3.6a.9.9 0 00-1.3 1.1L4 10.5l9 1.5-9 1.5-1.9 5.8a.9.9 0 001.3 1.1z" /></svg>
+                    <button type="submit" aria-label="Отправить" :disabled="busy || sending" :aria-busy="sending"
+                        class="grid size-11 shrink-0 place-items-center rounded-full text-black hover:text-ink disabled:opacity-60">
+                        <span x-show="sending" x-cloak class="size-5 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none" aria-hidden="true"></span>
+                        <svg x-show="!sending" class="size-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 20.4l17.5-7.5a1 1 0 000-1.8L3.4 3.6a.9.9 0 00-1.3 1.1L4 10.5l9 1.5-9 1.5-1.9 5.8a.9.9 0 001.3 1.1z" /></svg>
                     </button>
                 </div>
                 <p x-show="error" x-cloak x-text="error" class="m-0 text-sm text-red-600"></p>

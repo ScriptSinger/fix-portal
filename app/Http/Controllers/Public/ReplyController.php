@@ -33,7 +33,8 @@ class ReplyController extends Controller
         $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
         $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
         $this->notifier->replied($reply, auth()->user());
-        return redirect()->back();
+
+        return redirect()->back()->withFragment('r-' . $reply->id);
     }
 
     public function destroy($id)

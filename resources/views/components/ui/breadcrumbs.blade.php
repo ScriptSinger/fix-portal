@@ -17,7 +17,7 @@
 <script type="application/ld+json">@json($ld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
 <div class="bg-surface pt-4" data-breadcrumbs>
     <nav aria-label="Хлебные крошки" class="site-container">
-        <ol class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap py-1 text-[13px] leading-6">
+        <ol class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap py-1 text-[13px] leading-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             @foreach ($trail as [$title, $url])
                 <li class="flex shrink-0 items-center gap-2 {{ $loop->last ? 'min-w-0 shrink' : '' }}">
                     @if ($url)

@@ -3,7 +3,7 @@
     'href' => null,
     'size' => 'md', // sm | md | lg
 ])
-{{-- Единая кнопка сайта: прямые углы, Roboto Slab 14 px bold. Вид (variant) задаёт только цвет. --}}
+{{-- Единая кнопка сайта: скруглённые «таблеткой», Roboto Slab 14 px bold. Вид (variant) задаёт только цвет. --}}
 @php
     $variants = [
         'dark' => 'bg-black text-white border border-black',
@@ -16,7 +16,7 @@
         'md' => 'px-8 py-[11.8px] text-sm leading-[17.5px]',
         'lg' => 'h-[54px] px-8 text-sm leading-[17.5px]',
     ];
-    $classes = 'btn inline-flex items-center justify-center gap-2 text-center font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ' . $variants[$variant] . ' ' . $sizes[$size];
+    $classes = 'btn inline-flex items-center justify-center gap-2 rounded-full text-center font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ' . $variants[$variant] . ' ' . $sizes[$size];
 @endphp
 @if ($href)
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>{{ $slot }}</a>

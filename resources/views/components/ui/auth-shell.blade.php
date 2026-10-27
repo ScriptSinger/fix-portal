@@ -1,6 +1,6 @@
 @props(['title', 'lead' => null, 'eyebrow' => 'UfaMasters', 'headline', 'points' => []])
 {{-- Экран входа: слева жёлтая панель с пользой аккаунта, справа форма. На телефоне панель сжимается до полосы. --}}
-<div class="mx-auto grid w-full max-w-[920px] overflow-hidden rounded-[5px] bg-white shadow-[0_2px_20px_rgba(0,0,0,.08)] max-sm:rounded-none md:grid-cols-[1fr_1.15fr]">
+<div class="mx-auto grid w-full max-w-[920px] overflow-hidden rounded-card bg-white shadow-[0_2px_20px_rgba(0,0,0,.08)] max-sm:rounded-none md:grid-cols-[1fr_1.15fr]">
     <aside class="relative flex flex-col justify-start gap-10 bg-brand-400 p-10 text-black max-md:p-6">
         <div>
             <p class="mb-3 mt-0 text-[13px] font-bold uppercase tracking-[2px] max-md:hidden">{{ $eyebrow }}</p>

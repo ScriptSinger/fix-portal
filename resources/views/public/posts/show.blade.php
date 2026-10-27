@@ -19,7 +19,7 @@
 
 @section('sidebar-left')
     {{-- Содержание из заголовков статьи (Alpine): показывается, если в тексте есть хотя бы два раздела --}}
-    <div x-data="articleToc" x-show="items.length >= 2" x-cloak class="lg:rounded-[5px] lg:bg-white lg:p-5">
+    <div x-data="articleToc" x-show="items.length >= 2" x-cloak class="lg:rounded-card lg:bg-white lg:p-5">
         <button type="button" @click="open = !open" :aria-expanded="open"
             class="flex w-full items-center justify-between border border-black bg-white px-4 py-3 text-left text-sm font-bold text-ink lg:hidden">
             Содержание <span aria-hidden="true" x-text="open ? '−' : '+'"></span>
@@ -39,7 +39,7 @@
 @endsection
 
 @section('content')
-    <div class="bg-white p-5 sm:p-8 lg:p-10">
+    <div class="rounded-card bg-white p-5 sm:p-8 lg:p-10">
         <article>
             <header class="mb-8">
                 <h1 class="mb-3 mt-3 text-[34px] font-bold leading-[42px] text-black max-sm:text-[26px] max-sm:leading-8">{{ $post->title }}</h1>

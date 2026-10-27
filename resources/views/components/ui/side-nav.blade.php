@@ -2,7 +2,7 @@
 {{-- Левая навигация раздела: items = [['title' => , 'url' => , 'active' => bool], ...].
      На компьютере карточка как правые виджеты (заголовок и список с пунктирными разделителями),
      на телефоне и планшете вкладка у левого края и выезжающая панель, как фильтр прошивок. Счётчики не показываем. --}}
-<nav aria-label="{{ $label }}" x-data="{ open: false }" @keydown.escape.window="open = false" class="lg:rounded-[5px] lg:bg-white lg:p-5">
+<nav aria-label="{{ $label }}" x-data="{ open: false }" @keydown.escape.window="open = false" class="lg:rounded-card lg:bg-white lg:p-5">
     <button type="button" @click="open = true" aria-label="Открыть: {{ $heading }}"
         class="fixed left-0 top-1/2 z-30 -translate-y-1/2 rotate-180 bg-brand-400 px-[9px] py-4 text-[13px] font-bold uppercase leading-none tracking-[1.5px] text-black shadow-[2px_0_8px_rgba(0,0,0,.35)] [writing-mode:vertical-rl] lg:hidden">{{ $heading }}</button>
     <div x-show="open" x-cloak @click="open = false" class="fixed inset-0 z-[70] bg-black/50 lg:hidden" aria-hidden="true"></div>

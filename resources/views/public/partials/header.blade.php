@@ -42,7 +42,7 @@
                 </form>
                 @auth
                     @php $me = auth()->user(); $unread = $me->unreadNotifications()->count(); @endphp
-                    <a href="{{ route('cabinet.notifications') }}" class="keep relative grid size-10 place-items-center rounded-full text-ink" aria-label="Уведомления{{ $unread ? ': ' . $unread . ' новых' : '' }}">
+                    <a href="{{ route('cabinet.notifications') }}" class="keep relative grid size-11 place-items-center rounded-full text-ink" aria-label="Уведомления{{ $unread ? ': ' . $unread . ' новых' : '' }}">
                         <x-ui.icon name="bell" class="size-6" />
                         @if ($unread)<span class="absolute right-0 top-0 min-w-[18px] rounded-full bg-red-600 px-1 text-center text-[11px] font-bold leading-[18px] text-white">{{ $unread > 99 ? '99+' : $unread }}</span>@endif
                     </a>

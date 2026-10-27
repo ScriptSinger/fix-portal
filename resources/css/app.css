@@ -14,6 +14,10 @@
     --font-sans: 'Roboto Slab', ui-serif, Georgia, serif;
     --font-display: 'Roboto Slab', ui-serif, Georgia, serif;
 
+    /* Шкала скруглений: блоки и карточки, поля ввода; кнопки и плашки «таблеткой» (rounded-full) */
+    --radius-card: 1rem;
+    --radius-field: 0.75rem;
+
     --color-brand-50: #fefce8;
     --color-brand-400: #f9ca27;
     --color-brand-500: #e5b50f;
@@ -159,6 +163,7 @@ html { scroll-padding-top: 100px; }
 @layer components {
     .field {
         display: block; width: 100%; height: 40px; padding: 0 12px;
+        border-radius: var(--radius-field);
         border: 1px solid #ced4da; background: #fff; color: #464a4c; font-size: 16px; line-height: 24px;
     }
     textarea.field { height: auto; min-height: 114px; padding: 8px 12px; }
@@ -193,4 +198,21 @@ html { scroll-padding-top: 100px; }
     .pencil-line { stroke-dasharray: 1 2; stroke-dashoffset: 1; opacity: 0; animation: pencil-line 2.8s ease-in-out infinite; }
     .pencil-body { animation: pencil-body 2.8s ease-in-out infinite; }
     @media (prefers-reduced-motion: reduce) { .pencil-line { animation: none; stroke-dashoffset: 0; opacity: 1; } .pencil-body { animation: none; } }
+}
+
+@layer components {
+    /* Мелкий элемент остаётся мелким на вид, а область нажатия растёт до ~44 px по высоте (рекомендация для сенсорных экранов) */
+    .hit { position: relative; }
+    .hit::after { content: ''; position: absolute; inset: -14px -4px; }
+}
+
+@layer components {
+    /* Форма отправлена: кнопки заняты (см. submitLock.js). У обычных кнопок справа от текста крутится кружок */
+    button[data-sending], input[data-sending] { cursor: progress; opacity: .65; }
+    .btn[data-sending]::after {
+        content: ''; width: 1em; height: 1em; border-radius: 9999px; border: 2px solid currentColor; border-right-color: transparent;
+        animation: submit-spin .7s linear infinite;
+    }
+    @keyframes submit-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .btn[data-sending]::after { animation: none; } }
 }

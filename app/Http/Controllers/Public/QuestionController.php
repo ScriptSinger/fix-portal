@@ -42,9 +42,10 @@ class QuestionController extends Controller
 
     public function store(SaveQuestionRequest $request, QuestionService $questions)
     {
-        $questions->create($request->user(), $request->validated());
+        $question = $questions->create($request->user(), $request->validated());
 
-        return redirect()->route('questions.index')->with('success', 'Вопрос создан');
+        // человек сразу видит свой вопрос и может дополнить его, а не ищет его в общем списке
+        return redirect()->route('questions.show', ['question' => $question->slug])->with('success', 'Вопрос опубликован');
     }
 
     public function show(string $slug)
@@ -66,9 +67,9 @@ class QuestionController extends Controller
 
     public function update(SaveQuestionRequest $request, QuestionService $questions, string $slug)
     {
-        $questions->update($request->edited() ?? abort(404), $request->user(), $request->validated());
+        $question = $questions->update($request->edited() ?? abort(404), $request->user(), $request->validated());
 
-        return redirect()->route('questions.index')->with('success', 'Изменения сохранены');
+        return redirect()->route('questions.show', ['question' => $question->slug])->with('success', 'Изменения сохранены');
     }
 
     public function destroy($id)

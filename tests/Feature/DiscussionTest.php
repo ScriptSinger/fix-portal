@@ -38,6 +38,21 @@ class DiscussionTest extends TestCase
         $this->assertSame($user->id, $comment->user_id);
     }
 
+    #[DataProvider('entityProvider')]
+    public function test_after_sending_the_user_lands_on_the_new_message(string $kind): void
+    {
+        $subject = $this->subject($kind);
+        $page = $this->pageOf($subject);
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->from($page)->post(route('comments.store', ['type' => $kind, 'id' => $subject->id]), ['text' => 'Новое сообщение']);
+        $comment = $subject->comments()->latest('id')->first();
+        $response->assertRedirect($page . '#c-' . $comment->id);
+
+        $reply = $this->actingAs(User::factory()->create())->from($page)->post(route('comments.replies.store', ['id' => $comment->id]), ['text' => 'Ответ']);
+        $reply->assertRedirect($page . '#r-' . Reply::latest('id')->value('id'));
+    }
+
     public function test_empty_comment_is_rejected_and_guests_cannot_comment(): void
     {
         $subject = $this->subject('question');

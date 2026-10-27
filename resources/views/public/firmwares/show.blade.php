@@ -48,7 +48,7 @@
     <script type="application/ld+json">@json($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
 
     {{-- Главное на первом экране: что за файл и кнопка «Скачать» --}}
-    <section class="bg-white p-5 sm:p-8" aria-labelledby="fw-title">
+    <section class="rounded-card bg-white p-5 sm:p-8" aria-labelledby="fw-title">
         <div class="mb-3 flex flex-wrap gap-2">
             @if ($firmware->brand)<span class="bg-brand-400 px-2.5 py-1 text-xs font-bold leading-4 text-black">{{ $firmware->brand }}</span>@endif
             @if ($platform)<span class="border border-black px-2.5 py-1 text-xs leading-4 text-black">{{ $platform }}</span>@endif
@@ -95,7 +95,7 @@
     </section>
 
     @if ($pairs)
-        <section class="mt-6 bg-white p-5 sm:p-8" aria-labelledby="fw-params" x-data="{ all: false }">
+        <section class="mt-6 rounded-card bg-white p-5 sm:p-8" aria-labelledby="fw-params" x-data="{ all: false }">
             <h2 id="fw-params" class="mb-4 text-[13px] font-bold uppercase tracking-[1.5px] text-ink">Параметры прошивки</h2>
             <dl class="grid gap-x-10 sm:grid-cols-2">
                 @foreach ($pairs as $i => [$label, $value])

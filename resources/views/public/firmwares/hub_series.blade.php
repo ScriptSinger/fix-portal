@@ -26,7 +26,7 @@
 @endsection
 
 @section('content')
-    <section class="bg-white p-5 sm:p-8">
+    <section class="rounded-card bg-white p-5 sm:p-8">
         <p class="mb-0 text-[15px]">
             Серия <strong>{{ $brand['name'] }} {{ $seriesName }}</strong>.
             Прошивок в каталоге: <strong>{{ number_format($summary['pages'], 0, ',', ' ') }}</strong>, моделей: <strong>{{ count($summary['models']) }}</strong>.
@@ -45,7 +45,7 @@
         @endif
     </section>
 
-    <section class="mt-6 bg-white" aria-labelledby="all-title">
+    <section class="mt-6 overflow-hidden rounded-card bg-white" aria-labelledby="all-title">
         <h2 id="all-title" class="border-b border-line px-5 py-4 text-[13px] font-bold uppercase tracking-[1.5px] text-ink sm:px-8">Все прошивки серии</h2>
         <div class="overflow-x-auto">
             <table class="w-full border-collapse text-sm">

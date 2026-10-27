@@ -16,7 +16,7 @@
         ];
     @endphp
 
-    <section class="relative overflow-hidden rounded-2xl bg-black p-5 text-white sm:p-7" aria-labelledby="about-title">
+    <section class="relative overflow-hidden rounded-card bg-black p-5 text-white sm:p-7" aria-labelledby="about-title">
         <svg class="pointer-events-none absolute -right-6 -top-6 size-56 -rotate-12 text-brand-400/15 max-sm:size-40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="{{ $wrench }}" /></svg>
         <p class="relative mb-3 mt-0 inline-block rounded-full bg-brand-400 px-3 py-0.5 text-[11px] font-bold uppercase tracking-[2px] text-black">Право на ремонт</p>
         <h2 id="about-title" class="relative m-0 max-w-3xl text-[26px] font-bold leading-[1.2] text-brand-400 sm:text-[32px]">Починить значит продлить жизнь вещи</h2>
@@ -27,7 +27,7 @@
 
     @php $top = \App\Services\Reputation::top(5, now()->subDays(30)); @endphp
     @if ($top->isNotEmpty())
-        <section class="mt-4 rounded-2xl bg-white p-4 shadow-sm sm:p-5" aria-labelledby="helpers">
+        <section class="mt-4 rounded-card bg-white p-4 shadow-sm sm:p-5" aria-labelledby="helpers">
             <h2 id="helpers" class="m-0 text-lg font-bold text-black">Кто помогает в этом месяце</h2>
             <p class="mb-0 mt-1 text-[13px] text-subtle">По числу ответов, которые авторы вопросов отметили решением за последние 30 дней.</p>
             <ol class="m-0 mt-3 grid list-none gap-2 p-0">
@@ -42,7 +42,7 @@
         </section>
     @endif
 
-    <section class="mt-4 rounded-2xl bg-white p-4 shadow-sm sm:p-5" aria-labelledby="principles">
+    <section class="mt-4 rounded-card bg-white p-4 shadow-sm sm:p-5" aria-labelledby="principles">
         <h2 id="principles" class="m-0 text-lg font-bold text-black">Наши принципы</h2>
         <ul class="m-0 mt-3 grid list-none gap-4 p-0 sm:grid-cols-3">
             @foreach ($principles as [$title, $text])
@@ -57,7 +57,7 @@
     </section>
 
     <div class="mt-4">
-        <section class="rounded-2xl bg-brand-400 p-4 text-sm text-black">
+        <section class="rounded-card bg-brand-400 p-4 text-sm text-black">
             <h2 class="m-0 text-base font-bold">Поддержите нас</h2>
             <p class="mb-0 mt-2 leading-6">Сайт работает на платном сервере, а доход приносит реклама. Отключите, пожалуйста, блокировщик рекламы: так вы поможете проекту жить дальше.</p>
         </section>

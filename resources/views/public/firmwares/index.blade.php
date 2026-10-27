@@ -31,7 +31,7 @@
             class="fixed left-0 top-1/2 z-30 -translate-y-1/2 rotate-180 bg-brand-400 px-[9px] py-4 text-[13px] font-bold uppercase leading-none tracking-[1.5px] text-black shadow-[2px_0_8px_rgba(0,0,0,.35)] [writing-mode:vertical-rl] lg:hidden">Фильтр</button>
         <div x-show="open" x-cloak @click="close()" class="fixed inset-0 z-[70] bg-black/50 lg:hidden" aria-hidden="true"></div>
 
-        <div class="fw-drawer lg:rounded-[5px] lg:bg-white" :class="{ open }">
+        <div class="fw-drawer lg:rounded-card lg:bg-white" :class="{ open }">
             <form method="GET" action="{{ route('firmwares.index') }}" @submit.prevent="apply()" class="flex min-h-0 flex-1 flex-col">
                 {{-- Шапка панели на телефоне --}}
                 <div class="flex min-h-14 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden">
@@ -120,7 +120,18 @@
 @endsection
 
 @section('content')
-    <div class="bg-white">
+    <div class="overflow-hidden rounded-card bg-white">
+        {{-- Поиск виден сразу, без открытия панели фильтра (на компьютере он стоит в панели слева) --}}
+        <form method="GET" action="{{ route('firmwares.index') }}" role="search" class="border-b border-line px-4 py-3 lg:hidden">
+            @foreach (request()->except(['search', 'page']) as $name => $value)
+                @if (is_scalar($value))<input type="hidden" name="{{ $name }}" value="{{ $value }}">@endif
+            @endforeach
+            <label for="f-search-top" class="sr-only">Поиск прошивок</label>
+            <div class="relative">
+                <x-ui.icon name="search" class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-subtle" />
+                <input id="f-search-top" type="search" name="search" value="{{ request('search') }}" placeholder="Модель, серия, название или S/N" class="field !pl-9">
+            </div>
+        </form>
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-4 sm:px-5">
             <span class="text-sm text-subtle">Найдено {{ number_format($firmwares->total(), 0, ',', ' ') }}</span>
             <form method="GET" action="{{ route('firmwares.index') }}" class="flex items-center gap-2 text-xs text-subtle">

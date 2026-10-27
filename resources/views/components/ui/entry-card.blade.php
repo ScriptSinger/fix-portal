@@ -1,7 +1,7 @@
-@props(['url', 'image' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null, 'placeholder' => false, 'images' => [], 'rounded' => false, 'solved' => false])
+@props(['url', 'image' => null, 'title', 'excerpt', 'date', 'author', 'views', 'category' => null, 'categoryUrl' => null, 'placeholder' => false, 'images' => [], 'rounded' => true, 'solved' => false])
 {{-- Карточка записи для сетки: на телефоне компактная строка (миниатюра слева), от sm карточка с картинкой сверху.
      placeholder: если у записи нет картинки (или она не загрузилась), вместо неё светлая плитка с жёлтым «?». --}}
-<article @class(['group flex bg-white sm:flex-col', 'overflow-hidden rounded-2xl shadow-sm' => $rounded])>
+<article @class(['group flex bg-white sm:flex-col', 'overflow-hidden rounded-card shadow-sm' => $rounded])>
     @if ($image || $placeholder)
         <a href="{{ $url }}" tabindex="-1" aria-hidden="true"
             class="relative block aspect-square w-[104px] shrink-0 overflow-hidden {{ $placeholder ? 'bg-brand-50' : 'bg-surface' }} sm:aspect-[16/10] sm:w-full">

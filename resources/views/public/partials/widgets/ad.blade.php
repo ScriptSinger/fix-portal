@@ -1,7 +1,7 @@
 {{-- Рекламный блок показывается только в проде и только когда админ включил рекламу (Настройки → Реклама); место резервируется, чтобы страница не прыгала --}}
 @production
 @if (\App\Models\SiteSetting::adsEnabled())
-    <section class="mb-6 min-h-[250px] rounded-[5px] bg-white p-5" aria-label="Реклама">
+    <section class="mb-6 min-h-[250px] rounded-card bg-white p-5" aria-label="Реклама">
         <div id="yandex_rtb_R-A-1966455-2"></div>
     </section>
     @push('scripts')

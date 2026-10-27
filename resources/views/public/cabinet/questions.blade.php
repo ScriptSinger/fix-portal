@@ -12,7 +12,7 @@
 @endsection
 
 @section('content')
-    <section class="rounded-2xl bg-white px-5 py-2 shadow-sm">
+    <section class="rounded-card bg-white px-5 py-2 shadow-sm">
         @forelse ($questions as $question)
             @include('public.cabinet.question-row', ['question' => $question])
         @empty

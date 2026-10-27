@@ -88,11 +88,13 @@
 
     <div id="lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Изображение">
         <div class="max-h-full w-full max-w-[800px] overflow-y-auto rounded border border-black/20 bg-white">
-            <div class="flex justify-end border-b border-[#e9ecef] p-4">
+            <div class="flex items-center justify-end border-b border-[#e9ecef] p-4">
+                <span data-lightbox-count class="mr-auto text-sm text-subtle" aria-live="polite"></span>
                 <button type="button" data-lightbox-close class="text-2xl leading-none text-black/50 hover:text-black" aria-label="Закрыть">&times;</button>
             </div>
-            <div class="p-4"><img src="" alt="" class="w-full"></div>
+            <div class="p-4"><img src="" alt="" class="w-full transition-opacity duration-150"></div>
         </div>
+        <span data-lightbox-spinner hidden class="pointer-events-none absolute left-1/2 top-1/2 size-10 -translate-x-1/2 -translate-y-1/2 animate-spin rounded-full border-4 border-white/40 border-t-white motion-reduce:animate-none" aria-hidden="true"></span>
         <button type="button" data-lightbox-prev hidden aria-label="Предыдущее фото" class="fixed left-2 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-2xl leading-none text-black shadow-lg hover:bg-white sm:left-6">&lsaquo;</button>
         <button type="button" data-lightbox-next hidden aria-label="Следующее фото" class="fixed right-2 top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-2xl leading-none text-black shadow-lg hover:bg-white sm:right-6">&rsaquo;</button>
     </div>

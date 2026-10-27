@@ -5,7 +5,7 @@
 @section('no-sidebar', true)
 
 @section('content')
-    <div class="mx-auto max-w-[640px] rounded-[5px] bg-white px-8 py-12 text-center max-sm:px-4">
+    <div class="mx-auto max-w-[640px] rounded-card bg-white px-8 py-12 text-center max-sm:px-4">
         <p class="text-[72px] font-bold leading-none text-brand-400">404</p>
         <h1 class="mt-4 text-[28px] font-bold leading-9 text-black">Страница не найдена</h1>
         <p class="mt-3">Возможно, адрес изменился или статья удалена. Попробуйте поиск или перейдите в нужный раздел.</p>

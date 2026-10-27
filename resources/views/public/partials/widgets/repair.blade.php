@@ -1,5 +1,5 @@
 @php
-    $card = 'mb-6 rounded-[5px] bg-white p-5';
+    $card = 'mb-6 rounded-card bg-white p-5';
 @endphp
 @php
 @endphp
@@ -27,8 +27,8 @@
     <div class="grid gap-2">
         @foreach ($services as [$name, $img])
             <div class="flex min-h-[138px] items-end border border-line bg-cover bg-center p-3"
-                style="background-image: linear-gradient(rgba(255,255,255,.28), rgba(255,255,255,.3)), url('{{ asset('assets/front/images/service/' . $img) }}')">
-                <div class="text-lg font-bold leading-[1.3] text-service">{{ $name }}</div>
+                style="background-image: linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,.05) 100%), url('{{ asset('assets/front/images/service/' . $img) }}')">
+                <div class="text-lg font-bold leading-[1.3] text-white [text-shadow:0_1px_6px_rgba(0,0,0,.6)]">{{ $name }}</div>
             </div>
         @endforeach
     </div>

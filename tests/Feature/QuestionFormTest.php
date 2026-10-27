@@ -48,12 +48,23 @@ class QuestionFormTest extends TestCase
         $user = User::factory()->create();
         $data = $this->valid(['description' => 'Не греет вода <b>совсем</b>, ТЭН проверил, он целый, плату не смотрел.']);
 
-        $this->actingAs($user)->post(route('questions.store'), $data)->assertRedirect(route('questions.index'));
+        $this->actingAs($user)->post(route('questions.store'), $data);
 
         $question = Question::where('title', $data['title'])->firstOrFail();
+        $this->get(route('questions.show', ['question' => $question->slug]))->assertOk();
         $this->assertSame($user->id, $question->user_id);
         $this->assertStringContainsString('&lt;b&gt;совсем&lt;/b&gt;', $question->description);
         $this->assertSame('E03', $question->error_code);
+    }
+
+    public function test_after_publishing_the_user_lands_on_the_new_question(): void
+    {
+        $data = $this->valid();
+
+        $response = $this->actingAs(User::factory()->create())->post(route('questions.store'), $data);
+
+        $question = Question::where('title', $data['title'])->firstOrFail();
+        $response->assertRedirect(route('questions.show', ['question' => $question->slug]))->assertSessionHas('success', 'Вопрос опубликован');
     }
 
     public function test_title_description_and_appliance_are_validated(): void
@@ -100,7 +111,7 @@ class QuestionFormTest extends TestCase
         $this->actingAs(User::factory()->create())->put($url, $payload)->assertForbidden();
 
         $this->actingAs($owner)->put($url, array_merge($payload, ['description' => 'Дополнил: после замены насоса ошибка пропала, но вода ещё остаётся.']))
-            ->assertSessionHasNoErrors()->assertRedirect(route('questions.index'));
+            ->assertSessionHasNoErrors()->assertRedirect(route('questions.show', ['question' => $question->slug]));
         $this->assertStringContainsString('после замены насоса', $question->refresh()->description);
     }
 

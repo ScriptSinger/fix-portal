@@ -4,8 +4,11 @@
     @auth('web')
         <x-questions.form collapsed :action="route('questions.store')" :appliances="$appliances" :selected="$selected ?? null" />
     @else
-        <p class="m-0 rounded-2xl bg-white px-5 py-4 shadow-sm">Чтобы задать вопрос, необходимо
-            <a class="font-bold text-black underline" href="{{ route('register') }}">зарегистрироваться</a>
-            или <a class="font-bold text-black underline" href="{{ route('login') }}">войти</a></p>
+        {{-- Гость видит то же приглашение, что и вошедший; по нажатию его просят войти и после входа возвращают к форме (questions.create ведёт на #ask) --}}
+        <a href="{{ route('questions.create') }}" class="keep ask-pulse flex items-center gap-3 rounded-card bg-white px-4 py-3 text-ink no-underline shadow-sm ring-2 ring-brand-400 sm:px-5">
+            <x-ui.writing-pencil />
+            <span class="flex-1 text-[15px]">Задать вопрос</span>
+            <span class="text-xs text-subtle">нужен вход</span>
+        </a>
     @endauth
 </div>

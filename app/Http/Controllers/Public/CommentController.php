@@ -24,7 +24,9 @@ class CommentController extends Controller
         abort_if($text === '', 422, 'Пустое сообщение');
         $comment = $commentable->comments()->create(['text' => $text, 'user_id' => $userId]);
         $this->notifier->answered($comment, auth()->user());
-        return redirect()->back();
+
+        // возвращаем к новому сообщению, а не в начало страницы
+        return redirect()->back()->withFragment('c-' . $comment->id);
     }
 
     public function destroy($id)
