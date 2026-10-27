@@ -120,6 +120,7 @@ class FirmwareController extends Controller
 
         $firmware->increment('views_count');
         $firmware->refresh();
+        $firmware->load(['comments.user.avatar', 'comments.reactions', 'comments.replies.user.avatar', 'comments.replies.reactions']);
 
         return view('public.firmwares.show', compact('firmware'));
     }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\Public\MasterController;
 use App\Http\Controllers\Api\Public\UserImageController;
 
 
-use App\Http\Controllers\Public\LikeController;
 use App\Http\Controllers\Public\ReactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,11 +34,6 @@ Route::group(
     ],
     function () {
         Route::post('/reactions/{type}/{id}', [ReactionController::class, 'toggle'])->whereIn('type', ['comment', 'reply'])->name('reactions.toggle');
-
-        Route::prefix('/{type}/{id}/')->group(function () {
-            Route::post('/like', [LikeController::class, 'like'])->name('like');
-            Route::post('/dislike', [LikeController::class, 'dislike'])->name('dislike');
-        });
 
         // Загружать могут только пользователи с подтверждённой почтой и не чаще 20 файлов в минуту
         Route::post('users-images', [UserImageController::class, 'upload'])

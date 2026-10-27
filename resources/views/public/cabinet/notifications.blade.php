@@ -42,12 +42,12 @@
                 $n = $set->first(); $d = $n->data; $actor = $actors->get($d['actor_id'] ?? 0); $isNew = $set->contains(fn ($x) => $x->read_at === null);
                 $others = $set->count() - 1;
                 $who = '<b>' . e($d['actor_name'] ?? 'Участник') . '</b>' . ($others > 0 ? ' и ещё ' . $others . ' ' . trans_choice('человек|человека|человек', $others, [], 'ru') : '');
-                $title = '<b>«' . e(\Illuminate\Support\Str::limit($d['question_title'] ?? '', 70)) . '»</b>';
+                $title = '<b>«' . e(\Illuminate\Support\Str::limit(($d['title'] ?? $d['question_title'] ?? ''), 70)) . '»</b>';
                 $text = match ($d['kind'] ?? '') {
                     'answer' => $who . ' ответил на ваш вопрос ' . $title,
-                    'reply' => $who . ' ответил вам в вопросе ' . $title,
+                    'reply' => $who . ' ответил вам в ' . ($d['in'] ?? 'вопросе') . ' ' . $title,
                     'solution' => $who . ' отметил ваш ответ решением в вопросе ' . $title,
-                    'reaction' => $who . ' поставил реакцию <span class="emoji">' . e($d['emoji'] ?? '') . '</span> на ваше сообщение в вопросе ' . $title,
+                    'reaction' => $who . ' поставил реакцию <span class="emoji">' . e($d['emoji'] ?? '') . '</span> на ваше сообщение в ' . ($d['in'] ?? 'вопросе') . ' ' . $title,
                     default => $who . ' ' . $title,
                 };
             @endphp

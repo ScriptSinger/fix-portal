@@ -82,8 +82,6 @@ class Post extends Model
         static::deleting(function ($post) {
             $post->comments()->each(function ($comment) {
                 $comment->replies()->delete();
-                $comment->likes()->delete();
-                $comment->dislikes()->delete();
             });
             $post->comments()->delete();
         });
@@ -91,8 +89,6 @@ class Post extends Model
         static::restoring(function ($post) {
             $post->comments()->withTrashed()->each(function ($comment) {
                 $comment->replies()->withTrashed()->restore();
-                $comment->likes()->withTrashed()->restore();
-                $comment->dislikes()->withTrashed()->restore();
             });
             $post->comments()->withTrashed()->restore();
         });

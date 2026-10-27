@@ -37,13 +37,5 @@ class Reply extends Model
         return $this->morphMany(Reaction::class, 'reactable');
     }
 
-    public function likes(): MorphMany
-    {
-        return $this->morphMany(Like::class, 'likeable');
-    }
 
-    public function dislikes(): MorphMany
-    {
-        return $this->morphMany(Dislike::class, 'dislikeable');
-    }
 }

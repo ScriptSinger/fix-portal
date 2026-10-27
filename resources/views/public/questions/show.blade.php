@@ -29,7 +29,7 @@
             ] : null,
             'suggestedAnswer' => $answers->map(fn ($a) => [
                 '@type' => 'Answer', 'text' => $plain($a->text) ?: 'Ответ с фотографией', 'dateCreated' => $a->created_at?->toIso8601String(),
-                'url' => $url . '#comments', 'upvoteCount' => (int) ($a->likes_count ?? 0),
+                'url' => $url . '#comments', 'upvoteCount' => $a->reactions->where('emoji', '👍')->count(),
                 'author' => ['@type' => 'Person', 'name' => optional($a->user)->name ?: 'Посетитель'],
             ])->values()->all() ?: null,
         ], fn ($v) => $v !== null),

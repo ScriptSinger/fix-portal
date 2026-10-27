@@ -22,12 +22,14 @@
     $storeUrl = route('comments.store', ['type' => strtolower(class_basename($instance)), 'id' => $instance->id]);
     $day = null;
     $isQuestion = $instance instanceof \App\Models\Question;
+    // одна лента для вопросов, статей и прошивок; слова только разные: у вопроса «ответы», у остальных «комментарии»
+    $words = $isQuestion ? ['Ответы', 'Пока нет ответов, напишите первым', 'Написать ответ', 'Чтобы ответить'] : ['Комментарии', 'Пока нет комментариев, напишите первым', 'Написать комментарий', 'Чтобы написать комментарий'];
     $solution = $isQuestion ? $instance->solution() : null;
     $meId = auth('web')->id();
     $solved = \App\Services\Reputation::counts($items->pluck('model.user_id')->unique()->values()->all());
     $iAmAuthor = $isQuestion && $meId && $instance->user_id === $meId;
 @endphp
-<section id="comments" aria-label="Ответы" class="mt-4" @scroll.window.passive="measure()" @resize.window="measure()" x-init="measure()" x-data="{
+<section id="comments" aria-label="{{ $words[0] }}" class="mt-4" @scroll.window.passive="measure()" @resize.window="measure()" x-init="measure()" x-data="{
     target: null, base: @js($storeUrl), photos: [], busy: false, error: '', far: false,
     measure() { this.far = this.$root.getBoundingClientRect().bottom - window.innerHeight > 240; },
     // едем к концу ленты: поле ввода закреплено и всегда «в кадре», так что scrollIntoView к нему не работал, а $el в обработчике кнопки это сама кнопка, поэтому берём $root
@@ -56,9 +58,9 @@
     <div class="flex justify-center">
         <h2 class="m-0 rounded-full bg-black/5 px-3 py-0.5 text-xs font-medium leading-5 text-subtle">
             @if ($total)
-                Ответы · {{ $total }} {{ trans_choice('сообщение|сообщения|сообщений', $total, [], 'ru') }} · {{ $people }} {{ trans_choice('участник|участника|участников', $people, [], 'ru') }}
+                {{ $words[0] }} · {{ $total }} {{ trans_choice('сообщение|сообщения|сообщений', $total, [], 'ru') }} · {{ $people }} {{ trans_choice('участник|участника|участников', $people, [], 'ru') }}
             @else
-                Пока нет ответов, напишите первым
+                {{ $words[1] }}
             @endif
         </h2>
     </div>
@@ -193,7 +195,7 @@
                         <svg class="size-6" :class="busy && 'animate-pulse'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.5l-8.6 8.6a5.5 5.5 0 01-7.8-7.8l8.9-8.9a3.7 3.7 0 015.2 5.2l-8.9 8.9a1.8 1.8 0 01-2.6-2.6l8.2-8.2" /></svg>
                     </button>
                     <label for="chat-text" class="sr-only">Сообщение</label>
-                    <textarea id="chat-text" x-ref="text" name="text" rows="1" placeholder="Написать ответ" @input="grow($el)"
+                    <textarea id="chat-text" x-ref="text" name="text" rows="1" placeholder="{{ $words[2] }}" @input="grow($el)"
                         @keydown.ctrl.enter.prevent="$el.form.requestSubmit()" @paste="attach([...$event.clipboardData.files])"
                         class="max-h-40 min-w-0 flex-1 resize-none border-0 bg-transparent px-1 py-[11px] text-[15px] leading-[22px] text-ink outline-none focus:ring-0"></textarea>
                     <button type="submit" aria-label="Отправить" :disabled="busy"
@@ -208,7 +210,7 @@
             </form>
         @endauth
         @guest
-            <p class="m-0">Чтобы ответить, необходимо
+            <p class="m-0">{{ $words[3] }}, необходимо
                 <a class="font-bold text-black underline" href="{{ route('register') }}">зарегистрироваться</a>
                 или <a class="font-bold text-black underline" href="{{ route('login') }}">войти</a></p>
         @endguest

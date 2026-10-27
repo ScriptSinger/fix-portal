@@ -3,30 +3,36 @@
 namespace App\Services;
 
 use App\Models\Comment;
+use App\Models\Firmware;
+use App\Models\Post;
 use App\Models\Question;
 use App\Models\Reply;
 use App\Models\User;
 use App\Notifications\ActivityNotification;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-/** Создаёт уведомления кабинета. Себе и о сообщениях не в вопросах не пишем. */
+/**
+ * Создаёт уведомления кабинета. Обсуждение везде одинаковое (вопросы, статьи, прошивки), поэтому события тоже.
+ * Себе не пишем. «Ответили на ваш вопрос» и «решение» бывают только у вопросов: у статей и прошивок нет автора-пользователя.
+ */
 class ActivityNotifier
 {
     public function answered(Comment $comment, User $actor): void
     {
-        $question = $comment->commentable;
-        if (! $question instanceof Question || ! $question->user || $question->user_id === $actor->id) {
+        $subject = $comment->commentable;
+        if (! $subject instanceof Question || ! $subject->user || $subject->user_id === $actor->id) {
             return;
         }
 
-        $question->user->notify(new ActivityNotification($this->payload(ActivityNotification::ANSWER, $actor, $question, 'c-' . $comment->id, $comment->text)));
+        $subject->user->notify(new ActivityNotification($this->payload(ActivityNotification::ANSWER, $actor, $subject, 'c-' . $comment->id, $comment->text)));
     }
 
     public function replied(Reply $reply, User $actor): void
     {
         $comment = $reply->comment;
-        $question = $comment?->commentable;
-        if (! $question instanceof Question) {
+        $subject = $comment?->commentable;
+        if (! $subject || ! $this->describe($subject)) {
             return;
         }
 
@@ -36,14 +42,14 @@ class ActivityNotifier
             $targets->push($quoted->user);
         }
         foreach ($targets->filter()->unique('id')->reject(fn (User $u) => $u->id === $actor->id) as $user) {
-            $user->notify(new ActivityNotification($this->payload(ActivityNotification::REPLY, $actor, $question, 'r-' . $reply->id, $reply->text)));
+            $user->notify(new ActivityNotification($this->payload(ActivityNotification::REPLY, $actor, $subject, 'r-' . $reply->id, $reply->text)));
         }
     }
 
     public function reacted(Comment|Reply $message, User $actor, string $emoji): void
     {
-        $question = $message instanceof Comment ? $message->commentable : $message->comment?->commentable;
-        if (! $question instanceof Question || ! $message->user || $message->user_id === $actor->id) {
+        $subject = $message instanceof Comment ? $message->commentable : $message->comment?->commentable;
+        if (! $subject || ! $this->describe($subject) || ! $message->user || $message->user_id === $actor->id) {
             return;
         }
 
@@ -55,7 +61,7 @@ class ActivityNotifier
             return;
         }
 
-        $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::REACTION, $actor, $question, $anchor, $message->text, $emoji)));
+        $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::REACTION, $actor, $subject, $anchor, $message->text, $emoji)));
     }
 
     /** Автору ответа: его ответ отмечен решением. */
@@ -69,16 +75,29 @@ class ActivityNotifier
         $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::SOLUTION, $actor, $question, $anchor, $message->text)));
     }
 
-    private function payload(string $kind, User $actor, Question $question, string $anchor, ?string $text, ?string $emoji = null): array
+    /** Название, адрес и «где» (в вопросе, в статье, в прошивке) страницы, под которой написали. */
+    private function describe(Model $subject): ?array
     {
+        return match (true) {
+            $subject instanceof Question => ['title' => $subject->title, 'url' => route('questions.show', ['question' => $subject->slug]), 'in' => 'вопросе'],
+            $subject instanceof Post => ['title' => $subject->title, 'url' => route('articles.show', ['article' => $subject->slug]), 'in' => 'статье'],
+            $subject instanceof Firmware => ['title' => $subject->title, 'url' => route('firmwares.show', ['firmware' => $subject->id]), 'in' => 'прошивке'],
+            default => null,
+        };
+    }
+
+    private function payload(string $kind, User $actor, Model $subject, string $anchor, ?string $text, ?string $emoji = null): array
+    {
+        $info = $this->describe($subject);
         $plain = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) $text), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
 
         return array_filter([
             'kind' => $kind,
             'actor_id' => $actor->id,
             'actor_name' => $actor->name,
-            'question_title' => $question->title,
-            'url' => route('questions.show', ['question' => $question->slug]) . '#' . $anchor,
+            'title' => $info['title'],
+            'in' => $info['in'],
+            'url' => $info['url'] . '#' . $anchor,
             'target_id' => $anchor,
             'snippet' => Str::limit($plain, 140),
             'emoji' => $emoji,

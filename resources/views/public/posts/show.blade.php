@@ -5,6 +5,9 @@
 @section('og-type', 'article')
 @section('og-image', $post->thumbnail?->original ?? asset('assets/front/images/power_unit.jpg'))
 @section('main-pt', 'pt-8')
+@auth('web')
+    @section('has-composer', '1')
+@endauth
 
 @section('hero')
     <x-ui.breadcrumbs :items="[
@@ -99,8 +102,8 @@
         </section>
     @endif
 
-    <div class="mt-8 bg-white p-5 sm:p-8 lg:p-10">
-        @include('public.partials.comments', ['instance' => $post])
+    <div class="mt-8">
+        @include('public.partials.chat', ['instance' => $post])
     </div>
 @endsection
 

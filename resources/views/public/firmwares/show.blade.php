@@ -1,5 +1,8 @@
 @extends('public.layouts.app')
 @section('title', $firmware->meta_title . ' | ' . config('app.name', 'Ufamasters'))
+@auth('web')
+    @section('has-composer', '1')
+@endauth
 @section('description', $firmware->meta_description)
 @section('canonical', route('firmwares.show', ['firmware' => $firmware->canonical_id]))
 @if (! $firmware->has_file)
@@ -108,7 +111,7 @@
         </section>
     @endif
 
-    <div class="mt-6 bg-white p-5 sm:p-8">
-        @include('public.partials.comments', ['instance' => $firmware])
+    <div class="mt-6">
+        @include('public.partials.chat', ['instance' => $firmware])
     </div>
 @endsection

@@ -41,6 +41,9 @@ class PostController extends Controller
         $post = Post::where('slug', $slug)
             ->with([
                 'comments.user.avatar',
+                'comments.reactions',
+                'comments.replies.user.avatar',
+                'comments.replies.reactions',
                 'ctas' => fn($query) => $query
                     ->where('is_active', true)
                     ->orderByDesc('priority')
