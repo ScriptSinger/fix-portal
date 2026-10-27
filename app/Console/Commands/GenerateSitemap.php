@@ -11,6 +11,7 @@ use App\Models\Tag;
 use App\Models\User;
 use App\Services\FirmwareCatalog;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
 
@@ -21,7 +22,7 @@ class GenerateSitemap extends Command
      *
      * @var string
      */
-    protected $signature = 'sitemap:generate';
+    protected $signature = 'sitemap:generate {--path= : Куда записать файл (по умолчанию public/sitemap.xml)}';
 
     /**
      * The console command description.
@@ -35,27 +36,45 @@ class GenerateSitemap extends Command
      */
     public function handle()
     {
-        $outputPath = public_path('sitemap.xml');
+        $outputPath = $this->option('path') ?: public_path('sitemap.xml');
         $sitemap = Sitemap::create();
 
         $this->addStaticUrls($sitemap);
         $this->addModelUrls($sitemap);
 
-        $sitemap->writeToFile($outputPath);
+        // Пишем во временный файл и переименовываем: поисковик, пришедший во время записи, не увидит половину карты
+        $temporary = $outputPath . '.tmp';
+        $sitemap->writeToFile($temporary);
+        rename($temporary, $outputPath);
 
         $this->info("Sitemap successfully generated: {$outputPath}");
     }
 
     private function addStaticUrls(Sitemap $sitemap): void
     {
-        $sitemap->add($this->makeUrl(route('home'), now(), 1.0, Url::CHANGE_FREQUENCY_DAILY));
-        $sitemap->add($this->makeUrl(route('articles.index'), now(), 0.9, Url::CHANGE_FREQUENCY_DAILY));
-        $sitemap->add($this->makeUrl(route('about'), now(), 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
-        $sitemap->add($this->makeUrl(route('how-it-works'), now(), 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
+        // Дата изменения в карте должна быть настоящей: у списков это дата последней записи в них,
+        // у текстовых страниц («О нас», «Как это работает») реальной даты в данных нет, поэтому её не указываем совсем
+        // (лучше пропустить дату, чем писать «сегодня» при каждой генерации: поисковики перестают ей верить).
+        $sitemap->add($this->makeUrl(route('home'), $this->latest(Post::class), 1.0, Url::CHANGE_FREQUENCY_DAILY));
+        $sitemap->add($this->makeUrl(route('articles.index'), $this->latest(Post::class), 0.9, Url::CHANGE_FREQUENCY_DAILY));
+        $sitemap->add($this->makeUrl(route('about'), null, 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
+        $sitemap->add($this->makeUrl(route('how-it-works'), null, 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
         // $sitemap->add($this->makeUrl(route('users.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
-        $sitemap->add($this->makeUrl(route('tags.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
-        $sitemap->add($this->makeUrl(route('questions.index'), now(), 0.8, Url::CHANGE_FREQUENCY_DAILY));
-        $sitemap->add($this->makeUrl(route('firmwares.index'), now(), 0.9, Url::CHANGE_FREQUENCY_DAILY));
+        $sitemap->add($this->makeUrl(route('tags.index'), $this->latest(Tag::class), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
+        $sitemap->add($this->makeUrl(route('questions.index'), $this->latest(Question::class), 0.8, Url::CHANGE_FREQUENCY_DAILY));
+        $sitemap->add($this->makeUrl(route('firmwares.index'), $this->latest(Firmware::class), 0.9, Url::CHANGE_FREQUENCY_DAILY));
+    }
+
+    /** Дата последнего изменения среди записей модели (по умолчанию все записи) или null, если записей нет. */
+    private function latest(string $model, ?\Closure $scope = null): ?Carbon
+    {
+        $query = $model::query();
+        if ($scope) {
+            $scope($query);
+        }
+        $value = $query->max('updated_at');
+
+        return $value ? Carbon::parse($value) : null;
     }
 
     private function addModelUrls(Sitemap $sitemap): void
@@ -145,7 +164,7 @@ class GenerateSitemap extends Command
         foreach ($catalog->brands() as $brand) {
             $sitemap->add($this->makeUrl(
                 route('firmwares.brand', ['brand' => $brand['slug']]),
-                now(),
+                $this->latest(Firmware::class, fn ($q) => $q->where('brand', $brand['name'])),
                 0.8,
                 Url::CHANGE_FREQUENCY_WEEKLY
             ));
@@ -153,7 +172,7 @@ class GenerateSitemap extends Command
             foreach ($catalog->seriesList($brand['name']) as $row) {
                 $sitemap->add($this->makeUrl(
                     route('firmwares.series', ['brand' => $brand['slug'], 'series' => $row['slug']]),
-                    now(),
+                    $this->latest(Firmware::class, fn ($q) => $q->where('brand', $brand['name'])->where('series', $row['series'])),
                     0.7,
                     Url::CHANGE_FREQUENCY_WEEKLY
                 ));

@@ -12,3 +12,5 @@ Disallow: /firmwares/*/download
 Disallow: /login
 Disallow: /register
 Disallow: /admin
+
+Sitemap: https://ufamasters.ru/sitemap.xml
