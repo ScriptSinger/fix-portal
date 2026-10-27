@@ -59,9 +59,10 @@ class TelegramChannel implements AnnouncementChannel
 
     public function send(Question $question): ?string
     {
-        // тема нужна только при отправке: правка и удаление находят сообщение по его номеру
+        // тема нужна только при отправке: правка и удаление находят сообщение по его номеру.
+        // Тема «Общая» имеет номер 1, но Telegram не принимает его в запросе (message thread not found): для неё номер не указывают
         $thread = (int) config('services.telegram.thread_id');
-        $response = $this->call('sendMessage', $this->payload($question) + ($thread > 0 ? ['message_thread_id' => $thread] : []));
+        $response = $this->call('sendMessage', $this->payload($question) + ($thread > 1 ? ['message_thread_id' => $thread] : []));
 
         $id = $response->json('result.message_id');
 

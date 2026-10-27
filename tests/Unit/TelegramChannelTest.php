@@ -184,6 +184,16 @@ class TelegramChannelTest extends TestCase
         Http::assertSent(fn (Request $request) => $request['message_thread_id'] === 42);
     }
 
+    public function test_general_topic_number_is_not_sent_because_telegram_rejects_it(): void
+    {
+        $this->configure(['thread_id' => '1']);
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
+
+        (new TelegramChannel())->send($this->question());
+
+        Http::assertSent(fn (Request $request) => ! isset($request['message_thread_id']));
+    }
+
     public function test_without_a_topic_the_message_has_no_thread_and_edits_never_have_one(): void
     {
         $this->configure(['thread_id' => null]);
