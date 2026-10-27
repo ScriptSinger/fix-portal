@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AnnouncementStatus;
 use App\Jobs\SendQuestionAnnouncement;
 use App\Models\QuestionAnnouncement;
 use App\Models\User;
@@ -31,7 +32,7 @@ class AnnouncementsAdminTest extends TestCase
         ]);
     }
 
-    private function announcement(string $status): QuestionAnnouncement
+    private function announcement(AnnouncementStatus $status): QuestionAnnouncement
     {
         $question = $this->makeQuestion(User::factory()->create());
 
@@ -46,7 +47,7 @@ class AnnouncementsAdminTest extends TestCase
 
     public function test_admin_sees_the_list_with_questions_and_retry_for_failed(): void
     {
-        $failed = $this->announcement(QuestionAnnouncement::FAILED);
+        $failed = $this->announcement(AnnouncementStatus::Failed);
 
         $this->actingAs($this->admin(), 'moonshine')
             ->get(app(QuestionAnnouncementResource::class)->getIndexPageUrl())
@@ -59,7 +60,7 @@ class AnnouncementsAdminTest extends TestCase
 
     public function test_card_shows_the_last_error(): void
     {
-        $failed = $this->announcement(QuestionAnnouncement::FAILED);
+        $failed = $this->announcement(AnnouncementStatus::Failed);
 
         $this->actingAs($this->admin(), 'moonshine')
             ->get(app(QuestionAnnouncementResource::class)->getDetailPageUrl($failed->id))
@@ -75,31 +76,31 @@ class AnnouncementsAdminTest extends TestCase
     public function test_retry_button_requeues_a_failed_announcement(): void
     {
         Queue::fake();
-        $failed = $this->announcement(QuestionAnnouncement::FAILED);
+        $failed = $this->announcement(AnnouncementStatus::Failed);
         $resource = app(QuestionAnnouncementResource::class);
         $url = $resource->getAsyncMethodUrl('retry', params: ['resourceItem' => $failed->id], page: $resource->getIndexPage());
 
         $this->actingAs($this->admin(), 'moonshine')->get($url)->assertOk();
 
-        $this->assertSame(QuestionAnnouncement::PENDING, $failed->refresh()->status);
+        $this->assertSame(AnnouncementStatus::Pending, $failed->refresh()->status);
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
     }
 
     public function test_retry_requeues_only_a_failed_announcement(): void
     {
         Queue::fake();
-        $failed = $this->announcement(QuestionAnnouncement::FAILED);
-        $sent = $this->announcement(QuestionAnnouncement::SENT);
+        $failed = $this->announcement(AnnouncementStatus::Failed);
+        $sent = $this->announcement(AnnouncementStatus::Sent);
         $announcer = app(QuestionAnnouncer::class);
 
         $this->assertTrue($announcer->retry($failed));
         $this->assertFalse($announcer->retry($sent));
 
         $failed->refresh();
-        $this->assertSame(QuestionAnnouncement::PENDING, $failed->status);
+        $this->assertSame(AnnouncementStatus::Pending, $failed->status);
         $this->assertSame(0, $failed->attempts);
         $this->assertNull($failed->last_error);
-        $this->assertSame(QuestionAnnouncement::SENT, $sent->refresh()->status);
+        $this->assertSame(AnnouncementStatus::Sent, $sent->refresh()->status);
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
     }
 }

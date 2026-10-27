@@ -32,10 +32,14 @@ class TelegramChannel implements AnnouncementChannel
             $question->model,
             $question->error_code ? 'ошибка ' . $question->error_code : null,
         ]);
+        $author = $question->user?->name;
 
         return implode("\n\n", array_filter([
             '<b>' . $this->escape($question->title) . '</b>',
-            $facts ? $this->escape(implode(' · ', $facts)) : null,
+            implode("\n", array_filter([
+                $facts ? $this->escape(implode(' · ', $facts)) : null,
+                $author ? 'Спрашивает: ' . $this->escape($author) : null,
+            ])),
             $this->escape(PlainText::from($question->description, self::EXCERPT)),
             route('questions.show', ['question' => $question->slug]),
         ]));
@@ -43,7 +47,7 @@ class TelegramChannel implements AnnouncementChannel
 
     public function send(Question $question): ?string
     {
-        $question->loadMissing('appliance');
+        $question->loadMissing(['appliance', 'user']);
         $token = (string) config('services.telegram.bot_token');
         $url = rtrim((string) config('services.telegram.api_url'), '/') . '/bot' . $token . '/sendMessage';
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources;
 
+use App\Enums\AnnouncementStatus;
 use App\Models\QuestionAnnouncement;
 use App\MoonShine\Pages\AnnouncementsIndexPage;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
@@ -14,9 +15,9 @@ use MoonShine\Support\Attributes\Icon;
 use MoonShine\Support\Enums\Action;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Date;
+use MoonShine\UI\Fields\Enum;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
-use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
@@ -66,17 +67,7 @@ class QuestionAnnouncementResource extends BaseResource
             ID::make()->sortable(),
             BelongsTo::make('Вопрос', 'question', 'title', QuestionResource::class),
             Text::make('Канал', 'channel'),
-            Text::make('Статус', 'status')
-                ->badge(fn (string $status) => match ($status) {
-                    QuestionAnnouncement::SENT => 'success',
-                    QuestionAnnouncement::FAILED => 'error',
-                    default => 'warning',
-                })
-                ->changePreview(fn (string $status) => match ($status) {
-                    QuestionAnnouncement::SENT => 'Отправлено',
-                    QuestionAnnouncement::FAILED => 'Не удалось',
-                    default => 'В очереди',
-                }),
+            Enum::make('Статус', 'status')->attach(AnnouncementStatus::class),
             Number::make('Попытки', 'attempts'),
             Date::make('Отправлено', 'sent_at')->format('d.m.Y H:i')->sortable(),
             Date::make('Создано', 'created_at')->format('d.m.Y H:i')->sortable(),
@@ -95,11 +86,7 @@ class QuestionAnnouncementResource extends BaseResource
     protected function filters(): iterable
     {
         return [
-            Select::make('Статус', 'status')->options([
-                QuestionAnnouncement::PENDING => 'В очереди',
-                QuestionAnnouncement::SENT => 'Отправлено',
-                QuestionAnnouncement::FAILED => 'Не удалось',
-            ])->nullable(),
+            Enum::make('Статус', 'status')->attach(AnnouncementStatus::class)->nullable(),
         ];
     }
 

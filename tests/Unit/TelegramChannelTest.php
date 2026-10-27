@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use App\Models\Appliance;
 use App\Models\Question;
+use App\Models\User;
 use App\Services\Announcements\Channels\TelegramChannel;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Request;
@@ -34,17 +35,38 @@ class TelegramChannelTest extends TestCase
             'error_code' => 'E03',
         ]);
 
-        return $question->setRelation('appliance', (new Appliance())->forceFill(['title' => 'Стиральная машина']));
+        return $question
+            ->setRelation('appliance', (new Appliance())->forceFill(['title' => 'Стиральная машина']))
+            ->setRelation('user', (new User())->forceFill(['name' => 'Иван']));
     }
 
-    public function test_text_has_title_facts_excerpt_and_link(): void
+    public function test_text_has_title_facts_author_excerpt_and_link(): void
     {
         $text = (new TelegramChannel())->text($this->question());
 
         $this->assertStringContainsString('<b>Стиралка не сливает воду</b>', $text);
-        $this->assertStringContainsString('Стиральная машина · Beko WKL 13540 K · ошибка E03', $text);
+        $this->assertStringContainsString("Стиральная машина · Beko WKL 13540 K · ошибка E03\nСпрашивает: Иван", $text);
         $this->assertStringContainsString('Вода остаётся в баке, насос гудит.', $text);
         $this->assertStringContainsString(route('questions.show', ['question' => 'stiralka-ne-slivaet']), $text);
+        $this->assertStringNotContainsString('utm_', $text);
+    }
+
+    public function test_question_without_author_has_no_author_line(): void
+    {
+        $text = (new TelegramChannel())->text($this->question()->setRelation('user', null));
+
+        $this->assertStringNotContainsString('Спрашивает', $text);
+    }
+
+    public function test_author_name_is_escaped(): void
+    {
+        $question = $this->question();
+        $question->setRelation('user', (new User())->forceFill(['name' => '<i>Хакер</i> & Ко']));
+
+        $text = (new TelegramChannel())->text($question);
+
+        $this->assertStringNotContainsString('<i>', $text);
+        $this->assertStringContainsString('Спрашивает: &lt;i&gt;Хакер&lt;/i&gt; &amp; Ко', $text);
     }
 
     public function test_user_text_cannot_inject_html(): void

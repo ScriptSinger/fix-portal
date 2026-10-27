@@ -2,6 +2,7 @@
 
 namespace App\Services\Announcements;
 
+use App\Enums\AnnouncementStatus;
 use App\Jobs\SendQuestionAnnouncement;
 use App\Models\Question;
 use App\Models\QuestionAnnouncement;
@@ -28,11 +29,11 @@ class QuestionAnnouncer
     /** Повторная отправка неудавшейся записи: счётчик попыток обнуляется, задача ставится заново. */
     public function retry(QuestionAnnouncement $announcement): bool
     {
-        if ($announcement->status !== QuestionAnnouncement::FAILED) {
+        if ($announcement->status !== AnnouncementStatus::Failed) {
             return false;
         }
 
-        $announcement->update(['status' => QuestionAnnouncement::PENDING, 'attempts' => 0, 'last_error' => null]);
+        $announcement->update(['status' => AnnouncementStatus::Pending, 'attempts' => 0, 'last_error' => null]);
         SendQuestionAnnouncement::dispatch($announcement->id);
 
         return true;
@@ -48,7 +49,7 @@ class QuestionAnnouncer
             try {
                 $announcement = QuestionAnnouncement::firstOrCreate(
                     ['question_id' => $question->id, 'channel' => $name],
-                    ['status' => QuestionAnnouncement::PENDING],
+                    ['status' => AnnouncementStatus::Pending],
                 );
 
                 if ($announcement->wasRecentlyCreated) {

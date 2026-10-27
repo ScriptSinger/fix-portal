@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\AnnouncementStatus;
 use App\Models\QuestionAnnouncement;
 use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Bus\Queueable;
@@ -33,7 +34,7 @@ class SendQuestionAnnouncement implements ShouldQueue
         $channel = $announcement ? $announcer->channel($announcement->channel) : null;
 
         // отправлено раньше, вопрос удалён, канал выключен: делать нечего
-        if (! $announcement || $announcement->status === QuestionAnnouncement::SENT || ! $announcement->question || $announcement->question->trashed() || ! $channel?->enabled()) {
+        if (! $announcement || $announcement->status === AnnouncementStatus::Sent || ! $announcement->question || $announcement->question->trashed() || ! $channel?->enabled()) {
             return;
         }
 
@@ -46,7 +47,7 @@ class SendQuestionAnnouncement implements ShouldQueue
         }
 
         $announcement->update([
-            'status' => QuestionAnnouncement::SENT,
+            'status' => AnnouncementStatus::Sent,
             'attempts' => $announcement->attempts + 1,
             'last_error' => null,
             'external_id' => $externalId,
@@ -56,6 +57,6 @@ class SendQuestionAnnouncement implements ShouldQueue
 
     public function failed(\Throwable $e): void
     {
-        QuestionAnnouncement::whereKey($this->announcementId)->update(['status' => QuestionAnnouncement::FAILED]);
+        QuestionAnnouncement::whereKey($this->announcementId)->update(['status' => AnnouncementStatus::Failed]);
     }
 }

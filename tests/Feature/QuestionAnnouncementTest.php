@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AnnouncementStatus;
 use App\Jobs\SendQuestionAnnouncement;
 use App\Models\Appliance;
 use App\Models\QuestionAnnouncement;
@@ -45,7 +46,7 @@ class QuestionAnnouncementTest extends TestCase
         app(QuestionAnnouncer::class)->announce($question);
 
         $this->assertSame(1, QuestionAnnouncement::where('question_id', $question->id)->count());
-        $this->assertSame('pending', $question->announcements()->first()->status);
+        $this->assertSame(AnnouncementStatus::Pending, $question->announcements()->first()->status);
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
     }
 
@@ -102,7 +103,7 @@ class QuestionAnnouncementTest extends TestCase
         (new SendQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
 
         $announcement->refresh();
-        $this->assertSame('sent', $announcement->status);
+        $this->assertSame(AnnouncementStatus::Sent, $announcement->status);
         $this->assertSame('99', $announcement->external_id);
         $this->assertSame(1, $announcement->attempts);
         $this->assertNotNull($announcement->sent_at);
@@ -113,7 +114,7 @@ class QuestionAnnouncementTest extends TestCase
         $this->telegram();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 99]])]);
         $announcement = $this->announcement();
-        $announcement->update(['status' => 'sent']);
+        $announcement->update(['status' => AnnouncementStatus::Sent]);
 
         (new SendQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
 
@@ -133,7 +134,7 @@ class QuestionAnnouncementTest extends TestCase
         }
 
         $announcement->refresh();
-        $this->assertSame('pending', $announcement->status);
+        $this->assertSame(AnnouncementStatus::Pending, $announcement->status);
         $this->assertSame(1, $announcement->attempts);
         $this->assertStringNotContainsString('SECRET-TOKEN', (string) $announcement->last_error);
     }
@@ -144,7 +145,7 @@ class QuestionAnnouncementTest extends TestCase
 
         (new SendQuestionAnnouncement($announcement->id))->failed(new \RuntimeException('Telegram: down'));
 
-        $this->assertSame('failed', $announcement->refresh()->status);
+        $this->assertSame(AnnouncementStatus::Failed, $announcement->refresh()->status);
     }
 
     public function test_deleted_question_is_not_announced(): void

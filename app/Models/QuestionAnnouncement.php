@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\AnnouncementStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -10,13 +11,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class QuestionAnnouncement extends Model
 {
-    public const PENDING = 'pending';
-    public const SENT = 'sent';
-    public const FAILED = 'failed';
-
     protected $fillable = ['question_id', 'channel', 'status', 'attempts', 'last_error', 'external_id', 'sent_at'];
 
-    protected $casts = ['sent_at' => 'datetime'];
+    protected $casts = ['status' => AnnouncementStatus::class, 'sent_at' => 'datetime'];
 
     public function question(): BelongsTo
     {

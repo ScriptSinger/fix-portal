@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Pages;
 
+use App\Enums\AnnouncementStatus;
 use App\Models\QuestionAnnouncement;
 use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class AnnouncementsIndexPage extends IndexPage
         return parent::buttons()->add(
             ActionButton::make('Повторить')
                 ->icon('arrow-path')
-                ->canSee(fn (QuestionAnnouncement $announcement) => $announcement->status === QuestionAnnouncement::FAILED)
+                ->canSee(fn (QuestionAnnouncement $announcement) => $announcement->status === AnnouncementStatus::Failed)
                 ->method('retry', events: [$this->getListEventName()])
         );
     }
