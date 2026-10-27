@@ -53,6 +53,14 @@ return [
         'api_url' => env('TELEGRAM_API_URL', 'https://api.telegram.org'),
     ],
 
+    // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.
+    // Пока токен или группа пусты, канал выключен. Не путать с vkid выше: это вход на сайт.
+    'vk_group' => [
+        'token' => env('VK_GROUP_TOKEN'),
+        'group_id' => env('VK_GROUP_ID'),
+        'version' => env('VK_API_VERSION', '5.199'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

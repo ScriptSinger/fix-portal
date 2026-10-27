@@ -88,9 +88,8 @@ class TelegramChannel implements AnnouncementChannel
             'chat_id' => config('services.telegram.chat_id'),
             'text' => $this->text($question),
             'parse_mode' => 'HTML',
-            // Карточку ссылки строит краулер Telegram, а он до сайта не доходит: вместо неё кнопка
+            // Карточку ссылки строит краулер Telegram, а он до сайта не доходит: пустая карточка не нужна
             'link_preview_options' => ['is_disabled' => true],
-            'reply_markup' => ['inline_keyboard' => [[['text' => 'Открыть вопрос на сайте', 'url' => $this->url($question)]]]],
         ];
     }
 

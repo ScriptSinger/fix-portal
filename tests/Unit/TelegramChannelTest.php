@@ -121,7 +121,7 @@ class TelegramChannelTest extends TestCase
         });
     }
 
-    public function test_message_has_a_button_to_the_question_and_no_link_preview(): void
+    public function test_message_has_the_link_in_the_text_without_button_and_link_preview(): void
     {
         $this->configure();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
@@ -130,13 +130,9 @@ class TelegramChannelTest extends TestCase
 
         $channel->send($question);
 
-        Http::assertSent(function (Request $request) use ($channel, $question) {
-            $button = $request['reply_markup']['inline_keyboard'][0][0] ?? [];
-
-            return $request['link_preview_options'] === ['is_disabled' => true]
-                && $button['text'] === 'Открыть вопрос на сайте'
-                && $button['url'] === $channel->url($question);
-        });
+        Http::assertSent(fn (Request $request) => $request['link_preview_options'] === ['is_disabled' => true]
+            && ! isset($request['reply_markup'])
+            && str_contains($request['text'], $channel->url($question)));
     }
 
     public function test_api_url_can_point_to_a_relay(): void
@@ -192,7 +188,7 @@ class TelegramChannelTest extends TestCase
                 && $request['chat_id'] === '-5494489427'
                 && $request['message_id'] === 55
                 && str_contains($request['text'], 'Новый заголовок вопроса про насос')
-                && $request['reply_markup']['inline_keyboard'][0][0]['url'] === $channel->url($question);
+                && str_contains($request['text'], $channel->url($question));
         });
     }
 

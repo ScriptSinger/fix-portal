@@ -10,6 +10,7 @@ use App\Models\Question;
 use App\Models\QuestionAnnouncement;
 use App\Services\Announcements\Channels\AnnouncementChannel;
 use App\Services\Announcements\Channels\TelegramChannel;
+use App\Services\Announcements\Channels\VkChannel;
 use Illuminate\Support\Facades\Log;
 
 /** Ставит новый вопрос в очередь на отправку в каждый настроенный канал. Сбой здесь не мешает публикации вопроса. */
@@ -19,8 +20,9 @@ class QuestionAnnouncer
     public function channels(): array
     {
         $telegram = app(TelegramChannel::class);
+        $vk = app(VkChannel::class);
 
-        return [$telegram->name() => $telegram];
+        return [$telegram->name() => $telegram, $vk->name() => $vk];
     }
 
     public function channel(string $name): ?AnnouncementChannel

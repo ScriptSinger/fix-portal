@@ -54,6 +54,31 @@ class QuestionAnnouncementTest extends TestCase
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
     }
 
+    public function test_each_enabled_channel_gets_its_own_record_and_job(): void
+    {
+        $this->telegram();
+        config(['services.vk_group' => ['token' => 'vk-token', 'group_id' => '123456', 'version' => '5.199']]);
+        Queue::fake();
+        $question = $this->makeQuestion(User::factory()->create());
+
+        app(QuestionAnnouncer::class)->announce($question);
+
+        $this->assertEqualsCanonicalizing(['telegram', 'vk'], $question->announcements()->pluck('channel')->all());
+        Queue::assertPushed(SendQuestionAnnouncement::class, 2);
+    }
+
+    public function test_only_the_configured_channel_is_used(): void
+    {
+        $this->telegram(false);
+        config(['services.vk_group' => ['token' => 'vk-token', 'group_id' => '123456', 'version' => '5.199']]);
+        Queue::fake();
+        $question = $this->makeQuestion(User::factory()->create());
+
+        app(QuestionAnnouncer::class)->announce($question);
+
+        $this->assertSame(['vk'], $question->announcements()->pluck('channel')->all());
+    }
+
     public function test_disabled_channel_does_nothing(): void
     {
         $this->telegram(false);
