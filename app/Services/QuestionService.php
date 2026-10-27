@@ -4,15 +4,25 @@ namespace App\Services;
 
 use App\Models\Question;
 use App\Models\User;
+use App\Services\Announcements\QuestionAnnouncer;
 use App\Support\ContentImages;
 use App\Support\MessageBody;
 
 /** Сохранение вопроса: текст экранируется, к нему добавляются только собственные фото автора. */
 class QuestionService
 {
+    public function __construct(private readonly QuestionAnnouncer $announcer)
+    {
+    }
+
     public function create(User $author, array $data): Question
     {
-        return Question::create($this->fields($author, $data));
+        $question = Question::create($this->fields($author, $data));
+
+        // вопрос уходит в чат мастеров; без настроенных каналов ничего не происходит
+        $this->announcer->announce($question);
+
+        return $question;
     }
 
     public function update(Question $question, User $editor, array $data): Question

@@ -44,6 +44,15 @@ return [
         'redirect' => env('VKID_REDIRECT_URI', rtrim((string) env('APP_URL'), '/') . '/auth/vkid/callback'),
     ],
 
+    // Бот пишет новые вопросы в чат мастеров. Пока токен или чат пусты, канал выключен.
+    // Telegram недоступен с сервера, поэтому запросы идут через HTTP-прокси (TELEGRAM_PROXY=http://логин:пароль@хост:порт)
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'chat_id' => env('TELEGRAM_CHAT_ID'),
+        'proxy' => env('TELEGRAM_PROXY'),
+        'api_url' => env('TELEGRAM_API_URL', 'https://api.telegram.org'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),

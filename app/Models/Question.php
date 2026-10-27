@@ -76,6 +76,11 @@ class Question extends Model
         return $this->morphMany(Comment::class, 'commentable');
     }
 
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(QuestionAnnouncement::class);
+    }
+
     public function getSrcFromContentAttribute()
     {
         $html = $this->attributes['description'];
