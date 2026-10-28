@@ -219,7 +219,11 @@ class QuestionRemindersTest extends TestCase
         Http::fake();
         $this->makeQuestion(User::factory()->create());
 
-        $this->artisan('questions:digest', ['--dry-run' => true])->assertSuccessful();
+        $count = Question::unanswered()->count();
+
+        $this->artisan('questions:digest', ['--dry-run' => true])
+            ->expectsOutputToContain('На сайте сейчас ' . $count . ' ')
+            ->assertSuccessful();
 
         Http::assertNothingSent();
     }

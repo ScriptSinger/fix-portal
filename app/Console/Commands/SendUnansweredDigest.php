@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Question;
+use App\Services\Announcements\Channels\TelegramChannel;
 use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Console\Command;
 
@@ -26,7 +27,9 @@ class SendUnansweredDigest extends Command
         $url = route('questions.index', ['status' => 'unanswered']);
 
         if ($this->option('dry-run')) {
-            $this->line("Сводка: {$count} вопросов без ответа, ссылка {$url}");
+            // точный текст, который уйдёт в чат
+            $this->line('В чат ушло бы:');
+            $this->line(app(TelegramChannel::class)->digestText($count, $url));
 
             return self::SUCCESS;
         }
