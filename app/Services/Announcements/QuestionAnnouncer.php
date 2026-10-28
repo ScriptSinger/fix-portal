@@ -129,8 +129,11 @@ class QuestionAnnouncer
         return true;
     }
 
-    public function announce(Question $question): void
+    /** Ставит вопрос в очередь на отправку в каждый настроенный канал, где его ещё не было. Возвращает, сколько отправок поставлено. */
+    public function announce(Question $question): int
     {
+        $queued = 0;
+
         foreach ($this->channels() as $name => $channel) {
             if (! $channel->enabled()) {
                 continue;
@@ -144,10 +147,13 @@ class QuestionAnnouncer
 
                 if ($announcement->wasRecentlyCreated) {
                     SendQuestionAnnouncement::dispatch($announcement->id)->afterCommit();
+                    $queued++;
                 }
             } catch (\Throwable $e) {
                 Log::error("Не удалось поставить вопрос {$question->id} в очередь канала {$name}: {$e->getMessage()}");
             }
         }
+
+        return $queued;
     }
 }

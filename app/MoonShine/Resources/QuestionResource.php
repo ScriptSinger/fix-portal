@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\Question;
+use App\MoonShine\Pages\QuestionsIndexPage;
+use App\MoonShine\Pages\ResourceFormPage;
 use App\MoonShine\Support\TinyMceUpload;
 use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
+use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\TinyMce\Fields\TinyMce;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
@@ -38,6 +41,18 @@ class QuestionResource extends BaseResource
     public function getTitle(): string
     {
         return 'Вопросы';
+    }
+
+    /**
+     * @return list<class-string>
+     */
+    protected function pages(): array
+    {
+        return [
+            QuestionsIndexPage::class,
+            ResourceFormPage::class,
+            DetailPage::class,
+        ];
     }
 
     protected function indexFields(): iterable
