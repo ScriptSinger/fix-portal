@@ -1,23 +1,17 @@
 <?php
 
 /**
- * Собирает картинку для превью ссылок (og:image) 1200×630: фирменный жёлтый фон, плитка «U» из иконки сайта
- * и название. Только бренд, без подписей: описание страницы соцсеть показывает рядом с картинкой сама.
- * Вес около 40 КБ вместо 1,1 МБ у прежнего снимка с фотоаппарата.
+ * Собирает картинку для превью ссылок (og:image) 1200×630: фирменный жёлтый фон и плитка «U» из иконки сайта
+ * по центру. Только знак, без текста: VK и мессенджеры в чате показывают превью квадратной миниатюрой,
+ * обрезая картинку по центру, и любой текст сбоку оказывался бы разрезан. Описание страницы соцсеть показывает рядом сама.
+ * Вес около 20 КБ вместо 1,1 МБ у прежнего снимка с фотоаппарата.
  *
- * Использование (нужен шрифт Roboto Slab Bold в формате ttf; в репозитории его нет, берётся с Google Fonts):
- *   php tools/make-og-image.php /путь/к/RobotoSlab-Bold.ttf
+ * Использование:
+ *   php tools/make-og-image.php
  */
 
 const WIDTH = 1200;
 const HEIGHT = 630;
-
-$font = $argv[1] ?? null;
-
-if (! $font || ! is_file($font)) {
-    fwrite(STDERR, "Укажите путь к шрифту RobotoSlab-Bold.ttf первым аргументом.\n");
-    exit(1);
-}
 
 $root = dirname(__DIR__);
 $icon = $root . '/public/assets/front/images/favicon_io/android-chrome-512x512.png';
@@ -25,41 +19,17 @@ $out = $root . '/public/assets/front/images/og-default.jpg';
 
 $image = imagecreatetruecolor(WIDTH, HEIGHT);
 $yellow = imagecolorallocate($image, 0xf9, 0xca, 0x27);
-$ink = imagecolorallocate($image, 0x11, 0x11, 0x11);
 imagefill($image, 0, 0, $yellow);
 
-/** Размер шрифта, при котором текст помещается в ширину. */
-$fit = function (string $text, int $size, int $maxWidth) use ($font): int {
-    while ($size > 12) {
-        $box = imagettfbbox($size, 0, $font, $text);
-
-        if (($box[2] - $box[0]) <= $maxWidth) {
-            break;
-        }
-
-        $size--;
-    }
-
-    return $size;
-};
-
-$name = 'Ufamasters';
-$tile = 300;
-$gap = 56;
-$size = $fit($name, 108, 640);
-$box = imagettfbbox($size, 0, $font, $name);
-$textWidth = $box[2] - $box[0];
-
-// Плитка и название стоят одной группой по центру
-$groupWidth = $tile + $gap + $textWidth;
-$left = (int) ((WIDTH - $groupWidth) / 2);
+// Плитка по центру; в квадратной миниатюре (центральные 630×630) она остаётся целой с запасом по краям
+$tile = 400;
+$left = (int) ((WIDTH - $tile) / 2);
 $top = (int) ((HEIGHT - $tile) / 2);
-
-// Плитка с буквой U, углы скруглены цветом фона
 $source = imagecreatefrompng($icon);
 imagecopyresampled($image, $source, $left, $top, 0, 0, $tile, $tile, imagesx($source), imagesy($source));
 
-$radius = 44;
+// Углы плитки скруглены цветом фона
+$radius = 56;
 foreach ([[0, 0], [1, 0], [0, 1], [1, 1]] as [$cx, $cy]) {
     for ($dx = 0; $dx < $radius; $dx++) {
         for ($dy = 0; $dy < $radius; $dy++) {
@@ -74,10 +44,6 @@ foreach ([[0, 0], [1, 0], [0, 1], [1, 1]] as [$cx, $cy]) {
         }
     }
 }
-
-// Название по вертикали по центру плитки: baseline считается из высоты букв
-$baseline = (int) (HEIGHT / 2 - ($box[7] + $box[1]) / 2);
-imagettftext($image, $size, 0, $left + $tile + $gap - $box[0], $baseline, $ink, $font, $name);
 
 imageinterlace($image, true);
 imagejpeg($image, $out, 82);
