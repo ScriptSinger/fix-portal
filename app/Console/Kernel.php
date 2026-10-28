@@ -27,6 +27,21 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->onFailure(fn () => Log::critical('Ночная резервная копия базы не снята или не загружена в облако: см. вывод db:backup.'));
 
+        // Напоминание в чат о вопросах без ответа: один раз, днём по Уфе (мастера отвечают добровольно, ночью не тревожим)
+        $schedule->command('questions:remind')
+            ->hourly()
+            ->between('9:00', '21:00')
+            ->timezone('Asia/Yekaterinburg')
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::error('Не удалось отправить напоминания о вопросах: см. вывод questions:remind.'));
+
+        // Раз в неделю одним сообщением: сколько вопросов ждут ответа
+        $schedule->command('questions:digest')
+            ->weeklyOn(1, '10:00')
+            ->timezone('Asia/Yekaterinburg')
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::error('Не удалось отправить сводку по вопросам без ответа: см. вывод questions:digest.'));
+
         // Не подтвердил почту за неделю и ничего не делал на сайте: это бот или брошенная регистрация, удаляем навсегда
         $schedule->command('users:prune-unverified --apply')
             ->dailyAt('04:00')

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\AnnouncementKind;
 use App\Enums\AnnouncementStatus;
 use App\Models\QuestionAnnouncement;
 use App\Services\Announcements\QuestionAnnouncer;
@@ -39,7 +40,9 @@ class SendQuestionAnnouncement implements ShouldQueue
         }
 
         try {
-            $externalId = $channel->send($announcement->question);
+            $externalId = $announcement->kind === AnnouncementKind::Reminder
+                ? $channel->remind($announcement->question, $this->originalMessageId($announcement))
+                : $channel->send($announcement->question);
         } catch (\Throwable $e) {
             $announcement->update(['attempts' => $announcement->attempts + 1, 'last_error' => mb_substr($e->getMessage(), 0, 1000)]);
 
@@ -53,6 +56,17 @@ class SendQuestionAnnouncement implements ShouldQueue
             'external_id' => $externalId,
             'sent_at' => now(),
         ]);
+    }
+
+    /** Номер сообщения с самим вопросом в том же канале: на него отвечает напоминание. */
+    private function originalMessageId(QuestionAnnouncement $reminder): ?string
+    {
+        return QuestionAnnouncement::where([
+            'question_id' => $reminder->question_id,
+            'channel' => $reminder->channel,
+            'kind' => AnnouncementKind::New,
+            'status' => AnnouncementStatus::Sent,
+        ])->value('external_id');
     }
 
     public function failed(\Throwable $e): void

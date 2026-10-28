@@ -68,6 +68,22 @@ class VkChannel implements AnnouncementChannel
         return $id === null ? null : (string) $id;
     }
 
+    /** Напоминания и сводки только в Telegram: повторные публикации на стене VK исправить нельзя, они её засоряют. */
+    public function canRemind(): bool
+    {
+        return false;
+    }
+
+    public function remind(Question $question, ?string $originalId): ?string
+    {
+        return null;
+    }
+
+    public function digest(int $count, string $url): ?string
+    {
+        return null;
+    }
+
     /** VK не даёт ключу сообщества править записи: правка вопроса на стене не отражается (см. canModify). */
     public function update(Question $question, string $externalId): void
     {

@@ -59,11 +59,83 @@ class TelegramChannel implements AnnouncementChannel
 
     public function send(Question $question): ?string
     {
-        // тема нужна только при отправке: правка и удаление находят сообщение по его номеру.
-        // Тема «Общая» имеет номер 1, но Telegram не принимает его в запросе (message thread not found): для неё номер не указывают
-        $thread = (int) config('services.telegram.thread_id');
-        $response = $this->call('sendMessage', $this->payload($question) + ($thread > 1 ? ['message_thread_id' => $thread] : []));
+        return $this->messageId($this->call('sendMessage', $this->payload($question) + $this->thread()));
+    }
 
+    public function canRemind(): bool
+    {
+        return true;
+    }
+
+    /** Текст напоминания: просьба, а не требование, и без привязки к поломке (человек может искать прошивку). */
+    public function reminderText(Question $question): string
+    {
+        return implode("\n\n", [
+            'Этот вопрос пока без ответа. Если разбираетесь в теме, загляните, пожалуйста.',
+            '<b>' . $this->escape($question->title) . '</b>',
+            $this->url($question),
+        ]);
+    }
+
+    public function remind(Question $question, ?string $originalId): ?string
+    {
+        $payload = [
+            'chat_id' => config('services.telegram.chat_id'),
+            'text' => $this->reminderText($question),
+            'parse_mode' => 'HTML',
+            'link_preview_options' => ['is_disabled' => true],
+        ];
+
+        // ответом на исходное сообщение: в чате видна связь; если его уже нет, напоминание уйдёт обычным
+        if ($originalId) {
+            $payload['reply_parameters'] = ['message_id' => (int) $originalId, 'allow_sending_without_reply' => true];
+        }
+
+        return $this->messageId($this->call('sendMessage', $payload + $this->thread()));
+    }
+
+    public function digestText(int $count, string $url): string
+    {
+        return "На сайте сейчас {$count} " . $this->questionWord($count) . " без ответа. Если будет время и желание, загляните: {$url}\nСпасибо всем, кто помогает!";
+    }
+
+    public function digest(int $count, string $url): ?string
+    {
+        return $this->messageId($this->call('sendMessage', [
+            'chat_id' => config('services.telegram.chat_id'),
+            'text' => $this->digestText($count, $url),
+            'link_preview_options' => ['is_disabled' => true],
+        ] + $this->thread()));
+    }
+
+    /** вопрос, вопроса, вопросов */
+    private function questionWord(int $n): string
+    {
+        $last = $n % 10;
+        $lastTwo = $n % 100;
+
+        return match (true) {
+            $last === 1 && $lastTwo !== 11 => 'вопрос',
+            $last >= 2 && $last <= 4 && ($lastTwo < 10 || $lastTwo >= 20) => 'вопроса',
+            default => 'вопросов',
+        };
+    }
+
+    /**
+     * Тема форум-группы нужна только при отправке: правка и удаление находят сообщение по его номеру.
+     * Тема «Общая» имеет номер 1, но Telegram не принимает его в запросе (message thread not found): для неё номер не указывают.
+     *
+     * @return array<string, int>
+     */
+    private function thread(): array
+    {
+        $thread = (int) config('services.telegram.thread_id');
+
+        return $thread > 1 ? ['message_thread_id' => $thread] : [];
+    }
+
+    private function messageId(Response $response): ?string
+    {
         $id = $response->json('result.message_id');
 
         return $id === null ? null : (string) $id;

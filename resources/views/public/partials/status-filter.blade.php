@@ -1,7 +1,7 @@
-{{-- Фильтр списка вопросов: все, решённые, без решения (только вопросы, созданные после запуска отметок) --}}
+{{-- Фильтр списка вопросов: все, решённые, без решения (только вопросы, созданные после запуска отметок), без ответов (любой давности) --}}
 @php
-    $current = in_array(request('status'), ['solved', 'open'], true) ? request('status') : null;
-    $tabs = [null => 'Все', 'solved' => 'Решённые', 'open' => 'Без решения'];
+    $current = in_array(request('status'), ['solved', 'open', 'unanswered'], true) ? request('status') : null;
+    $tabs = [null => 'Все', 'solved' => 'Решённые', 'open' => 'Без решения', 'unanswered' => 'Без ответов'];
     $base = request()->except(['status', 'page']);
 @endphp
 <nav aria-label="Статус вопросов" class="mb-4 flex flex-wrap gap-2">

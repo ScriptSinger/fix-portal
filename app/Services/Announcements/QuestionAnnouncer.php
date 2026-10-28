@@ -2,6 +2,7 @@
 
 namespace App\Services\Announcements;
 
+use App\Enums\AnnouncementKind;
 use App\Enums\AnnouncementStatus;
 use App\Jobs\RetractQuestionAnnouncement;
 use App\Jobs\SendQuestionAnnouncement;
@@ -42,7 +43,8 @@ class QuestionAnnouncer
             }
 
             try {
-                $id = QuestionAnnouncement::where(['question_id' => $question->id, 'channel' => $name, 'status' => AnnouncementStatus::Sent])->value('id');
+                // обновляется только сообщение о вопросе: текст напоминания не зависит от правок
+                $id = QuestionAnnouncement::where(['question_id' => $question->id, 'channel' => $name, 'kind' => AnnouncementKind::New, 'status' => AnnouncementStatus::Sent])->value('id');
 
                 if ($id) {
                     UpdateQuestionAnnouncement::dispatch($id)->delay(now()->addSeconds(self::EDIT_DELAY_SECONDS))->afterCommit();
@@ -53,8 +55,48 @@ class QuestionAnnouncer
         }
     }
 
+    /** Ставит напоминание о вопросе без ответа в очередь каналов, которые умеют напоминать. Возвращает, сколько отправок поставлено. */
+    public function remind(Question $question): int
+    {
+        $queued = 0;
+
+        foreach ($this->channels() as $name => $channel) {
+            if (! $channel->enabled() || ! $channel->canRemind()) {
+                continue;
+            }
+
+            $reminder = QuestionAnnouncement::firstOrCreate(
+                ['question_id' => $question->id, 'channel' => $name, 'kind' => AnnouncementKind::Reminder],
+                ['status' => AnnouncementStatus::Pending],
+            );
+
+            if ($reminder->wasRecentlyCreated) {
+                SendQuestionAnnouncement::dispatch($reminder->id)->afterCommit();
+                $queued++;
+            }
+        }
+
+        return $queued;
+    }
+
+    /** Еженедельная сводка в каналы, которые умеют её слать. Сбой одного канала не мешает остальным. */
+    public function digest(int $count, string $url): void
+    {
+        foreach ($this->channels() as $name => $channel) {
+            if (! $channel->enabled() || ! $channel->canRemind()) {
+                continue;
+            }
+
+            try {
+                $channel->digest($count, $url);
+            } catch (\Throwable $e) {
+                Log::error("Не удалось отправить сводку в канал {$name}: {$e->getMessage()}");
+            }
+        }
+    }
+
     /**
-     * Вопрос удаляется: его сообщения в чатах убираются. Записи об отправках исчезнут вместе с вопросом,
+     * Вопрос удаляется: его сообщения в чатах убираются (и объявление, и напоминание). Записи об отправках исчезнут вместе с вопросом,
      * поэтому в задачу уходят канал и номер сообщения, а не сама запись.
      */
     public function retract(Question $question): void
@@ -96,7 +138,7 @@ class QuestionAnnouncer
 
             try {
                 $announcement = QuestionAnnouncement::firstOrCreate(
-                    ['question_id' => $question->id, 'channel' => $name],
+                    ['question_id' => $question->id, 'channel' => $name, 'kind' => AnnouncementKind::New],
                     ['status' => AnnouncementStatus::Pending],
                 );
 

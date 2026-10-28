@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources;
 
+use App\Enums\AnnouncementKind;
 use App\Enums\AnnouncementStatus;
 use App\Models\QuestionAnnouncement;
 use App\MoonShine\Pages\AnnouncementsIndexPage;
@@ -67,6 +68,7 @@ class QuestionAnnouncementResource extends BaseResource
             ID::make()->sortable(),
             BelongsTo::make('Вопрос', 'question', 'title', QuestionResource::class),
             Text::make('Канал', 'channel'),
+            Enum::make('Вид', 'kind')->attach(AnnouncementKind::class),
             Enum::make('Статус', 'status')->attach(AnnouncementStatus::class),
             Number::make('Попытки', 'attempts'),
             LocalDate::make('Отправлено', 'sent_at')->format('d.m.Y H:i')->sortable(),
@@ -87,6 +89,7 @@ class QuestionAnnouncementResource extends BaseResource
     {
         return [
             Enum::make('Статус', 'status')->attach(AnnouncementStatus::class)->nullable(),
+            Enum::make('Вид', 'kind')->attach(AnnouncementKind::class)->nullable(),
         ];
     }
 

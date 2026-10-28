@@ -36,6 +36,18 @@ class Question extends Model
     /** Отметку «решён» ведём с этой даты: у старых вопросов статуса нет, и «без решения» к ним не относится. */
     public const SOLUTION_TRACKING_SINCE = '2026-10-26';
 
+    /**
+     * Вопросы без ответа: не решены и нет ни одного комментария от другого человека
+     * (комментарий самого автора ответом не считается).
+     */
+    public function scopeUnanswered($query)
+    {
+        return $query->whereNull('solved_at')->whereDoesntHave(
+            'comments',
+            fn ($comments) => $comments->whereColumn('comments.user_id', '!=', 'questions.user_id')
+        );
+    }
+
     public function isSolved(): bool
     {
         return $this->solved_at !== null;
