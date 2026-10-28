@@ -23,8 +23,8 @@ use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
 #[Icon('paper-airplane')]
-#[Group('Контент', 'document-text')]
-#[Order(5)]
+#[Group('Рассылки', 'megaphone')]
+#[Order(1)]
 /**
  * @extends ModelResource<QuestionAnnouncement>
  */
