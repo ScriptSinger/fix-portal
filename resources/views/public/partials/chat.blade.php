@@ -91,7 +91,7 @@
                         <x-ui.photo-grid :photos="$e->photos" :alt="$e->isReply() ? 'Ответ' : 'Комментарий'" class="my-1 rounded-lg" />
                     @endif
                     @if ($e->body !== '')
-                        <div class="article-content {{ $e->body === strip_tags($e->body) ? 'whitespace-pre-line' : '' }} text-[15px] leading-[1.45] [overflow-wrap:anywhere]">{!! \App\Support\ContentImages::withAlt($e->body, $e->isReply() ? 'Ответ' : 'Комментарий') !!}</div>
+                        <div class="article-content {{ $e->body === strip_tags($e->body) ? 'whitespace-pre-line' : '' }} text-[15px] leading-[1.45] [overflow-wrap:anywhere]">{!! \App\Support\Linkify::html(\App\Support\ContentImages::withAlt($e->body, $e->isReply() ? 'Ответ' : 'Комментарий')) !!}</div>
                     @endif
 
                     <div class="mt-1 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">

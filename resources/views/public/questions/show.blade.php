@@ -66,7 +66,7 @@
 
             <x-ui.photo-grid :photos="$photos" :alt="$question->title" />
 
-            <div class="article-content {{ $bodyHtml === strip_tags($bodyHtml) ? 'whitespace-pre-line' : '' }} px-4 pt-3 text-[15px] leading-[1.5] [overflow-wrap:anywhere] sm:px-5">{!! $bodyHtml !!}</div>
+            <div class="article-content {{ $bodyHtml === strip_tags($bodyHtml) ? 'whitespace-pre-line' : '' }} px-4 pt-3 text-[15px] leading-[1.5] [overflow-wrap:anywhere] sm:px-5">{!! \App\Support\Linkify::html($bodyHtml) !!}</div>
 
             <footer class="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 px-4 pb-2 pt-1 text-xs leading-5 text-subtle sm:px-5">
                 @if (auth('web')->id() === $question->user_id)

@@ -26,6 +26,21 @@ class DiscussionTest extends TestCase
     }
 
     #[DataProvider('entityProvider')]
+    public function test_urls_in_a_message_are_shown_as_links_without_trusting_the_markup(string $kind): void
+    {
+        $subject = $this->subject($kind);
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('comments.store', ['type' => $kind, 'id' => $subject->id]), [
+            'text' => "Смотрите https://ufamasters.ru/firmwares?search=wiun100.s19.\n<script>alert(1)</script>",
+        ])->assertRedirect();
+
+        $this->get($this->pageOf($subject))->assertOk()
+            ->assertSee('<a href="https://ufamasters.ru/firmwares?search=wiun100.s19" target="_blank" rel="nofollow noopener noreferrer ugc">', false)
+            ->assertDontSee('<script>alert(1)</script>', false);
+    }
+
+    #[DataProvider('entityProvider')]
     public function test_comment_is_stored_escaped(string $kind): void
     {
         $subject = $this->subject($kind);
