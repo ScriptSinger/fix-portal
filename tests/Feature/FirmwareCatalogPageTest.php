@@ -77,6 +77,25 @@ class FirmwareCatalogPageTest extends TestCase
         $this->get(route('firmwares.index', ['search' => 'SN9988776655']))->assertOk()->assertSee($f->title);
     }
 
+    public function test_search_finds_a_firmware_by_the_board_code_inside_a_pasted_serial_number(): void
+    {
+        $code = (string) random_int(10_000_000_000, 99_999_999_999);
+        $f = $this->row('WIUN100CSI_' . $code, ['brand' => 'Indesit']);
+        $other = $this->row('WIUN100CSI_' . ($code + 5));
+
+        foreach (["811250175*$code", "s|n 811250175 * $code", "Indesit WIUN 100 csi s/n 811250175*$code"] as $serial) {
+            $this->get(route('firmwares.index', ['search' => $serial]))->assertOk()->assertSee($f->title)->assertDontSee($other->title);
+        }
+    }
+
+    public function test_search_does_not_split_ordinary_words_into_codes(): void
+    {
+        $this->row('PLAIN_' . uniqid());
+
+        // слова и короткие обрывки без длинной цифровой части кодами не считаются
+        $this->get(route('firmwares.index', ['search' => 'Indesit WIUN 100 csi']))->assertOk()->assertDontSee('PLAIN_');
+    }
+
     public function test_search_treats_percent_and_underscore_literally(): void
     {
         $this->row('PLAINTITLE' . uniqid());

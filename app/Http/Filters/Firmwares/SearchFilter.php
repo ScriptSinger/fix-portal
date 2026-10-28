@@ -30,6 +30,26 @@ class SearchFilter
         return $next($builder);
     }
 
+    /**
+     * Коды из строки с разделителями («s/n 811250175*24535420200» → 811250175, 24535420200): не короче 8 знаков, из них не меньше 6 цифр,
+     * чтобы слова вроде «Indesit» и короткие обрывки не давали случайных совпадений. Если разбирать нечего, пусто.
+     *
+     * @return list<string>
+     */
+    private function serialCodes(string $search): array
+    {
+        $parts = preg_split('/[^\p{L}\p{N}]+/u', $search, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        if (count($parts) < 2) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(
+            $parts,
+            fn (string $part) => mb_strlen($part) >= 8 && preg_match_all('/\d/', $part) >= 6
+        )));
+    }
+
     private function apply(Builder $query, string $search): void
     {
         $fast = function ($q) use ($search) {
@@ -53,6 +73,24 @@ class SearchFilter
             $query->where($fast);
 
             return;
+        }
+
+        // серийный номер вставили целиком («811250175*24535420200»): в названии прошивки только код платы, поэтому ищем по частям
+        $codes = $this->serialCodes($search);
+
+        if ($codes) {
+            $byCodes = function ($q) use ($codes) {
+                foreach ($codes as $code) {
+                    $q->orWhere('title', 'like', '%' . SqlLike::escape($code) . '%')
+                        ->orWhere('aliases', 'like', '%' . SqlLike::escape($code) . '%');
+                }
+            };
+
+            if (Cache::remember('firmware.search.codes.' . md5(implode('|', $codes)), 600, fn () => Firmware::query()->where($byCodes)->exists())) {
+                $query->where($byCodes);
+
+                return;
+            }
         }
 
         $query->where(function ($q) use ($fast, $search) {
