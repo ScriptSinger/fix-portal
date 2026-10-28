@@ -18,6 +18,10 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ActivityNotifier
 {
+    public function __construct(private readonly ActivityMailer $mailer)
+    {
+    }
+
     public function answered(Comment $comment, User $actor): void
     {
         $subject = $comment->commentable;
@@ -26,6 +30,7 @@ class ActivityNotifier
         }
 
         $subject->user->notify(new ActivityNotification($this->payload(ActivityNotification::ANSWER, $actor, $subject, 'c-' . $comment->id, $comment->text)));
+        $this->mailer->schedule($subject->user);
     }
 
     public function replied(Reply $reply, User $actor): void
@@ -73,6 +78,7 @@ class ActivityNotifier
 
         $anchor = ($message instanceof Comment ? 'c-' : 'r-') . $message->id;
         $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::SOLUTION, $actor, $question, $anchor, $message->text)));
+        $this->mailer->schedule($message->user);
     }
 
     /** Название, адрес и «где» (в вопросе, в статье, в прошивке) страницы, под которой написали. */

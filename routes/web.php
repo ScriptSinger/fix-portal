@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Public\EmailUnsubscribeController;
 use App\Http\Controllers\Public\FirmwareController;
 use App\Http\Controllers\Public\FirmwareHubController;
 use App\Services\FirmwareCatalog;
@@ -46,6 +47,12 @@ Route::group(
 
 
 Route::redirect('/article/{slug}', '/articles/{slug}', 301);
+
+// Отключение писем по ссылке из письма: без входа, секрет в адресе; POST же вызывает почтовая программа (отписка в один клик)
+Route::middleware('throttle:30,1')->group(function () {
+    Route::get('/email/unsubscribe/{token}', [EmailUnsubscribeController::class, 'show'])->name('email.unsubscribe.show');
+    Route::post('/email/unsubscribe/{token}', [EmailUnsubscribeController::class, 'update'])->name('email.unsubscribe');
+});
 
 
 // Route::get('/users', [UserController::class, 'index'])->name('users.index');

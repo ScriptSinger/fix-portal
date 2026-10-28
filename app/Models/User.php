@@ -15,6 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Notifications\QueuedResetPassword;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -55,10 +56,22 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_seen_at' => 'datetime',
+        'email_notifications' => 'boolean',
     ];
 
     /** Сколько минут после последнего запроса пользователь считается «онлайн» */
     public const ONLINE_MINUTES = 5;
+
+    /** Секрет для ссылки «отключить письма»: создаётся при первом обращении и дальше не меняется. */
+    public function unsubscribeToken(): string
+    {
+        if (! $this->unsubscribe_token) {
+            $this->unsubscribe_token = Str::random(40);
+            $this->saveQuietly();
+        }
+
+        return $this->unsubscribe_token;
+    }
 
     public function scopeOnline($query)
     {

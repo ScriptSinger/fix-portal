@@ -61,6 +61,15 @@
                 </div>
 
                 <div>
+                    <span class="{{ $label }}">Письма</span>
+                    <input type="hidden" name="email_notifications" value="0">
+                    <label class="flex items-start gap-2 text-sm">
+                        <input type="checkbox" name="email_notifications" value="1" class="mt-1 size-4 accent-black" @checked(old('email_notifications', $user->email_notifications))>
+                        <span>Присылать письма, когда мне ответили на вопрос или мой ответ отметили решением</span>
+                    </label>
+                </div>
+
+                <div>
                     <span class="{{ $label }}">Аватар</span>
                     <div class="flex items-center gap-3">
                         <img x-show="preview && !remove" :src="preview" alt="" class="size-10 shrink-0 rounded-full object-cover">

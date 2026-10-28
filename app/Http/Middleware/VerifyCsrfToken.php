@@ -12,6 +12,7 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        // отписка в один клик: запрос приходит от почтовой программы без нашей сессии, защита это секрет в адресе
+        'email/unsubscribe/*',
     ];
 }

@@ -28,6 +28,10 @@ class UserController extends Controller
         if (! empty($data['name'])) {
             $user->name = $data['name'];
         }
+        // переключатель писем приходит всегда вместе с формой; запросы без него (старые формы) настройку не трогают
+        if ($request->has('email_notifications')) {
+            $user->email_notifications = $request->boolean('email_notifications');
+        }
         if (! empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }

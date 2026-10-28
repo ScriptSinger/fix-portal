@@ -22,6 +22,7 @@ class UpdateProfileRequest extends FormRequest
             'bio' => ['nullable', 'string', 'max:512'],
             'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
             'remove_avatar' => ['nullable', 'boolean'],
+            'email_notifications' => ['nullable', 'boolean'],
             'current_password' => ['required_with:password', 'nullable', 'current_password:web'],
             'password' => ['nullable', 'confirmed', Password::defaults()],
         ];
