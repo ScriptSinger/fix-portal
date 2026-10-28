@@ -3,7 +3,7 @@
 @section('description', $post->description)
 @section('canonical', url('/articles/' . $post->slug))
 @section('og-type', 'article')
-@section('og-image', $post->thumbnail?->original ?? asset('assets/front/images/power_unit.jpg'))
+@section('og-image', $post->thumbnail?->original ?? asset('assets/front/images/og-default.jpg'))
 @section('main-pt', 'pt-8')
 @auth('web')
     @section('has-composer', '1')

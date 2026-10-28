@@ -29,8 +29,18 @@
     <meta property="og:title" content="@yield('title')">
     <meta property="og:description" content="@yield('description')">
     <meta property="og:url" content="@hasSection('canonical')@yield('canonical')@else{{ url()->current() }}@endif">
-    @php $ogImage = trim($__env->yieldContent('og-image')) ?: asset('assets/front/images/power_unit.jpg'); @endphp
+    {{-- Картинка по умолчанию лёгкая (1200×630, около 40 КБ): тяжёлое фото соцсети не принимают (VK отвергает запись по правилу размера) или не показывают --}}
+    @php
+        $customOgImage = trim($__env->yieldContent('og-image'));
+        $ogImage = $customOgImage ?: asset('assets/front/images/og-default.jpg');
+    @endphp
     <meta property="og:image" content="{{ \Illuminate\Support\Str::startsWith($ogImage, ['http://', 'https://']) ? $ogImage : url($ogImage) }}">
+    @unless ($customOgImage)
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:alt" content="{{ config('app.name', 'Ufamasters') }}: сообщество по ремонту бытовой техники">
+    @endunless
+    <meta name="twitter:image" content="{{ \Illuminate\Support\Str::startsWith($ogImage, ['http://', 'https://']) ? $ogImage : url($ogImage) }}">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="yandex-verification" content="7843198b5b2a0b60" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
