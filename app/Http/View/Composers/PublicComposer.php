@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Customization;
 use App\Models\Post;
 use App\Models\Question;
+use App\Services\LatestDiscussion;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
@@ -16,13 +17,15 @@ class PublicComposer
     protected $posts;
     protected $categories;
     protected $customization;
+    protected $discussion;
 
-    public function __construct(Post $posts, Category $categories, Customization $customization)
+    public function __construct(Post $posts, Category $categories, Customization $customization, LatestDiscussion $discussion)
     {
 
         $this->posts = $posts;
         $this->categories = $categories;
         $this->customization = $customization;
+        $this->discussion = $discussion;
     }
 
     public function compose(View $view)
@@ -43,6 +46,13 @@ class PublicComposer
 
             Cache::put($cacheKey, $data, 30);
         }
+
+        // Обсуждения должны обновляться чаще, чем остальные данные правой колонки.
+        $data['latest_discussions'] = Cache::remember(
+            'latest_discussions_widget',
+            now()->addMinutes(2),
+            fn () => $this->discussion->get(),
+        );
 
         $view->with($data);
     }

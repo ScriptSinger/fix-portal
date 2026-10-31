@@ -12,6 +12,17 @@
 .discussion-editor:focus-visible,
 .discussion-editor.ProseMirror:focus { outline: none !important; box-shadow: none; }
 
+.telegram-widget-tail {
+    position: absolute;
+    left: -7px;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-top: 7px solid transparent;
+    border-right: 8px solid #fff;
+}
+
+
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 
