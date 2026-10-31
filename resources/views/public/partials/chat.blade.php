@@ -78,7 +78,7 @@
                     text: @js(\App\Support\MessageBody::toPlain($m->text)), isReply: {{ $e->isReply() ? 'true' : 'false' }}, hasImages: {{ $e->photos ? 'true' : 'false' }},
                     updateUrl: @js(route($e->isReply() ? 'comments.replies.update' : 'comments.update', [$e->isReply() ? 'reply' : 'comment' => $m->id])),
                     deleteUrl: @js(route($e->isReply() ? 'comments.replies.destroy' : 'comments.destroy', [$e->isReply() ? 'reply' : 'comment' => $m->id]))
-                })" x-init="init()" @discussion-close-menu.window="menu = false" @click.outside="menu = false" @keydown.escape.window="menu = false" class="relative {{ $e->photos ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-card px-3 py-1.5 shadow-sm {{ $isMine ? 'bg-blue-50' : 'bg-white' }} {{ $e->lastInSeries ? ($isMine ? 'rounded-br-sm' : 'rounded-bl-sm') : '' }} {{ $e->isSolution ? 'ring-2 ring-green-600' : '' }}">
+                })" x-init="init()" tabindex="-1" @discussion-close-menu.window="menu = false" @click.outside="menu = false" @keydown.escape.window="menu = false" class="relative {{ $e->photos ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-card px-3 py-1.5 shadow-sm focus:outline-none {{ $isMine ? 'bg-blue-50' : 'bg-white' }} {{ $e->lastInSeries ? ($isMine ? 'rounded-br-sm' : 'rounded-bl-sm') : '' }} {{ $e->isSolution ? 'ring-2 ring-green-600' : '' }}">
                     @if ($e->firstInSeries)
                         <div class="flex flex-wrap items-baseline gap-x-2 text-sm font-bold leading-snug {{ $names[$e->colorSlot] }}">
                             {{ $m->user->name }}
@@ -222,3 +222,19 @@
         @endguest
     </div>
 </section>
+
+@push('scripts')
+    <script>
+        (() => {
+            const focusDiscussion = () => {
+                const id = window.location.hash.match(/^#(?:c|r)-\d+$/)?.[0]?.slice(1);
+                const target = id ? document.getElementById(id) : null;
+                if (!target) return;
+                target.focus({ preventScroll: false });
+                window.scrollTo({ top: Math.max(0, target.getBoundingClientRect().top + window.scrollY - 100), behavior: 'auto' });
+            };
+            window.addEventListener('load', () => window.setTimeout(focusDiscussion, 0), { once: true });
+            for (let i = 1; i <= 20; i += 1) window.setTimeout(focusDiscussion, i * 250);
+        })();
+    </script>
+@endpush

@@ -125,13 +125,16 @@ export function discussionEditor(options = {}) {
             this.photos = [];
             this.$dispatch('discussion-edit-cancel');
 
-            if (this.destroyUrl) {
-                await Promise.all(photos.map((photo) => fetch(this.destroyUrl.replace(':id', photo.id), {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-TOKEN': csrf(), Accept: 'application/json' },
-                    credentials: 'same-origin',
-                }).catch(() => null)));
-            }
+            await this.cleanupPhotos(photos);
+        },
+
+        async cleanupPhotos(photos = []) {
+            if (!this.destroyUrl || !photos.length) return;
+            await Promise.all(photos.map((photo) => fetch(this.destroyUrl.replace(':id', photo.id), {
+                method: 'DELETE',
+                headers: { 'X-CSRF-TOKEN': csrf(), Accept: 'application/json' },
+                credentials: 'same-origin',
+            }).catch(() => null)));
         },
 
         async attach(files) {
@@ -185,6 +188,20 @@ export function discussionEditor(options = {}) {
                 this.cancel();
             } catch (error) {
                 if (content) content.innerHTML = previousContent;
+                const failedPhotos = this.photos;
+                if (editorInstance && !editorInstance.isDestroyed && failedPhotos.length) {
+                    const urls = new Set(failedPhotos.map((photo) => photo.url));
+                    editorInstance.commands.command(({ tr, state }) => {
+                        const positions = [];
+                        state.doc.descendants((node, position) => {
+                            if (node.type.name === 'image' && urls.has(node.attrs.src)) positions.push([position, position + node.nodeSize]);
+                        });
+                        positions.reverse().forEach(([from, to]) => tr.delete(from, to));
+                        return positions.length > 0;
+                    });
+                }
+                this.photos = [];
+                await this.cleanupPhotos(failedPhotos);
                 this.error = error.message || 'Не удалось сохранить сообщение.';
             } finally {
                 this.saving = false;

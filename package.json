@@ -4,9 +4,11 @@
         "dev": "vite",
         "build": "vite build",
         "prod": "vite build",
-        "test:e2e": "node tests/e2e/discussion-edit.mjs"
+        "test:e2e": "node tests/e2e/discussion-edit.mjs",
+        "test:e2e:widget": "playwright test tests/e2e/latest-discussions.spec.js"
     },
     "devDependencies": {
+        "@playwright/test": "^1.64.1",
         "@tailwindcss/typography": "^0.5.4",
         "@tailwindcss/vite": "^4.3.3",
         "laravel-vite-plugin": "^2.1.0",

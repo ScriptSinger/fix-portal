@@ -49,7 +49,7 @@ class PublicComposer
 
         // Обсуждения должны обновляться чаще, чем остальные данные правой колонки.
         $data['latest_discussions'] = Cache::remember(
-            'latest_discussions_widget',
+            LatestDiscussion::CACHE_KEY,
             now()->addMinutes(2),
             fn () => $this->discussion->get(),
         );

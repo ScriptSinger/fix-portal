@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Reaction;
 use App\Models\Reply;
 use App\Models\User;
+use App\Services\LatestDiscussion;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\CreatesDiscussions;
@@ -105,6 +107,44 @@ class DiscussionTest extends TestCase
             ->assertJsonPath('text', 'Обновление https://example.com')
             ->assertJsonPath('content', fn (string $content) => str_contains($content, 'data-message-content')
                 && str_contains($content, 'href="https://example.com"'));
+    }
+
+    public function test_latest_discussions_widget_links_to_comments_and_replies(): void
+    {
+        Cache::forget('public_composer_data');
+        Cache::forget(LatestDiscussion::CACHE_KEY);
+
+        $subject = $this->subject('question');
+        $author = User::factory()->create(['name' => 'Автор виджета']);
+        $comment = $this->commentOn($subject, $author, 'Комментарий для виджета');
+        $reply = $comment->replies()->create(['user_id' => $author->id, 'text' => 'Ответ для виджета']);
+
+        $response = $this->get(route('home'))->assertOk();
+
+        $response->assertSee('Последние обсуждения')
+            ->assertSee(route('questions.show', ['question' => $subject->slug]) . '#c-' . $comment->id, false)
+            ->assertSee(route('questions.show', ['question' => $subject->slug]) . '#r-' . $reply->id, false)
+            ->assertSee('Автор виджета');
+    }
+
+    public function test_latest_discussions_cache_is_invalidated_after_message_changes(): void
+    {
+        Cache::forget('public_composer_data');
+        Cache::forget(LatestDiscussion::CACHE_KEY);
+
+        $subject = $this->subject('question');
+        $author = User::factory()->create();
+        $old = $this->commentOn($subject, $author, 'Старое сообщение виджета');
+
+        $this->get(route('home'))->assertSee('Старое сообщение виджета');
+
+        $this->actingAs($author)
+            ->post(route('comments.store', ['type' => 'question', 'id' => $subject->id]), ['text' => 'Новое сообщение виджета'])
+            ->assertRedirect();
+        $this->get(route('home'))->assertSee('Новое сообщение виджета');
+
+        $this->delete(route('comments.destroy', ['comment' => $old->id]));
+        $this->get(route('home'))->assertDontSee('Старое сообщение виджета');
     }
 
     public function test_old_messages_and_foreign_messages_cannot_be_edited(): void

@@ -8,6 +8,7 @@ use App\Models\Comment;
 use App\Models\Reply;
 use App\Services\ActivityNotifier;
 use App\Services\DiscussionMessageService;
+use App\Services\LatestDiscussion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -16,6 +17,7 @@ class ReplyController extends Controller
     public function __construct(
         private readonly ActivityNotifier $notifier,
         private readonly DiscussionMessageService $messages,
+        private readonly LatestDiscussion $latestDiscussion,
     )
     {
     }
@@ -38,6 +40,7 @@ class ReplyController extends Controller
             'user_id' => $userId,
             'quote_reply_id' => $quote,
         ]));
+        $this->latestDiscussion->forget();
         $this->notifier->replied($reply, auth()->user());
 
         return redirect()->to($this->messages->url($reply))->withFragment('r-' . $reply->id);
@@ -49,6 +52,7 @@ class ReplyController extends Controller
 
         $data = $request->validated();
         DB::transaction(fn () => $this->messages->update($reply, $data, auth()->id()));
+        $this->latestDiscussion->forget();
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -65,6 +69,7 @@ class ReplyController extends Controller
     {
         $this->authorize('delete', $reply);
         DB::transaction(fn () => $reply->delete());
+        $this->latestDiscussion->forget();
 
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true]);

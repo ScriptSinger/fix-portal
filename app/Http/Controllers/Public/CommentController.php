@@ -11,6 +11,7 @@ use App\Models\Post;
 use App\Models\Question;
 use App\Services\ActivityNotifier;
 use App\Services\DiscussionMessageService;
+use App\Services\LatestDiscussion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -26,6 +27,7 @@ class CommentController extends Controller
     public function __construct(
         private readonly ActivityNotifier $notifier,
         private readonly DiscussionMessageService $messages,
+        private readonly LatestDiscussion $latestDiscussion,
     )
     {
     }
@@ -41,6 +43,7 @@ class CommentController extends Controller
             'text' => $text,
             'user_id' => $userId,
         ]));
+        $this->latestDiscussion->forget();
         $this->notifier->answered($comment, auth()->user());
 
         // возвращаем к новому сообщению, а не в начало страницы
@@ -51,6 +54,7 @@ class CommentController extends Controller
     {
         $this->authorize('delete', $comment);
         DB::transaction(fn () => $comment->delete());
+        $this->latestDiscussion->forget();
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true]);
         }
@@ -63,6 +67,7 @@ class CommentController extends Controller
 
         $data = $request->validated();
         DB::transaction(fn () => $this->messages->update($comment, $data, auth()->id()));
+        $this->latestDiscussion->forget();
 
         if ($request->expectsJson()) {
             return response()->json([
