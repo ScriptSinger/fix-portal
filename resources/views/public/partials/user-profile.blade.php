@@ -3,11 +3,10 @@
     x-cloak
     @user-profile-open.document="openProfile($event.detail)"
     @keydown.escape.window="close()"
-    @resize.window="position()"
     @click="close()"
     class="fixed inset-0 z-[65]"
     role="presentation">
-    <div x-show="mobile" x-transition.opacity class="absolute inset-0 bg-black/45" @click="close()" aria-hidden="true"></div>
+    <div x-show="open" x-transition.opacity class="absolute inset-0 bg-black/45" @click="close()" aria-hidden="true"></div>
 
     <section x-ref="card"
         x-show="open"
@@ -17,7 +16,7 @@
         aria-modal="true"
         aria-label="Профиль пользователя"
         aria-labelledby="user-profile-name"
-        class="absolute bottom-0 left-0 w-full overflow-hidden rounded-t-2xl bg-white shadow-[0_8px_32px_rgba(0,0,0,.2)] sm:bottom-auto sm:w-[min(22.5rem,calc(100vw-1.5rem))] sm:rounded-2xl">
+        class="absolute bottom-0 left-0 w-full overflow-hidden rounded-t-2xl bg-white shadow-[0_8px_32px_rgba(0,0,0,.2)] sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:w-[min(22.5rem,calc(100vw-1.5rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl">
         <div x-show="loading" class="p-5" aria-live="polite" aria-label="Загрузка профиля">
             <div class="flex items-center gap-3">
                 <span class="size-16 animate-pulse rounded-full bg-black/10"></span>

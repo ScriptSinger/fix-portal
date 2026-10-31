@@ -14,7 +14,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('latest discussion links open the target message anchor', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?e2e=latest-discussions');
 
     const link = page.locator('section[aria-label="Последние комментарии и ответы"] a').first();
     await expect(link).toBeVisible();
@@ -31,7 +31,7 @@ test('latest discussion links open the target message anchor', async ({ page }) 
 });
 
 test('latest discussion links are keyboard accessible', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?e2e=latest-discussions');
 
     const link = page.locator('section[aria-label="Последние комментарии и ответы"] a').first();
     await expect(link).toBeVisible();
@@ -41,7 +41,7 @@ test('latest discussion links are keyboard accessible', async ({ page }) => {
 });
 
 test('avatar opens the public profile and Escape returns focus', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/?e2e=latest-discussions');
 
     const avatar = page.locator('section[aria-label="Последние комментарии и ответы"] button[aria-label^="Открыть профиль:"]').first();
     await expect(avatar).toBeVisible();
@@ -50,6 +50,7 @@ test('avatar opens the public profile and Escape returns focus', async ({ page }
 
     const dialog = page.locator('[role="dialog"][aria-labelledby="user-profile-name"]');
     await expect(dialog).toBeVisible();
+    await expect(page.locator('body')).toHaveClass(/overflow-hidden/);
     if (profileStatus === 200) {
         await expect(dialog.locator('#user-profile-name')).not.toBeEmpty();
     } else {
@@ -58,5 +59,6 @@ test('avatar opens the public profile and Escape returns focus', async ({ page }
 
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
+    await expect(page.locator('body')).not.toHaveClass(/overflow-hidden/);
     await expect(avatar).toBeFocused();
 });

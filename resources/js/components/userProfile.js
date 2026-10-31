@@ -34,6 +34,7 @@ export default function userProfile() {
             this.requestId += 1;
             const requestId = this.requestId;
             this.open = true;
+            document.body.classList.add('overflow-hidden');
             this.loading = true;
             this.error = '';
             this.data = null;
@@ -55,7 +56,6 @@ export default function userProfile() {
             } finally {
                 if (requestId === this.requestId) {
                     this.loading = false;
-                    this.$nextTick(() => this.position());
                 }
             }
         },
@@ -79,6 +79,7 @@ export default function userProfile() {
         close() {
             this.requestId += 1;
             this.open = false;
+            document.body.classList.remove('overflow-hidden');
             this.loading = false;
             this.error = '';
             this.data = null;
