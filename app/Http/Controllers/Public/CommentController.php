@@ -12,6 +12,7 @@ use App\Models\Question;
 use App\Services\ActivityNotifier;
 use App\Services\DiscussionMessageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CommentController extends Controller
 {
@@ -36,7 +37,10 @@ class CommentController extends Controller
         $commentable = $model::findOrFail($id);
         $userId = auth()->user()->id;
         $text = $this->messages->makeText($data['text'] ?? null, $data['images'] ?? [], $userId);
-        $comment = $commentable->comments()->create(['text' => $text, 'user_id' => $userId]);
+        $comment = DB::transaction(fn () => $commentable->comments()->create([
+            'text' => $text,
+            'user_id' => $userId,
+        ]));
         $this->notifier->answered($comment, auth()->user());
 
         // возвращаем к новому сообщению, а не в начало страницы
@@ -46,8 +50,7 @@ class CommentController extends Controller
     public function destroy(Request $request, Comment $comment)
     {
         $this->authorize('delete', $comment);
-        $comment->delete();
-        $comment->replies()->delete();
+        DB::transaction(fn () => $comment->delete());
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true]);
         }
@@ -59,7 +62,7 @@ class CommentController extends Controller
         $this->authorize('update', $comment);
 
         $data = $request->validated();
-        $this->messages->update($comment, $data, auth()->id());
+        DB::transaction(fn () => $this->messages->update($comment, $data, auth()->id()));
 
         if ($request->expectsJson()) {
             return response()->json([

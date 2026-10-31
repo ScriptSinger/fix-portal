@@ -78,6 +78,7 @@ export function discussionEditor(options = {}) {
         emojiOpen: false,
         emojis: options.emojis ?? [],
         target: null,
+        destroyUrl: options.destroyUrl ?? '',
 
         openEdit(detail) {
             editorInstance?.destroy();
@@ -115,12 +116,22 @@ export function discussionEditor(options = {}) {
             });
         },
 
-        cancel() {
+        async cancel() {
+            const photos = this.photos;
             editorInstance?.destroy();
             editorInstance = null;
             this.target = null;
             this.error = '';
+            this.photos = [];
             this.$dispatch('discussion-edit-cancel');
+
+            if (this.destroyUrl) {
+                await Promise.all(photos.map((photo) => fetch(this.destroyUrl.replace(':id', photo.id), {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': csrf(), Accept: 'application/json' },
+                    credentials: 'same-origin',
+                }).catch(() => null)));
+            }
         },
 
         async attach(files) {
@@ -170,6 +181,7 @@ export function discussionEditor(options = {}) {
                 if (!response.ok) throw new Error(Object.values(data.errors ?? {}).flat().join(' ') || data.message || 'Не удалось сохранить сообщение.');
                 if (content && data.content) content.outerHTML = data.content;
                 this.$dispatch('discussion-toast', { type: 'success', message: 'Сообщение изменено' });
+                this.photos = [];
                 this.cancel();
             } catch (error) {
                 if (content) content.innerHTML = previousContent;

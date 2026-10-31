@@ -9,6 +9,7 @@ use App\Models\Reply;
 use App\Services\ActivityNotifier;
 use App\Services\DiscussionMessageService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ReplyController extends Controller
 {
@@ -32,7 +33,11 @@ class ReplyController extends Controller
         $text = $this->messages->makeText($data['text'] ?? null, $data['images'] ?? [], $userId);
         // цитировать можно только ответ из этой же ветки
         $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
-        $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
+        $reply = DB::transaction(fn () => $comment->replies()->create([
+            'text' => $text,
+            'user_id' => $userId,
+            'quote_reply_id' => $quote,
+        ]));
         $this->notifier->replied($reply, auth()->user());
 
         return redirect()->to($this->messages->url($reply))->withFragment('r-' . $reply->id);
@@ -43,7 +48,7 @@ class ReplyController extends Controller
         $this->authorize('update', $reply);
 
         $data = $request->validated();
-        $this->messages->update($reply, $data, auth()->id());
+        DB::transaction(fn () => $this->messages->update($reply, $data, auth()->id()));
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -59,7 +64,7 @@ class ReplyController extends Controller
     public function destroy(Request $request, Reply $reply)
     {
         $this->authorize('delete', $reply);
-        $reply->delete();
+        DB::transaction(fn () => $reply->delete());
 
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true]);

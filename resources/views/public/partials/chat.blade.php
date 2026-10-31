@@ -137,7 +137,7 @@
             <x-ui.icon name="chevron-down" class="size-5" />
         </button>
         @auth('web')
-            <div x-data="discussionEditor({ emojis: @js(\App\Models\Reaction::EMOJI) })" @discussion-edit.window="openEdit($event.detail)" x-show="editing" x-cloak class="mb-3 space-y-1 rounded-card border border-black/10 bg-white p-2">
+            <div x-data="discussionEditor({ emojis: @js(\App\Models\Reaction::EMOJI), destroyUrl: @js(route('api.users.images.destroy', ['image' => ':id'])) })" @discussion-edit.window="openEdit($event.detail)" x-show="editing" x-cloak class="mb-3 space-y-1 rounded-card border border-black/10 bg-white p-2">
                 <div class="relative flex min-h-10 items-center gap-2 px-2 py-2 pr-10 text-[13px] leading-5 text-subtle">
                     <svg class="size-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4 16-1 4 4-1L19 7a2.8 2.8 0 0 0-4-4L4 16Z" /></svg>
                     <span class="font-medium">Редактирование сообщения</span>
