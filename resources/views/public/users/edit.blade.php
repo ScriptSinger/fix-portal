@@ -77,7 +77,7 @@
                         <div class="flex h-10 min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-line">
                             <label for="f-avatar" class="flex cursor-pointer items-center whitespace-nowrap bg-brand-400/30 px-4 text-sm text-ink">Выберите файл</label>
                             <span class="min-w-0 flex-1 truncate px-3 text-sm leading-10 text-ink" x-text="name || 'Файл не выбран'">Файл не выбран</span>
-                            <input id="f-avatar" name="avatar" type="file" accept="image/jpeg,image/png" class="sr-only"
+                            <input id="f-avatar" name="avatar" type="file" accept="image/jpeg,image/png,image/webp" class="sr-only"
                                 @change="const f = $event.target.files[0]; if (f) { name = f.name; preview = URL.createObjectURL(f); remove = false }">
                         </div>
                     </div>

@@ -20,7 +20,7 @@ class UpdateProfileRequest extends FormRequest
             'phone' => ['nullable', 'string', 'max:255', 'regex:/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/'],
             'location' => ['nullable', 'string', 'max:255'],
             'bio' => ['nullable', 'string', 'max:512'],
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'remove_avatar' => ['nullable', 'boolean'],
             'email_notifications' => ['nullable', 'boolean'],
             'current_password' => ['required_with:password', 'nullable', 'current_password:web'],
