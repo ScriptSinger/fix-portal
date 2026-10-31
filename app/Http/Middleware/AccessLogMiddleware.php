@@ -44,8 +44,8 @@ class AccessLogMiddleware
                 'response_size' => $responseSize,
                 'is_suspicious' => $this->isSuspiciousPath($request->getPathInfo()),
                 'ip' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'referer' => $request->headers->get('referer'),
+                'user_agent' => $this->limited($request->userAgent()),
+                'referer' => $this->limited($request->headers->get('referer')),
                 'is_bot' => $this->isBot($request->userAgent()),
                 'admin_user_id' => $this->adminUserId($request),
                 'user_id' => $this->siteUserId($request),
@@ -96,6 +96,13 @@ class AccessLogMiddleware
         $query = $request->getQueryString();
 
         return $query === null || $query === '' ? null : Str::limit($query, 500, '…');
+    }
+
+    private function limited(?string $value): ?string
+    {
+        return $value === null || $value === ''
+            ? null
+            : Str::limit($value, (int) config('access_log.max_field_length', 500), '…');
     }
 
     private function shouldSkip(string $path): bool

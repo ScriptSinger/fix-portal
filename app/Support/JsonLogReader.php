@@ -99,6 +99,7 @@ abstract class JsonLogReader
         $to = $this->filterDate($filters['date_to'] ?? null, false);
 
         $rows = [];
+        $maxRows = max(1, (int) ($filters['max_rows'] ?? config('access_log.max_entries', 5000)));
 
         foreach ($files as $path) {
             $object = new SplFileObject($path, 'r');
@@ -117,7 +118,14 @@ abstract class JsonLogReader
                 $row = $this->row(basename($path), $object->key(), $decoded);
 
                 if ($this->matches($row, $filters, $from, $to)) {
+                    // Keep memory bounded even when an old log file contains
+                    // millions of matching requests. Files are processed from
+                    // newest to oldest, so retain the newest matching rows.
                     $rows[] = $row;
+
+                    if (count($rows) > $maxRows) {
+                        array_pop($rows);
+                    }
                 }
             }
         }

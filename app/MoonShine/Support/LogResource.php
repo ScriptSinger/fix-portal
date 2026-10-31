@@ -47,6 +47,15 @@ abstract class LogResource extends CrudResource
     {
         $filters = $this->getFilterParams();
 
+        // Do not scan the full retention window on the first page load. Older
+        // files remain available when an administrator selects a file or date.
+        if (empty($filters['file'])
+            && empty($filters['date_from'])
+            && empty($filters['date_to'])) {
+            $filters['date_from'] = now()->toDateString();
+            $filters['date_to'] = now()->toDateString();
+        }
+
         // "Hide my IP" excludes whichever address the admin is browsing from.
         if (filter_var($filters['hide_my_ip'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
             $filters['exclude_ip'] = trim(($filters['exclude_ip'] ?? '') . ' ' . request()->ip());

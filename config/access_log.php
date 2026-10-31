@@ -1,6 +1,10 @@
 <?php
 
 return [
+    // Safety limit for the in-memory log reader. Older entries must be
+    // requested explicitly by file/date instead of allowing an unbounded scan.
+    'max_entries' => (int) env('LOG_ACCESS_MAX_ENTRIES', 5000),
+    'max_field_length' => (int) env('LOG_ACCESS_MAX_FIELD_LENGTH', 500),
     'slow_threshold_ms' => 1000,
     'suspicious_paths' => [
         'secrets' => [
