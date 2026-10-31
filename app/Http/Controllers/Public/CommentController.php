@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreCommentRequest;
 use App\Http\Requests\Public\UpdateCommentRequest;
 use App\Models\Comment;
+use App\Models\Firmware;
+use App\Models\Post;
+use App\Models\Question;
 use App\Services\ActivityNotifier;
 use App\Support\MessageBody;
 use Illuminate\Http\Request;
@@ -27,15 +30,18 @@ class CommentController extends Controller
         $this->notifier->answered($comment, auth()->user());
 
         // возвращаем к новому сообщению, а не в начало страницы
-        return redirect()->back()->withFragment('c-' . $comment->id);
+        return redirect()->to($this->discussionUrl($comment->commentable))->withFragment('c-' . $comment->id);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $comment = Comment::findOrFail($id);
         $this->authorize('delete', $comment);
         $comment->delete();
         $comment->replies()->delete();
+        if ($request->expectsJson()) {
+            return response()->json(['deleted' => true]);
+        }
         return redirect()->back();
     }
 
@@ -55,7 +61,11 @@ class CommentController extends Controller
 
         $comment->update(['text' => $text]);
 
-        return redirect()->back()->withFragment('c-' . $comment->id);
+        if ($request->expectsJson()) {
+            return response()->json(['text' => MessageBody::toPlain($comment->text), 'id' => $comment->id]);
+        }
+
+        return redirect()->to($this->discussionUrl($comment->commentable))->withFragment('c-' . $comment->id);
     }
 
     /** @return list<string> */
@@ -64,5 +74,15 @@ class CommentController extends Controller
         preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) $body, $matches);
 
         return array_values(array_unique($matches[1] ?? []));
+    }
+
+    private function discussionUrl($subject): string
+    {
+        return match (class_basename($subject)) {
+            'Post' => route('articles.show', ['article' => $subject->slug]),
+            'Question' => route('questions.show', ['question' => $subject->slug]),
+            'Firmware' => route('firmwares.show', ['firmware' => $subject->id]),
+            default => url('/'),
+        };
     }
 }

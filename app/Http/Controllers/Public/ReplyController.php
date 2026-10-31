@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\UpdateReplyRequest;
 use App\Models\Comment;
+use App\Models\Firmware;
+use App\Models\Post;
+use App\Models\Question;
 use App\Models\Reply;
 use App\Services\ActivityNotifier;
 use App\Support\MessageBody;
@@ -35,7 +38,7 @@ class ReplyController extends Controller
         $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
         $this->notifier->replied($reply, auth()->user());
 
-        return redirect()->back()->withFragment('r-' . $reply->id);
+        return redirect()->to($this->discussionUrl($reply->comment->commentable))->withFragment('r-' . $reply->id);
     }
 
     public function update(UpdateReplyRequest $request, $id)
@@ -54,7 +57,11 @@ class ReplyController extends Controller
 
         $reply->update(['text' => $text]);
 
-        return redirect()->back()->withFragment('r-' . $reply->id);
+        if ($request->expectsJson()) {
+            return response()->json(['text' => MessageBody::toPlain($reply->text), 'id' => $reply->id]);
+        }
+
+        return redirect()->to($this->discussionUrl($reply->comment->commentable))->withFragment('r-' . $reply->id);
     }
 
     /** @return list<string> */
@@ -65,12 +72,26 @@ class ReplyController extends Controller
         return array_values(array_unique($matches[1] ?? []));
     }
 
-    public function destroy($id)
+    private function discussionUrl($subject): string
+    {
+        return match (class_basename($subject)) {
+            'Post' => route('articles.show', ['article' => $subject->slug]),
+            'Question' => route('questions.show', ['question' => $subject->slug]),
+            'Firmware' => route('firmwares.show', ['firmware' => $subject->id]),
+            default => url('/'),
+        };
+    }
+
+    public function destroy(Request $request, $id)
     {
 
         $reply = Reply::findOrFail($id);
         $this->authorize('delete', $reply);
         $reply->delete();
+
+        if ($request->expectsJson()) {
+            return response()->json(['deleted' => true]);
+        }
 
         return redirect()->back();
     }

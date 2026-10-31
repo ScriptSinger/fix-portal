@@ -1,6 +1,17 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+/* Минималистичный headless-редактор сообщений: Tiptap supplies только поведение. */
+.discussion-editor p { margin: 0; }
+.discussion-editor p + p { margin-top: .35rem; }
+.discussion-editor ul, .discussion-editor ol { margin: .35rem 0; padding-left: 1.25rem; }
+.discussion-editor ul { list-style: disc; }
+.discussion-editor ol { list-style: decimal; }
+.discussion-editor img { max-width: 100%; height: auto; }
+.discussion-editor:focus,
+.discussion-editor:focus-visible,
+.discussion-editor.ProseMirror:focus { outline: none !important; box-shadow: none; }
+
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 

@@ -6,6 +6,7 @@
     $mine = optional($instance->reactions->firstWhere('user_id', auth('web')->id()))->emoji;
 @endphp
 <div x-data="reactions({ url: @js(route('reactions.toggle', ['type' => $type, 'id' => $instance->id])), counts: @js($counts), mine: @js($mine), order: @js(\App\Models\Reaction::EMOJI) })"
+    @click="$dispatch('discussion-close-menu'); $event.stopPropagation()"
     @click.outside="open = false" class="relative inline-flex flex-wrap items-center gap-1">
     <template x-for="chip in chips" :key="chip.emoji">
         @auth('web')

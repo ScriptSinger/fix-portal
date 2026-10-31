@@ -27,7 +27,8 @@ Route::get('/masters', [MasterController::class, 'index'])->name('api.masters.in
 Route::group(
     [
         // Только пользователи сайта: контент привязывается по user_id, админам тут делать нечего.
-        'middleware' => 'auth:web',
+        // API-группа сама по себе stateless, но эти действия используют обычную web-сессию и CSRF из браузера.
+        'middleware' => ['web', 'auth:web'],
     ],
     function () {
         Route::post('/reactions/{type}/{id}', [ReactionController::class, 'toggle'])->whereIn('type', ['comment', 'reply'])->name('reactions.toggle');
