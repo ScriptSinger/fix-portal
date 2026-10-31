@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Public\UpdateReplyRequest;
 use App\Models\Comment;
 use App\Models\Reply;
 use App\Services\ActivityNotifier;
@@ -35,6 +36,33 @@ class ReplyController extends Controller
         $this->notifier->replied($reply, auth()->user());
 
         return redirect()->back()->withFragment('r-' . $reply->id);
+    }
+
+    public function update(UpdateReplyRequest $request, $id)
+    {
+        $reply = Reply::findOrFail($id);
+        $this->authorize('update', $reply);
+
+        $data = $request->validated();
+        $text = MessageBody::make(
+            $data['text'] ?? null,
+            $data['images'] ?? [],
+            auth()->id(),
+            $this->existingImages($reply->text),
+        );
+        abort_if($text === '', 422, 'Пустое сообщение');
+
+        $reply->update(['text' => $text]);
+
+        return redirect()->back()->withFragment('r-' . $reply->id);
+    }
+
+    /** @return list<string> */
+    private function existingImages(?string $body): array
+    {
+        preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) $body, $matches);
+
+        return array_values(array_unique($matches[1] ?? []));
     }
 
     public function destroy($id)

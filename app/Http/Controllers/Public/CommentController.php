@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\StoreCommentRequest;
+use App\Http\Requests\Public\UpdateCommentRequest;
 use App\Models\Comment;
 use App\Services\ActivityNotifier;
 use App\Support\MessageBody;
@@ -36,5 +37,32 @@ class CommentController extends Controller
         $comment->delete();
         $comment->replies()->delete();
         return redirect()->back();
+    }
+
+    public function update(UpdateCommentRequest $request, $id)
+    {
+        $comment = Comment::findOrFail($id);
+        $this->authorize('update', $comment);
+
+        $data = $request->validated();
+        $text = MessageBody::make(
+            $data['text'] ?? null,
+            $data['images'] ?? [],
+            auth()->id(),
+            $this->existingImages($comment->text),
+        );
+        abort_if($text === '', 422, 'Пустое сообщение');
+
+        $comment->update(['text' => $text]);
+
+        return redirect()->back()->withFragment('c-' . $comment->id);
+    }
+
+    /** @return list<string> */
+    private function existingImages(?string $body): array
+    {
+        preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) $body, $matches);
+
+        return array_values(array_unique($matches[1] ?? []));
     }
 }

@@ -17,4 +17,10 @@ class CommentPolicy
     {
         return $user->id === $comment->user_id;
     }
+
+    public function update(User $user, Comment $comment): bool
+    {
+        return $user->id === $comment->user_id
+            && $comment->created_at?->gt(now()->subHours(24)) === true;
+    }
 }

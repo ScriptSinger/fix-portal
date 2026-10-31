@@ -6,6 +6,7 @@ use App\Models\Reaction;
 use App\Models\Reply;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
@@ -66,6 +67,57 @@ class DiscussionTest extends TestCase
 
         $reply = $this->actingAs(User::factory()->create())->from($page)->post(route('comments.replies.store', ['id' => $comment->id]), ['text' => 'Ответ']);
         $reply->assertRedirect($page . '#r-' . Reply::latest('id')->value('id'));
+    }
+
+    public function test_author_can_edit_a_comment_and_reply_for_24_hours(): void
+    {
+        $subject = $this->subject('question');
+        $user = User::factory()->create();
+        $comment = $this->commentOn($subject, $user, 'Старый комментарий');
+
+        $this->actingAs($user)->put(route('comments.update', ['id' => $comment->id]), [
+            'text' => 'Изменённый комментарий',
+        ])->assertRedirect($this->pageOf($subject) . '#c-' . $comment->id);
+
+        $this->assertSame('Изменённый комментарий', $comment->refresh()->text);
+
+        $reply = $comment->replies()->create(['user_id' => $user->id, 'text' => 'Старый ответ']);
+        $this->actingAs($user)->put(route('comments.replies.update', ['id' => $reply->id]), [
+            'text' => 'Изменённый ответ',
+        ])->assertRedirect($this->pageOf($subject) . '#r-' . $reply->id);
+
+        $this->assertSame('Изменённый ответ', $reply->refresh()->text);
+    }
+
+    public function test_old_messages_and_foreign_messages_cannot_be_edited(): void
+    {
+        $subject = $this->subject('question');
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $comment = $this->commentOn($subject, $owner, 'Старый комментарий');
+        $comment->forceFill(['created_at' => Carbon::now()->subDay()])->save();
+
+        $this->actingAs($owner)->put(route('comments.update', ['id' => $comment->id]), [
+            'text' => 'Нельзя',
+        ])->assertForbidden();
+
+        $fresh = $this->commentOn($subject, $owner, 'Чужой комментарий');
+        $this->actingAs($other)->put(route('comments.update', ['id' => $fresh->id]), [
+            'text' => 'Нельзя',
+        ])->assertForbidden();
+    }
+
+    public function test_comment_creation_is_rate_limited(): void
+    {
+        $subject = $this->subject('question');
+        $user = User::factory()->create();
+        $url = route('comments.store', ['type' => 'question', 'id' => $subject->id]);
+
+        foreach (range(1, 5) as $i) {
+            $this->actingAs($user)->post($url, ['text' => "Сообщение {$i}"])->assertRedirect();
+        }
+
+        $this->actingAs($user)->post($url, ['text' => 'Шестое сообщение'])->assertStatus(429);
     }
 
     public function test_empty_comment_is_rejected_and_guests_cannot_comment(): void

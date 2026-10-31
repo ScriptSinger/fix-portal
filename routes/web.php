@@ -100,11 +100,15 @@ Route::middleware(['auth:web', 'verified'])->group(
         });
         Route::redirect('/profile/edit', '/cabinet/profile');
         Route::put('/profile/update', [UserController::class, 'update'])->name('profile.update');
-        Route::post('/{type}/{id}/comments', [CommentController::class, 'store'])->name('comments.store');
+        Route::post('/{type}/{id}/comments', [CommentController::class, 'store'])
+            ->middleware('throttle:comments')
+            ->name('comments.store');
         Route::group(['prefix' => '/comments'], function () {
             Route::put('/{id}', [CommentController::class, 'update'])->name('comments.update');
             Route::delete('/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
-            Route::post('/{id}/replies', [ReplyController::class, 'store'])->name('comments.replies.store');
+            Route::post('/{id}/replies', [ReplyController::class, 'store'])
+                ->middleware('throttle:comments')
+                ->name('comments.replies.store');
         });
 
         Route::put('/replies/{id}', [ReplyController::class, 'update'])->name('comments.replies.update');
