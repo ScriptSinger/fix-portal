@@ -15,6 +15,13 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
+    /** @var array<string, class-string<Post|Question|Firmware>> */
+    private const COMMENTABLES = [
+        'post' => Post::class,
+        'question' => Question::class,
+        'firmware' => Firmware::class,
+    ];
+
     public function __construct(private readonly ActivityNotifier $notifier)
     {
     }
@@ -22,7 +29,8 @@ class CommentController extends Controller
     public function store(StoreCommentRequest $request, $type, $id)
     {
         $data = $request->validated();
-        $commentable = ("App\\Models\\" . ucfirst($type))::findOrFail($id);
+        $model = self::COMMENTABLES[strtolower($type)] ?? abort(404);
+        $commentable = $model::findOrFail($id);
         $userId = auth()->user()->id;
         $text = MessageBody::make($data['text'] ?? null, $data['images'] ?? [], $userId);
         abort_if($text === '', 422, 'Пустое сообщение');
@@ -33,9 +41,8 @@ class CommentController extends Controller
         return redirect()->to($this->discussionUrl($comment->commentable))->withFragment('c-' . $comment->id);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Comment $comment)
     {
-        $comment = Comment::findOrFail($id);
         $this->authorize('delete', $comment);
         $comment->delete();
         $comment->replies()->delete();
@@ -45,9 +52,8 @@ class CommentController extends Controller
         return redirect()->back();
     }
 
-    public function update(UpdateCommentRequest $request, $id)
+    public function update(UpdateCommentRequest $request, Comment $comment)
     {
-        $comment = Comment::findOrFail($id);
         $this->authorize('update', $comment);
 
         $data = $request->validated();

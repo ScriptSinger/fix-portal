@@ -104,15 +104,15 @@ Route::middleware(['auth:web', 'verified'])->group(
             ->middleware('throttle:comments')
             ->name('comments.store');
         Route::group(['prefix' => '/comments'], function () {
-            Route::put('/{id}', [CommentController::class, 'update'])->name('comments.update');
-            Route::delete('/{id}', [CommentController::class, 'destroy'])->name('comments.destroy');
-            Route::post('/{id}/replies', [ReplyController::class, 'store'])
+            Route::put('/{comment}', [CommentController::class, 'update'])->name('comments.update');
+            Route::delete('/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+            Route::post('/{comment}/replies', [ReplyController::class, 'store'])
                 ->middleware('throttle:comments')
                 ->name('comments.replies.store');
         });
 
-        Route::put('/replies/{id}', [ReplyController::class, 'update'])->name('comments.replies.update');
-        Route::delete('/replies/{id}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
+        Route::put('/replies/{reply}', [ReplyController::class, 'update'])->name('comments.replies.update');
+        Route::delete('/replies/{reply}', [ReplyController::class, 'destroy'])->name('comments.replies.destroy');
 
         Route::post('/questions/{id}/solution', [SolutionController::class, 'store'])->whereNumber('id')->name('questions.solution.store');
         Route::delete('/questions/{id}/solution', [SolutionController::class, 'destroy'])->whereNumber('id')->name('questions.solution.destroy');

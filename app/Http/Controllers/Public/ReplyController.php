@@ -19,7 +19,7 @@ class ReplyController extends Controller
     {
     }
 
-    public function store(Request $request, $id)
+    public function store(Request $request, Comment $comment)
     {
         $data = $request->validate([
             'text' => 'required_without:images|nullable|string|max:5000',
@@ -31,8 +31,6 @@ class ReplyController extends Controller
         $userId = auth()->user()->id;
         $text = MessageBody::make($data['text'] ?? null, $data['images'] ?? [], $userId);
         abort_if($text === '', 422, 'Пустое сообщение');
-        $comment = Comment::findOrFail($id);
-
         // цитировать можно только ответ из этой же ветки
         $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
         $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
@@ -41,9 +39,8 @@ class ReplyController extends Controller
         return redirect()->to($this->discussionUrl($reply->comment->commentable))->withFragment('r-' . $reply->id);
     }
 
-    public function update(UpdateReplyRequest $request, $id)
+    public function update(UpdateReplyRequest $request, Reply $reply)
     {
-        $reply = Reply::findOrFail($id);
         $this->authorize('update', $reply);
 
         $data = $request->validated();
@@ -86,10 +83,8 @@ class ReplyController extends Controller
         };
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Reply $reply)
     {
-
-        $reply = Reply::findOrFail($id);
         $this->authorize('delete', $reply);
         $reply->delete();
 

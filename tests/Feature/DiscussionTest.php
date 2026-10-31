@@ -65,7 +65,7 @@ class DiscussionTest extends TestCase
         $comment = $subject->comments()->latest('id')->first();
         $response->assertRedirect($page . '#c-' . $comment->id);
 
-        $reply = $this->actingAs(User::factory()->create())->from($page)->post(route('comments.replies.store', ['id' => $comment->id]), ['text' => 'Ответ']);
+        $reply = $this->actingAs(User::factory()->create())->from($page)->post(route('comments.replies.store', ['comment' => $comment->id]), ['text' => 'Ответ']);
         $reply->assertRedirect($page . '#r-' . Reply::latest('id')->value('id'));
     }
 
@@ -75,14 +75,14 @@ class DiscussionTest extends TestCase
         $user = User::factory()->create();
         $comment = $this->commentOn($subject, $user, 'Старый комментарий');
 
-        $this->actingAs($user)->put(route('comments.update', ['id' => $comment->id]), [
+        $this->actingAs($user)->put(route('comments.update', ['comment' => $comment->id]), [
             'text' => 'Изменённый комментарий',
         ])->assertRedirect($this->pageOf($subject) . '#c-' . $comment->id);
 
         $this->assertSame('Изменённый комментарий', $comment->refresh()->text);
 
         $reply = $comment->replies()->create(['user_id' => $user->id, 'text' => 'Старый ответ']);
-        $this->actingAs($user)->put(route('comments.replies.update', ['id' => $reply->id]), [
+        $this->actingAs($user)->put(route('comments.replies.update', ['reply' => $reply->id]), [
             'text' => 'Изменённый ответ',
         ])->assertRedirect($this->pageOf($subject) . '#r-' . $reply->id);
 
@@ -97,7 +97,7 @@ class DiscussionTest extends TestCase
 
         $this->actingAs($user)
             ->withHeaders(['Accept' => 'application/json'])
-            ->putJson(route('comments.update', ['id' => $comment->id]), [
+            ->putJson(route('comments.update', ['comment' => $comment->id]), [
                 'text' => 'Обновление https://example.com',
             ])
             ->assertOk()
@@ -115,12 +115,12 @@ class DiscussionTest extends TestCase
         $comment = $this->commentOn($subject, $owner, 'Старый комментарий');
         $comment->forceFill(['created_at' => Carbon::now()->subDay()])->save();
 
-        $this->actingAs($owner)->put(route('comments.update', ['id' => $comment->id]), [
+        $this->actingAs($owner)->put(route('comments.update', ['comment' => $comment->id]), [
             'text' => 'Нельзя',
         ])->assertForbidden();
 
         $fresh = $this->commentOn($subject, $owner, 'Чужой комментарий');
-        $this->actingAs($other)->put(route('comments.update', ['id' => $fresh->id]), [
+        $this->actingAs($other)->put(route('comments.update', ['comment' => $fresh->id]), [
             'text' => 'Нельзя',
         ])->assertForbidden();
     }
@@ -156,7 +156,7 @@ class DiscussionTest extends TestCase
         [$owner, $other] = [User::factory()->create(), User::factory()->create()];
         $comment = $this->commentOn($subject, $owner);
 
-        $this->actingAs($other)->post(route('comments.replies.store', ['id' => $comment->id]), ['text' => 'Согласен'])->assertRedirect();
+        $this->actingAs($other)->post(route('comments.replies.store', ['comment' => $comment->id]), ['text' => 'Согласен'])->assertRedirect();
 
         $note = $owner->notifications()->first();
         $this->assertNotNull($note);
@@ -171,7 +171,7 @@ class DiscussionTest extends TestCase
         $owner = User::factory()->create();
         $comment = $this->commentOn($subject, $owner);
 
-        $this->actingAs($owner)->post(route('comments.replies.store', ['id' => $comment->id]), ['text' => 'дополню']);
+        $this->actingAs($owner)->post(route('comments.replies.store', ['comment' => $comment->id]), ['text' => 'дополню']);
 
         $this->assertSame(0, $owner->notifications()->count());
     }

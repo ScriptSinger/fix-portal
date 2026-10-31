@@ -76,8 +76,8 @@
                 <div id="{{ $e->anchor }}" x-data="discussionMessage({
                     id: {{ $m->id }}, root: {{ $e->rootId }}, name: @js($m->user->name), preview: @js($e->preview),
                     text: @js(\App\Support\MessageBody::toPlain($m->text)), isReply: {{ $e->isReply() ? 'true' : 'false' }}, hasImages: {{ $e->photos ? 'true' : 'false' }},
-                    updateUrl: @js(route($e->isReply() ? 'comments.replies.update' : 'comments.update', ['id' => $m->id])),
-                    deleteUrl: @js(route($e->isReply() ? 'comments.replies.destroy' : 'comments.destroy', ['id' => $m->id]))
+                    updateUrl: @js(route($e->isReply() ? 'comments.replies.update' : 'comments.update', [$e->isReply() ? 'reply' : 'comment' => $m->id])),
+                    deleteUrl: @js(route($e->isReply() ? 'comments.replies.destroy' : 'comments.destroy', [$e->isReply() ? 'reply' : 'comment' => $m->id]))
                 })" x-init="init()" @discussion-close-menu.window="menu = false" @click.outside="menu = false" @keydown.escape.window="menu = false" class="relative {{ $e->photos ? 'w-[min(100%,28rem)]' : 'max-w-[min(100%,34rem)]' }} scroll-mt-24 justify-self-start rounded-card px-3 py-1.5 shadow-sm {{ $isMine ? 'bg-blue-50' : 'bg-white' }} {{ $e->lastInSeries ? ($isMine ? 'rounded-br-sm' : 'rounded-bl-sm') : '' }} {{ $e->isSolution ? 'ring-2 ring-green-600' : '' }}">
                     @if ($e->firstInSeries)
                         <div class="flex flex-wrap items-baseline gap-x-2 text-sm font-bold leading-snug {{ $names[$e->colorSlot] }}">
@@ -164,7 +164,7 @@
                 </div>
             </div>
             <form x-show="!editing" method="POST" class="grid gap-2" @submit="submit($event)"
-                :action="target ? @js(route('comments.replies.store', ['id' => '__ID__'])).replace('__ID__', target.root) : base">
+                :action="target ? @js(route('comments.replies.store', ['comment' => '__ID__'])).replace('__ID__', target.root) : base">
                 @csrf
                 <input type="hidden" name="quote_reply_id" :value="target && target.reply" :disabled="!target || !target.reply">
                 <div x-show="target" x-cloak class="flex items-center justify-between gap-2 border-l-[3px] border-teal-700 px-2 text-[13px] leading-snug text-teal-700">
