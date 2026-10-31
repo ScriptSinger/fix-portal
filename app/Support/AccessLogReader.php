@@ -48,7 +48,14 @@ class AccessLogReader extends JsonLogReader
 
     protected function matchesOwn(array $row, array $filters): bool
     {
-        if (! $this->contains($row, 'path', $filters) || ! $this->contains($row, 'user_agent', $filters)) {
+        if (! $this->contains($row, 'path', $filters)
+            || ! $this->contains($row, 'user_agent', $filters)
+            || ! $this->contains($row, 'request_id', $filters)
+            || ! $this->contains($row, 'user_id', $filters)) {
+            return false;
+        }
+
+        if (($filters['status'] ?? '') !== '' && (int) $row['status'] !== (int) $filters['status']) {
             return false;
         }
 

@@ -46,6 +46,8 @@ class AccessLogResource extends LogResource
             Text::make('Время', 'time')->sortable('time_sort'),
             Text::make('Метод', 'method')->sortable(),
             Text::make('Путь', 'path')->sortable(),
+            Text::make('Request ID', 'request_id')->sortable(),
+            Text::make('User ID', 'user_id')->sortable(),
             Preview::make('Статус', 'status', fn (array $row) => (string) Badge::make(
                 (string) $row['status'],
                 $this->statusColor($row['status']),

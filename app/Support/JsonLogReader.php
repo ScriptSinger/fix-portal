@@ -7,6 +7,7 @@ namespace App\Support;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use SplFileObject;
+use SplQueue;
 
 /**
  * Reads daily JSON-lines logs (storage/logs/<prefix>-YYYY-MM-DD.log).
@@ -98,7 +99,10 @@ abstract class JsonLogReader
         $from = $this->filterDate($filters['date_from'] ?? null, true);
         $to = $this->filterDate($filters['date_to'] ?? null, false);
 
-        $rows = [];
+        // Read oldest to newest so the bounded queue can discard the oldest
+        // matching entries and keep the newest window across all log files.
+        $files = array_reverse($files);
+        $rows = new SplQueue();
         $maxRows = max(1, (int) ($filters['max_rows'] ?? config('access_log.max_entries', 5000)));
 
         foreach ($files as $path) {
@@ -121,16 +125,16 @@ abstract class JsonLogReader
                     // Keep memory bounded even when an old log file contains
                     // millions of matching requests. Files are processed from
                     // newest to oldest, so retain the newest matching rows.
-                    $rows[] = $row;
+                    $rows->enqueue($row);
 
-                    if (count($rows) > $maxRows) {
-                        array_pop($rows);
+                    if ($rows->count() > $maxRows) {
+                        $rows->dequeue();
                     }
                 }
             }
         }
 
-        return new Collection($rows);
+        return new Collection(iterator_to_array($rows, false));
     }
 
     /**
