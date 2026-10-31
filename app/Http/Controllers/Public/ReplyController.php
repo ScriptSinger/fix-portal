@@ -58,7 +58,11 @@ class ReplyController extends Controller
         $reply->update(['text' => $text]);
 
         if ($request->expectsJson()) {
-            return response()->json(['text' => MessageBody::toPlain($reply->text), 'id' => $reply->id]);
+            return response()->json([
+                'text' => MessageBody::toPlain($reply->text),
+                'content' => view('public.partials.discussion-content', ['message' => $reply])->render(),
+                'id' => $reply->id,
+            ]);
         }
 
         return redirect()->to($this->discussionUrl($reply->comment->commentable))->withFragment('r-' . $reply->id);

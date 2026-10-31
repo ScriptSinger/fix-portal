@@ -89,6 +89,24 @@ class DiscussionTest extends TestCase
         $this->assertSame('Изменённый ответ', $reply->refresh()->text);
     }
 
+    public function test_ajax_edit_returns_rendered_message_content(): void
+    {
+        $subject = $this->subject('question');
+        $user = User::factory()->create();
+        $comment = $this->commentOn($subject, $user, 'Старый комментарий');
+
+        $this->actingAs($user)
+            ->withHeaders(['Accept' => 'application/json'])
+            ->putJson(route('comments.update', ['id' => $comment->id]), [
+                'text' => 'Обновление https://example.com',
+            ])
+            ->assertOk()
+            ->assertJsonPath('id', $comment->id)
+            ->assertJsonPath('text', 'Обновление https://example.com')
+            ->assertJsonPath('content', fn (string $content) => str_contains($content, 'data-message-content')
+                && str_contains($content, 'href="https://example.com"'));
+    }
+
     public function test_old_messages_and_foreign_messages_cannot_be_edited(): void
     {
         $subject = $this->subject('question');

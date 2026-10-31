@@ -98,10 +98,7 @@
                         </a>
                     @endif
 
-                    @if ($e->photos)
-                        <x-ui.photo-grid :photos="$e->photos" :alt="$e->isReply() ? 'Ответ' : 'Комментарий'" class="my-1 rounded-lg" />
-                    @endif
-                    <div data-message-body class="article-content {{ $e->body === strip_tags($e->body) ? 'whitespace-pre-line' : '' }} text-[15px] leading-[1.45] [overflow-wrap:anywhere]">@if ($e->body !== ''){!! \App\Support\Linkify::html(\App\Support\ContentImages::withAlt($e->body, $e->isReply() ? 'Ответ' : 'Комментарий')) !!}@endif</div>
+                    @include('public.partials.discussion-content', ['message' => $m])
 
                     <div class="mt-1 flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
                         <x-ui.reactions :instance="$m" />

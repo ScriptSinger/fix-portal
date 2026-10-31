@@ -62,7 +62,11 @@ class CommentController extends Controller
         $comment->update(['text' => $text]);
 
         if ($request->expectsJson()) {
-            return response()->json(['text' => MessageBody::toPlain($comment->text), 'id' => $comment->id]);
+            return response()->json([
+                'text' => MessageBody::toPlain($comment->text),
+                'content' => view('public.partials.discussion-content', ['message' => $comment])->render(),
+                'id' => $comment->id,
+            ]);
         }
 
         return redirect()->to($this->discussionUrl($comment->commentable))->withFragment('c-' . $comment->id);

@@ -71,7 +71,6 @@ export function discussionEditor(options = {}) {
     let editorInstance = null;
 
     return {
-        open: false,
         saving: false,
         error: '',
         photos: [],
@@ -86,7 +85,6 @@ export function discussionEditor(options = {}) {
             this.target = detail;
             this.photos = [];
             this.error = '';
-            this.open = true;
             this.$nextTick(() => {
                 editorInstance = new Editor({
                     element: this.$refs.editor,
@@ -122,7 +120,6 @@ export function discussionEditor(options = {}) {
             editorInstance = null;
             this.target = null;
             this.error = '';
-            this.open = false;
             this.$dispatch('discussion-edit-cancel');
         },
 
@@ -158,9 +155,9 @@ export function discussionEditor(options = {}) {
 
             this.saving = true;
             this.error = '';
-            const body = document.querySelector(`${this.target.anchor} [data-message-body]`);
-            const previousText = this.target.text;
-            if (body) body.textContent = text;
+            const content = document.querySelector(`${this.target.anchor} [data-message-content]`);
+            const previousContent = content?.innerHTML ?? '';
+            if (content) content.textContent = text;
 
             try {
                 const response = await fetch(this.target.updateUrl, {
@@ -171,11 +168,11 @@ export function discussionEditor(options = {}) {
                 });
                 const data = await response.json().catch(() => ({}));
                 if (!response.ok) throw new Error(Object.values(data.errors ?? {}).flat().join(' ') || data.message || 'Не удалось сохранить сообщение.');
-                if (body) body.textContent = data.text ?? text;
+                if (content && data.content) content.outerHTML = data.content;
                 this.$dispatch('discussion-toast', { type: 'success', message: 'Сообщение изменено' });
                 this.cancel();
             } catch (error) {
-                if (body) body.textContent = previousText;
+                if (content) content.innerHTML = previousContent;
                 this.error = error.message || 'Не удалось сохранить сообщение.';
             } finally {
                 this.saving = false;
