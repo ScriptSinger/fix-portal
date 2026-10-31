@@ -5,17 +5,17 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Public\UpdateReplyRequest;
 use App\Models\Comment;
-use App\Models\Firmware;
-use App\Models\Post;
-use App\Models\Question;
 use App\Models\Reply;
 use App\Services\ActivityNotifier;
-use App\Support\MessageBody;
+use App\Services\DiscussionMessageService;
 use Illuminate\Http\Request;
 
 class ReplyController extends Controller
 {
-    public function __construct(private readonly ActivityNotifier $notifier)
+    public function __construct(
+        private readonly ActivityNotifier $notifier,
+        private readonly DiscussionMessageService $messages,
+    )
     {
     }
 
@@ -29,14 +29,13 @@ class ReplyController extends Controller
         ]);
 
         $userId = auth()->user()->id;
-        $text = MessageBody::make($data['text'] ?? null, $data['images'] ?? [], $userId);
-        abort_if($text === '', 422, 'Пустое сообщение');
+        $text = $this->messages->makeText($data['text'] ?? null, $data['images'] ?? [], $userId);
         // цитировать можно только ответ из этой же ветки
         $quote = ! empty($data['quote_reply_id']) ? $comment->replies()->whereKey($data['quote_reply_id'])->value('id') : null;
         $reply = $comment->replies()->create(['text' => $text, 'user_id' => $userId, 'quote_reply_id' => $quote]);
         $this->notifier->replied($reply, auth()->user());
 
-        return redirect()->to($this->discussionUrl($reply->comment->commentable))->withFragment('r-' . $reply->id);
+        return redirect()->to($this->messages->url($reply))->withFragment('r-' . $reply->id);
     }
 
     public function update(UpdateReplyRequest $request, Reply $reply)
@@ -44,43 +43,17 @@ class ReplyController extends Controller
         $this->authorize('update', $reply);
 
         $data = $request->validated();
-        $text = MessageBody::make(
-            $data['text'] ?? null,
-            $data['images'] ?? [],
-            auth()->id(),
-            $this->existingImages($reply->text),
-        );
-        abort_if($text === '', 422, 'Пустое сообщение');
-
-        $reply->update(['text' => $text]);
+        $this->messages->update($reply, $data, auth()->id());
 
         if ($request->expectsJson()) {
             return response()->json([
-                'text' => MessageBody::toPlain($reply->text),
-                'content' => view('public.partials.discussion-content', ['message' => $reply])->render(),
+                'text' => $this->messages->plain($reply),
+                'content' => $this->messages->rendered($reply),
                 'id' => $reply->id,
             ]);
         }
 
-        return redirect()->to($this->discussionUrl($reply->comment->commentable))->withFragment('r-' . $reply->id);
-    }
-
-    /** @return list<string> */
-    private function existingImages(?string $body): array
-    {
-        preg_match_all('/<img[^>]+src=["\']([^"\']+)["\']/i', (string) $body, $matches);
-
-        return array_values(array_unique($matches[1] ?? []));
-    }
-
-    private function discussionUrl($subject): string
-    {
-        return match (class_basename($subject)) {
-            'Post' => route('articles.show', ['article' => $subject->slug]),
-            'Question' => route('questions.show', ['question' => $subject->slug]),
-            'Firmware' => route('firmwares.show', ['firmware' => $subject->id]),
-            default => url('/'),
-        };
+        return redirect()->to($this->messages->url($reply))->withFragment('r-' . $reply->id);
     }
 
     public function destroy(Request $request, Reply $reply)
