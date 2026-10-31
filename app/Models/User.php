@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'location',
@@ -114,6 +115,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         parent::boot();
 
+        static::creating(function (User $user): void {
+            if (blank($user->username)) {
+                $user->username = static::makeUsername($user->name);
+            }
+        });
+
         // Пользователь стирается окончательно вместе со своими вопросами, комментариями и привязками соцсетей:
         // иначе занятая «пустая» привязка не пустила бы его войти через ту же соцсеть заново
         static::deleting(function ($user) {
@@ -124,6 +131,22 @@ class User extends Authenticatable implements MustVerifyEmail
             \App\Models\Reaction::where('user_id', $user->id)->delete();
             $user->notifications()->delete();
         });
+    }
+
+    public static function makeUsername(?string $name): string
+    {
+        $base = Str::lower(Str::slug((string) $name, '_'));
+        $base = preg_replace('/[^a-z0-9_]+/', '', $base) ?: 'user';
+        $base = Str::substr($base, 0, 32);
+        $candidate = $base;
+        $suffix = 1;
+
+        while (static::query()->where('username', $candidate)->exists()) {
+            $tail = '_' . $suffix++;
+            $candidate = Str::substr($base, 0, 32 - Str::length($tail)) . $tail;
+        }
+
+        return $candidate;
     }
 
     public function hasVerifiedEmail()

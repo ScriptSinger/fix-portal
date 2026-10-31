@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Notifications\ActivityNotification;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use App\Services\LatestDiscussion;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
 
@@ -96,7 +98,7 @@ class CabinetTest extends TestCase
     {
         $me = User::factory()->create(['name' => 'Прежнее имя']);
 
-        $this->actingAs($me)->put(route('profile.update'), ['name' => '', 'phone' => '', 'location' => '', 'bio' => ''])->assertSessionHasNoErrors();
+        $this->actingAs($me)->put(route('profile.update'), ['name' => '', 'username' => $me->username, 'phone' => '', 'location' => '', 'bio' => ''])->assertSessionHasNoErrors();
 
         $this->assertSame('Прежнее имя', $me->refresh()->name);
     }
@@ -107,10 +109,48 @@ class CabinetTest extends TestCase
         $this->actingAs($me);
 
         $this->put(route('profile.update'), ['phone' => '123'])->assertSessionHasErrors('phone');
-        $this->put(route('profile.update'), ['name' => 'Новое имя', 'phone' => '+7 (900) 111-22-33', 'location' => 'Уфа', 'bio' => 'Чиню технику'])->assertSessionHasNoErrors();
+        $this->put(route('profile.update'), ['name' => 'Новое имя', 'username' => $me->username, 'phone' => '+7 (900) 111-22-33', 'location' => 'Уфа', 'bio' => 'Чиню технику'])->assertSessionHasNoErrors();
 
         $me->refresh();
         $this->assertSame(['Новое имя', '+7 (900) 111-22-33', 'Уфа'], [$me->name, $me->phone, $me->location]);
+    }
+
+    public function test_profile_saves_a_valid_unique_username(): void
+    {
+        $me = User::factory()->create();
+
+        $this->actingAs($me)
+            ->put(route('profile.update'), ['username' => 'master_ufa'])
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('master_ufa', $me->fresh()->username);
+    }
+
+    public function test_profile_rejects_duplicate_and_invalid_usernames(): void
+    {
+        $me = User::factory()->create();
+        User::factory()->create(['username' => 'taken_name']);
+
+        $this->actingAs($me)
+            ->put(route('profile.update'), ['username' => 'taken_name'])
+            ->assertSessionHasErrors('username');
+
+        $this->actingAs($me)
+            ->put(route('profile.update'), ['username' => 'Bad Name'])
+            ->assertSessionHasErrors('username');
+    }
+
+    public function test_profile_avatar_changes_invalidate_latest_discussions_cache(): void
+    {
+        $me = User::factory()->create();
+        $me->avatar()->create(['uri' => 'images/users/avatar.webp', 'mime' => 'image/webp', 'size' => 10]);
+        Cache::put(LatestDiscussion::CACHE_KEY, collect(['stale']), now()->addHour());
+
+        $this->actingAs($me)->put(route('profile.update'), ['remove_avatar' => true])->assertRedirect();
+
+        $this->assertTrue(Cache::missing(LatestDiscussion::CACHE_KEY));
+        $this->assertDatabaseMissing('avatars', ['user_id' => $me->id]);
     }
 
     public function test_password_change_needs_the_current_password(): void

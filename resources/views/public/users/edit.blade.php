@@ -39,6 +39,15 @@
                     @error('name')<p class="{{ $err }}">{{ $message }}</p>@enderror
                 </div>
                 <div>
+                    <label for="f-username" class="{{ $label }}">Username</label>
+                    <div class="flex items-center">
+                        <span class="flex h-10 items-center rounded-l-lg border border-r-0 border-line bg-surface px-3 text-subtle">@</span>
+                        <input id="f-username" name="username" type="text" value="{{ old('username', $user->username) }}" minlength="3" maxlength="32" pattern="[a-z0-9_]{3,32}" autocomplete="username" class="{{ $input }} rounded-l-none" @error('username') aria-invalid="true" @enderror>
+                    </div>
+                    <p class="mt-1 mb-0 text-[13px] text-subtle">3–32 символа: латиница, цифры и нижнее подчёркивание.</p>
+                    @error('username')<p class="{{ $err }}">{{ $message }}</p>@enderror
+                </div>
+                <div>
                     <label for="f-email" class="{{ $label }}">Логин (email)</label>
                     <input id="f-email" type="email" value="{{ $user->email }}" readonly class="{{ $input }} bg-surface text-subtle">
                 </div>

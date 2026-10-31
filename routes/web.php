@@ -16,6 +16,7 @@ use App\Http\Controllers\Public\ReplyController;
 use App\Http\Controllers\Public\SolutionController;
 use App\Http\Controllers\Public\TagController;
 use App\Http\Controllers\Public\UserController;
+use App\Http\Controllers\Public\UserProfileController;
 
 // use function Laravel\Prompts\search;
 
@@ -67,6 +68,10 @@ Route::get('/tag/{tag}', [TagController::class, 'show'])->name('tags.show');
 Route::resource('questions', QuestionController::class);
 
 Route::get('/appliances/{appliance}', [ApplianceController::class, 'show'])->name('public.appliances.show');
+
+Route::get('/users/{user:username}/profile', [UserProfileController::class, 'show'])
+    ->middleware('throttle:profiles')
+    ->name('users.profile');
 
 Route::get('/firmwares', [FirmwareController::class, 'index'])->name('firmwares.index');
 
