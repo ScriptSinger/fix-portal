@@ -40,4 +40,11 @@ class UserProfileController extends Controller
 
         return new UserProfileResource($user);
     }
+
+    public function redirectByUsername(string $username)
+    {
+        $user = User::query()->where('username', $username)->firstOrFail();
+
+        return redirect()->route('users.profile', ['user' => $user->id], 301);
+    }
 }

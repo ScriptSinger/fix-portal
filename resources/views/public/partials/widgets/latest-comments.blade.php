@@ -9,13 +9,14 @@
             @foreach ($latest_discussions as $item)
                 @php($message = $item['message'])
                 <li class="{{ $item['firstInSeries'] ? 'mt-2' : '-mt-1' }}">
-                        <a href="{{ $item['url'] }}" aria-label="{{ $item['kind'] }}: {{ $item['subject']->title }} — {{ $item['excerpt'] }}" class="group flex min-w-0 items-end gap-2 rounded-lg no-underline focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1">
+                        <div class="group flex min-w-0 items-end gap-2">
                         @if ($item['firstInSeries'])
-                            <x-ui.avatar :user="$message->user" size="size-8" />
+                            <x-ui.avatar :user="$message->user" size="size-8" profile />
                         @else
                             <span class="size-8 shrink-0" aria-hidden="true"></span>
                         @endif
-                        <span class="relative min-w-0 flex-1 rounded-2xl rounded-bl-md bg-white px-3 py-2 shadow-[0_1px_1px_rgba(0,0,0,.08)] ring-1 ring-line transition group-hover:bg-brand-50">
+                        <a href="{{ $item['url'] }}" aria-label="{{ $item['kind'] }}: {{ $item['subject']->title }} — {{ $item['excerpt'] }}" class="min-w-0 flex-1 rounded-lg no-underline focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1">
+                        <span class="relative block rounded-2xl rounded-bl-md bg-white px-3 py-2 shadow-[0_1px_1px_rgba(0,0,0,.08)] ring-1 ring-line transition group-hover:bg-brand-50">
                             @if ($item['firstInSeries'])<span class="telegram-widget-tail" aria-hidden="true"></span>@endif
                             <span class="flex items-center justify-between gap-2 text-xs leading-4">
                                 @if ($item['firstInSeries'])
@@ -28,7 +29,8 @@
                             <span class="mt-0.5 block truncate text-[11px] leading-4 text-subtle">{{ $item['subject']->title }}</span>
                             <span class="mt-1 block line-clamp-2 text-[13px] leading-[18px] text-body group-hover:text-ink">{{ $item['excerpt'] }}</span>
                         </span>
-                    </a>
+                        </a>
+                        </div>
                 </li>
             @endforeach
         </ul>

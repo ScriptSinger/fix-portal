@@ -15,6 +15,7 @@ import bell from './components/bell';
 import firmwareFilter from './components/firmwareFilter';
 import articleToc from './components/articleToc';
 import discussionMessage, { discussionEditor } from './components/discussionMessage';
+import userProfile from './components/userProfile';
 
 Alpine.plugin(collapse);
 // Показана ли стрелка «вниз» в ленте ответов: стрелка «Наверх» тогда встаёт над ней
@@ -27,6 +28,7 @@ Alpine.data('firmwareFilter', firmwareFilter);
 Alpine.data('articleToc', articleToc);
 Alpine.data('discussionMessage', discussionMessage);
 Alpine.data('discussionEditor', discussionEditor);
+Alpine.data('userProfile', userProfile);
 
 anchorScroll();
 document.addEventListener('DOMContentLoaded', carousel);

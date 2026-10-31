@@ -14,7 +14,7 @@ final class UserProfileTest extends TestCase
 {
     use CreatesDiscussions, DatabaseTransactions;
 
-    public function test_guest_can_read_public_profile_by_username(): void
+    public function test_guest_can_read_public_profile_by_id(): void
     {
         $user = User::factory()->create([
             'name' => 'Александр Николаевич',
@@ -28,7 +28,7 @@ final class UserProfileTest extends TestCase
         $reply = Reply::factory()->create(['user_id' => $user->id, 'comment_id' => $comment->id]);
         $question->forceFill(['solved_at' => now(), 'solution_type' => 'reply', 'solution_id' => $reply->id])->save();
 
-        $this->get(route('users.profile', ['user' => $user->username]))
+        $this->get(route('users.profile', ['user' => $user->id]))
             ->assertOk()
             ->assertJsonPath('data.name', 'Александр Николаевич')
             ->assertJsonPath('data.username', 'alexand_nikol')
@@ -41,15 +41,23 @@ final class UserProfileTest extends TestCase
             ->assertJsonMissingPath('data.password');
     }
 
-    public function test_unknown_username_returns_not_found(): void
+    public function test_unknown_user_id_returns_not_found(): void
     {
-        $this->get('/users/not-existing-user/profile')->assertNotFound();
+        $this->get('/users/999999999/profile')->assertNotFound();
     }
 
     public function test_profile_endpoint_is_available_without_authentication(): void
     {
         $user = User::factory()->create(['username' => 'public_user']);
 
-        $this->get(route('users.profile', ['user' => $user->username]))->assertOk();
+        $this->get(route('users.profile', ['user' => $user->id]))->assertOk();
+    }
+
+    public function test_legacy_username_profile_url_redirects_to_id_url(): void
+    {
+        $user = User::factory()->create(['username' => 'legacy_user']);
+
+        $this->get('/users/legacy_user/profile')
+            ->assertRedirect(route('users.profile', ['user' => $user->id]));
     }
 }

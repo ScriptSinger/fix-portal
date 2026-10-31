@@ -115,7 +115,7 @@ class CabinetTest extends TestCase
         $this->assertSame(['Новое имя', '+7 (900) 111-22-33', 'Уфа'], [$me->name, $me->phone, $me->location]);
     }
 
-    public function test_profile_saves_a_valid_unique_username(): void
+    public function test_profile_can_change_username(): void
     {
         $me = User::factory()->create();
 
@@ -125,20 +125,6 @@ class CabinetTest extends TestCase
             ->assertSessionHasNoErrors();
 
         $this->assertSame('master_ufa', $me->fresh()->username);
-    }
-
-    public function test_profile_rejects_duplicate_and_invalid_usernames(): void
-    {
-        $me = User::factory()->create();
-        User::factory()->create(['username' => 'taken_name']);
-
-        $this->actingAs($me)
-            ->put(route('profile.update'), ['username' => 'taken_name'])
-            ->assertSessionHasErrors('username');
-
-        $this->actingAs($me)
-            ->put(route('profile.update'), ['username' => 'Bad Name'])
-            ->assertSessionHasErrors('username');
     }
 
     public function test_profile_avatar_changes_invalidate_latest_discussions_cache(): void

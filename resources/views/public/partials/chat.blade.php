@@ -69,7 +69,7 @@
             @endif
             <div data-discussion-row class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-end gap-2 {{ $e->firstInSeries ? 'mt-2.5' : '' }}">
                 @if ($e->lastInSeries)
-                    <x-ui.avatar :user="$m->user" size="size-9" />
+                    <x-ui.avatar :user="$m->user" size="size-9" profile />
                 @else
                     <span class="size-9" aria-hidden="true"></span>
                 @endif

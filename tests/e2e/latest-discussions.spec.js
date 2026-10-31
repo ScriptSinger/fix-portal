@@ -39,3 +39,24 @@ test('latest discussion links are keyboard accessible', async ({ page }) => {
     await expect(link).toBeFocused();
     await expect(link).toHaveAttribute('aria-label', /Комментарий|Ответ/);
 });
+
+test('avatar opens the public profile and Escape returns focus', async ({ page }) => {
+    await page.goto('/');
+
+    const avatar = page.locator('section[aria-label="Последние комментарии и ответы"] button[aria-label^="Открыть профиль:"]').first();
+    await expect(avatar).toBeVisible();
+    const profileStatus = (await page.request.get(await avatar.getAttribute('data-user-profile-url'))).status();
+    await avatar.click();
+
+    const dialog = page.locator('[role="dialog"][aria-labelledby="user-profile-name"]');
+    await expect(dialog).toBeVisible();
+    if (profileStatus === 200) {
+        await expect(dialog.locator('#user-profile-name')).not.toBeEmpty();
+    } else {
+        await expect(dialog).toContainText('Профиль недоступен');
+    }
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(avatar).toBeFocused();
+});

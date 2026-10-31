@@ -96,6 +96,8 @@
     @endif
     <x-ui.flash />
 
+    @include('public.partials.user-profile')
+
     <div id="lightbox" class="fixed inset-0 z-[70] hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Изображение">
         <div class="max-h-full w-full max-w-[800px] overflow-y-auto rounded border border-black/20 bg-white">
             <div class="flex items-center justify-end border-b border-[#e9ecef] p-4">

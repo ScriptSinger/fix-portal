@@ -69,9 +69,14 @@ Route::resource('questions', QuestionController::class);
 
 Route::get('/appliances/{appliance}', [ApplianceController::class, 'show'])->name('public.appliances.show');
 
-Route::get('/users/{user:username}/profile', [UserProfileController::class, 'show'])
+Route::get('/users/{user}/profile', [UserProfileController::class, 'show'])
+    ->whereNumber('user')
     ->middleware('throttle:profiles')
     ->name('users.profile');
+Route::get('/users/{username}/profile', [UserProfileController::class, 'redirectByUsername'])
+    ->where('username', '[a-z0-9_]+')
+    ->middleware('throttle:profiles')
+    ->name('users.profile.legacy');
 
 Route::get('/firmwares', [FirmwareController::class, 'index'])->name('firmwares.index');
 
