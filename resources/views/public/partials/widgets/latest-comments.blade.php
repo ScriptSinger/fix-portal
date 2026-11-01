@@ -1,4 +1,5 @@
 @if ($latest_discussions->isNotEmpty())
+    @php($names = ['text-orange-700', 'text-teal-700', 'text-violet-700', 'text-pink-700', 'text-blue-700'])
     <x-ui.widget title="Последние обсуждения" title-class="sr-only" aria-label="Последние комментарии и ответы" class="overflow-hidden bg-surface p-0">
         <div class="flex items-center gap-2 border-b border-line bg-white px-4 py-2.5">
             <div class="min-w-0">
@@ -19,7 +20,7 @@
                         <span class="relative block rounded-2xl rounded-bl-md bg-white px-3 py-1.5 shadow-[0_1px_1px_rgba(0,0,0,.08)] ring-1 ring-line transition group-hover:bg-brand-50">
                             <span class="flex items-center justify-between gap-2 text-xs leading-4">
                                 @if ($item['firstInSeries'])
-                                    <span class="truncate font-bold text-ink group-hover:text-black">{{ $message->user->name }}</span>
+                                    <span class="truncate font-bold {{ $names[$message->user_id % count($names)] }} group-hover:text-black">{{ $message->user->name }}</span>
                                 @else
                                     <span class="truncate text-[11px] text-subtle">{{ $item['kind'] }}</span>
                                 @endif
