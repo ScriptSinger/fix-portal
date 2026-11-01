@@ -46,6 +46,7 @@ final class ArticleHtmlNormalizer
             self::cleanNode($child);
         }
 
+        self::removeLegacyPopupLinks($root);
         self::removeLegacyWidgetText($root);
         self::removeEmbeddedToc($root);
 
@@ -59,6 +60,31 @@ final class ArticleHtmlNormalizer
         }
 
         return trim($result);
+    }
+
+    private static function removeLegacyPopupLinks(DOMElement $root): void
+    {
+        foreach (iterator_to_array($root->getElementsByTagName('a')) as $link) {
+            if (! preg_match('~^#popup-[0-9]+$~i', trim($link->getAttribute('href')))) {
+                continue;
+            }
+
+            $images = $link->getElementsByTagName('img');
+            if ($images->length !== 1) {
+                $link->removeAttribute('href');
+                continue;
+            }
+
+            $image = $images->item(0);
+            $image->setAttribute('data-lightbox-cover', '');
+            $parent = $link->parentNode;
+            if (! $parent) {
+                continue;
+            }
+
+            $parent->insertBefore($image, $link);
+            $parent->removeChild($link);
+        }
     }
 
     private static function removeLegacyWidgetText(DOMElement $root): void
@@ -146,7 +172,7 @@ final class ArticleHtmlNormalizer
     {
         $allowed = match (strtolower($node->tagName)) {
             'a' => ['href', 'title'],
-            'img' => ['src', 'alt', 'width', 'height', 'data-full'],
+            'img' => ['src', 'alt', 'width', 'height', 'data-full', 'data-lightbox-cover'],
             'iframe' => ['src', 'width', 'height', 'allow', 'allowfullscreen', 'title', 'loading'],
             'th', 'td' => ['colspan', 'rowspan', 'scope'],
             default => [],
