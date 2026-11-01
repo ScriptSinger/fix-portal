@@ -91,7 +91,13 @@
                     </form>
                 @endcan
                 <span class="inline-flex items-center gap-1"><x-ui.icon name="eye" class="size-3" />{{ $question->views }}</span>
-                <span>{{ optional($question->user)->name }}</span>
+                @if ($question->user)
+                    <button type="button" data-user-profile-url="{{ route('users.profile', ['user' => $question->user->id]) }}"
+                        class="text-left hover:text-ink hover:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500"
+                        aria-label="Открыть профиль: {{ $question->user->name }}">{{ $question->user->name }}</button>
+                @else
+                    <span>Посетитель</span>
+                @endif
                 <time datetime="{{ $question->dateAsCarbon->toIso8601String() }}">{{ $question->dateAsCarbon->translatedFormat('j F Y, H:i') }}</time>
             </footer>
         </article>
