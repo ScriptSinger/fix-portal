@@ -226,15 +226,26 @@
 @push('scripts')
     <script>
         (() => {
+            let userInteracted = false;
+            const timers = [];
+            const stopAlignment = () => {
+                userInteracted = true;
+                timers.splice(0).forEach((timer) => window.clearTimeout(timer));
+            };
             const focusDiscussion = () => {
+                if (userInteracted) return;
                 const id = window.location.hash.match(/^#(?:c|r)-\d+$/)?.[0]?.slice(1);
                 const target = id ? document.getElementById(id) : null;
                 if (!target) return;
                 target.focus({ preventScroll: false });
                 window.scrollTo({ top: Math.max(0, target.getBoundingClientRect().top + window.scrollY - 100), behavior: 'auto' });
             };
+            window.addEventListener('wheel', stopAlignment, { once: true, passive: true });
+            window.addEventListener('touchstart', stopAlignment, { once: true, passive: true });
+            window.addEventListener('pointerdown', stopAlignment, { once: true, passive: true });
+            window.addEventListener('keydown', stopAlignment, { once: true });
             window.addEventListener('load', () => window.setTimeout(focusDiscussion, 0), { once: true });
-            for (let i = 1; i <= 20; i += 1) window.setTimeout(focusDiscussion, i * 250);
+            for (let i = 1; i <= 20; i += 1) timers.push(window.setTimeout(focusDiscussion, i * 250));
         })();
     </script>
 @endpush
