@@ -10,7 +10,7 @@ class CategoryController extends Controller
     public function show($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
-        $posts = $category->posts()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->paginate(15);
+        $posts = $category->posts()->published()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->paginate(15);
 
         return view('public.categories.show', compact('category', 'posts'));
     }

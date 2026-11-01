@@ -11,6 +11,7 @@ use App\MoonShine\Pages\ResourceFormPage;
 use App\MoonShine\Support\TinyMceUpload;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
+use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
@@ -82,6 +83,8 @@ class QuestionResource extends BaseResource
         return [
             ...$this->indexFields(),
             Textarea::make('Описание', 'description')->unescape(),
+            HasMany::make('Комментарии и ответы', 'comments', resource: CommentResource::class),
+            HasMany::make('Публикации', 'announcements', resource: QuestionAnnouncementResource::class),
         ];
     }
 

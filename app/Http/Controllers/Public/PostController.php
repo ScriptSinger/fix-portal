@@ -12,7 +12,7 @@ class PostController extends Controller
     /** Главная: баннер и последние статьи; полный список с поиском и страницами живёт на /articles. */
     public function home()
     {
-        $posts = Post::query()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->limit(6)->get();
+        $posts = Post::published()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->limit(6)->get();
 
         return view('public.posts.home', compact('posts'));
     }
@@ -20,7 +20,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = app(Pipeline::class)
-            ->send(Post::query())
+            ->send(Post::published())
             ->through([
                 TextFilter::class,
             ])
@@ -34,7 +34,7 @@ class PostController extends Controller
 
     public function show($slug)
     {
-        $post = Post::where('slug', $slug)
+        $post = Post::published()->where('slug', $slug)
             ->with([
                 'comments.user.avatar',
                 'comments.reactions',
@@ -54,7 +54,7 @@ class PostController extends Controller
 
         $postTags = $post->tags;
         // Найдите другие статьи, содержащие хотя бы один из этих тегов
-        $relatedPosts = Post::whereHas('tags', function ($query) use ($postTags) {
+        $relatedPosts = Post::published()->whereHas('tags', function ($query) use ($postTags) {
             $query->whereIn('title', $postTags->pluck('title'));
         })->where('slug', '!=', $slug)
             ->orderBy('views', 'desc') // Сортировка по количеству просмотров в порядке убывания

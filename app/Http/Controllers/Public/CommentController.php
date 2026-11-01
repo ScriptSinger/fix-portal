@@ -34,7 +34,9 @@ class CommentController extends Controller
     {
         $data = $request->validated();
         $model = self::COMMENTABLES[strtolower($type)] ?? abort(404);
-        $commentable = $model::findOrFail($id);
+        $commentable = $model === Post::class
+            ? $model::published()->findOrFail($id)
+            : $model::findOrFail($id);
         $userId = auth()->user()->id;
         $text = $this->messages->makeText($data['text'] ?? null, $data['images'] ?? [], $userId);
         $comment = DB::transaction(fn () => $commentable->comments()->create([

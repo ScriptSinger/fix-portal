@@ -55,8 +55,8 @@ class GenerateSitemap extends Command
         // Дата изменения в карте должна быть настоящей: у списков это дата последней записи в них,
         // у текстовых страниц («О нас», «Как это работает») реальной даты в данных нет, поэтому её не указываем совсем
         // (лучше пропустить дату, чем писать «сегодня» при каждой генерации: поисковики перестают ей верить).
-        $sitemap->add($this->makeUrl(route('home'), $this->latest(Post::class), 1.0, Url::CHANGE_FREQUENCY_DAILY));
-        $sitemap->add($this->makeUrl(route('articles.index'), $this->latest(Post::class), 0.9, Url::CHANGE_FREQUENCY_DAILY));
+        $sitemap->add($this->makeUrl(route('home'), $this->latest(Post::class, fn ($q) => $q->published()), 1.0, Url::CHANGE_FREQUENCY_DAILY));
+        $sitemap->add($this->makeUrl(route('articles.index'), $this->latest(Post::class, fn ($q) => $q->published()), 0.9, Url::CHANGE_FREQUENCY_DAILY));
         $sitemap->add($this->makeUrl(route('about'), null, 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
         $sitemap->add($this->makeUrl(route('how-it-works'), null, 0.6, Url::CHANGE_FREQUENCY_MONTHLY));
         // $sitemap->add($this->makeUrl(route('users.index'), now(), 0.5, Url::CHANGE_FREQUENCY_WEEKLY));
@@ -79,7 +79,7 @@ class GenerateSitemap extends Command
 
     private function addModelUrls(Sitemap $sitemap): void
     {
-        Post::query()
+        Post::published()
             ->select(['slug', 'updated_at'])
             ->orderBy('id')
             ->chunk(500, function ($posts) use ($sitemap) {

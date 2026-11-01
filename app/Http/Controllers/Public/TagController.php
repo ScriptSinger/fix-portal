@@ -9,7 +9,7 @@ class TagController extends Controller
 {
     public function index()
     {
-        $tags = Tag::withCount('posts')->get();
+        $tags = Tag::withCount(['posts' => fn ($query) => $query->published()])->get();
 
         return view('public.tags.index', compact('tags'));
     }
@@ -17,7 +17,7 @@ class TagController extends Controller
     public function show($slug)
     {
         $tag = Tag::where('slug', $slug)->firstOrFail();
-        $posts = $tag->posts()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->paginate(10);
+        $posts = $tag->posts()->published()->with('category', 'thumbnail', 'administrator')->orderBy('id', 'desc')->paginate(10);
 
         return view('public.tags.show', compact('tag', 'posts'));
     }

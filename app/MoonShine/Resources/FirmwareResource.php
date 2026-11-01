@@ -8,6 +8,7 @@ use App\Models\Firmware;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
+use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
@@ -66,6 +67,7 @@ class FirmwareResource extends BaseResource
             ...$this->indexFields(),
             Text::make('CRC32', 'crc32'),
             Textarea::make('Данные', 'data')->unescape(),
+            HasMany::make('Комментарии и ответы', 'comments', resource: CommentResource::class),
         ];
     }
 

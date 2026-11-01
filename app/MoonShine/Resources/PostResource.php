@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources;
 
+use App\Enums\PostStatus;
 use App\Models\Administrator;
 use App\Models\Post;
+use App\Models\Tag;
 use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Support\TinyMceUpload;
 use App\Services\ThumbnailService;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Fields\Relationships\BelongsToMany;
@@ -17,10 +20,13 @@ use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\TinyMce\Fields\TinyMce;
+use MoonShine\UI\Fields\DateRange;
+use MoonShine\UI\Fields\Enum;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Image;
 use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Preview;
+use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
@@ -59,6 +65,7 @@ class PostResource extends BaseResource
                 icon: 'arrow-top-right-on-square',
                 blank: true,
             ),
+            Enum::make('Статус', 'status')->attach(PostStatus::class),
             BelongsTo::make('Категория', 'category', 'title', CategoryResource::class),
             Number::make('Просмотры', 'views')->sortable(),
             LocalDate::make('Создана', 'created_at')->format('d.m.Y H:i')->sortable(),
@@ -72,7 +79,9 @@ class PostResource extends BaseResource
             Text::make('Slug', 'slug'),
             Textarea::make('Описание', 'description'),
             Textarea::make('Содержимое', 'content')->unescape(),
+            Enum::make('Статус', 'status')->attach(PostStatus::class),
             BelongsToMany::make('Теги', 'tags', 'title', TagResource::class),
+            HasMany::make('Комментарии и ответы', 'comments', resource: CommentResource::class),
             HasMany::make('CTA', 'ctas', resource: CtaResource::class),
         ];
     }
@@ -82,6 +91,7 @@ class PostResource extends BaseResource
         return [
             ID::make(),
             Text::make('Заголовок', 'title')->required(),
+            Enum::make('Статус', 'status')->attach(PostStatus::class)->default(PostStatus::Published->value),
             Textarea::make('Описание', 'description')->required(),
             TinyMceUpload::withImageUpload(TinyMce::make('Содержимое', 'content'))
                 ->required(),
@@ -120,6 +130,34 @@ class PostResource extends BaseResource
     {
         return [
             BelongsTo::make('Категория', 'category', 'title', CategoryResource::class)->nullable(),
+            Enum::make('Статус', 'status')->attach(PostStatus::class)->nullable(),
+            Select::make('Тег', 'tag_id')
+                ->options(Tag::query()->orderBy('title')->pluck('title', 'id')->all())
+                ->nullable()
+                ->searchable()
+                ->onApply(static function (Builder $query, $value): Builder {
+                    return blank($value)
+                        ? $query
+                        : $query->whereHas('tags', static fn (Builder $tags) => $tags->whereKey($value));
+                }),
+            Select::make('Автор', 'administrator_id')
+                ->options(Administrator::query()->orderBy('name')->pluck('name', 'id')->all())
+                ->nullable()
+                ->searchable()
+                ->onApply(static function (Builder $query, $value): Builder {
+                    return blank($value) ? $query : $query->where('administrator_id', $value);
+                }),
+            DateRange::make('Создана', 'created_at'),
+            Number::make('Просмотры от', 'views_from')
+                ->nullable()
+                ->onApply(static function (Builder $query, $value): Builder {
+                    return blank($value) ? $query : $query->where('views', '>=', (int) $value);
+                }),
+            Number::make('Просмотры до', 'views_to')
+                ->nullable()
+                ->onApply(static function (Builder $query, $value): Builder {
+                    return blank($value) ? $query : $query->where('views', '<=', (int) $value);
+                }),
         ];
     }
 

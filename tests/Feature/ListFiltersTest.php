@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Enums\PostStatus;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -56,6 +57,23 @@ class ListFiltersTest extends TestCase
         $this->get(route('articles.index', ['text' => $post->title]))->assertOk()->assertViewHas('posts', fn ($posts) => $posts->pluck('id')->contains($post->id));
         $this->get(route('articles.index', ['text' => '%']))->assertOk()->assertViewHas('posts', fn ($posts) => $posts->total() === 0);
         $this->assertInstanceOf(Post::class, $post);
+    }
+
+    public function test_only_published_articles_are_public(): void
+    {
+        $published = $this->subject('post');
+        $draft = $this->subject('post');
+        $draft->update(['status' => PostStatus::Draft]);
+        $archived = $this->subject('post');
+        $archived->update(['status' => PostStatus::Archived]);
+
+        $this->get(route('articles.index'))
+            ->assertSee($published->title)
+            ->assertDontSee($draft->title)
+            ->assertDontSee($archived->title);
+
+        $this->get(route('articles.show', ['article' => $draft->slug]))->assertNotFound();
+        $this->get(route('articles.show', ['article' => $archived->slug]))->assertNotFound();
     }
 
     public function test_empty_lists_explain_what_to_do(): void
