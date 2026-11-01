@@ -25,7 +25,7 @@ return new class extends Migration
         foreach ([['dislikes', 'dislikeable', '👎'], ['likes', 'likeable', '👍']] as [$source, $morph, $emoji]) {
             DB::table($source)->whereNull('deleted_at')->orderBy('id')->each(function ($row) use ($morph, $emoji) {
                 DB::table('reactions')->updateOrInsert(
-                    ['user_id' => $row->user_id, 'reactable_type' => $row->{$morph . '_type'}, 'reactable_id' => $row->{$morph . '_id'}],
+                    ['user_id' => $row->user_id, 'reactable_type' => $row->{$morph.'_type'}, 'reactable_id' => $row->{$morph.'_id'}],
                     ['emoji' => $emoji, 'created_at' => $row->created_at, 'updated_at' => $row->updated_at],
                 );
             });

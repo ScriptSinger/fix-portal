@@ -12,9 +12,7 @@ use Illuminate\Http\Request;
 
 class SolutionController extends Controller
 {
-    public function __construct(private readonly ActivityNotifier $notifier, private readonly QuestionAnnouncer $announcer)
-    {
-    }
+    public function __construct(private readonly ActivityNotifier $notifier, private readonly QuestionAnnouncer $announcer) {}
 
     /** Автор отмечает вопрос решённым, при желании указывает ответ-решение. Можно сменить решение. */
     public function store(Request $request, int $id)
@@ -53,7 +51,7 @@ class SolutionController extends Controller
             $this->notifier->solution($question, $message, $request->user());
         }
 
-        return redirect(route('questions.show', ['question' => $question->slug]) . ($message ? '#' . ($data['type'] === 'comment' ? 'c-' : 'r-') . $message->id : ''));
+        return redirect(route('questions.show', ['question' => $question->slug]).($message ? '#'.($data['type'] === 'comment' ? 'c-' : 'r-').$message->id : ''));
     }
 
     public function destroy(Request $request, int $id)

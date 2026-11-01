@@ -3,16 +3,15 @@
 namespace App\Models;
 
 use App\Mail\RegistrationConfirmation;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-
+use App\Notifications\QueuedResetPassword;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use App\Notifications\QueuedResetPassword;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -20,7 +19,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, DateTrait, ImageHandlerTrait; // Использовать трейт для добавления метода getDate  ;
+    use DateTrait, HasApiTokens, HasFactory, ImageHandlerTrait, Notifiable; // Использовать трейт для добавления метода getDate  ;
 
     /**
      * The attributes that are mass assignable.
@@ -36,7 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone',
         'bio',
         'avatar',
-        'role_id'
+        'role_id',
     ];
 
     /**
@@ -79,7 +78,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query->where('last_seen_at', '>=', now()->subMinutes(self::ONLINE_MINUTES));
     }
 
-
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
@@ -110,7 +108,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Avatar::class);
     }
 
-
     protected static function boot()
     {
         parent::boot();
@@ -126,9 +123,9 @@ class User extends Authenticatable implements MustVerifyEmail
         static::deleting(function ($user) {
             $user->comments()->get()->each->delete();
             $user->questions()->get()->each->delete();
-            \App\Models\SocialAccount::where('user_id', $user->id)->delete();
+            SocialAccount::where('user_id', $user->id)->delete();
             $user->avatar()->delete();
-            \App\Models\Reaction::where('user_id', $user->id)->delete();
+            Reaction::where('user_id', $user->id)->delete();
             $user->notifications()->delete();
         });
     }
@@ -142,8 +139,8 @@ class User extends Authenticatable implements MustVerifyEmail
         $suffix = 1;
 
         while (static::query()->where('username', $candidate)->exists()) {
-            $tail = '_' . $suffix++;
-            $candidate = Str::substr($base, 0, 32 - Str::length($tail)) . $tail;
+            $tail = '_'.$suffix++;
+            $candidate = Str::substr($base, 0, 32 - Str::length($tail)).$tail;
         }
 
         return $candidate;

@@ -18,9 +18,7 @@ class ReplyController extends Controller
         private readonly ActivityNotifier $notifier,
         private readonly DiscussionMessageService $messages,
         private readonly LatestDiscussion $latestDiscussion,
-    )
-    {
-    }
+    ) {}
 
     public function store(Request $request, Comment $comment)
     {
@@ -43,7 +41,7 @@ class ReplyController extends Controller
         $this->latestDiscussion->forget();
         $this->notifier->replied($reply, auth()->user());
 
-        return redirect()->to($this->messages->url($reply))->withFragment('r-' . $reply->id);
+        return redirect()->to($this->messages->url($reply))->withFragment('r-'.$reply->id);
     }
 
     public function update(UpdateReplyRequest $request, Reply $reply)
@@ -62,7 +60,7 @@ class ReplyController extends Controller
             ]);
         }
 
-        return redirect()->to($this->messages->url($reply))->withFragment('r-' . $reply->id);
+        return redirect()->to($this->messages->url($reply))->withFragment('r-'.$reply->id);
     }
 
     public function destroy(Request $request, Reply $reply)

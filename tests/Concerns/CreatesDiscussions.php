@@ -30,8 +30,8 @@ trait CreatesDiscussions
     protected function makeQuestion(User $author, array $overrides = []): Question
     {
         return Question::create($overrides + [
-            'title' => 'Тестовый вопрос про насос ' . Str::random(8),
-            'description' => 'Машина не сливает воду, подскажите что проверить. ' . Str::random(20),
+            'title' => 'Тестовый вопрос про насос '.Str::random(8),
+            'description' => 'Машина не сливает воду, подскажите что проверить. '.Str::random(20),
             'appliance_id' => Appliance::factory()->create()->id,
             'user_id' => $author->id,
         ]);
@@ -43,11 +43,11 @@ trait CreatesDiscussions
         return match ($kind) {
             'question' => $this->makeQuestion($owner ?? User::factory()->create()),
             'post' => Post::create([
-                'title' => 'Тестовая статья ' . Str::random(8), 'description' => 'Описание', 'content' => '<p>Текст статьи</p>',
+                'title' => 'Тестовая статья '.Str::random(8), 'description' => 'Описание', 'content' => '<p>Текст статьи</p>',
                 'category_id' => Category::factory()->create()->id,
-                'administrator_id' => Administrator::forceCreate(['name' => 'Автор', 'email' => Str::random(10) . '@example.invalid', 'password' => 'x'])->id,
+                'administrator_id' => Administrator::forceCreate(['name' => 'Автор', 'email' => Str::random(10).'@example.invalid', 'password' => 'x'])->id,
             ]),
-            'firmware' => Firmware::create(['path_id' => random_int(1_000_000, 9_999_999), 'title' => 'TEST_' . Str::random(8), 'extension' => '.bin', 'size' => 4096]),
+            'firmware' => Firmware::create(['path_id' => random_int(1_000_000, 9_999_999), 'title' => 'TEST_'.Str::random(8), 'extension' => '.bin', 'size' => 4096]),
         };
     }
 

@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Schema;
  * Запросы теперь пишутся в файлы (storage/logs/access-*.log), таблица больше не нужна.
  * Данные заархивированы перед удалением, down() возвращает пустую таблицу той же структуры.
  */
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::dropIfExists('request_logs');

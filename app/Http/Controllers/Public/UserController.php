@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-
     public function edit()
     {
         $user = auth()->user()->load('avatar');

@@ -7,6 +7,7 @@ namespace App\MoonShine\Support;
 use App\Support\JsonLogReader;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
+use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
 use MoonShine\Contracts\Core\TypeCasts\DataCasterContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
@@ -21,7 +22,7 @@ use MoonShine\Support\ListOf;
  * filters, status tabs, sorting and paging come from MoonShine, the rows from
  * the log files. Subclasses define the reader, pages and fields.
  *
- * @extends CrudResource<\MoonShine\Contracts\Core\DependencyInjection\CoreContract, array<string, mixed>>
+ * @extends CrudResource<CoreContract, array<string, mixed>>
  */
 abstract class LogResource extends CrudResource
 {
@@ -40,7 +41,7 @@ abstract class LogResource extends CrudResource
 
     public function getCaster(): DataCasterContract
     {
-        return new LogEntryCaster();
+        return new LogEntryCaster;
     }
 
     public function getItems(): LengthAwarePaginator
@@ -58,7 +59,7 @@ abstract class LogResource extends CrudResource
 
         // "Hide my IP" excludes whichever address the admin is browsing from.
         if (filter_var($filters['hide_my_ip'] ?? false, FILTER_VALIDATE_BOOLEAN)) {
-            $filters['exclude_ip'] = trim(($filters['exclude_ip'] ?? '') . ' ' . request()->ip());
+            $filters['exclude_ip'] = trim(($filters['exclude_ip'] ?? '').' '.request()->ip());
         }
 
         $rows = $this->reader()->entries($filters);

@@ -28,8 +28,7 @@ final class FeedEntry
         public readonly int $solutions,
         public readonly ?FeedQuote $quote,
         public readonly string $preview,
-    ) {
-    }
+    ) {}
 
     public function isReply(): bool
     {

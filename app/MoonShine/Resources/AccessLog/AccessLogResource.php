@@ -6,8 +6,8 @@ namespace App\MoonShine\Resources\AccessLog;
 
 use App\MoonShine\Resources\AccessLog\Pages\AccessLogDetailPage;
 use App\MoonShine\Resources\AccessLog\Pages\AccessLogIndexPage;
-use App\Support\AccessLogReader;
 use App\MoonShine\Support\LogResource;
+use App\Support\AccessLogReader;
 use App\Support\JsonLogReader;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
@@ -83,7 +83,7 @@ class AccessLogResource extends LogResource
             Text::make('Admin user ID', 'admin_user_id'),
             Text::make('User ID', 'user_id'),
             Preview::make('Флаги', 'is_suspicious', fn (array $row) => $this->flags($row)),
-            Preview::make('Запись', 'raw', fn (array $row) => '<pre style="white-space:pre-wrap">' . e($row['raw']) . '</pre>'),
+            Preview::make('Запись', 'raw', fn (array $row) => '<pre style="white-space:pre-wrap">'.e($row['raw']).'</pre>'),
         ];
     }
 

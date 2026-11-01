@@ -14,14 +14,14 @@ class AskInvitationTest extends TestCase
     public function test_guest_sees_the_same_invitation_as_a_link_to_the_ask_page(): void
     {
         $this->get(route('questions.index'))->assertOk()
-            ->assertSee('href="' . route('questions.create') . '"', false)->assertSee('нужен вход')->assertSee('pencil-line', false);
+            ->assertSee('href="'.route('questions.create').'"', false)->assertSee('нужен вход')->assertSee('pencil-line', false);
     }
 
     public function test_the_ask_page_asks_a_guest_to_log_in_and_a_user_goes_to_the_form(): void
     {
         $this->get(route('questions.create'))->assertRedirect(route('login'));
 
-        $this->actingAs(User::factory()->create())->get(route('questions.create'))->assertRedirect(route('questions.index') . '#ask');
+        $this->actingAs(User::factory()->create())->get(route('questions.create'))->assertRedirect(route('questions.index').'#ask');
     }
 
     public function test_the_guest_is_remembered_so_that_login_brings_them_back_to_the_ask_page(): void

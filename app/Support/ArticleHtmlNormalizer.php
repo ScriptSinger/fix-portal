@@ -31,7 +31,7 @@ final class ArticleHtmlNormalizer
         $document = new DOMDocument('1.0', 'UTF-8');
         $previousState = libxml_use_internal_errors(true);
         $document->loadHTML(
-            '<?xml encoding="UTF-8"><div id="article-root">' . $html . '</div>',
+            '<?xml encoding="UTF-8"><div id="article-root">'.$html.'</div>',
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS
         );
         libxml_clear_errors();
@@ -72,6 +72,7 @@ final class ArticleHtmlNormalizer
             $images = $link->getElementsByTagName('img');
             if ($images->length !== 1) {
                 $link->removeAttribute('href');
+
                 continue;
             }
 
@@ -143,6 +144,7 @@ final class ArticleHtmlNormalizer
         $tag = strtolower($node->tagName);
         if (in_array($tag, ['script', 'style', 'object', 'embed'], true)) {
             $node->parentNode?->removeChild($node);
+
             return;
         }
 
@@ -158,6 +160,7 @@ final class ArticleHtmlNormalizer
                 self::cleanNode($child);
             }
             $parent->removeChild($node);
+
             return;
         }
 

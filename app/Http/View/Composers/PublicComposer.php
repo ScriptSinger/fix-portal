@@ -13,10 +13,12 @@ use Illuminate\View\View;
 
 class PublicComposer
 {
-
     protected $posts;
+
     protected $categories;
+
     protected $customization;
+
     protected $discussion;
 
     public function __construct(Post $posts, Category $categories, Customization $customization, LatestDiscussion $discussion)

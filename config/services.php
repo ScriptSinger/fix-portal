@@ -35,13 +35,13 @@ return [
     'yandex' => [
         'client_id' => env('YANDEX_CLIENT_ID'),
         'client_secret' => env('YANDEX_CLIENT_SECRET'),
-        'redirect' => env('YANDEX_REDIRECT_URI', rtrim((string) env('APP_URL'), '/') . '/auth/yandex/callback'),
+        'redirect' => env('YANDEX_REDIRECT_URI', rtrim((string) env('APP_URL'), '/').'/auth/yandex/callback'),
     ],
 
     'vkid' => [
         'client_id' => env('VKID_CLIENT_ID'),
         'client_secret' => env('VKID_CLIENT_SECRET'),
-        'redirect' => env('VKID_REDIRECT_URI', rtrim((string) env('APP_URL'), '/') . '/auth/vkid/callback'),
+        'redirect' => env('VKID_REDIRECT_URI', rtrim((string) env('APP_URL'), '/').'/auth/vkid/callback'),
     ],
 
     // Бот пишет новые вопросы в чат мастеров. Пока токен или чат пусты, канал выключен.

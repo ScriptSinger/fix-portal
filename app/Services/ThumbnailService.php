@@ -13,8 +13,9 @@ class ThumbnailService
     public static function getInstance()
     {
         if (self::$instance === null) {
-            self::$instance = new ThumbnailService();
+            self::$instance = new ThumbnailService;
         }
+
         return self::$instance;
     }
 
@@ -24,27 +25,27 @@ class ThumbnailService
         $image = Image::read($tempPath);
 
         $dir = date('Y-m-d');
-        $basePath = 'images/posts/thumbnails/' . $dir . '/';
+        $basePath = 'images/posts/thumbnails/'.$dir.'/';
         $name = $file->hashName();
 
-        $blogDir = $basePath . 'blog/';
+        $blogDir = $basePath.'blog/';
         Storage::disk('public')->makeDirectory($blogDir);
 
-        $smallDir = $basePath . 'small/';
+        $smallDir = $basePath.'small/';
         Storage::disk('public')->makeDirectory($smallDir);
 
-        $blogPath = Storage::disk('public')->path($blogDir . $name);
+        $blogPath = Storage::disk('public')->path($blogDir.$name);
         $image->cover(800, 460);
         $image->toJpeg()->save($blogPath);
 
-        $smallPath = Storage::disk('public')->path($smallDir . $name);
+        $smallPath = Storage::disk('public')->path($smallDir.$name);
         $image->cover(90, 90);
         $image->toJpeg()->save($smallPath);
 
         return [
-            'original' => Storage::url($file->store($basePath . 'original', 'public')),
-            'blog' =>   Storage::url($blogDir . $name),
-            'small' => Storage::url($smallDir . $name),
+            'original' => Storage::url($file->store($basePath.'original', 'public')),
+            'blog' => Storage::url($blogDir.$name),
+            'small' => Storage::url($smallDir.$name),
         ];
     }
 
@@ -53,6 +54,7 @@ class ThumbnailService
         foreach ($paths as $path) {
             Storage::disk('public')->delete($path);
         }
+
         return $this;
     }
 }

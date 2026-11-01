@@ -23,9 +23,7 @@ class RetractQuestionAnnouncement implements ShouldQueue
         return [60, 300];
     }
 
-    public function __construct(public string $channel, public string $externalId)
-    {
-    }
+    public function __construct(public string $channel, public string $externalId) {}
 
     public function handle(QuestionAnnouncer $announcer): void
     {

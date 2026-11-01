@@ -7,6 +7,7 @@ use App\Jobs\RetractQuestionAnnouncement;
 use App\Jobs\SendQuestionAnnouncement;
 use App\Jobs\UpdateQuestionAnnouncement;
 use App\Models\Appliance;
+use App\Models\Question;
 use App\Models\QuestionAnnouncement;
 use App\Models\Reaction;
 use App\Models\Reply;
@@ -96,7 +97,7 @@ class QuestionAnnouncementTest extends TestCase
         $this->telegram();
         Queue::fake();
         $data = [
-            'title' => 'Стиральная машина не сливает воду ' . uniqid(),
+            'title' => 'Стиральная машина не сливает воду '.uniqid(),
             'appliance_id' => Appliance::factory()->create()->id,
             'description' => 'Вода остаётся в баке, насос гудит. Фильтр чистил, шланг прочистил, ничего не помогло.',
         ];
@@ -117,18 +118,18 @@ class QuestionAnnouncementTest extends TestCase
         $this->actingAs($author)->put(route('questions.update', ['question' => $question->slug]), [
             'title' => $question->title,
             'appliance_id' => $question->appliance_id,
-            'description' => 'Дополнение: ' . str_repeat('подробности ', 10),
+            'description' => 'Дополнение: '.str_repeat('подробности ', 10),
         ])->assertRedirect();
 
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
     }
 
-    private function sentAnnouncementFor(\App\Models\Question $question, AnnouncementStatus $status = AnnouncementStatus::Sent): QuestionAnnouncement
+    private function sentAnnouncementFor(Question $question, AnnouncementStatus $status = AnnouncementStatus::Sent): QuestionAnnouncement
     {
         return QuestionAnnouncement::create(['question_id' => $question->id, 'channel' => 'telegram', 'status' => $status, 'external_id' => '55']);
     }
 
-    private function edit(\App\Models\Question $question, User $author, array $over = []): void
+    private function edit(Question $question, User $author, array $over = []): void
     {
         $this->actingAs($author)->put(route('questions.update', ['question' => $question->slug]), $over + [
             'title' => $question->title,
@@ -145,7 +146,7 @@ class QuestionAnnouncementTest extends TestCase
         $question = $this->makeQuestion($author);
         $announcement = $this->sentAnnouncementFor($question);
 
-        $this->edit($question, $author, ['description' => 'Дополнение: ' . str_repeat('подробности ', 10)]);
+        $this->edit($question, $author, ['description' => 'Дополнение: '.str_repeat('подробности ', 10)]);
 
         Queue::assertPushed(UpdateQuestionAnnouncement::class, fn ($job) => $job->announcementId === $announcement->id && $job->delay !== null);
     }
@@ -171,7 +172,7 @@ class QuestionAnnouncementTest extends TestCase
         $question = $this->makeQuestion($author);
         $this->sentAnnouncementFor($question, AnnouncementStatus::Pending);
 
-        $this->edit($question, $author, ['title' => 'Совсем другой заголовок вопроса ' . uniqid()]);
+        $this->edit($question, $author, ['title' => 'Совсем другой заголовок вопроса '.uniqid()]);
 
         Queue::assertNotPushed(UpdateQuestionAnnouncement::class);
     }
@@ -286,7 +287,7 @@ class QuestionAnnouncementTest extends TestCase
         Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
     }
 
-    private function bothChannelsSent(\App\Models\Question $question): void
+    private function bothChannelsSent(Question $question): void
     {
         $this->telegram();
         config(['services.vk_group' => ['token' => 'vk-token', 'group_id' => '123456', 'version' => '5.199']]);
@@ -301,7 +302,7 @@ class QuestionAnnouncementTest extends TestCase
         $question = $this->makeQuestion($author);
         $this->bothChannelsSent($question);
 
-        $this->edit($question, $author, ['description' => 'Дополнение: ' . str_repeat('подробности ', 10)]);
+        $this->edit($question, $author, ['description' => 'Дополнение: '.str_repeat('подробности ', 10)]);
 
         // VK ключом сообщества править записи не даёт: обновляется только Telegram
         Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);

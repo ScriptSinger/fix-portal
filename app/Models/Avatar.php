@@ -13,7 +13,7 @@ class Avatar extends Model
     protected $fillable = [
         'uri',
         'mime',
-        'size'
+        'size',
     ];
 
     public function user(): BelongsTo

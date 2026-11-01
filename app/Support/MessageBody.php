@@ -11,8 +11,8 @@ use App\Models\Image;
 class MessageBody
 {
     /**
-     * @param list<string> $urls
-     * @param list<string> $keep
+     * @param  list<string>  $urls
+     * @param  list<string>  $keep
      */
     public static function make(?string $text, array $urls, int $userId, array $keep = []): string
     {
@@ -21,9 +21,9 @@ class MessageBody
         $owned = $urls === [] ? collect() : Image::query()->where('user_id', $userId)->whereIn('url', $urls)->get()->keyBy('url');
         foreach (array_unique($urls) as $url) {
             if ($image = $owned->get($url)) {
-                $out .= '<img src="' . e($url) . '" class="img-fluid" data-id="' . $image->id . '">';
+                $out .= '<img src="'.e($url).'" class="img-fluid" data-id="'.$image->id.'">';
             } elseif (in_array($url, $keep, true)) {
-                $out .= '<img src="' . e($url) . '" class="img-fluid">';
+                $out .= '<img src="'.e($url).'" class="img-fluid">';
             }
         }
 

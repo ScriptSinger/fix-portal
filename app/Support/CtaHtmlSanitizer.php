@@ -30,7 +30,7 @@ class CtaHtmlSanitizer
         $document = new DOMDocument('1.0', 'UTF-8');
         $previousState = libxml_use_internal_errors(true);
         $document->loadHTML(
-            mb_convert_encoding('<div>' . $html . '</div>', 'HTML-ENTITIES', 'UTF-8'),
+            mb_convert_encoding('<div>'.$html.'</div>', 'HTML-ENTITIES', 'UTF-8'),
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
         );
         libxml_clear_errors();
@@ -41,6 +41,7 @@ class CtaHtmlSanitizer
                 while ($node->attributes->length > 0) {
                     $node->removeAttribute($node->attributes->item(0)->nodeName);
                 }
+
                 continue;
             }
 

@@ -17,9 +17,7 @@ use Illuminate\Support\Str;
 class ActivityDigest extends Mailable
 {
     /** @param list<array{kind: string, actor_name: string, title: string, in: string, url: string, snippet?: string}> $items */
-    public function __construct(public User $user, public array $items)
-    {
-    }
+    public function __construct(public User $user, public array $items) {}
 
     public function envelope(): Envelope
     {
@@ -44,7 +42,7 @@ class ActivityDigest extends Mailable
     public function headers(): Headers
     {
         return new Headers(text: [
-            'List-Unsubscribe' => '<' . $this->unsubscribeUrl() . '>',
+            'List-Unsubscribe' => '<'.$this->unsubscribeUrl().'>',
             'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
         ]);
     }
@@ -67,7 +65,7 @@ class ActivityDigest extends Mailable
             $kinds === [ActivityNotification::ANSWER] && count($titles) === 1 => "Новые ответы на ваш вопрос: {$title} ({$count})",
             $kinds === [ActivityNotification::ANSWER] => "Новые ответы на ваши вопросы ({$count})",
             $kinds === [ActivityNotification::SOLUTION] => "Ваши ответы отмечены решением ({$count})",
-            default => "Новое на " . config('app.name', 'Ufamasters') . " ({$count})",
+            default => 'Новое на '.config('app.name', 'Ufamasters')." ({$count})",
         };
     }
 }

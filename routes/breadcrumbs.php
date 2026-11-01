@@ -8,9 +8,9 @@ use App\Models\Question;
 use App\Models\Tag;
 use App\Models\User;
 use App\Services\FirmwareCatalog;
-use Illuminate\Support\Str;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
+use Illuminate\Support\Str;
 
 Breadcrumbs::for('home', function (BreadcrumbTrail $trail) {
     $trail->push('Главная', route('articles.index'));
@@ -83,7 +83,7 @@ Breadcrumbs::for('firmware', function (BreadcrumbTrail $trail, Firmware $firmwar
         $trail->parent('firmwares');
     }
 
-    $title = $firmware->model_name ?: ($firmware->title ?: ('Прошивка #' . $firmware->id));
+    $title = $firmware->model_name ?: ($firmware->title ?: ('Прошивка #'.$firmware->id));
     $trail->push(Str::limit($title, 30, '...'), route('firmwares.show', $firmware));
 });
 

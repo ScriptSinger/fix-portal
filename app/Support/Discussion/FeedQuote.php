@@ -10,6 +10,5 @@ final class FeedQuote
         public readonly string $authorName,
         public readonly int $colorSlot,
         public readonly string $text,
-    ) {
-    }
+    ) {}
 }

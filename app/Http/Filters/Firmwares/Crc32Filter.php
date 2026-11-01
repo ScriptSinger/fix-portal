@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 /** ?crc32=… (поле хранит контрольную сумму файла) */
 class Crc32Filter
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function handle(Builder $builder, \Closure $next)
     {

@@ -11,10 +11,7 @@ use App\Services\FirmwareCatalog;
  */
 class FirmwareHubController extends Controller
 {
-
-    public function __construct(private readonly FirmwareCatalog $catalog)
-    {
-    }
+    public function __construct(private readonly FirmwareCatalog $catalog) {}
 
     public function brand(string $brand)
     {
@@ -70,10 +67,10 @@ class FirmwareHubController extends Controller
         $platforms = collect($summary['platforms'])->keys()->take(3)->implode(', ');
 
         $text = "Прошивки {$info['name']}: {$info['pages']} файлов, {$seriesCount} серий моделей"
-            . ($platforms !== '' ? ", платформы {$platforms}" : '')
-            . '. Скачать дампы модулей управления на UfaMasters.';
+            .($platforms !== '' ? ", платформы {$platforms}" : '')
+            .'. Скачать дампы модулей управления на UfaMasters.';
 
-        return mb_strlen($text) <= 160 ? $text : rtrim(mb_substr($text, 0, 157), ' ,;:') . '…';
+        return mb_strlen($text) <= 160 ? $text : rtrim(mb_substr($text, 0, 157), ' ,;:').'…';
     }
 
     /**
@@ -85,10 +82,10 @@ class FirmwareHubController extends Controller
         $platforms = collect($summary['platforms'])->keys()->take(2)->implode(', ');
 
         $text = "Прошивки {$brand} {$series}: {$summary['pages']} файлов"
-            . ($models !== '' ? ", модели {$models}" : '')
-            . ($platforms !== '' ? ", платформа {$platforms}" : '')
-            . '. Скачать на UfaMasters.';
+            .($models !== '' ? ", модели {$models}" : '')
+            .($platforms !== '' ? ", платформа {$platforms}" : '')
+            .'. Скачать на UfaMasters.';
 
-        return mb_strlen($text) <= 160 ? $text : rtrim(mb_substr($text, 0, 157), ' ,;:') . '…';
+        return mb_strlen($text) <= 160 ? $text : rtrim(mb_substr($text, 0, 157), ' ,;:').'…';
     }
 }

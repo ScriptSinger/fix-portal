@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Question;
 use App\Models\Reply;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -61,7 +62,7 @@ return new class extends Migration
             DB::table('post_tag')->whereNotExists(fn ($q) => $q->select(DB::raw(1))->from('posts')->whereColumn('posts.id', 'post_tag.post_id'))->delete();
             DB::table('post_tag')->whereNotExists(fn ($q) => $q->select(DB::raw(1))->from('tags')->whereColumn('tags.id', 'post_tag.tag_id'))->delete();
 
-            Log::info('Корзина убрана, стёрто записей: ' . json_encode($removed));
+            Log::info('Корзина убрана, стёрто записей: '.json_encode($removed));
         });
 
         foreach (self::TABLES as $table) {
@@ -89,7 +90,7 @@ return new class extends Migration
         }
     }
 
-    private function trashed(string $table): \Illuminate\Database\Query\Builder
+    private function trashed(string $table): Builder
     {
         return DB::table($table)->whereNotNull('deleted_at');
     }

@@ -12,9 +12,7 @@ use Illuminate\Validation\Rule;
 
 class ReactionController extends Controller
 {
-    public function __construct(private readonly ActivityNotifier $notifier)
-    {
-    }
+    public function __construct(private readonly ActivityNotifier $notifier) {}
 
     private const REACTABLE = ['comment' => Comment::class, 'reply' => Reply::class];
 

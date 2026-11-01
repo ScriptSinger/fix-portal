@@ -28,9 +28,7 @@ class CommentController extends Controller
         private readonly ActivityNotifier $notifier,
         private readonly DiscussionMessageService $messages,
         private readonly LatestDiscussion $latestDiscussion,
-    )
-    {
-    }
+    ) {}
 
     public function store(StoreCommentRequest $request, $type, $id)
     {
@@ -47,7 +45,7 @@ class CommentController extends Controller
         $this->notifier->answered($comment, auth()->user());
 
         // возвращаем к новому сообщению, а не в начало страницы
-        return redirect()->to($this->messages->url($comment))->withFragment('c-' . $comment->id);
+        return redirect()->to($this->messages->url($comment))->withFragment('c-'.$comment->id);
     }
 
     public function destroy(Request $request, Comment $comment)
@@ -58,6 +56,7 @@ class CommentController extends Controller
         if ($request->expectsJson()) {
             return response()->json(['deleted' => true]);
         }
+
         return redirect()->back();
     }
 
@@ -77,6 +76,6 @@ class CommentController extends Controller
             ]);
         }
 
-        return redirect()->to($this->messages->url($comment))->withFragment('c-' . $comment->id);
+        return redirect()->to($this->messages->url($comment))->withFragment('c-'.$comment->id);
     }
 }

@@ -43,7 +43,7 @@ class DisplayTimezoneTest extends TestCase
         $question = $this->makeQuestion(User::factory()->create());
         QuestionAnnouncement::create(['question_id' => $question->id, 'channel' => 'telegram', 'status' => 'sent', 'sent_at' => self::UTC]);
         $role = MoonshineUserRole::query()->first() ?? MoonshineUserRole::forceCreate(['name' => 'Admin']);
-        $admin = MoonshineUser::forceCreate(['moonshine_user_role_id' => $role->id, 'name' => 'Тест', 'email' => uniqid('a') . '@example.invalid', 'password' => bcrypt('secret-pass')]);
+        $admin = MoonshineUser::forceCreate(['moonshine_user_role_id' => $role->id, 'name' => 'Тест', 'email' => uniqid('a').'@example.invalid', 'password' => bcrypt('secret-pass')]);
 
         $this->actingAs($admin, 'moonshine')
             ->get(app(QuestionAnnouncementResource::class)->getIndexPageUrl())

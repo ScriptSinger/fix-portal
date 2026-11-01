@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Appliance extends Model
 {
-    use HasFactory, Sluggable, DateTrait;
+    use DateTrait, HasFactory, Sluggable;
 
     protected $fillable = ['title'];
 
@@ -18,8 +18,8 @@ class Appliance extends Model
     {
         return [
             'slug' => [
-                'source' => 'title'
-            ]
+                'source' => 'title',
+            ],
         ];
     }
 

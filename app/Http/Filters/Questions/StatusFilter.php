@@ -9,9 +9,7 @@ use Illuminate\Http\Request;
 /** ?status=solved (решённые), ?status=open (без решения; только вопросы после запуска отметок) или ?status=unanswered (без ответов от других, любой давности). */
 class StatusFilter
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function handle(Builder $builder, \Closure $next)
     {

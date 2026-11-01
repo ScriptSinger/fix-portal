@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\User;
+use App\MoonShine\Fields\LocalDate;
+use App\Support\SqlLike;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use App\MoonShine\Fields\LocalDate;
 use MoonShine\Laravel\QueryTags\QueryTag;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
@@ -100,9 +101,9 @@ class UserResource extends BaseResource
     {
         return [
             Text::make('Имя', 'name')
-                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('name', 'like', '%' . \App\Support\SqlLike::escape((string) $value) . '%')),
+                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('name', 'like', '%'.SqlLike::escape((string) $value).'%')),
             Text::make('E-mail', 'email')
-                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('email', 'like', '%' . \App\Support\SqlLike::escape((string) $value) . '%')),
+                ->onApply(fn (Builder $query, $value) => $value === null || $value === '' ? $query : $query->where('email', 'like', '%'.SqlLike::escape((string) $value).'%')),
             DateRange::make('Регистрация', 'created_at'),
             DateRange::make('Последний визит', 'last_seen_at'),
         ];
@@ -115,7 +116,6 @@ class UserResource extends BaseResource
             QueryTag::make('Не подтверждённые', static fn (Builder $q) => $q->whereNull('email_verified_at'))->alias('unverified'),
         ];
     }
-
 
     protected function search(): array
     {

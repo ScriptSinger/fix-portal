@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Controllers\MoonShine\TinyMceImageUploadController;
+use App\MoonShine\Resources\AccessLog\AccessLogResource;
 use App\MoonShine\Resources\ApplianceResource;
 use App\MoonShine\Resources\BlockedUserAgentResource;
 use App\MoonShine\Resources\BlockerResource;
@@ -11,19 +13,17 @@ use App\MoonShine\Resources\CategoryResource;
 use App\MoonShine\Resources\CommentResource;
 use App\MoonShine\Resources\CtaResource;
 use App\MoonShine\Resources\CustomizationResource;
-use App\MoonShine\Resources\SiteSettingResource;
-use App\MoonShine\Resources\VisitorResource;
 use App\MoonShine\Resources\FirmwareResource;
 use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
 use App\MoonShine\Resources\QuestionAnnouncementResource;
-use App\MoonShine\Resources\SentEmailResource;
 use App\MoonShine\Resources\QuestionResource;
 use App\MoonShine\Resources\ReplyResource;
-use App\MoonShine\Resources\AccessLog\AccessLogResource;
+use App\MoonShine\Resources\SentEmailResource;
+use App\MoonShine\Resources\SiteSettingResource;
 use App\MoonShine\Resources\TagResource;
 use App\MoonShine\Resources\UserResource;
-use App\Http\Controllers\MoonShine\TinyMceImageUploadController;
+use App\MoonShine\Resources\VisitorResource;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use MoonShine\Contracts\Core\DependencyInjection\CoreContract;
@@ -72,7 +72,6 @@ class MoonShineServiceProvider extends ServiceProvider
             ])
             ->pages([
                 ...$core->getConfig()->getPages(),
-            ])
-        ;
+            ]);
     }
 }

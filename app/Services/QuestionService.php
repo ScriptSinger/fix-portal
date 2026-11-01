@@ -11,9 +11,7 @@ use App\Support\MessageBody;
 /** Сохранение вопроса: текст экранируется, к нему добавляются только собственные фото автора. */
 class QuestionService
 {
-    public function __construct(private readonly QuestionAnnouncer $announcer)
-    {
-    }
+    public function __construct(private readonly QuestionAnnouncer $announcer) {}
 
     public function create(User $author, array $data): Question
     {

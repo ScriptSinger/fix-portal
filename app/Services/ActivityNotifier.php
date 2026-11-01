@@ -18,9 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ActivityNotifier
 {
-    public function __construct(private readonly ActivityMailer $mailer)
-    {
-    }
+    public function __construct(private readonly ActivityMailer $mailer) {}
 
     public function answered(Comment $comment, User $actor): void
     {
@@ -29,7 +27,7 @@ class ActivityNotifier
             return;
         }
 
-        $subject->user->notify(new ActivityNotification($this->payload(ActivityNotification::ANSWER, $actor, $subject, 'c-' . $comment->id, $comment->text)));
+        $subject->user->notify(new ActivityNotification($this->payload(ActivityNotification::ANSWER, $actor, $subject, 'c-'.$comment->id, $comment->text)));
         $this->mailer->schedule($subject->user);
     }
 
@@ -47,7 +45,7 @@ class ActivityNotifier
             $targets->push($quoted->user);
         }
         foreach ($targets->filter()->unique('id')->reject(fn (User $u) => $u->id === $actor->id) as $user) {
-            $user->notify(new ActivityNotification($this->payload(ActivityNotification::REPLY, $actor, $subject, 'r-' . $reply->id, $reply->text)));
+            $user->notify(new ActivityNotification($this->payload(ActivityNotification::REPLY, $actor, $subject, 'r-'.$reply->id, $reply->text)));
         }
     }
 
@@ -58,7 +56,7 @@ class ActivityNotifier
             return;
         }
 
-        $anchor = ($message instanceof Comment ? 'c-' : 'r-') . $message->id;
+        $anchor = ($message instanceof Comment ? 'c-' : 'r-').$message->id;
         // одну и ту же реакцию того же человека на то же сообщение второй раз не показываем (снял и поставил снова)
         $again = $message->user->notifications()->where('data->kind', ActivityNotification::REACTION)
             ->where('data->actor_id', $actor->id)->where('data->target_id', $anchor)->where('data->emoji', $emoji)->exists();
@@ -76,7 +74,7 @@ class ActivityNotifier
             return;
         }
 
-        $anchor = ($message instanceof Comment ? 'c-' : 'r-') . $message->id;
+        $anchor = ($message instanceof Comment ? 'c-' : 'r-').$message->id;
         $message->user->notify(new ActivityNotification($this->payload(ActivityNotification::SOLUTION, $actor, $question, $anchor, $message->text)));
         $this->mailer->schedule($message->user);
     }
@@ -95,13 +93,14 @@ class ActivityNotifier
     private function payload(string $kind, User $actor, Model $subject, string $anchor, ?string $text, ?string $emoji = null): array
     {
         $info = $this->describe($subject);
+
         return array_filter([
             'kind' => $kind,
             'actor_id' => $actor->id,
             'actor_name' => $actor->name,
             'title' => $info['title'],
             'in' => $info['in'],
-            'url' => $info['url'] . '#' . $anchor,
+            'url' => $info['url'].'#'.$anchor,
             'target_id' => $anchor,
             'snippet' => PlainText::from($text, 140),
             'emoji' => $emoji,

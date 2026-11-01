@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class BlockedUserAgent extends Model
 {
     use HasFactory;
 
-
     protected $fillable = [
-        'user_agent'
+        'user_agent',
     ];
 
     /**
@@ -19,7 +19,7 @@ class BlockedUserAgent extends Model
      */
     protected static function booted(): void
     {
-        $forget = static fn () => \Illuminate\Support\Facades\Cache::forget('blocked.user_agents');
+        $forget = static fn () => Cache::forget('blocked.user_agents');
 
         static::saved($forget);
         static::deleted($forget);

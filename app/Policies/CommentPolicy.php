@@ -10,6 +10,7 @@ class CommentPolicy
     public function create(User $user, string $commentableType): bool
     {
         $allowedModels = ['Post', 'Question', 'Firmware'];
+
         return in_array(ucfirst($commentableType), $allowedModels);
     }
 

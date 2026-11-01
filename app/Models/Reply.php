@@ -10,15 +10,14 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Reply extends Model
 {
-    use HasFactory, DateTrait;
-
+    use DateTrait, HasFactory;
 
     protected $fillable = [
         'text',
         'user_id',
         'comment_id',
         'quote_reply_id',
-        'user_id'
+        'user_id',
     ];
 
     public function user(): BelongsTo
@@ -31,7 +30,7 @@ class Reply extends Model
         return $this->belongsTo(Comment::class);
     }
 
-    public function reactions(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    public function reactions(): MorphMany
     {
         return $this->morphMany(Reaction::class, 'reactable');
     }

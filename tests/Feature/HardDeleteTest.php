@@ -102,7 +102,7 @@ class HardDeleteTest extends TestCase
     public function test_merging_duplicates_redirects_their_addresses_and_erases_them(): void
     {
         $hash = md5(uniqid('', true));
-        $make = fn (int $pathId, int $views) => Firmware::create(['path_id' => $pathId, 'title' => 'MERGE_' . $pathId, 'extension' => '.bin', 'size' => 1, 'crc32' => $hash, 'views_count' => $views]);
+        $make = fn (int $pathId, int $views) => Firmware::create(['path_id' => $pathId, 'title' => 'MERGE_'.$pathId, 'extension' => '.bin', 'size' => 1, 'crc32' => $hash, 'views_count' => $views]);
         $main = $make(7000001, 5);
         $dup = $make(7000002, 3);
         $dup2 = $make(7000003, 2);

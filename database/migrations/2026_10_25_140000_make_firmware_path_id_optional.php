@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Schema;
  * В базе остался внешний ключ firmware.path_id -> paths.id на таблицу, которой нет ни в одной миграции
  * (след старого импорта). Из-за него нельзя добавить ни одной новой прошивки: вставка падает с ошибкой 1452.
  */
-return new class () extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         $hasForeignKey = DB::selectOne(

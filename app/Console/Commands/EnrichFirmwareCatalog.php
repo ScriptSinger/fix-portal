@@ -41,7 +41,7 @@ class EnrichFirmwareCatalog extends Command
                     $stats['model'] += $new['model'] ? 1 : 0;
                     $stats['platform'] += $new['platform_norm'] ? 1 : 0;
 
-                    $label = $new['brand'] ?? ($new['brand_group'] ? '(только группа) ' . $new['brand_group'] : '(не определено)');
+                    $label = $new['brand'] ?? ($new['brand_group'] ? '(только группа) '.$new['brand_group'] : '(не определено)');
                     $byBrand[$label] = ($byBrand[$label] ?? 0) + 1;
 
                     if (count($samples[$label] ?? []) < $sampleSize && $new['model']) {
@@ -74,7 +74,7 @@ class EnrichFirmwareCatalog extends Command
                 }
             });
 
-        $pct = fn (int $n) => $n . ' (' . round($n * 100 / max(1, $stats['total'])) . '%)';
+        $pct = fn (int $n) => $n.' ('.round($n * 100 / max(1, $stats['total'])).'%)';
         $this->table(['Поле', 'Заполнено'], [
             ['записей всего', $stats['total']],
             ['brand (марка)', $pct($stats['brand'])],
@@ -93,7 +93,7 @@ class EnrichFirmwareCatalog extends Command
         );
 
         if ($conflicts) {
-            $this->warn('Противоречия (первые): ' . implode('; ', $conflicts));
+            $this->warn('Противоречия (первые): '.implode('; ', $conflicts));
         }
 
         if (! $apply) {
@@ -125,12 +125,12 @@ class EnrichFirmwareCatalog extends Command
 
         // Одинаковый префикс у разных марок: смотрим на платформу
         if ($brand === null && $series !== null) {
-            $brand = config('firmware_brands.ambiguous_families.' . $series . '.' . $platformKey);
+            $brand = config('firmware_brands.ambiguous_families.'.$series.'.'.$platformKey);
         }
 
-        $platformNorm = config('firmware_brands.platforms.' . $platformKey);
-        $platformGroup = config('firmware_brands.platform_groups.' . $platformKey);
-        $brandGroup = $brand ? config('firmware_brands.brand_groups.' . $brand) : null;
+        $platformNorm = config('firmware_brands.platforms.'.$platformKey);
+        $platformGroup = config('firmware_brands.platform_groups.'.$platformKey);
+        $brandGroup = $brand ? config('firmware_brands.brand_groups.'.$brand) : null;
 
         return [
             'brand' => $brand,

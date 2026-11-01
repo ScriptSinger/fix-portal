@@ -3,16 +3,12 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\Questions\TextFilter;
-use App\Models\Appliance;
-use App\Models\Question;
-use Illuminate\Http\Request;
 use App\Http\Filters\Questions\StatusFilter;
+use App\Models\Appliance;
 use Illuminate\Pipeline\Pipeline;
 
 class ApplianceController extends Controller
 {
-
     public function show($slug)
     {
         $appliance = Appliance::where('slug', $slug)->firstOrFail();

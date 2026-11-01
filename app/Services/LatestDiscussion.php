@@ -8,8 +8,8 @@ use App\Models\Post;
 use App\Models\Question;
 use App\Models\Reply;
 use App\Support\PlainText;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class LatestDiscussion
 {
@@ -27,8 +27,8 @@ class LatestDiscussion
         $replies = Reply::query()->with(['user.avatar', 'comment.commentable'])->latest('created_at')->limit($limit)->get();
 
         $items = $comments
-            ->map(fn (Comment $message) => $this->item($message, $message->commentable, 'c-' . $message->id))
-            ->merge($replies->map(fn (Reply $message) => $this->item($message, $message->comment->commentable, 'r-' . $message->id)))
+            ->map(fn (Comment $message) => $this->item($message, $message->commentable, 'c-'.$message->id))
+            ->merge($replies->map(fn (Reply $message) => $this->item($message, $message->comment->commentable, 'r-'.$message->id)))
             ->filter()
             ->sortByDesc(fn (array $item) => $item['message']->created_at)
             ->take($limit)
@@ -53,9 +53,9 @@ class LatestDiscussion
     private function item(Comment|Reply $message, mixed $subject, string $anchor): ?array
     {
         $url = match (true) {
-            $subject instanceof Post => route('articles.show', ['article' => $subject->slug]) . '#' . $anchor,
-            $subject instanceof Question => route('questions.show', ['question' => $subject->slug]) . '#' . $anchor,
-            $subject instanceof Firmware => route('firmwares.show', ['firmware' => $subject->id]) . '#' . $anchor,
+            $subject instanceof Post => route('articles.show', ['article' => $subject->slug]).'#'.$anchor,
+            $subject instanceof Question => route('questions.show', ['question' => $subject->slug]).'#'.$anchor,
+            $subject instanceof Firmware => route('firmwares.show', ['firmware' => $subject->id]).'#'.$anchor,
             default => null,
         };
 

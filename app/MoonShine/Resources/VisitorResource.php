@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\User;
+use App\MoonShine\Fields\LocalDate;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use App\MoonShine\Fields\LocalDate;
 use MoonShine\Crud\QueryTags\QueryTag;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
+use MoonShine\Support\Enums\Action;
 use MoonShine\Support\Enums\SortDirection;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Components\Badge;
 use MoonShine\UI\Fields\Email;
 use MoonShine\UI\Fields\Preview;
-use MoonShine\UI\Fields\Text;
 
 #[Icon('signal')]
 #[Group('Пользователи', 'user-group')]
@@ -31,8 +31,11 @@ use MoonShine\UI\Fields\Text;
 class VisitorResource extends BaseResource
 {
     public const TAG_ONLINE = 'online';
+
     public const TAG_TODAY = 'today';
+
     public const TAG_WEEK = '7d';
+
     public const TAG_MONTH = '30d';
 
     protected string $model = User::class;
@@ -62,7 +65,7 @@ class VisitorResource extends BaseResource
 
     protected function activeActions(): ListOf
     {
-        return new ListOf(\MoonShine\Support\Enums\Action::class, []);
+        return new ListOf(Action::class, []);
     }
 
     protected function modifyQueryBuilder(Builder $builder): Builder
@@ -73,7 +76,7 @@ class VisitorResource extends BaseResource
     protected function indexFields(): iterable
     {
         return [
-            Preview::make('Пользователь', 'name', fn (User $user) => '<a href="' . e(app(UserResource::class)->getDetailPageUrl($user->id)) . '" class="underline">' . e($user->name) . '</a>')
+            Preview::make('Пользователь', 'name', fn (User $user) => '<a href="'.e(app(UserResource::class)->getDetailPageUrl($user->id)).'" class="underline">'.e($user->name).'</a>')
                 ->sortable(),
             Email::make('E-mail', 'email')->sortable(),
             Preview::make('Статус', 'last_seen_at', fn (User $user) => $this->isOnline($user)

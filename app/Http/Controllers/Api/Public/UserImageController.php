@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Api\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Image;
+use App\Support\UserImages;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use App\Support\UserImages;
 use Illuminate\Support\Facades\Storage;
 
 class UserImageController extends Controller
@@ -17,15 +17,16 @@ class UserImageController extends Controller
         $validated = $request->validate([
             'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:4096',
         ]);
-        $folder = 'user_' . auth()->user()->id;
+        $folder = 'user_'.auth()->user()->id;
         $path = UserImages::store($validated['file'], "images/users/$folder");
         $url = Storage::url($path);
-        $image = new Image();
+        $image = new Image;
         $image->url = $url;
-        $image->mime  = Storage::disk('public')->mimeType($path);
-        $image->size  = Storage::disk('public')->size($path);
+        $image->mime = Storage::disk('public')->mimeType($path);
+        $image->size = Storage::disk('public')->size($path);
         $image->user()->associate(auth()->user());
         $image->save();
+
         return response()->json(['id' => $image->id, 'url' => $url]);
     }
 
@@ -41,6 +42,7 @@ class UserImageController extends Controller
                 Storage::disk('public')->delete(UserImages::variantPath($original, $width));
             }
             $image->delete();
+
             return response()->json(['message' => 'Файл успешно удален']);
         } catch (ModelNotFoundException $e) {
             return response()->json(['error' => 'Файл не найден'], 404);

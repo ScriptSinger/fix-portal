@@ -16,7 +16,7 @@ class DataSearch
         $escaped = SqlLike::escape($term);
 
         foreach (self::LABELS as $label) {
-            $query->orWhereRaw("data LIKE ? ESCAPE '\\\\'", ['%<td>' . $label . '</td>%<td>' . $escaped . '%</td>%']);
+            $query->orWhereRaw("data LIKE ? ESCAPE '\\\\'", ['%<td>'.$label.'</td>%<td>'.$escaped.'%</td>%']);
         }
     }
 }

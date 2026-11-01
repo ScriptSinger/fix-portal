@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Http\Filters\Post\DescriptionFilter;
 use App\Http\Filters\Post\TextFilter;
-use App\Http\Filters\Post\TitleFilter;
-use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Pipeline\Pipeline;
 
@@ -25,13 +22,12 @@ class PostController extends Controller
         $posts = app(Pipeline::class)
             ->send(Post::query())
             ->through([
-                TextFilter::class
+                TextFilter::class,
             ])
             ->thenReturn()
             ->with('category', 'thumbnail')
             ->orderBy('id', 'desc')
             ->paginate(10);
-
 
         return view('public.posts.index', compact('posts'));
     }
@@ -44,13 +40,12 @@ class PostController extends Controller
                 'comments.reactions',
                 'comments.replies.user.avatar',
                 'comments.replies.reactions',
-                'ctas' => fn($query) => $query
+                'ctas' => fn ($query) => $query
                     ->where('is_active', true)
                     ->orderByDesc('priority')
                     ->orderByDesc('id'),
             ])
             ->firstOrFail();
-        
 
         $post->views += 1;
         $post->update();

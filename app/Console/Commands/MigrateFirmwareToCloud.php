@@ -31,7 +31,7 @@ class MigrateFirmwareToCloud extends Command
             ->orderBy('id');
 
         $total = (clone $query)->count();
-        $this->info("Записей на локальном диске: {$total}" . ($limit ? ", беру первые {$limit}" : ''));
+        $this->info("Записей на локальном диске: {$total}".($limit ? ", беру первые {$limit}" : ''));
 
         $stats = ['linked' => 0, 'uploaded' => 0, 'reused' => 0, 'missing_local' => 0, 'hash_mismatch' => 0, 'failed' => 0];
         $uploadedBytes = 0;
@@ -45,7 +45,7 @@ class MigrateFirmwareToCloud extends Command
                 }
                 $processed++;
 
-                $relative = 'firmwares/' . $firmware->file_path;
+                $relative = 'firmwares/'.$firmware->file_path;
 
                 if (! $local->exists($relative)) {
                     $stats['missing_local']++;
@@ -64,7 +64,7 @@ class MigrateFirmwareToCloud extends Command
                     continue;
                 }
 
-                $key = 'firmwares/' . substr($md5, 0, 2) . '/' . $md5;
+                $key = 'firmwares/'.substr($md5, 0, 2).'/'.$md5;
 
                 try {
                     if (! isset($seen[$md5])) {
@@ -100,7 +100,7 @@ class MigrateFirmwareToCloud extends Command
                     $stats['linked']++;
                 } catch (Throwable $e) {
                     $stats['failed']++;
-                    $this->error("#{$firmware->id} {$firmware->title}: " . $e->getMessage());
+                    $this->error("#{$firmware->id} {$firmware->title}: ".$e->getMessage());
                 }
             }
 
@@ -108,14 +108,14 @@ class MigrateFirmwareToCloud extends Command
         });
 
         $this->table(['Итог', 'Количество'], [
-            [$apply ? 'записей перенесено на диск ' . $diskName : 'записей будет перенесено', $stats['linked']],
+            [$apply ? 'записей перенесено на диск '.$diskName : 'записей будет перенесено', $stats['linked']],
             [$apply ? 'файлов загружено' : 'файлов будет загружено (уникальных)', $stats['uploaded']],
             ['файлов уже было в облаке', $stats['reused']],
             ['локального файла нет', $stats['missing_local']],
             ['хеш не совпал с содержимым', $stats['hash_mismatch']],
             ['ошибок', $stats['failed']],
         ]);
-        $this->line('Объём загрузки: ' . round($uploadedBytes / 1048576, 1) . ' МБ');
+        $this->line('Объём загрузки: '.round($uploadedBytes / 1048576, 1).' МБ');
 
         if (! $apply) {
             $this->comment('Пробный прогон. Для загрузки добавьте --apply (при первом запуске лучше с --limit=50).');
@@ -130,7 +130,7 @@ class MigrateFirmwareToCloud extends Command
     private function etag($disk, string $key): string
     {
         $head = $disk->getClient()->headObject([
-            'Bucket' => config('filesystems.disks.' . $this->option('disk') . '.bucket'),
+            'Bucket' => config('filesystems.disks.'.$this->option('disk').'.bucket'),
             'Key' => $key,
         ]);
 

@@ -38,7 +38,7 @@ class VkChannel implements AnnouncementChannel
         $facts = array_filter([
             $question->appliance?->title,
             $question->model,
-            $question->error_code ? 'ошибка ' . $question->error_code : null,
+            $question->error_code ? 'ошибка '.$question->error_code : null,
         ]);
         $author = $question->user?->name;
 
@@ -46,7 +46,7 @@ class VkChannel implements AnnouncementChannel
             $question->title,
             implode("\n", array_filter([
                 $facts ? implode(' · ', $facts) : null,
-                $author ? 'Спрашивает: ' . $author : null,
+                $author ? 'Спрашивает: '.$author : null,
             ])),
             PlainText::from($question->description, self::EXCERPT),
             // Ссылкой-вложением VK требует картинку определённого размера со страницы (link_photo_sizing_rule) и иначе отказывает во всей записи
@@ -85,14 +85,10 @@ class VkChannel implements AnnouncementChannel
     }
 
     /** VK не даёт ключу сообщества править записи: правка вопроса на стене не отражается (см. canModify). */
-    public function update(Question $question, string $externalId): void
-    {
-    }
+    public function update(Question $question, string $externalId): void {}
 
     /** VK не даёт ключу сообщества удалять записи: при удалении вопроса запись остаётся на стене (см. canModify). */
-    public function retract(string $externalId): void
-    {
-    }
+    public function retract(string $externalId): void {}
 
     /** @return array<string, mixed> */
     private function content(Question $question): array
@@ -112,14 +108,14 @@ class VkChannel implements AnnouncementChannel
 
         try {
             // токен в заголовке, а не в адресе: в тексте исключений и журналах его не будет
-            $body = Http::timeout(15)->withToken((string) config('services.vk_group.token'))->asForm()->post(self::API . $method, $params)->throw()->json();
+            $body = Http::timeout(15)->withToken((string) config('services.vk_group.token'))->asForm()->post(self::API.$method, $params)->throw()->json();
         } catch (RequestException|ConnectionException $e) {
-            throw new \RuntimeException('VK: ' . $this->redact($e->getMessage()));
+            throw new \RuntimeException('VK: '.$this->redact($e->getMessage()));
         }
 
         // ошибки VK приходят с кодом 200 внутри ответа
         if (isset($body['error'])) {
-            throw new \RuntimeException('VK: ' . $this->redact((string) ($body['error']['error_msg'] ?? 'ошибка')) . ' (код ' . ($body['error']['error_code'] ?? '?') . ')');
+            throw new \RuntimeException('VK: '.$this->redact((string) ($body['error']['error_msg'] ?? 'ошибка')).' (код '.($body['error']['error_code'] ?? '?').')');
         }
 
         $response = $body['response'] ?? [];

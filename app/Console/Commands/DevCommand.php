@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Filters\Duplicate;
 use App\Mail\RegistrationConfirmation;
-use App\Models\Firmware;
 use Illuminate\Console\Command;
-use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Facades\Mail;
 
 // use Illuminate\Routing\Pipeline;

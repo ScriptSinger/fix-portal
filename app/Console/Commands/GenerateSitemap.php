@@ -43,7 +43,7 @@ class GenerateSitemap extends Command
         $this->addModelUrls($sitemap);
 
         // Пишем во временный файл и переименовываем: поисковик, пришедший во время записи, не увидит половину карты
-        $temporary = $outputPath . '.tmp';
+        $temporary = $outputPath.'.tmp';
         $sitemap->writeToFile($temporary);
         rename($temporary, $outputPath);
 

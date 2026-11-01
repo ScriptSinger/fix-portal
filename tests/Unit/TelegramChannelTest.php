@@ -26,7 +26,7 @@ class TelegramChannelTest extends TestCase
 
     private function question(array $attributes = []): Question
     {
-        $question = (new Question())->forceFill($attributes + [
+        $question = (new Question)->forceFill($attributes + [
             'id' => 7,
             'slug' => 'stiralka-ne-slivaet',
             'title' => 'Стиралка не сливает воду',
@@ -36,13 +36,13 @@ class TelegramChannelTest extends TestCase
         ]);
 
         return $question
-            ->setRelation('appliance', (new Appliance())->forceFill(['title' => 'Стиральная машина']))
-            ->setRelation('user', (new User())->forceFill(['name' => 'Иван']));
+            ->setRelation('appliance', (new Appliance)->forceFill(['title' => 'Стиральная машина']))
+            ->setRelation('user', (new User)->forceFill(['name' => 'Иван']));
     }
 
     public function test_text_has_title_facts_author_excerpt_and_link(): void
     {
-        $text = (new TelegramChannel())->text($this->question());
+        $text = (new TelegramChannel)->text($this->question());
 
         $this->assertStringContainsString('<b>Стиралка не сливает воду</b>', $text);
         $this->assertStringContainsString("Стиральная машина · Beko WKL 13540 K · ошибка E03\nСпрашивает: Иван", $text);
@@ -53,7 +53,7 @@ class TelegramChannelTest extends TestCase
 
     public function test_question_without_author_has_no_author_line(): void
     {
-        $text = (new TelegramChannel())->text($this->question()->setRelation('user', null));
+        $text = (new TelegramChannel)->text($this->question()->setRelation('user', null));
 
         $this->assertStringNotContainsString('Спрашивает', $text);
     }
@@ -61,9 +61,9 @@ class TelegramChannelTest extends TestCase
     public function test_author_name_is_escaped(): void
     {
         $question = $this->question();
-        $question->setRelation('user', (new User())->forceFill(['name' => '<i>Хакер</i> & Ко']));
+        $question->setRelation('user', (new User)->forceFill(['name' => '<i>Хакер</i> & Ко']));
 
-        $text = (new TelegramChannel())->text($question);
+        $text = (new TelegramChannel)->text($question);
 
         $this->assertStringNotContainsString('<i>', $text);
         $this->assertStringContainsString('Спрашивает: &lt;i&gt;Хакер&lt;/i&gt; &amp; Ко', $text);
@@ -76,7 +76,7 @@ class TelegramChannelTest extends TestCase
             'description' => 'Текст &lt;script&gt;alert(1)&lt;/script&gt; и <img src="/x.jpg"> фото',
         ]);
 
-        $text = (new TelegramChannel())->text($question);
+        $text = (new TelegramChannel)->text($question);
 
         $this->assertStringNotContainsString('<a href', $text);
         $this->assertStringNotContainsString('<script', $text);
@@ -88,7 +88,7 @@ class TelegramChannelTest extends TestCase
 
     public function test_long_description_is_cut(): void
     {
-        $text = (new TelegramChannel())->text($this->question(['description' => str_repeat('слово ', 500)]));
+        $text = (new TelegramChannel)->text($this->question(['description' => str_repeat('слово ', 500)]));
 
         $this->assertLessThan(1000, mb_strlen($text));
     }
@@ -96,13 +96,13 @@ class TelegramChannelTest extends TestCase
     public function test_channel_is_enabled_only_with_token_and_chat(): void
     {
         $this->configure();
-        $this->assertTrue((new TelegramChannel())->enabled());
+        $this->assertTrue((new TelegramChannel)->enabled());
 
         $this->configure(['bot_token' => null]);
-        $this->assertFalse((new TelegramChannel())->enabled());
+        $this->assertFalse((new TelegramChannel)->enabled());
 
         $this->configure(['chat_id' => '']);
-        $this->assertFalse((new TelegramChannel())->enabled());
+        $this->assertFalse((new TelegramChannel)->enabled());
     }
 
     public function test_send_posts_to_the_chat_and_returns_message_id(): void
@@ -110,7 +110,7 @@ class TelegramChannelTest extends TestCase
         $this->configure();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 42]])]);
 
-        $id = (new TelegramChannel())->send($this->question());
+        $id = (new TelegramChannel)->send($this->question());
 
         $this->assertSame('42', $id);
         Http::assertSent(function (Request $request) {
@@ -125,7 +125,7 @@ class TelegramChannelTest extends TestCase
     {
         $this->configure();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
-        $channel = new TelegramChannel();
+        $channel = new TelegramChannel;
         $question = $this->question();
 
         $channel->send($question);
@@ -140,7 +140,7 @@ class TelegramChannelTest extends TestCase
         $this->configure(['api_url' => 'https://relay.example/tg/']);
         Http::fake(['relay.example/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
 
-        (new TelegramChannel())->send($this->question());
+        (new TelegramChannel)->send($this->question());
 
         Http::assertSent(fn (Request $request) => $request->url() === 'https://relay.example/tg/bot123456:SECRET-TOKEN/sendMessage');
     }
@@ -149,8 +149,8 @@ class TelegramChannelTest extends TestCase
     {
         $solved = $this->question(['solved_at' => now()]);
 
-        $this->assertStringStartsWith('✅ Вопрос решён', (new TelegramChannel())->text($solved));
-        $this->assertStringNotContainsString('Вопрос решён', (new TelegramChannel())->text($this->question()));
+        $this->assertStringStartsWith('✅ Вопрос решён', (new TelegramChannel)->text($solved));
+        $this->assertStringNotContainsString('Вопрос решён', (new TelegramChannel)->text($this->question()));
     }
 
     public function test_retract_deletes_the_message_from_the_chat(): void
@@ -158,7 +158,7 @@ class TelegramChannelTest extends TestCase
         $this->configure();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
 
-        (new TelegramChannel())->retract('55');
+        (new TelegramChannel)->retract('55');
 
         Http::assertSent(fn (Request $request) => $request->url() === 'https://api.telegram.org/bot123456:SECRET-TOKEN/deleteMessage'
             && $request['chat_id'] === '-5494489427' && $request['message_id'] === 55);
@@ -169,7 +169,7 @@ class TelegramChannelTest extends TestCase
         $this->configure();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => false, 'error_code' => 400, 'description' => 'Bad Request: message to delete not found'], 400)]);
 
-        (new TelegramChannel())->retract('55');
+        (new TelegramChannel)->retract('55');
 
         $this->addToAssertionCount(1);
     }
@@ -179,7 +179,7 @@ class TelegramChannelTest extends TestCase
         $this->configure(['thread_id' => '42']);
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
 
-        (new TelegramChannel())->send($this->question());
+        (new TelegramChannel)->send($this->question());
 
         Http::assertSent(fn (Request $request) => $request['message_thread_id'] === 42);
     }
@@ -189,7 +189,7 @@ class TelegramChannelTest extends TestCase
         $this->configure(['thread_id' => '1']);
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
 
-        (new TelegramChannel())->send($this->question());
+        (new TelegramChannel)->send($this->question());
 
         Http::assertSent(fn (Request $request) => ! isset($request['message_thread_id']));
     }
@@ -198,7 +198,7 @@ class TelegramChannelTest extends TestCase
     {
         $this->configure(['thread_id' => null]);
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 1]])]);
-        $channel = new TelegramChannel();
+        $channel = new TelegramChannel;
 
         $channel->send($this->question());
         $this->configure(['thread_id' => '42']);
@@ -212,7 +212,7 @@ class TelegramChannelTest extends TestCase
     {
         $this->configure();
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 55]])]);
-        $channel = new TelegramChannel();
+        $channel = new TelegramChannel;
         $question = $this->question(['title' => 'Новый заголовок вопроса про насос']);
 
         $channel->update($question, '55');
@@ -234,7 +234,7 @@ class TelegramChannelTest extends TestCase
             'description' => 'Bad Request: message is not modified: specified new message content and reply markup are exactly the same as a current content and reply markup of the message',
         ], 400)]);
 
-        (new TelegramChannel())->update($this->question(), '55');
+        (new TelegramChannel)->update($this->question(), '55');
 
         $this->addToAssertionCount(1);
     }
@@ -245,7 +245,7 @@ class TelegramChannelTest extends TestCase
         Http::fake(['api.telegram.org/*' => Http::response(['ok' => false, 'error_code' => 400, 'description' => 'Bad Request: message to edit not found'], 400)]);
 
         try {
-            (new TelegramChannel())->update($this->question(), '55');
+            (new TelegramChannel)->update($this->question(), '55');
             $this->fail('Исключение не брошено');
         } catch (\RuntimeException $e) {
             $this->assertStringContainsString('Telegram:', $e->getMessage());
@@ -261,7 +261,7 @@ class TelegramChannelTest extends TestCase
         ));
 
         try {
-            (new TelegramChannel())->send($this->question());
+            (new TelegramChannel)->send($this->question());
             $this->fail('Исключение не брошено');
         } catch (\RuntimeException $e) {
             $this->assertStringNotContainsString('SECRET-TOKEN', $e->getMessage());
@@ -278,6 +278,6 @@ class TelegramChannelTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Telegram:');
 
-        (new TelegramChannel())->send($this->question());
+        (new TelegramChannel)->send($this->question());
     }
 }

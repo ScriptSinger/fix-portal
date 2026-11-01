@@ -54,7 +54,7 @@ class UserImages
     {
         $info = pathinfo($path);
 
-        return $info['dirname'] . '/w' . $width . '/' . $info['filename'] . '.jpg';
+        return $info['dirname'].'/w'.$width.'/'.$info['filename'].'.jpg';
     }
 
     /** Адрес копии нужной ширины для публичного адреса оригинала; если копии нет, возвращает сам оригинал. */

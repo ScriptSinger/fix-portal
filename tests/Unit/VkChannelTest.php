@@ -21,7 +21,7 @@ class VkChannelTest extends TestCase
 
     private function question(array $attributes = []): Question
     {
-        return (new Question())->forceFill($attributes + [
+        return (new Question)->forceFill($attributes + [
             'id' => 7,
             'slug' => 'stiralka-ne-slivaet',
             'title' => 'Стиралка не сливает воду',
@@ -29,25 +29,25 @@ class VkChannelTest extends TestCase
             'model' => 'Beko WKL 13540 K',
             'error_code' => 'E03',
         ])
-            ->setRelation('appliance', (new Appliance())->forceFill(['title' => 'Стиральная машина']))
-            ->setRelation('user', (new User())->forceFill(['name' => 'Иван']));
+            ->setRelation('appliance', (new Appliance)->forceFill(['title' => 'Стиральная машина']))
+            ->setRelation('user', (new User)->forceFill(['name' => 'Иван']));
     }
 
     public function test_channel_is_enabled_only_with_token_and_group(): void
     {
         $this->configure();
-        $this->assertTrue((new VkChannel())->enabled());
+        $this->assertTrue((new VkChannel)->enabled());
 
         $this->configure(['token' => null]);
-        $this->assertFalse((new VkChannel())->enabled());
+        $this->assertFalse((new VkChannel)->enabled());
 
         $this->configure(['group_id' => '']);
-        $this->assertFalse((new VkChannel())->enabled());
+        $this->assertFalse((new VkChannel)->enabled());
     }
 
     public function test_text_is_plain_with_title_facts_author_and_excerpt(): void
     {
-        $text = (new VkChannel())->text($this->question(['description' => 'Вода <b>остаётся</b> в баке <img src="/x.jpg">']));
+        $text = (new VkChannel)->text($this->question(['description' => 'Вода <b>остаётся</b> в баке <img src="/x.jpg">']));
 
         $this->assertStringStartsWith('Стиралка не сливает воду', $text);
         $this->assertStringContainsString("Стиральная машина · Beko WKL 13540 K · ошибка E03\nСпрашивает: Иван", $text);
@@ -60,7 +60,7 @@ class VkChannelTest extends TestCase
     {
         $this->configure();
         Http::fake(['api.vk.com/*' => Http::response(['response' => ['post_id' => 987]])]);
-        $channel = new VkChannel();
+        $channel = new VkChannel;
         $question = $this->question();
 
         $id = $channel->send($question);
@@ -81,7 +81,7 @@ class VkChannelTest extends TestCase
     {
         $this->configure();
         Http::fake();
-        $channel = new VkChannel();
+        $channel = new VkChannel;
 
         $this->assertFalse($channel->canModify());
         $channel->update($this->question(), '987');
@@ -96,7 +96,7 @@ class VkChannelTest extends TestCase
         Http::fake(['api.vk.com/*' => Http::response(['error' => ['error_code' => 214, 'error_msg' => 'Access to adding post denied: you can only add 50 posts a day']])]);
 
         try {
-            (new VkChannel())->send($this->question());
+            (new VkChannel)->send($this->question());
             $this->fail('Исключение не брошено');
         } catch (\RuntimeException $e) {
             $this->assertStringContainsString('VK:', $e->getMessage());
@@ -110,7 +110,7 @@ class VkChannelTest extends TestCase
         Http::fake(fn () => throw new ConnectionException('cURL error 28: https://api.vk.com/method/wall.post?access_token=vk1.a.SECRET-VK-TOKEN timed out, Authorization: Bearer vk1.a.SECRET-VK-TOKEN'));
 
         try {
-            (new VkChannel())->send($this->question());
+            (new VkChannel)->send($this->question());
             $this->fail('Исключение не брошено');
         } catch (\RuntimeException $e) {
             $this->assertStringNotContainsString('SECRET-VK-TOKEN', $e->getMessage());

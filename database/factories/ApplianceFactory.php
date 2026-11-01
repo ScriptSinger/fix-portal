@@ -7,7 +7,7 @@ use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Appliance>
+ * @extends Factory<Appliance>
  */
 class ApplianceFactory extends Factory
 {
@@ -16,7 +16,6 @@ class ApplianceFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     protected $model = Appliance::class;
 
     public function definition(): array

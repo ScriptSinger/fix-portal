@@ -69,7 +69,7 @@ class PurgeLocalFirmwareFiles extends Command
             ['оставить: копии в облаке нет (не трогаем)', $keep['no_cloud_copy']],
             ['можно удалить: копия в облаке подтверждена', count($deletable)],
         ]);
-        $this->line('Освободится: ' . round($bytes / 1048576, 1) . ' МБ');
+        $this->line('Освободится: '.round($bytes / 1048576, 1).' МБ');
 
         if (! $this->option('apply')) {
             $this->comment('Пробный прогон. Для удаления добавьте --apply.');
@@ -81,7 +81,7 @@ class PurgeLocalFirmwareFiles extends Command
             unlink($path);
         }
 
-        $this->info('Удалено файлов: ' . count($deletable));
+        $this->info('Удалено файлов: '.count($deletable));
 
         return self::SUCCESS;
     }

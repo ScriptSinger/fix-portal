@@ -13,11 +13,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-use Intervention\Image\Laravel\Facades\Image;
-
 class Post extends Model
 {
-    use HasFactory, Sluggable, DateTrait, ImageHandlerTrait;
+    use DateTrait, HasFactory, ImageHandlerTrait, Sluggable;
 
     protected $fillable = [
         'title',
@@ -25,7 +23,7 @@ class Post extends Model
         'content',
         'category_id',
         'thumbnail',
-        'administrator_id'
+        'administrator_id',
 
     ];
 
@@ -33,8 +31,8 @@ class Post extends Model
     {
         return [
             'slug' => [
-                'source' => 'title'
-            ]
+                'source' => 'title',
+            ],
         ];
     }
 
@@ -47,7 +45,6 @@ class Post extends Model
     {
         return $this->hasOne(Thumbnail::class);
     }
-
 
     public function getThumbnailUrlAttribute(): ?string
     {

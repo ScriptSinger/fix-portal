@@ -25,7 +25,7 @@ class Downloader
         // Трафик из облака идёт мимо сервера, а права проверены выше (маршрут под auth и verified)
         if ($firmware->file_disk) {
             return redirect()->away($disk->temporaryUrl($key, now()->addMinutes(10), [
-                'ResponseContentDisposition' => "attachment; filename*=UTF-8''" . rawurlencode($firmware->download_name),
+                'ResponseContentDisposition' => "attachment; filename*=UTF-8''".rawurlencode($firmware->download_name),
             ]));
         }
 

@@ -2,18 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use App\Services\FirmwareCatalog;
 use App\Support\Firmware\DumpData;
 use App\Support\Firmware\FirmwareText;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class Firmware extends Model
 {
     private ?DumpData $dumpCache = null;
+
     private ?string $dumpSource = null;
 
     protected $fillable = [
@@ -53,8 +53,8 @@ class Firmware extends Model
     {
         return [
             'slug' => [
-                'source' => 'title'
-            ]
+                'source' => 'title',
+            ],
         ];
     }
 
@@ -82,7 +82,7 @@ class Firmware extends Model
             return (string) $this->file_path;
         }
 
-        return 'firmwares/' . ($this->file_path ?: $this->title . ($this->extension ?? ''));
+        return 'firmwares/'.($this->file_path ?: $this->title.($this->extension ?? ''));
     }
 
     /**
@@ -113,7 +113,7 @@ class Firmware extends Model
      */
     public function getDownloadNameAttribute(): string
     {
-        return $this->title . ($this->extension ?? '');
+        return $this->title.($this->extension ?? '');
     }
 
     // Параметры дампа и тексты считают DumpData и FirmwareText; здесь только короткие свойства для шаблонов
@@ -231,7 +231,7 @@ class Firmware extends Model
         }
 
         return Cache::remember(
-            'firmware.series_count.' . md5($this->brand . '|' . $this->series),
+            'firmware.series_count.'.md5($this->brand.'|'.$this->series),
             600,
             fn () => static::query()->where('brand', $this->brand)->where('series', $this->series)->count()
         );

@@ -87,6 +87,6 @@ class ActivityMailer
     /** Счётчик писем за сутки: на человека или (без аргумента) на весь сайт. */
     private function dailyKey(?User $user = null): string
     {
-        return 'activity-mail:daily:' . now()->format('Y-m-d') . ':' . ($user?->id ?? 'all');
+        return 'activity-mail:daily:'.now()->format('Y-m-d').':'.($user?->id ?? 'all');
     }
 }

@@ -20,6 +20,7 @@ class NormalizeArticleContent extends Command
         $slugs = $this->argument('slugs') ?: [];
         if ($slugs === [] && ! $this->option('all')) {
             $this->error('Укажите слаги статей или используйте --all.');
+
             return self::FAILURE;
         }
 
@@ -32,6 +33,7 @@ class NormalizeArticleContent extends Command
 
         if ($posts->isEmpty()) {
             $this->error('Статьи не найдены.');
+
             return self::FAILURE;
         }
 

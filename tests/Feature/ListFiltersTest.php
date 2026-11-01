@@ -16,8 +16,8 @@ class ListFiltersTest extends TestCase
     public function test_question_text_filter_finds_by_title_and_treats_wildcards_literally(): void
     {
         $user = User::factory()->create();
-        $a = $this->makeQuestion($user, ['title' => 'Фильтрация сушилки ' . uniqid()]);
-        $b = $this->makeQuestion($user, ['title' => 'Другой вопрос про насос ' . uniqid()]);
+        $a = $this->makeQuestion($user, ['title' => 'Фильтрация сушилки '.uniqid()]);
+        $b = $this->makeQuestion($user, ['title' => 'Другой вопрос про насос '.uniqid()]);
 
         $this->get(route('questions.index', ['text' => 'Фильтрация сушилки']))->assertSee($a->title)->assertDontSee($b->title);
         $this->get(route('questions.index', ['text' => '%']))->assertDontSee($a->title)->assertDontSee($b->title);
@@ -26,23 +26,23 @@ class ListFiltersTest extends TestCase
     public function test_status_filter_on_an_appliance_page(): void
     {
         $user = User::factory()->create();
-        $solved = $this->makeQuestion($user, ['title' => 'Решённый про технику ' . uniqid()]);
+        $solved = $this->makeQuestion($user, ['title' => 'Решённый про технику '.uniqid()]);
         $solved->forceFill(['solved_at' => now()])->save();
-        $open = $this->makeQuestion($user, ['title' => 'Открытый про технику ' . uniqid(), 'appliance_id' => $solved->appliance_id]);
-        $elsewhere = $this->makeQuestion($user, ['title' => 'Чужая техника ' . uniqid()]);
+        $open = $this->makeQuestion($user, ['title' => 'Открытый про технику '.uniqid(), 'appliance_id' => $solved->appliance_id]);
+        $elsewhere = $this->makeQuestion($user, ['title' => 'Чужая техника '.uniqid()]);
         $url = route('public.appliances.show', ['appliance' => $solved->appliance->slug]);
 
-        $this->get($url . '?status=solved')->assertSee($solved->title)->assertDontSee($open->title);
-        $this->get($url . '?status=open')->assertSee($open->title)->assertDontSee($solved->title);
+        $this->get($url.'?status=solved')->assertSee($solved->title)->assertDontSee($open->title);
+        $this->get($url.'?status=open')->assertSee($open->title)->assertDontSee($solved->title);
         $this->get($url)->assertSee($solved->title)->assertSee($open->title)->assertDontSee($elsewhere->title);
     }
 
     public function test_status_and_text_filters_combine(): void
     {
         $user = User::factory()->create();
-        $match = $this->makeQuestion($user, ['title' => 'Сочетание фильтров раз ' . uniqid()]);
+        $match = $this->makeQuestion($user, ['title' => 'Сочетание фильтров раз '.uniqid()]);
         $match->forceFill(['solved_at' => now()])->save();
-        $unsolved = $this->makeQuestion($user, ['title' => 'Сочетание фильтров два ' . uniqid()]);
+        $unsolved = $this->makeQuestion($user, ['title' => 'Сочетание фильтров два '.uniqid()]);
 
         $this->get(route('questions.index', ['text' => 'Сочетание фильтров', 'status' => 'solved']))
             ->assertSee($match->title)->assertDontSee($unsolved->title);

@@ -35,21 +35,21 @@ class DatabaseBackup
     {
         File::ensureDirectoryExists($this->directory());
 
-        $file = $this->directory() . '/' . $this->fileName($label);
+        $file = $this->directory().'/'.$this->fileName($label);
 
         $result = Process::env([...$this->credentials(), 'BACKUP_FILE' => $file])
             ->timeout(1800)
             ->run([
                 'bash', '-c',
                 'set -o pipefail; mysqldump --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USER" '
-                . '--single-transaction --quick --routines --triggers --no-tablespaces --set-gtid-purged=OFF '
-                . '--default-character-set=utf8mb4 "$DB_NAME" | gzip > "$BACKUP_FILE"',
+                .'--single-transaction --quick --routines --triggers --no-tablespaces --set-gtid-purged=OFF '
+                .'--default-character-set=utf8mb4 "$DB_NAME" | gzip > "$BACKUP_FILE"',
             ]);
 
         if ($result->failed()) {
             File::delete($file);
 
-            throw new RuntimeException('Дамп не снят: ' . trim($result->errorOutput()));
+            throw new RuntimeException('Дамп не снят: '.trim($result->errorOutput()));
         }
 
         if (! $this->isComplete($file)) {
@@ -78,7 +78,7 @@ class DatabaseBackup
      */
     public function upload(string $file): string
     {
-        if (blank(config('filesystems.disks.' . config('backup.cloud_disk') . '.bucket'))) {
+        if (blank(config('filesystems.disks.'.config('backup.cloud_disk').'.bucket'))) {
             throw new RuntimeException('Не задан бакет для копий (YANDEX_BACKUP_BUCKET в .env).');
         }
 
@@ -90,7 +90,7 @@ class DatabaseBackup
         try {
             $disk->writeStream($path, $stream);
         } catch (\Throwable $exception) {
-            throw new RuntimeException('Копия не загружена в облако: ' . $exception->getMessage());
+            throw new RuntimeException('Копия не загружена в облако: '.$exception->getMessage());
         } finally {
             if (is_resource($stream)) {
                 fclose($stream);
@@ -155,7 +155,7 @@ class DatabaseBackup
             return collect();
         }
 
-        return collect(File::glob($this->directory() . '/*.sql.gz'))
+        return collect(File::glob($this->directory().'/*.sql.gz'))
             ->map(fn (string $path): array => [
                 'path' => $path,
                 'name' => basename($path),
@@ -178,14 +178,14 @@ class DatabaseBackup
 
     private function cloudPath(string $name): string
     {
-        return trim((string) config('backup.cloud_prefix'), '/') . '/' . $name;
+        return trim((string) config('backup.cloud_prefix'), '/').'/'.$name;
     }
 
     private function fileName(?string $label): string
     {
-        $suffix = filled($label) ? '-' . Str::slug($label) : '';
+        $suffix = filled($label) ? '-'.Str::slug($label) : '';
 
-        return config("database.connections.{$this->connection}.database") . '-' . now()->format('Y-m-d_His') . $suffix . '.sql.gz';
+        return config("database.connections.{$this->connection}.database").'-'.now()->format('Y-m-d_His').$suffix.'.sql.gz';
     }
 
     /**

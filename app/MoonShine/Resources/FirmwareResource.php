@@ -8,11 +8,11 @@ use App\Models\Firmware;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
-use MoonShine\UI\Fields\File;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\UI\Fields\Date;
+use MoonShine\UI\Fields\File;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Text;
@@ -128,7 +128,7 @@ class FirmwareResource extends BaseResource
         }
 
         $md5 = md5_file($file->getRealPath());
-        $key = 'firmwares/' . substr($md5, 0, 2) . '/' . $md5;
+        $key = 'firmwares/'.substr($md5, 0, 2).'/'.$md5;
         $disk = Storage::disk('firmware_s3');
 
         if (! $disk->exists($key)) {
@@ -145,7 +145,7 @@ class FirmwareResource extends BaseResource
 
         $name = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $firmware->title = filled($firmware->title) ? $firmware->title : $name;
-        $firmware->extension = '.' . strtolower($file->getClientOriginalExtension());
+        $firmware->extension = '.'.strtolower($file->getClientOriginalExtension());
         $firmware->size = $file->getSize();
         $firmware->crc32 = $md5;
         $firmware->file_disk = 'firmware_s3';

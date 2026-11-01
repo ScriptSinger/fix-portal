@@ -26,6 +26,7 @@ class AccessLogMiddleware
 
         try {
             $response = $next($request);
+
             return $response;
         } finally {
             $status = $response?->getStatusCode() ?? 500;
@@ -63,7 +64,7 @@ class AccessLogMiddleware
     {
         $prefix = trim((string) config('moonshine.prefix', 'admin'), '/');
 
-        if ($prefix === '' || ! $request->is($prefix, $prefix . '/*')) {
+        if ($prefix === '' || ! $request->is($prefix, $prefix.'/*')) {
             return null;
         }
 
@@ -116,7 +117,7 @@ class AccessLogMiddleware
         // Whole path segments only: a bare "/js" prefix also swallowed real
         // pages such as /jsonld-demo or /images-gallery.
         foreach (['/css', '/js', '/images'] as $dir) {
-            if ($lower === $dir || str_starts_with($lower, $dir . '/')) {
+            if ($lower === $dir || str_starts_with($lower, $dir.'/')) {
                 return true;
             }
         }
@@ -152,13 +153,13 @@ class AccessLogMiddleware
 
     private function isSuspiciousPath(string $path): bool
     {
-        $normalized = '/' . ltrim(strtolower($path), '/');
+        $normalized = '/'.ltrim(strtolower($path), '/');
         $paths = (array) config('access_log.suspicious_paths', []);
         $allowlist = (array) config('access_log.well_known_allowlist', []);
 
         if (str_starts_with($normalized, '/.well-known')) {
             foreach ($allowlist as $allowed) {
-                $allowedPath = '/' . ltrim(strtolower((string) $allowed), '/');
+                $allowedPath = '/'.ltrim(strtolower((string) $allowed), '/');
                 if ($allowedPath !== '/' && str_starts_with($normalized, $allowedPath)) {
                     return false;
                 }
@@ -167,7 +168,7 @@ class AccessLogMiddleware
 
         foreach ($paths as $group) {
             foreach ((array) $group as $susPath) {
-                $needle = '/' . ltrim(strtolower((string) $susPath), '/');
+                $needle = '/'.ltrim(strtolower((string) $susPath), '/');
                 if ($needle !== '/' && str_starts_with($normalized, $needle)) {
                     return true;
                 }
@@ -186,6 +187,7 @@ class AccessLogMiddleware
         $headerSize = $response->headers->get('Content-Length');
         if ($headerSize !== null && $headerSize !== '') {
             $size = (int) $headerSize;
+
             return $size >= 0 ? $size : null;
         }
 

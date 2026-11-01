@@ -5,17 +5,17 @@ namespace App\Http\Middleware;
 use App\Models\BlockedUserAgent;
 use App\Models\Blocker;
 use Closure;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class BlockedMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -41,6 +41,7 @@ class BlockedMiddleware
         if (in_array($request->ip(), $blockedIps, true)) {
             abort(403);
         }
+
         return $next($request);
     }
 }

@@ -24,9 +24,7 @@ final class Feed
 
     private ?Collection $entries = null;
 
-    public function __construct(private readonly Model $subject, private readonly ?int $viewerId = null)
-    {
-    }
+    public function __construct(private readonly Model $subject, private readonly ?int $viewerId = null) {}
 
     public static function for(Model $subject, ?int $viewerId = null): self
     {
@@ -75,7 +73,7 @@ final class Feed
         }
 
         return [
-            'anchor' => ($this->subject->solution_type === 'comment' ? 'c-' : 'r-') . $message->id,
+            'anchor' => ($this->subject->solution_type === 'comment' ? 'c-' : 'r-').$message->id,
             'author' => $message->user->name,
             'text' => PlainText::from($message->text, 200) ?: 'Фото',
         ];
@@ -116,7 +114,7 @@ final class Feed
             return new FeedEntry(
                 message: $m,
                 type: $type,
-                anchor: ($type === 'comment' ? 'c-' : 'r-') . $m->id,
+                anchor: ($type === 'comment' ? 'c-' : 'r-').$m->id,
                 rootId: $r['root'],
                 body: $body,
                 photos: $photos,
@@ -137,7 +135,7 @@ final class Feed
     private function quote(Comment|Reply $message): FeedQuote
     {
         return new FeedQuote(
-            anchor: ($message instanceof Reply ? 'r-' : 'c-') . $message->id,
+            anchor: ($message instanceof Reply ? 'r-' : 'c-').$message->id,
             authorName: $message->user->name,
             colorSlot: $message->user_id % self::COLORS,
             text: PlainText::from($message->text),

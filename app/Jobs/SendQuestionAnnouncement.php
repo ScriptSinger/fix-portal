@@ -25,9 +25,7 @@ class SendQuestionAnnouncement implements ShouldQueue
         return [60, 300, 900];
     }
 
-    public function __construct(public int $announcementId)
-    {
-    }
+    public function __construct(public int $announcementId) {}
 
     public function handle(QuestionAnnouncer $announcer): void
     {

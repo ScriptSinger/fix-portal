@@ -57,7 +57,7 @@ class VkIdProvider extends AbstractProvider
         $data = json_decode($contents, true);
 
         if (! is_array($data) || ! isset($data['user'])) {
-            throw new RuntimeException('Неверный ответ VK ID: ' . $contents);
+            throw new RuntimeException('Неверный ответ VK ID: '.$contents);
         }
 
         return $data['user'];
@@ -65,9 +65,9 @@ class VkIdProvider extends AbstractProvider
 
     protected function mapUserToObject(array $user)
     {
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => (string) Arr::get($user, 'user_id'),
-            'name' => trim(Arr::get($user, 'first_name') . ' ' . Arr::get($user, 'last_name')),
+            'name' => trim(Arr::get($user, 'first_name').' '.Arr::get($user, 'last_name')),
             'email' => Arr::get($user, 'email'),
             'avatar' => Arr::get($user, 'avatar'),
         ]);

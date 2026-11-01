@@ -28,10 +28,10 @@ class OgImageTest extends TestCase
         $image = asset('assets/front/images/og-default.jpg');
 
         $this->get('/about')->assertOk()
-            ->assertSee('<meta property="og:image" content="' . $image . '">', false)
+            ->assertSee('<meta property="og:image" content="'.$image.'">', false)
             ->assertSee('<meta property="og:image:width" content="1200">', false)
             ->assertSee('<meta property="og:image:height" content="630">', false)
-            ->assertSee('<meta name="twitter:image" content="' . $image . '">', false)
+            ->assertSee('<meta name="twitter:image" content="'.$image.'">', false)
             ->assertSee('og:image:alt', false)
             ->assertDontSee('power_unit.jpg', false);
     }
@@ -42,6 +42,6 @@ class OgImageTest extends TestCase
 
         $this->get($this->pageOf($question))->assertOk()
             ->assertSee('og-default.jpg', false)
-            ->assertDontSee('<meta property="og:image" content="' . asset('assets/front/images/power_unit.jpg') . '">', false);
+            ->assertDontSee('<meta property="og:image" content="'.asset('assets/front/images/power_unit.jpg').'">', false);
     }
 }

@@ -40,8 +40,8 @@ class MergeDuplicateFirmware extends Command
 
             // Другие названия файла: без повторов и без названия основной записи
             $names = $duplicates
-                ->map(fn ($d) => trim($d->title . ($d->extension ?? '')))
-                ->filter(fn ($name) => $name !== '' && $name !== trim($keep->title . ($keep->extension ?? '')))
+                ->map(fn ($d) => trim($d->title.($d->extension ?? '')))
+                ->filter(fn ($name) => $name !== '' && $name !== trim($keep->title.($keep->extension ?? '')))
                 ->merge(array_filter(explode("\n", (string) $keep->aliases)))
                 ->unique()
                 ->values()
@@ -63,10 +63,10 @@ class MergeDuplicateFirmware extends Command
 
             if (count($examples) < (int) $this->option('sample')) {
                 $examples[] = [
-                    '#' . $keep->id,
-                    $duplicates->pluck('id')->map(fn ($id) => '#' . $id)->implode(', '),
+                    '#'.$keep->id,
+                    $duplicates->pluck('id')->map(fn ($id) => '#'.$id)->implode(', '),
                     $names->take(3)->implode(' | ') ?: '-',
-                    $views . ' / ' . $downloads,
+                    $views.' / '.$downloads,
                 ];
             }
 
@@ -81,8 +81,8 @@ class MergeDuplicateFirmware extends Command
                     ->update(['commentable_id' => $keep->id]);
 
                 DB::table('firmware')->where('id', $keep->id)->update([
-                    'views_count' => DB::raw('views_count + ' . $views),
-                    'downloads_count' => DB::raw('downloads_count + ' . $downloads),
+                    'views_count' => DB::raw('views_count + '.$views),
+                    'downloads_count' => DB::raw('downloads_count + '.$downloads),
                     'aliases' => $names->isEmpty() ? null : $names->implode("\n"),
                 ]);
 

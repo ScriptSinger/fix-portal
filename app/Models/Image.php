@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Image extends Model
 {
-
     use HasFactory;
 
     public function user(): BelongsTo
@@ -24,6 +23,7 @@ class Image extends Model
     public function getSizeMbAttribute()
     {
         $sizeInMb = round($this->attributes['size'] / 1048576, 2); // Разделение на 1024^2 для преобразования в мегабайты
-        return $sizeInMb . " MB"; // Добавляем "MB" к значению
+
+        return $sizeInMb.' MB'; // Добавляем "MB" к значению
     }
 }

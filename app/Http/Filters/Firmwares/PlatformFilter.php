@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 /** ?platform=Arcadia. platform_norm склеивает Arcadia / ARCADIA / arcadia; старое поле оставляем для записей без обогащения. */
 class PlatformFilter
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function handle(Builder $builder, \Closure $next)
     {

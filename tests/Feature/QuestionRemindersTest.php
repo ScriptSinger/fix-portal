@@ -177,9 +177,9 @@ class QuestionRemindersTest extends TestCase
 
     public function test_reminder_title_is_escaped_for_telegram_html(): void
     {
-        $question = (new Question())->forceFill(['id' => 9, 'slug' => 'x', 'title' => 'Не греет <b>вода</b> & пишет ошибку']);
+        $question = (new Question)->forceFill(['id' => 9, 'slug' => 'x', 'title' => 'Не греет <b>вода</b> & пишет ошибку']);
 
-        $text = (new TelegramChannel())->reminderText($question);
+        $text = (new TelegramChannel)->reminderText($question);
 
         $this->assertStringNotContainsString('<b>вода</b>', $text);
         $this->assertStringContainsString('&lt;b&gt;вода&lt;/b&gt; &amp; пишет', $text);
@@ -187,7 +187,7 @@ class QuestionRemindersTest extends TestCase
 
     public function test_digest_text_declines_the_word_and_has_the_link_and_thanks(): void
     {
-        $channel = new TelegramChannel();
+        $channel = new TelegramChannel;
         $url = 'https://ufamasters.ru/questions?status=unanswered';
 
         foreach ([1 => 'вопрос', 2 => 'вопроса', 5 => 'вопросов', 11 => 'вопросов', 21 => 'вопрос', 22 => 'вопроса', 112 => 'вопросов'] as $n => $word) {
@@ -209,7 +209,7 @@ class QuestionRemindersTest extends TestCase
         $this->artisan('questions:digest')->assertSuccessful();
 
         Http::assertSent(fn (Request $request) => str_ends_with($request->url(), '/sendMessage')
-            && str_contains($request['text'], 'На сайте сейчас ' . ($before + 2))
+            && str_contains($request['text'], 'На сайте сейчас '.($before + 2))
             && str_contains($request['text'], 'status=unanswered'));
     }
 
@@ -222,7 +222,7 @@ class QuestionRemindersTest extends TestCase
         $count = Question::unanswered()->count();
 
         $this->artisan('questions:digest', ['--dry-run' => true])
-            ->expectsOutputToContain('На сайте сейчас ' . $count . ' ')
+            ->expectsOutputToContain('На сайте сейчас '.$count.' ')
             ->assertSuccessful();
 
         Http::assertNothingSent();

@@ -2,12 +2,12 @@
 
 namespace App\Http\Filters\Firmwares;
 
+use App\Models\Firmware;
 use App\Services\Firmware\DataSearch;
 use App\Support\SqlLike;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Firmware;
 
 /**
  * ?search=… Поиск идёт в два шага. Сначала по коротким полям (название, модель, серия, алиасы): это миллисекунды.
@@ -17,9 +17,7 @@ use App\Models\Firmware;
  */
 class SearchFilter
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function handle(Builder $builder, \Closure $next)
     {
@@ -56,18 +54,18 @@ class SearchFilter
             // «wisl 105», «WISL-105» и «WISL105» должны находить одну и ту же модель
             $compact = mb_strtoupper(preg_replace('/[\s\-_]+/u', '', $search) ?? $search);
 
-            $q->where('title', 'like', '%' . SqlLike::escape($search) . '%')
-                ->orWhere('model', 'like', '%' . SqlLike::escape(mb_strtoupper($search)) . '%')
-                ->orWhere('model', 'like', '%' . SqlLike::escape($compact) . '%')
+            $q->where('title', 'like', '%'.SqlLike::escape($search).'%')
+                ->orWhere('model', 'like', '%'.SqlLike::escape(mb_strtoupper($search)).'%')
+                ->orWhere('model', 'like', '%'.SqlLike::escape($compact).'%')
                 ->orWhere('series', $compact)
-                ->orWhere('aliases', 'like', '%' . SqlLike::escape($search) . '%');
+                ->orWhere('aliases', 'like', '%'.SqlLike::escape($search).'%');
 
             if (ctype_digit($search)) {
                 $q->orWhere('id', (int) $search);
             }
         };
 
-        $found = Cache::remember('firmware.search.' . md5(mb_strtolower($search)), 600, fn () => Firmware::query()->where($fast)->exists());
+        $found = Cache::remember('firmware.search.'.md5(mb_strtolower($search)), 600, fn () => Firmware::query()->where($fast)->exists());
 
         if ($found) {
             $query->where($fast);
@@ -81,12 +79,12 @@ class SearchFilter
         if ($codes) {
             $byCodes = function ($q) use ($codes) {
                 foreach ($codes as $code) {
-                    $q->orWhere('title', 'like', '%' . SqlLike::escape($code) . '%')
-                        ->orWhere('aliases', 'like', '%' . SqlLike::escape($code) . '%');
+                    $q->orWhere('title', 'like', '%'.SqlLike::escape($code).'%')
+                        ->orWhere('aliases', 'like', '%'.SqlLike::escape($code).'%');
                 }
             };
 
-            if (Cache::remember('firmware.search.codes.' . md5(implode('|', $codes)), 600, fn () => Firmware::query()->where($byCodes)->exists())) {
+            if (Cache::remember('firmware.search.codes.'.md5(implode('|', $codes)), 600, fn () => Firmware::query()->where($byCodes)->exists())) {
                 $query->where($byCodes);
 
                 return;

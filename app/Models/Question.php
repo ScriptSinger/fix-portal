@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\Announcements\QuestionAnnouncer;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -13,10 +14,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Question extends Model
 {
+    use DateTrait, HasFactory, ImageHandlerTrait, Sluggable;
     use HasFactory;
-
-
-    use HasFactory, Sluggable, DateTrait, ImageHandlerTrait;
 
     protected $fillable = [
         'title',
@@ -67,8 +66,8 @@ class Question extends Model
     {
         return [
             'slug' => [
-                'source' => 'title'
-            ]
+                'source' => 'title',
+            ],
         ];
     }
 
@@ -95,6 +94,7 @@ class Question extends Model
     public function getSrcFromContentAttribute()
     {
         $html = $this->attributes['description'];
+
         return $this->getFirstSrc($html);
     }
 
@@ -102,6 +102,7 @@ class Question extends Model
     {
         $pattern = '/<img.+?src="(.+?)".*?>/';
         preg_match($pattern, $html, $matches);
+
         return isset($matches[1]) ? $matches[1] : null;
     }
 
@@ -110,7 +111,7 @@ class Question extends Model
         parent::boot();
 
         static::deleting(function ($question) {
-            app(\App\Services\Announcements\QuestionAnnouncer::class)->retract($question);
+            app(QuestionAnnouncer::class)->retract($question);
             $question->comments()->get()->each->delete();
         });
     }

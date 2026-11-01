@@ -13,6 +13,7 @@ use MoonShine\Laravel\Resources\ModelResource;
 
 /**
  * @template TModel of Model
+ *
  * @extends ModelResource<TModel>
  */
 abstract class BaseResource extends ModelResource

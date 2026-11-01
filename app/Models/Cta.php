@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Support\CtaHtmlSanitizer;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -57,6 +57,6 @@ class Cta extends Model
 
         $separator = str_contains($this->target_url, '?') ? '&' : '?';
 
-        return $this->target_url . $separator . http_build_query($params);
+        return $this->target_url.$separator.http_build_query($params);
     }
 }

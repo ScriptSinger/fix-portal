@@ -24,7 +24,7 @@ class AccessLogReader extends JsonLogReader
         $time = $this->parseTime(Arr::get($decoded, 'datetime'));
 
         return [
-            'id' => $file . ':' . $line,
+            'id' => $file.':'.$line,
             'file' => $file,
             'time' => $time?->format('d.m.Y H:i:s'),
             'time_sort' => $time?->getTimestamp() ?? 0,

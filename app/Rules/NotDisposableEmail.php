@@ -19,7 +19,7 @@ class NotDisposableEmail implements ValidationRule
         }
 
         foreach ((array) config('disposable_emails.domains', []) as $blocked) {
-            if ($domain === $blocked || str_ends_with($domain, '.' . $blocked)) {
+            if ($domain === $blocked || str_ends_with($domain, '.'.$blocked)) {
                 $fail('Адреса временной почты не принимаются. Укажите постоянный e-mail.');
 
                 return;

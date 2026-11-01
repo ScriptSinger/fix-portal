@@ -14,7 +14,7 @@ class JsonFormatter
 
         foreach ($monolog->getHandlers() as $handler) {
             if ($handler instanceof StreamHandler) {
-                $handler->setFormatter(new MonologJsonFormatter());
+                $handler->setFormatter(new MonologJsonFormatter);
             }
         }
     }

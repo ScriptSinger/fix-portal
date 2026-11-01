@@ -12,12 +12,13 @@ class Tag extends Model
     use HasFactory, Sluggable;
 
     protected $fillable = ['title'];
+
     public function sluggable(): array
     {
         return [
             'slug' => [
-                'source' => 'title'
-            ]
+                'source' => 'title',
+            ],
         ];
     }
 

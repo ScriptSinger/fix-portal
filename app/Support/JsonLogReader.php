@@ -18,9 +18,7 @@ use SplQueue;
  */
 abstract class JsonLogReader
 {
-    public function __construct(private ?string $directory = null)
-    {
-    }
+    public function __construct(private ?string $directory = null) {}
 
     /**
      * Log channel file prefix, e.g. "access" for access-*.log.
@@ -53,10 +51,10 @@ abstract class JsonLogReader
         $dir = $this->directory ?? storage_path('logs');
         $prefix = $this->prefix();
 
-        $files = glob($dir . '/' . $prefix . '-*.log') ?: [];
+        $files = glob($dir.'/'.$prefix.'-*.log') ?: [];
 
-        if (is_file($dir . '/' . $prefix . '.log')) {
-            $files[] = $dir . '/' . $prefix . '.log';
+        if (is_file($dir.'/'.$prefix.'.log')) {
+            $files[] = $dir.'/'.$prefix.'.log';
         }
 
         $files = array_values(array_unique($files));
@@ -102,7 +100,7 @@ abstract class JsonLogReader
         // Read oldest to newest so the bounded queue can discard the oldest
         // matching entries and keep the newest window across all log files.
         $files = array_reverse($files);
-        $rows = new SplQueue();
+        $rows = new SplQueue;
         $maxRows = max(1, (int) ($filters['max_rows'] ?? config('access_log.max_entries', 5000)));
 
         foreach ($files as $path) {

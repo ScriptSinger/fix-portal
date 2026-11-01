@@ -14,7 +14,7 @@ class FirmwareTextTest extends TestCase
             $rows .= "<tr><td>{$label}</td><td>{$value}</td></tr>";
         }
 
-        return (new Firmware())->forceFill(array_merge([
+        return (new Firmware)->forceFill(array_merge([
             'id' => 5,
             'title' => 'TEST_123',
             'extension' => '.eep',

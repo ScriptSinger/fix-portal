@@ -14,7 +14,7 @@ class Thumbnail extends Model
         'post_id',
         'original',
         'blog',
-        'small'
+        'small',
     ];
 
     public function post(): BelongsTo

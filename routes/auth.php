@@ -38,7 +38,6 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-
     // Вход через Яндекс ID и VK ID. Кнопки видны, только если в окружении заданы ключи приложения
     Route::get('auth/{provider}', [OAuthController::class, 'redirect'])
         ->where('provider', 'yandex|vkid')

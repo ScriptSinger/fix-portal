@@ -131,7 +131,7 @@ class ActivityEmailTest extends TestCase
             return $mail->hasTo('author@example.invalid')
                 && $mail->envelope()->subject === 'Вам ответили на вопрос: Не сливает воду стиральная машина'
                 && str_contains($html, 'Проверьте крыльчатку насоса и фильтр')
-                && str_contains($html, route('questions.show', ['question' => $question->slug]) . '#c-')
+                && str_contains($html, route('questions.show', ['question' => $question->slug]).'#c-')
                 && str_contains($html, $unsubscribe)
                 && $mail->headers()->text['List-Unsubscribe'] === "<{$unsubscribe}>"
                 && $mail->headers()->text['List-Unsubscribe-Post'] === 'List-Unsubscribe=One-Click'

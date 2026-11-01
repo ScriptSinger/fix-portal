@@ -5,17 +5,14 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Http\Filters\Questions\StatusFilter;
 use App\Http\Filters\Questions\TextFilter;
-
+use App\Http\Requests\Public\SaveQuestionRequest;
 use App\Models\Appliance;
 use App\Models\Question;
-use App\Http\Requests\Public\SaveQuestionRequest;
 use App\Services\QuestionService;
-
 use Illuminate\Pipeline\Pipeline;
 
 class QuestionController extends Controller
 {
-
     public function index()
     {
         $questions = app(Pipeline::class)
@@ -38,7 +35,7 @@ class QuestionController extends Controller
     /** Отдельной страницы нет: форма стоит над списком вопросов, кнопки «Задать вопрос» ведут к ней. */
     public function create()
     {
-        return redirect(route('questions.index') . '#ask');
+        return redirect(route('questions.index').'#ask');
     }
 
     public function store(SaveQuestionRequest $request, QuestionService $questions)
@@ -63,6 +60,7 @@ class QuestionController extends Controller
         $appliances = Appliance::pluck('title', 'id'); // Получаем коллекцию объектов Eloquent.
         $question = Question::where('slug', $slug)->firstOrFail();
         $this->authorize('update', $question);
+
         return view('public.questions.edit', compact('question', 'appliances'));
     }
 
@@ -78,6 +76,7 @@ class QuestionController extends Controller
         $question = Question::findOrFail($id);
         $this->authorize('update', $question);
         $question->delete();
+
         return redirect()->route('questions.index')->with('success', 'Вопрос удален');
     }
 }

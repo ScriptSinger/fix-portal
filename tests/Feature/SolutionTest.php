@@ -27,7 +27,7 @@ class SolutionTest extends TestCase
         [$author, $helper, $question, $answer] = $this->setup3();
 
         $this->actingAs($author)->post(route('questions.solution.store', ['id' => $question->id]), ['type' => 'comment', 'message' => $answer->id])
-            ->assertRedirect(route('questions.show', ['question' => $question->slug]) . '#c-' . $answer->id);
+            ->assertRedirect(route('questions.show', ['question' => $question->slug]).'#c-'.$answer->id);
 
         $question->refresh();
         $this->assertTrue($question->isSolved());
@@ -92,9 +92,9 @@ class SolutionTest extends TestCase
     public function test_status_filter_in_the_list(): void
     {
         $author = User::factory()->create();
-        $solved = $this->makeQuestion($author, ['title' => 'Решённый вопрос про сушку ' . uniqid()]);
+        $solved = $this->makeQuestion($author, ['title' => 'Решённый вопрос про сушку '.uniqid()]);
         $solved->forceFill(['solved_at' => now()])->save();
-        $open = $this->makeQuestion($author, ['title' => 'Открытый вопрос про сушку ' . uniqid()]);
+        $open = $this->makeQuestion($author, ['title' => 'Открытый вопрос про сушку '.uniqid()]);
 
         $this->get(route('questions.index', ['status' => 'solved']))->assertSee($solved->title)->assertDontSee($open->title);
         $this->get(route('questions.index', ['status' => 'open']))->assertSee($open->title)->assertDontSee($solved->title);
@@ -103,7 +103,7 @@ class SolutionTest extends TestCase
 
     public function test_old_questions_are_not_counted_as_unsolved(): void
     {
-        $old = $this->makeQuestion(User::factory()->create(), ['title' => 'Старый вопрос из архива ' . uniqid()]);
+        $old = $this->makeQuestion(User::factory()->create(), ['title' => 'Старый вопрос из архива '.uniqid()]);
         $old->forceFill(['created_at' => '2020-01-01 00:00:00'])->saveQuietly();
 
         $this->get(route('questions.index', ['status' => 'open']))->assertDontSee($old->title);

@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Comment>
+ * @extends Factory<Comment>
  */
 class CommentFactory extends Factory
 {
@@ -18,6 +19,7 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         $commentableTypes = ['App\Models\Post', 'App\Models\Question', 'App\Models\Firmware'];
+
         return [
             'user_id' => User::factory(),
             'commentable_type' => $this->faker->randomElement($commentableTypes),

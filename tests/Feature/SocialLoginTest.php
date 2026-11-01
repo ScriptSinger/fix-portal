@@ -16,7 +16,7 @@ class SocialLoginTest extends TestCase
 
     private function social(string $id, ?string $email, string $name = 'Иван Иванов'): SocialUser
     {
-        return (new SocialUser())->map(['id' => $id, 'name' => $name, 'nickname' => 'ivan', 'email' => $email]);
+        return (new SocialUser)->map(['id' => $id, 'name' => $name, 'nickname' => 'ivan', 'email' => $email]);
     }
 
     public function test_new_user_is_created_verified_and_linked(): void

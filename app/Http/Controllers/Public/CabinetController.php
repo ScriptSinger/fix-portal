@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Question;
-use App\Models\Reaction;
 use App\Models\Reply;
+use App\Services\Reputation;
 use Illuminate\Http\Request;
 
 class CabinetController extends Controller
@@ -19,7 +19,7 @@ class CabinetController extends Controller
             'unread' => $user->unreadNotifications()->count(),
             'questions' => $user->questions()->count(),
             'answers' => $this->answersCount($user->id),
-            'solutions' => \App\Services\Reputation::countFor($user->id),
+            'solutions' => Reputation::countFor($user->id),
         ];
         $questions = $user->questions()->withCount('comments')->latest('id')->limit(5)->get();
 
@@ -69,9 +69,9 @@ class CabinetController extends Controller
     {
         $id = $request->user()->id;
         $comments = Comment::where('user_id', $id)->where('commentable_type', Question::class)->with(['commentable', 'reactions'])->get()
-            ->map(fn (Comment $c) => ['text' => $c->text, 'question' => $c->commentable, 'anchor' => 'c-' . $c->id, 'at' => $c->created_at, 'reactions' => $c->reactions]);
+            ->map(fn (Comment $c) => ['text' => $c->text, 'question' => $c->commentable, 'anchor' => 'c-'.$c->id, 'at' => $c->created_at, 'reactions' => $c->reactions]);
         $replies = Reply::where('user_id', $id)->whereHas('comment', fn ($q) => $q->where('commentable_type', Question::class))->with(['comment.commentable', 'reactions'])->get()
-            ->map(fn (Reply $r) => ['text' => $r->text, 'question' => $r->comment->commentable, 'anchor' => 'r-' . $r->id, 'at' => $r->created_at, 'reactions' => $r->reactions]);
+            ->map(fn (Reply $r) => ['text' => $r->text, 'question' => $r->comment->commentable, 'anchor' => 'r-'.$r->id, 'at' => $r->created_at, 'reactions' => $r->reactions]);
         $answers = $comments->concat($replies)->filter(fn ($a) => $a['question'])->sortByDesc('at')->take(50)->values();
 
         return view('public.cabinet.answers', compact('answers'));
@@ -82,5 +82,4 @@ class CabinetController extends Controller
         return Comment::where('user_id', $userId)->where('commentable_type', Question::class)->count()
             + Reply::where('user_id', $userId)->whereHas('comment', fn ($q) => $q->where('commentable_type', Question::class))->count();
     }
-
 }

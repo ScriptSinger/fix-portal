@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources;
 
+use App\Models\BlockedUserAgent;
+use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Pages\BlocksIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
-use App\MoonShine\Fields\LocalDate;
-use MoonShine\Laravel\Pages\Crud\DetailPage;
-use App\Models\BlockedUserAgent;
 use Illuminate\Validation\Rule;
+use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\MenuManager\Attributes\SkipMenu;

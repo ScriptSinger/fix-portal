@@ -9,16 +9,15 @@
  * Использование:
  *   php tools/make-og-image.php
  */
-
 const WIDTH = 1200;
 const HEIGHT = 630;
 
 $root = dirname(__DIR__);
-$icon = $root . '/public/assets/front/images/favicon_io/android-chrome-512x512.png';
-$out = $root . '/public/assets/front/images/og-default.jpg';
+$icon = $root.'/public/assets/front/images/favicon_io/android-chrome-512x512.png';
+$out = $root.'/public/assets/front/images/og-default.jpg';
 
 $image = imagecreatetruecolor(WIDTH, HEIGHT);
-$yellow = imagecolorallocate($image, 0xf9, 0xca, 0x27);
+$yellow = imagecolorallocate($image, 0xF9, 0xCA, 0x27);
 imagefill($image, 0, 0, $yellow);
 
 // Плитка по центру; в квадратной миниатюре (центральные 630×630) она остаётся целой с запасом по краям

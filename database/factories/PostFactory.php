@@ -2,14 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Administrator;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
+ * @extends Factory<Post>
  */
 class PostFactory extends Factory
 {
@@ -18,7 +17,6 @@ class PostFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     protected $model = Post::class;
 
     public function definition(): array

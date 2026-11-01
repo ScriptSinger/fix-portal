@@ -78,7 +78,7 @@ class FirmwareCatalog
      */
     public function seriesList(string $brand): Collection
     {
-        return Cache::remember('catalog.series.' . md5($brand), self::CACHE_SECONDS, function () use ($brand) {
+        return Cache::remember('catalog.series.'.md5($brand), self::CACHE_SECONDS, function () use ($brand) {
             return Firmware::query()
                 ->where('brand', $brand)
                 ->whereNotNull('series')
@@ -109,7 +109,7 @@ class FirmwareCatalog
      */
     public function brandSummary(string $brand): array
     {
-        return Cache::remember('catalog.brand_summary.' . md5($brand), self::CACHE_SECONDS, function () use ($brand) {
+        return Cache::remember('catalog.brand_summary.'.md5($brand), self::CACHE_SECONDS, function () use ($brand) {
             return [
                 'pages' => Firmware::query()->where('brand', $brand)->count(),
                 'platforms' => $this->distribution('brand', $brand, 'platform_norm'),
@@ -126,7 +126,7 @@ class FirmwareCatalog
      */
     public function seriesSummary(string $brand, string $series): ?array
     {
-        return Cache::remember('catalog.series_summary.' . md5($brand . '|' . $series), self::CACHE_SECONDS, function () use ($brand, $series) {
+        return Cache::remember('catalog.series_summary.'.md5($brand.'|'.$series), self::CACHE_SECONDS, function () use ($brand, $series) {
             $base = Firmware::query()->where('brand', $brand)->where('series', $series);
             $pages = (clone $base)->count();
 

@@ -31,7 +31,7 @@ class QuestionSendToChatButtonTest extends TestCase
         return $this->admin = MoonshineUser::forceCreate([
             'moonshine_user_role_id' => $role->id,
             'name' => 'Тест',
-            'email' => uniqid('admin') . '@example.invalid',
+            'email' => uniqid('admin').'@example.invalid',
             'password' => bcrypt('secret-pass'),
         ]);
     }

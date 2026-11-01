@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Crud\QueryTags\QueryTag;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
+use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Switcher;
@@ -76,7 +77,7 @@ class AccessLogIndexPage extends IndexPage
      * much of a value is shown, so a client sending a huge User-Agent cannot
      * stretch the layout.
      *
-     * @param  \MoonShine\UI\Components\Table\TableBuilder  $component
+     * @param  TableBuilder  $component
      */
     protected function modifyListComponent(ComponentContract $component): ComponentContract
     {

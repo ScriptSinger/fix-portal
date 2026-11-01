@@ -36,16 +36,16 @@ class TelegramChannel implements AnnouncementChannel
         $facts = array_filter([
             $question->appliance?->title,
             $question->model,
-            $question->error_code ? 'ошибка ' . $question->error_code : null,
+            $question->error_code ? 'ошибка '.$question->error_code : null,
         ]);
         $author = $question->user?->name;
 
         return implode("\n\n", array_filter([
             $question->isSolved() ? '✅ Вопрос решён' : null,
-            '<b>' . $this->escape($question->title) . '</b>',
+            '<b>'.$this->escape($question->title).'</b>',
             implode("\n", array_filter([
                 $facts ? $this->escape(implode(' · ', $facts)) : null,
-                $author ? 'Спрашивает: ' . $this->escape($author) : null,
+                $author ? 'Спрашивает: '.$this->escape($author) : null,
             ])),
             $this->escape(PlainText::from($question->description, self::EXCERPT)),
             $this->url($question),
@@ -72,7 +72,7 @@ class TelegramChannel implements AnnouncementChannel
     {
         return implode("\n\n", [
             'Этот вопрос пока без ответа. Если разбираетесь в теме, загляните, пожалуйста.',
-            '<b>' . $this->escape($question->title) . '</b>',
+            '<b>'.$this->escape($question->title).'</b>',
             $this->url($question),
         ]);
     }
@@ -96,7 +96,7 @@ class TelegramChannel implements AnnouncementChannel
 
     public function digestText(int $count, string $url): string
     {
-        return "На сайте сейчас {$count} " . $this->questionWord($count) . " без ответа. Если будет время и желание, загляните: {$url}\nСпасибо всем, кто помогает!";
+        return "На сайте сейчас {$count} ".$this->questionWord($count)." без ответа. Если будет время и желание, загляните: {$url}\nСпасибо всем, кто помогает!";
     }
 
     public function digest(int $count, string $url): ?string
@@ -179,7 +179,7 @@ class TelegramChannel implements AnnouncementChannel
      */
     private function call(string $method, array $payload, array $tolerate = []): Response
     {
-        $url = rtrim((string) config('services.telegram.api_url'), '/') . '/bot' . config('services.telegram.bot_token') . '/' . $method;
+        $url = rtrim((string) config('services.telegram.api_url'), '/').'/bot'.config('services.telegram.bot_token').'/'.$method;
 
         try {
             return Http::timeout(15)
@@ -195,10 +195,10 @@ class TelegramChannel implements AnnouncementChannel
                 }
             }
 
-            throw new \RuntimeException('Telegram: ' . $this->redact($e->getMessage()));
+            throw new \RuntimeException('Telegram: '.$this->redact($e->getMessage()));
         } catch (ConnectionException $e) {
             // в тексте исключения Guzzle стоят адрес с токеном и логин с паролем прокси: наружу они не уходят
-            throw new \RuntimeException('Telegram: ' . $this->redact($e->getMessage()));
+            throw new \RuntimeException('Telegram: '.$this->redact($e->getMessage()));
         }
     }
 

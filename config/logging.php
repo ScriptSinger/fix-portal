@@ -1,5 +1,6 @@
 <?php
 
+use App\Logging\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -80,7 +81,7 @@ return [
             'level' => env('LOG_ACCESS_LEVEL', 'info'),
             'days' => env('LOG_ACCESS_DAYS', 14),
             'replace_placeholders' => true,
-            'tap' => [App\Logging\JsonFormatter::class],
+            'tap' => [JsonFormatter::class],
         ],
 
         'slack' => [

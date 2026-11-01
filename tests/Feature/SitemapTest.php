@@ -19,13 +19,13 @@ class SitemapTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->path = tempnam(sys_get_temp_dir(), 'sitemap') . '.xml';
+        $this->path = tempnam(sys_get_temp_dir(), 'sitemap').'.xml';
     }
 
     protected function tearDown(): void
     {
         @unlink($this->path);
-        @unlink($this->path . '.tmp');
+        @unlink($this->path.'.tmp');
         parent::tearDown();
     }
 
@@ -56,7 +56,7 @@ class SitemapTest extends TestCase
 
         foreach ([route('about'), route('how-it-works')] as $loc) {
             $entry = $this->entry($xml, $loc);
-            $this->assertNotNull($entry, $loc . ' должна быть в карте сайта');
+            $this->assertNotNull($entry, $loc.' должна быть в карте сайта');
             $this->assertCount(0, $entry->lastmod, 'у текстовых страниц нет настоящей даты изменения, значит и lastmod нет');
         }
     }
@@ -76,14 +76,14 @@ class SitemapTest extends TestCase
         $this->generate();
 
         $this->assertFileExists($this->path);
-        $this->assertFileDoesNotExist($this->path . '.tmp');
+        $this->assertFileDoesNotExist($this->path.'.tmp');
     }
 
     public function test_thin_firmwares_are_not_listed_but_informative_ones_are(): void
     {
-        $thin = Firmware::forceCreate(['path_id' => random_int(1_000_000, 9_999_999), 'title' => 'THIN_' . uniqid(), 'extension' => '.bin', 'size' => 100]);
+        $thin = Firmware::forceCreate(['path_id' => random_int(1_000_000, 9_999_999), 'title' => 'THIN_'.uniqid(), 'extension' => '.bin', 'size' => 100]);
         $good = Firmware::forceCreate([
-            'path_id' => random_int(1_000_000, 9_999_999), 'title' => 'GOOD_' . uniqid(), 'extension' => '.bin', 'size' => 100,
+            'path_id' => random_int(1_000_000, 9_999_999), 'title' => 'GOOD_'.uniqid(), 'extension' => '.bin', 'size' => 100,
             'data' => '<table><tr><td>Модель</td><td>WISL105CSI</td></tr></table>',
         ]);
 

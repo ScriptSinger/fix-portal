@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Notifications\ActivityNotification;
+use App\Services\LatestDiscussion;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use App\Services\LatestDiscussion;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
 
@@ -172,6 +172,6 @@ class CabinetTest extends TestCase
         $this->notify($me);
 
         $this->actingAs($me)->get(route('cabinet.index'))->assertOk()
-            ->assertSee('data-url="' . route('cabinet.notifications.count') . '"', false)->assertSee('data-bell-badge', false)->assertSee('Уведомления: 1 новых');
+            ->assertSee('data-url="'.route('cabinet.notifications.count').'"', false)->assertSee('data-bell-badge', false)->assertSee('Уведомления: 1 новых');
     }
 }

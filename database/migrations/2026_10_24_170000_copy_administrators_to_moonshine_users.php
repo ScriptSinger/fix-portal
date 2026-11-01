@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use MoonShine\Laravel\Models\MoonshineUserRole;
 
-return new class () extends Migration {
+return new class extends Migration
+{
     /**
      * Переносим администраторов в moonshine_users вместе с готовыми хешами паролей,
      * чтобы войти в MoonShine можно было прежним логином и паролем.

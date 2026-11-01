@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\Reply;
-use Illuminate\Support\Str;
 use App\MoonShine\Fields\LocalDate;
-use MoonShine\Support\Enums\Action;
+use Illuminate\Support\Str;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\MenuManager\Attributes\SkipMenu;
 use MoonShine\Support\Attributes\Icon;
+use MoonShine\Support\Enums\Action;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Preview;
@@ -53,7 +53,7 @@ class ReplyResource extends BaseResource
             ID::make()->sortable(),
             Preview::make('Текст', 'text', fn (Reply $r) => Str::limit(strip_tags((string) $r->text), 100)),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class),
-            Preview::make('Комментарий', 'comment_id', fn (Reply $r) => '#' . $r->comment_id),
+            Preview::make('Комментарий', 'comment_id', fn (Reply $r) => '#'.$r->comment_id),
             LocalDate::make('Создан', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }

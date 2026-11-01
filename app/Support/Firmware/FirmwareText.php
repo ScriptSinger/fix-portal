@@ -10,16 +10,14 @@ use App\Models\Firmware;
  */
 final class FirmwareText
 {
-    public function __construct(private readonly Firmware $firmware, private readonly DumpData $dump)
-    {
-    }
+    public function __construct(private readonly Firmware $firmware, private readonly DumpData $dump) {}
 
     /** Название: марка и модель, если они известны. */
     public function displayName(): string
     {
         $f = $this->firmware;
 
-        return trim(($f->brand ? $f->brand . ' ' : '') . ($this->dump->modelName() ?: $f->title));
+        return trim(($f->brand ? $f->brand.' ' : '').($this->dump->modelName() ?: $f->title));
     }
 
     public function metaTitle(): string
@@ -28,16 +26,16 @@ final class FirmwareText
         $model = $this->dump->modelName();
 
         if ($model && $this->dump->serialNumber()) {
-            return 'Прошивка ' . $this->displayName() . ' | S/N ' . $this->dump->serialNumber();
+            return 'Прошивка '.$this->displayName().' | S/N '.$this->dump->serialNumber();
         }
         if ($model && $this->dump->pns()) {
-            return 'Прошивка ' . $this->displayName() . ' | PNS ' . $this->dump->pns();
+            return 'Прошивка '.$this->displayName().' | PNS '.$this->dump->pns();
         }
         if ($model) {
-            return 'Прошивка ' . $this->displayName() . ' | ID ' . $f->id;
+            return 'Прошивка '.$this->displayName().' | ID '.$f->id;
         }
 
-        return 'Прошивка: ' . $f->title . ' | ID ' . $f->id;
+        return 'Прошивка: '.$f->title.' | ID '.$f->id;
     }
 
     /**
@@ -50,16 +48,16 @@ final class FirmwareText
         $platform = $f->platform_norm ?: $f->platform;
 
         $facts = array_filter([
-            $platform ? 'платформа ' . $platform : null,
-            $this->dump->firmwareCode() ? 'код прошивки ' . $this->dump->firmwareCode() : null,
-            $this->dump->serialNumber() ? 'S/N ' . $this->dump->serialNumber() : null,
-            $this->dump->pns() ? 'PNS ' . $this->dump->pns() : null,
-            $this->dump->storedError() ? 'сохранённая ошибка ' . $this->dump->storedError() : null,
-            $f->extension ? 'формат ' . $f->extension : null,
-            $f->size ? 'размер ' . $this->humanSize() : null,
+            $platform ? 'платформа '.$platform : null,
+            $this->dump->firmwareCode() ? 'код прошивки '.$this->dump->firmwareCode() : null,
+            $this->dump->serialNumber() ? 'S/N '.$this->dump->serialNumber() : null,
+            $this->dump->pns() ? 'PNS '.$this->dump->pns() : null,
+            $this->dump->storedError() ? 'сохранённая ошибка '.$this->dump->storedError() : null,
+            $f->extension ? 'формат '.$f->extension : null,
+            $f->size ? 'размер '.$this->humanSize() : null,
         ]);
 
-        $text = 'Прошивка ' . $this->displayName() . ($facts ? ': ' . implode(', ', $facts) : '') . '. Скачать файл на UfaMasters.';
+        $text = 'Прошивка '.$this->displayName().($facts ? ': '.implode(', ', $facts) : '').'. Скачать файл на UfaMasters.';
 
         if (mb_strlen($text) <= 160) {
             return $text;
@@ -69,14 +67,14 @@ final class FirmwareText
         $cut = mb_substr($text, 0, 158);
         $space = mb_strrpos($cut, ' ');
 
-        return rtrim(mb_substr($cut, 0, $space ?: 158), ',;: ') . '…';
+        return rtrim(mb_substr($cut, 0, $space ?: 158), ',;: ').'…';
     }
 
     public function humanSize(): string
     {
         $size = (int) $this->firmware->size;
 
-        return $size >= 1024 ? number_format($size / 1024, 1, ',', ' ') . ' КБ' : $size . ' Б';
+        return $size >= 1024 ? number_format($size / 1024, 1, ',', ' ').' КБ' : $size.' Б';
     }
 
     /**
@@ -91,44 +89,44 @@ final class FirmwareText
         $algorithm = $this->dump->algorithm();
         $lines = [];
 
-        $intro = 'файл ' . ($f->extension ? 'формата ' . $f->extension : '') . ' размером ' . $this->humanSize();
-        $intro = 'Прошивка ' . $this->displayName() . ': ' . trim($intro);
+        $intro = 'файл '.($f->extension ? 'формата '.$f->extension : '').' размером '.$this->humanSize();
+        $intro = 'Прошивка '.$this->displayName().': '.trim($intro);
 
         if ($platform) {
-            $intro .= '; платформа модуля ' . $platform;
-            $intro .= $f->brand_group ? ' (' . $f->brand_group . ')' : '';
+            $intro .= '; платформа модуля '.$platform;
+            $intro .= $f->brand_group ? ' ('.$f->brand_group.')' : '';
         }
         if ($algorithm && $algorithm !== $platform) {
-            $intro .= '; алгоритм ' . $algorithm;
+            $intro .= '; алгоритм '.$algorithm;
         }
-        $lines[] = $intro . '.';
+        $lines[] = $intro.'.';
 
         $ids = array_filter([
-            $this->dump->firmwareCode() ? 'код прошивки ' . $this->dump->firmwareCode() : null,
-            $this->dump->serialNumber() ? 'серийный номер ' . $this->dump->serialNumber() : null,
-            $this->dump->pns() ? 'PNS ' . $this->dump->pns() : null,
+            $this->dump->firmwareCode() ? 'код прошивки '.$this->dump->firmwareCode() : null,
+            $this->dump->serialNumber() ? 'серийный номер '.$this->dump->serialNumber() : null,
+            $this->dump->pns() ? 'PNS '.$this->dump->pns() : null,
         ]);
         if ($ids) {
-            $lines[] = 'Идентификаторы в дампе: ' . implode(', ', $ids) . '.';
+            $lines[] = 'Идентификаторы в дампе: '.implode(', ', $ids).'.';
         }
 
         $aliases = array_filter(explode("\n", (string) $f->aliases));
         if ($aliases) {
-            $lines[] = 'Этот же файл встречается под названиями: ' . implode(', ', array_slice($aliases, 0, 8)) . '.';
+            $lines[] = 'Этот же файл встречается под названиями: '.implode(', ', array_slice($aliases, 0, 8)).'.';
         }
 
         $state = [];
         if (($ok = $this->dump->checksumOk()) !== null) {
-            $state[] = 'контрольная сумма ' . ($ok ? 'совпадает' : 'не совпадает (файл мог быть изменён или повреждён)');
+            $state[] = 'контрольная сумма '.($ok ? 'совпадает' : 'не совпадает (файл мог быть изменён или повреждён)');
         }
         if ($this->dump->storedError()) {
-            $state[] = 'сохранённая ошибка ' . $this->dump->storedError();
+            $state[] = 'сохранённая ошибка '.$this->dump->storedError();
         }
         if ($this->dump->currentError()) {
-            $state[] = 'текущая ошибка ' . $this->dump->currentError();
+            $state[] = 'текущая ошибка '.$this->dump->currentError();
         }
         if ($state) {
-            $lines[] = 'Состояние дампа: ' . implode('; ', $state) . '.';
+            $lines[] = 'Состояние дампа: '.implode('; ', $state).'.';
         }
 
         return $lines;

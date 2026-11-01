@@ -46,7 +46,7 @@ class Dashboard extends Page
                 $this->count('Вопросы', Question::class, 'question-mark-circle'),
                 $this->count('Прошивки', Firmware::class, 'cpu-chip'),
                 $this->users(),
-                $this->seen('Онлайн сейчас (за ' . User::ONLINE_MINUTES . ' мин)', 'signal', now()->subMinutes(User::ONLINE_MINUTES), VisitorResource::TAG_ONLINE),
+                $this->seen('Онлайн сейчас (за '.User::ONLINE_MINUTES.' мин)', 'signal', now()->subMinutes(User::ONLINE_MINUTES), VisitorResource::TAG_ONLINE),
                 $this->seen('Заходили сегодня', 'sun', VisitorResource::startOfToday(), VisitorResource::TAG_TODAY),
             ]),
         ];
@@ -64,7 +64,7 @@ class Dashboard extends Page
         return ValueMetric::make($label)
             ->icon($icon)
             ->value(fn () => User::where('last_seen_at', '>=', $since)->count())
-            ->customAttributes(['onclick' => "window.location.href='" . e($url) . "'", 'style' => 'cursor: pointer'])
+            ->customAttributes(['onclick' => "window.location.href='".e($url)."'", 'style' => 'cursor: pointer'])
             ->columnSpan(4);
     }
 
@@ -78,8 +78,8 @@ class Dashboard extends Page
         return ValueMetric::make('Пользователи: с подтверждённой почтой из всех')
             ->icon('users')
             ->value(fn () => number_format(User::whereNotNull('email_verified_at')->count(), 0, ',', ' ')
-                . ' из ' . number_format(User::count(), 0, ',', ' '))
-            ->customAttributes(['onclick' => "window.location.href='" . e($url) . "'", 'style' => 'cursor: pointer'])
+                .' из '.number_format(User::count(), 0, ',', ' '))
+            ->customAttributes(['onclick' => "window.location.href='".e($url)."'", 'style' => 'cursor: pointer'])
             ->columnSpan(4);
     }
 

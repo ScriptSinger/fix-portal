@@ -45,8 +45,8 @@ class FeedTest extends TestCase
         $entries = $this->feed($question)->entries()->values();
 
         $this->assertNull($entries[0]->quote);
-        $this->assertSame(['c-' . $comment->id, 'Анна'], [$entries[1]->quote->anchor, $entries[1]->quote->authorName]);
-        $this->assertSame(['r-' . $first->id, 'Борис'], [$entries[2]->quote->anchor, $entries[2]->quote->authorName]);
+        $this->assertSame(['c-'.$comment->id, 'Анна'], [$entries[1]->quote->anchor, $entries[1]->quote->authorName]);
+        $this->assertSame(['r-'.$first->id, 'Борис'], [$entries[2]->quote->anchor, $entries[2]->quote->authorName]);
         $this->assertSame($comment->id, $entries[2]->rootId);
     }
 
@@ -78,7 +78,7 @@ class FeedTest extends TestCase
 
         $this->assertTrue($feed->entries()->first()->isSolution);
         $this->assertFalse($feed->entries()->first()->canMarkSolution);
-        $this->assertSame('c-' . $answer->id, $feed->solution()['anchor']);
+        $this->assertSame('c-'.$answer->id, $feed->solution()['anchor']);
         $this->assertSame(1, $feed->entries()->first()->solutions);
     }
 

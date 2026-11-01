@@ -6,7 +6,6 @@ use App\Models\Firmware;
 
 class DuplicateService
 {
-
     public function getDuplicates()
     {
         return Firmware::select('title', 'size', 'date', 'extension', 'platform', 'crc32', 'data')
@@ -38,7 +37,6 @@ class DuplicateService
                 ->where('data', $duplicate->data)
                 ->get();
 
-
             // Добавить пару в результат, если найдены дублирующиеся записи
             if ($pair->count() > 1) {
                 // Преобразовать коллекцию в массив для удобства
@@ -47,7 +45,7 @@ class DuplicateService
                 // Добавить пару в массив
                 $duplicatePairs[] = [
                     'first' => $pairArray[0], // первая запись
-                    'second' => $pairArray[1] // вторая запись
+                    'second' => $pairArray[1], // вторая запись
                 ];
             }
         }

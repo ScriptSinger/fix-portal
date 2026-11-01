@@ -47,7 +47,7 @@ class Linkify
             $tail = '';
 
             while ($url !== '' && preg_match('/[.,;:!?)\]]$/u', $url)) {
-                $tail = mb_substr($url, -1) . $tail;
+                $tail = mb_substr($url, -1).$tail;
                 $url = mb_substr($url, 0, -1);
             }
 
@@ -55,7 +55,7 @@ class Linkify
                 return $m[0];
             }
 
-            return '<a href="' . $url . '" target="_blank" rel="nofollow noopener noreferrer ugc">' . $url . '</a>' . $tail;
+            return '<a href="'.$url.'" target="_blank" rel="nofollow noopener noreferrer ugc">'.$url.'</a>'.$tail;
         }, $text) ?? $text;
     }
 }

@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use App\Services\FirmwareCatalog;
-use Illuminate\Support\Facades\Route;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class FirmwareCatalogTest extends TestCase
@@ -52,14 +52,14 @@ class FirmwareCatalogTest extends TestCase
 
     public function test_unknown_brand_or_series_format_is_not_routed_to_a_hub(): void
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
 
         app('router')->getRoutes()->match(request()->create('/firmwares/no-such-brand'));
     }
 
     public function test_series_slug_must_be_lowercase_letters(): void
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
 
         // Цифры в серии не допускаем: серия это буквенный префикс модели
         app('router')->getRoutes()->match(request()->create('/firmwares/indesit/wisl105'));

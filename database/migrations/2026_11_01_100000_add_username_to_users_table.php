@@ -22,8 +22,8 @@ return new class extends Migration
             $suffix = 1;
 
             while (DB::table('users')->where('username', $candidate)->exists()) {
-                $tail = '_' . $suffix++;
-                $candidate = Str::substr($base, 0, 32 - Str::length($tail)) . $tail;
+                $tail = '_'.$suffix++;
+                $candidate = Str::substr($base, 0, 32 - Str::length($tail)).$tail;
             }
 
             DB::table('users')->where('id', $user->id)->update(['username' => $candidate]);

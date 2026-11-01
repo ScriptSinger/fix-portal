@@ -21,7 +21,7 @@ class HowItWorksPageTest extends TestCase
 
         // звания и пороги берутся из тех же настроек, что и расчёт репутации
         foreach (Reputation::RANKS as $threshold => $title) {
-            $response->assertSee($title)->assertSee('от ' . $threshold . ' ');
+            $response->assertSee($title)->assertSee('от '.$threshold.' ');
         }
     }
 
@@ -35,7 +35,7 @@ class HowItWorksPageTest extends TestCase
 
         $this->get(route('about'))->assertOk()->assertSee('id="helpers"', false)->assertSee('Кто помогает в этом месяце')->assertSee('Мастер Тестов');
         $this->get(route('how-it-works'))->assertOk()->assertDontSee('Мастер Тестов')
-            ->assertSee('href="' . route('about') . '#helpers"', false)->assertSee('Кто помогает в этом месяце →');
+            ->assertSee('href="'.route('about').'#helpers"', false)->assertSee('Кто помогает в этом месяце →');
     }
 
     public function test_the_helpers_block_is_hidden_when_nobody_has_solutions_yet(): void
@@ -47,11 +47,11 @@ class HowItWorksPageTest extends TestCase
     {
         $url = route('how-it-works');
 
-        $this->get(route('about'))->assertOk()->assertSee('href="' . $url . '"', false)->assertSee('Знания собраны в трёх местах')->assertSee('Вопросы работают так')->assertSee('Подробнее →');
+        $this->get(route('about'))->assertOk()->assertSee('href="'.$url.'"', false)->assertSee('Знания собраны в трёх местах')->assertSee('Вопросы работают так')->assertSee('Подробнее →');
         // ссылка в колонке «Техника» на странице вопросов (карточка для компьютера и пункт в панели телефона)
-        $this->get(route('questions.index'))->assertOk()->assertSee('href="' . $url . '"', false)->assertSee('Как это работает');
+        $this->get(route('questions.index'))->assertOk()->assertSee('href="'.$url.'"', false)->assertSee('Как это работает');
         // в подвале страниц «О нас» и «Как это работает» нет: там их не замечают
-        $this->get(route('articles.index'))->assertOk()->assertDontSee('href="' . $url . '"', false);
+        $this->get(route('articles.index'))->assertOk()->assertDontSee('href="'.$url.'"', false);
     }
 
     public function test_the_ask_form_and_the_cabinet_link_to_it(): void
@@ -59,6 +59,6 @@ class HowItWorksPageTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)->get(route('questions.index'))->assertOk()->assertSee('Как задать хороший вопрос');
-        $this->get(route('cabinet.index'))->assertOk()->assertSee('Что это значит?')->assertSee(route('how-it-works') . '#ranks', false);
+        $this->get(route('cabinet.index'))->assertOk()->assertSee('Что это значит?')->assertSee(route('how-it-works').'#ranks', false);
     }
 }

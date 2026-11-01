@@ -25,7 +25,7 @@ class RelinkFirmwareFiles extends Command
             return self::FAILURE;
         }
 
-        $this->info('Считаю MD5 файлов в ' . $dir . ' ...');
+        $this->info('Считаю MD5 файлов в '.$dir.' ...');
         $filesByHash = [];
         $names = [];
 
@@ -43,7 +43,7 @@ class RelinkFirmwareFiles extends Command
         }
         unset($list);
 
-        $this->line('Файлов: ' . count($names) . ', уникальных содержимых: ' . count($filesByHash));
+        $this->line('Файлов: '.count($names).', уникальных содержимых: '.count($filesByHash));
 
         $stats = ['same' => 0, 'relinked' => 0, 'unverified' => 0, 'lost' => 0];
         $updates = [];
@@ -53,7 +53,7 @@ class RelinkFirmwareFiles extends Command
             ->orderBy('id')
             ->chunkById(1000, function ($chunk) use (&$stats, &$updates, &$lost, $filesByHash, $names): void {
                 foreach ($chunk as $firmware) {
-                    $expected = $firmware->title . ($firmware->extension ?? '');
+                    $expected = $firmware->title.($firmware->extension ?? '');
                     $hash = strtolower(trim((string) $firmware->crc32));
 
                     if (preg_match('/^[a-f0-9]{32}$/', $hash) === 1) {
@@ -97,8 +97,8 @@ class RelinkFirmwareFiles extends Command
             ['без хеша, но файл по имени есть', $stats['unverified']],
             ['содержимого на диске нет', $stats['lost']],
         ]);
-        $this->line('К обновлению file_path: ' . count($updates));
-        $this->line('Без содержимого, скачивали (downloads_count > 0): ' . collect($lost)->filter(fn ($f) => (int) $f->downloads_count > 0)->count());
+        $this->line('К обновлению file_path: '.count($updates));
+        $this->line('Без содержимого, скачивали (downloads_count > 0): '.collect($lost)->filter(fn ($f) => (int) $f->downloads_count > 0)->count());
 
         if (! $this->option('apply')) {
             $this->comment('Пробный прогон. Для записи добавьте --apply (и --delete-missing, чтобы удалить записи без содержимого).');
@@ -114,7 +114,7 @@ class RelinkFirmwareFiles extends Command
             });
         }
 
-        $this->info('file_path записан: ' . count($updates));
+        $this->info('file_path записан: '.count($updates));
 
         if ($this->option('delete-missing')) {
             $deleted = 0;

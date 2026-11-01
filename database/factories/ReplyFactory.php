@@ -3,11 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Comment;
+use App\Models\Reply;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Reply>
+ * @extends Factory<Reply>
  */
 class ReplyFactory extends Factory
 {

@@ -11,14 +11,15 @@ use Illuminate\Notifications\Notification;
 class ActivityNotification extends Notification
 {
     public const ANSWER = 'answer';
+
     public const REPLY = 'reply';
+
     public const REACTION = 'reaction';
+
     public const SOLUTION = 'solution';
 
     /** @param array{kind: string, actor_id: int, actor_name: string, title: string, in: string, url: string, snippet?: string, emoji?: string, target_id?: string} $data */
-    public function __construct(private array $data)
-    {
-    }
+    public function __construct(private array $data) {}
 
     public function via(object $notifiable): array
     {

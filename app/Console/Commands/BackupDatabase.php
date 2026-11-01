@@ -26,12 +26,12 @@ class BackupDatabase extends Command
             return self::FAILURE;
         }
 
-        $this->info('Копия снята и проверена: ' . basename($file) . ' (' . $this->megabytes(filesize($file)) . ')');
+        $this->info('Копия снята и проверена: '.basename($file).' ('.$this->megabytes(filesize($file)).')');
 
         // Локальная копия остаётся, даже если облако недоступно, но запуск
         // считается неудачным, чтобы это попало в лог.
         try {
-            $this->info('Загружена в облако: ' . $backup->upload($file));
+            $this->info('Загружена в облако: '.$backup->upload($file));
         } catch (RuntimeException $exception) {
             $this->error($exception->getMessage());
 
@@ -39,11 +39,11 @@ class BackupDatabase extends Command
         }
 
         foreach ($backup->prune(config('backup.keep_days')) as $deleted) {
-            $this->line('Удалена старая копия на сервере: ' . basename($deleted));
+            $this->line('Удалена старая копия на сервере: '.basename($deleted));
         }
 
         foreach ($backup->pruneCloud(config('backup.cloud_keep_days')) as $deleted) {
-            $this->line('Удалена старая копия в облаке: ' . $deleted);
+            $this->line('Удалена старая копия в облаке: '.$deleted);
         }
 
         return self::SUCCESS;
@@ -51,6 +51,6 @@ class BackupDatabase extends Command
 
     private function megabytes(int $bytes): string
     {
-        return number_format($bytes / 1024 / 1024, 1, ',', ' ') . ' МБ';
+        return number_format($bytes / 1024 / 1024, 1, ',', ' ').' МБ';
     }
 }

@@ -30,7 +30,7 @@ class ContentImages
                 return $m[0];
             }
 
-            return '<img' . $m[1] . 'src="' . e($small) . '" data-full="' . e($m[2]) . '"' . $m[3] . '>';
+            return '<img'.$m[1].'src="'.e($small).'" data-full="'.e($m[2]).'"'.$m[3].'>';
         }, $html) ?? $html;
     }
 

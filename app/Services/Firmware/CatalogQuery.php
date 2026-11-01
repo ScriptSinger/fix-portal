@@ -17,14 +17,13 @@ use Illuminate\Pipeline\Pipeline;
 class CatalogQuery
 {
     public const SORTABLE = ['id', 'title', 'size', 'date', 'extension', 'platform', 'brand', 'model', 'views_count', 'downloads_count'];
+
     public const PER_PAGE = [25, 50, 100, 200];
 
     /** Фильтры по параметрам запроса; каждый читает свой параметр и ничего не делает, если его нет. */
     public const FILTERS = [BrandFilter::class, SeriesFilter::class, PlatformFilter::class, ExtensionFilter::class, Crc32Filter::class, SearchFilter::class];
 
-    public function __construct(private readonly Pipeline $pipeline)
-    {
-    }
+    public function __construct(private readonly Pipeline $pipeline) {}
 
     public function filtered(): Builder
     {

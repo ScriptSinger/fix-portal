@@ -10,7 +10,6 @@ use Illuminate\View\View;
 
 class EmailVerificationPromptController extends Controller
 {
-
     /**
      * Display the email verification prompt.
      */

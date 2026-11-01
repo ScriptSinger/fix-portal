@@ -4,7 +4,6 @@ namespace App\Traits;
 
 trait ImageHandlerTrait
 {
-
     public function getImage($attributeName)
     {
 

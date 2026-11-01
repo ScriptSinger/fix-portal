@@ -12,7 +12,7 @@ class LinkifyTest extends TestCase
     public function test_plain_url_becomes_a_link(): void
     {
         $this->assertSame(
-            'Смотрите <a href="https://ufamasters.ru/firmwares?search=wiun100.s19" ' . self::REL . '>https://ufamasters.ru/firmwares?search=wiun100.s19</a>',
+            'Смотрите <a href="https://ufamasters.ru/firmwares?search=wiun100.s19" '.self::REL.'>https://ufamasters.ru/firmwares?search=wiun100.s19</a>',
             Linkify::html('Смотрите https://ufamasters.ru/firmwares?search=wiun100.s19')
         );
     }
@@ -20,7 +20,7 @@ class LinkifyTest extends TestCase
     public function test_punctuation_after_the_url_stays_outside_the_link(): void
     {
         $this->assertSame(
-            '(<a href="https://a.ru/x" ' . self::REL . '>https://a.ru/x</a>), и ещё <a href="https://b.ru" ' . self::REL . '>https://b.ru</a>.',
+            '(<a href="https://a.ru/x" '.self::REL.'>https://a.ru/x</a>), и ещё <a href="https://b.ru" '.self::REL.'>https://b.ru</a>.',
             Linkify::html('(https://a.ru/x), и ещё https://b.ru.')
         );
     }

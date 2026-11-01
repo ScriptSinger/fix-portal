@@ -10,6 +10,4 @@ use MoonShine\Laravel\Pages\Crud\DetailPage;
 /**
  * @extends DetailPage<AccessLogResource>
  */
-class AccessLogDetailPage extends DetailPage
-{
-}
+class AccessLogDetailPage extends DetailPage {}

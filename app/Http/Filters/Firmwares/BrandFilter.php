@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 /** ?brand=Indesit */
 class BrandFilter
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function handle(Builder $builder, \Closure $next)
     {

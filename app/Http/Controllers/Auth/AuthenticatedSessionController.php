@@ -13,7 +13,6 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-
     /**
      * Display the login view.
      */
@@ -29,21 +28,18 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-
         // Сохраняем IP-адрес пользователя при успешной аутентификации
         $existingUserIp = Ip::where('user_id', auth()->id())
             ->where('ip_address', $request->ip())
             ->first();
 
         // Если запись не существует, то добавляем новую
-        if (!$existingUserIp) {
-            $userIp = new Ip();
+        if (! $existingUserIp) {
+            $userIp = new Ip;
             $userIp->user_id = auth()->id();
             $userIp->ip_address = $request->ip();
             $userIp->save();
         }
-
-
 
         $request->session()->regenerate();
 

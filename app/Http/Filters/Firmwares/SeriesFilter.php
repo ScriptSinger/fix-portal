@@ -8,9 +8,7 @@ use Illuminate\Http\Request;
 /** ?series=wisl (серии хранятся в верхнем регистре) */
 class SeriesFilter
 {
-    public function __construct(private readonly Request $request)
-    {
-    }
+    public function __construct(private readonly Request $request) {}
 
     public function handle(Builder $builder, \Closure $next)
     {

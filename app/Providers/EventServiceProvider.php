@@ -2,12 +2,13 @@
 
 namespace App\Providers;
 
+use App\Socialite\VkIdProvider;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use App\Socialite\VkIdProvider;
 use Illuminate\Support\Facades\Event;
 use SocialiteProviders\Manager\SocialiteWasCalled;
+use SocialiteProviders\Yandex\YandexExtendSocialite;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -23,7 +24,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Вход через Яндекс ID и VK ID (SocialiteProviders)
         SocialiteWasCalled::class => [
-            \SocialiteProviders\Yandex\YandexExtendSocialite::class . '@handle',
+            YandexExtendSocialite::class.'@handle',
         ],
     ];
 

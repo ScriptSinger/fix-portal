@@ -7,8 +7,8 @@ use App\Models\Reply;
 use App\Models\User;
 use App\Services\LatestDiscussion;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
@@ -65,10 +65,10 @@ class DiscussionTest extends TestCase
 
         $response = $this->actingAs($user)->from($page)->post(route('comments.store', ['type' => $kind, 'id' => $subject->id]), ['text' => 'Новое сообщение']);
         $comment = $subject->comments()->latest('id')->first();
-        $response->assertRedirect($page . '#c-' . $comment->id);
+        $response->assertRedirect($page.'#c-'.$comment->id);
 
         $reply = $this->actingAs(User::factory()->create())->from($page)->post(route('comments.replies.store', ['comment' => $comment->id]), ['text' => 'Ответ']);
-        $reply->assertRedirect($page . '#r-' . Reply::latest('id')->value('id'));
+        $reply->assertRedirect($page.'#r-'.Reply::latest('id')->value('id'));
     }
 
     public function test_author_can_edit_a_comment_and_reply_for_24_hours(): void
@@ -79,14 +79,14 @@ class DiscussionTest extends TestCase
 
         $this->actingAs($user)->put(route('comments.update', ['comment' => $comment->id]), [
             'text' => 'Изменённый комментарий',
-        ])->assertRedirect($this->pageOf($subject) . '#c-' . $comment->id);
+        ])->assertRedirect($this->pageOf($subject).'#c-'.$comment->id);
 
         $this->assertSame('Изменённый комментарий', $comment->refresh()->text);
 
         $reply = $comment->replies()->create(['user_id' => $user->id, 'text' => 'Старый ответ']);
         $this->actingAs($user)->put(route('comments.replies.update', ['reply' => $reply->id]), [
             'text' => 'Изменённый ответ',
-        ])->assertRedirect($this->pageOf($subject) . '#r-' . $reply->id);
+        ])->assertRedirect($this->pageOf($subject).'#r-'.$reply->id);
 
         $this->assertSame('Изменённый ответ', $reply->refresh()->text);
     }
@@ -122,8 +122,8 @@ class DiscussionTest extends TestCase
         $response = $this->get(route('home'))->assertOk();
 
         $response->assertSee('Последние обсуждения')
-            ->assertSee(route('questions.show', ['question' => $subject->slug]) . '#c-' . $comment->id, false)
-            ->assertSee(route('questions.show', ['question' => $subject->slug]) . '#r-' . $reply->id, false)
+            ->assertSee(route('questions.show', ['question' => $subject->slug]).'#c-'.$comment->id, false)
+            ->assertSee(route('questions.show', ['question' => $subject->slug]).'#r-'.$reply->id, false)
             ->assertSee('Автор виджета');
     }
 
@@ -202,7 +202,7 @@ class DiscussionTest extends TestCase
         $this->assertNotNull($note);
         $this->assertSame('reply', $note->data['kind']);
         $this->assertSame(['question' => 'вопросе', 'post' => 'статье', 'firmware' => 'прошивке'][$kind], $note->data['in']);
-        $this->assertStringContainsString('#r-' . Reply::latest('id')->value('id'), $note->data['url']);
+        $this->assertStringContainsString('#r-'.Reply::latest('id')->value('id'), $note->data['url']);
     }
 
     public function test_replying_to_yourself_does_not_notify(): void

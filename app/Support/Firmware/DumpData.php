@@ -11,9 +11,7 @@ final class DumpData
     /** @var array<string, string>|null */
     private ?array $fields = null;
 
-    public function __construct(private readonly string $html)
-    {
-    }
+    public function __construct(private readonly string $html) {}
 
     public static function from(?string $html): self
     {

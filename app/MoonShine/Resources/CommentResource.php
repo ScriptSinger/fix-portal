@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\Comment;
-use Illuminate\Support\Str;
 use App\MoonShine\Fields\LocalDate;
-use MoonShine\Support\Enums\Action;
+use Illuminate\Support\Str;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
+use MoonShine\Support\Enums\Action;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Preview;
@@ -53,7 +53,7 @@ class CommentResource extends BaseResource
             Preview::make('Текст', 'text', fn (Comment $c) => Str::limit(strip_tags((string) $c->text), 100)),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class),
             Preview::make('К чему', 'commentable_type', fn (Comment $c) => class_basename((string) $c->commentable_type)
-                . ' #' . $c->commentable_id),
+                .' #'.$c->commentable_id),
             LocalDate::make('Создан', 'created_at')->format('d.m.Y H:i')->sortable(),
         ];
     }

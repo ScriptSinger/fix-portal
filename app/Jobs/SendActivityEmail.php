@@ -26,9 +26,7 @@ class SendActivityEmail implements ShouldQueue
         return [60, 300];
     }
 
-    public function __construct(public int $userId)
-    {
-    }
+    public function __construct(public int $userId) {}
 
     public function handle(ActivityMailer $mailer): void
     {

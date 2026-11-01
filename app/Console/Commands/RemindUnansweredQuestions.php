@@ -54,7 +54,7 @@ class RemindUnansweredQuestions extends Command
         }
 
         foreach ($questions as $question) {
-            $this->line(($this->option('dry-run') ? 'Напомнили бы: ' : 'Напоминаем: ') . "#{$question->id} {$question->title}");
+            $this->line(($this->option('dry-run') ? 'Напомнили бы: ' : 'Напоминаем: ')."#{$question->id} {$question->title}");
 
             if (! $this->option('dry-run')) {
                 $announcer->remind($question);

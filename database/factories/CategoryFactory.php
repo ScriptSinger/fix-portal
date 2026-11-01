@@ -3,13 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Category;
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-
 use Cviebrock\EloquentSluggable\Services\SlugService;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Category>
+ * @extends Factory<Category>
  */
 class CategoryFactory extends Factory
 {
@@ -18,10 +16,10 @@ class CategoryFactory extends Factory
      *
      * @return array<string, mixed>
      */
-
     protected $model = Category::class;
 
     private $categoryIndex = 0;
+
     public function definition(): array
     {
         $categories = [
@@ -35,7 +33,6 @@ class CategoryFactory extends Factory
 
         $title = $categories[$this->categoryIndex];
         $this->categoryIndex++;
-
 
         $slug = SlugService::createSlug(Category::class, 'slug', $title);
 

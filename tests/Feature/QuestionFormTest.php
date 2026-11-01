@@ -18,7 +18,7 @@ class QuestionFormTest extends TestCase
     private function valid(array $over = []): array
     {
         return $over + [
-            'title' => 'Стиральная машина не сливает воду ' . uniqid(),
+            'title' => 'Стиральная машина не сливает воду '.uniqid(),
             'appliance_id' => Appliance::factory()->create()->id,
             'model' => 'Beko WKL 13540 K',
             'error_code' => 'E03',
@@ -28,7 +28,7 @@ class QuestionFormTest extends TestCase
 
     private function image(User $owner, string $url = '/storage/images/users/user_1/a.jpg'): Image
     {
-        $image = new Image();
+        $image = new Image;
         $image->url = $url;
         $image->mime = 'image/jpeg';
         $image->size = 10;
