@@ -24,6 +24,7 @@ use App\MoonShine\Resources\UserResource;
 use App\MoonShine\Resources\VisitorResource;
 use MoonShine\ColorManager\ColorManager;
 use MoonShine\Contracts\ColorManager\ColorManagerContract;
+use MoonShine\AssetManager\Js;
 use MoonShine\Laravel\Layouts\AppLayout;
 use MoonShine\Laravel\Resources\MoonShineUserResource;
 use MoonShine\MenuManager\MenuGroup;
@@ -36,6 +37,7 @@ final class MoonShineLayout extends AppLayout
     {
         return [
             ...parent::assets(),
+            Js::make('/assets/moonshine/truncated-values.js')->defer(),
         ];
     }
 

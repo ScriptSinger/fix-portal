@@ -45,8 +45,8 @@ class AccessLogResource extends LogResource
         return [
             Text::make('Время', 'time')->sortable('time_sort'),
             Text::make('Метод', 'method')->sortable(),
-            Text::make('Путь', 'path')->sortable(),
-            Text::make('Request ID', 'request_id')->sortable(),
+            Text::make('Путь', 'path')->prettyLimit(limit: 320)->sortable(),
+            Text::make('Request ID', 'request_id')->prettyLimit(limit: 180)->sortable(),
             Text::make('User ID', 'user_id')->sortable(),
             Preview::make('Статус', 'status', fn (array $row) => (string) Badge::make(
                 (string) $row['status'],
@@ -57,8 +57,8 @@ class AccessLogResource extends LogResource
             Preview::make('Bot', 'is_bot', fn (array $row) => $this->flag($row['is_bot'], 'bot', Color::SECONDARY))->sortable(),
             Preview::make('Подозрит.', 'is_suspicious', fn (array $row) => $this->flag($row['is_suspicious'], 'suspicious', Color::ERROR))->sortable(),
             Text::make('IP', 'ip')->sortable(),
-            Text::make('Referer', 'referer')->sortable(),
-            Text::make('User-Agent', 'user_agent')->sortable(),
+            Text::make('Referer', 'referer')->prettyLimit(limit: 220)->sortable(),
+            Text::make('User-Agent', 'user_agent')->prettyLimit(limit: 420)->sortable(),
         ];
     }
 
