@@ -9,6 +9,7 @@ use App\Models\Firmware;
 use App\Models\Post;
 use App\Models\Question;
 use App\MoonShine\Fields\LocalDate;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Fields\Relationships\HasMany;
@@ -18,8 +19,10 @@ use MoonShine\Support\Attributes\Icon;
 use MoonShine\Support\Enums\Action;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Components\Link;
+use MoonShine\UI\Fields\DateRange;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Preview;
+use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Textarea;
 
 #[Icon('chat-bubble-left-right')]
@@ -103,5 +106,23 @@ class CommentResource extends BaseResource
     protected function search(): array
     {
         return ['id', 'text'];
+    }
+
+    protected function filters(): iterable
+    {
+        return [
+            BelongsTo::make('Автор', 'user', 'name', UserResource::class)->nullable(),
+            Select::make('Раздел', 'commentable_type')
+                ->options([
+                    Question::class => 'Вопросы',
+                    Post::class => 'Статьи',
+                    Firmware::class => 'Прошивки',
+                ])
+                ->nullable()
+                ->onApply(static function (Builder $query, $value): Builder {
+                    return blank($value) ? $query : $query->where('commentable_type', $value);
+                }),
+            DateRange::make('Создан', 'created_at'),
+        ];
     }
 }

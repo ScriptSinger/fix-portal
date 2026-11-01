@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\MoonShine\Pages;
 
 use App\Enums\AnnouncementStatus;
+use App\Enums\PostStatus;
+use App\Models\Comment;
 use App\Models\Firmware;
 use App\Models\Post;
 use App\Models\Question;
@@ -62,6 +64,13 @@ class Dashboard extends Page
                             $this->count('Статьи', Post::class, 'newspaper'),
                             $this->count('Вопросы', Question::class, 'question-mark-circle'),
                             $this->count('Прошивки', Firmware::class, 'cpu-chip'),
+                        ]),
+                    ]),
+                    Box::make('Модерация', [
+                        Grid::make([
+                            $this->postStatus('Черновики статей', PostStatus::Draft, 'pencil-square'),
+                            $this->unansweredQuestions(),
+                            $this->recentComments(),
                         ]),
                     ]),
                     Box::make('Пользователи', [
@@ -159,6 +168,33 @@ class Dashboard extends Page
         return ValueMetric::make($label)
             ->icon($icon)
             ->value(fn () => $model::count())
+            ->columnSpan(4);
+    }
+
+    private function postStatus(string $label, PostStatus $status, string $icon): ValueMetric
+    {
+        return ValueMetric::make($label)
+            ->icon($icon)
+            ->value(fn () => Post::where('status', $status)->count())
+            ->columnSpan(4);
+    }
+
+    private function unansweredQuestions(): ValueMetric
+    {
+        return ValueMetric::make('Вопросы без ответа')
+            ->icon('question-mark-circle')
+            ->value(fn () => Question::query()
+                ->where('created_at', '>=', Question::SOLUTION_TRACKING_SINCE)
+                ->unanswered()
+                ->count())
+            ->columnSpan(4);
+    }
+
+    private function recentComments(): ValueMetric
+    {
+        return ValueMetric::make('Обсуждения за 24 часа')
+            ->icon('chat-bubble-left-right')
+            ->value(fn () => Comment::where('created_at', '>=', now()->subDay())->count())
             ->columnSpan(4);
     }
 
