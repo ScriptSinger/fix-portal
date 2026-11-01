@@ -6,7 +6,6 @@ namespace App\MoonShine\Resources;
 
 use App\Models\Reply;
 use App\MoonShine\Fields\LocalDate;
-use Illuminate\Support\Str;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
@@ -51,7 +50,7 @@ class ReplyResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Preview::make('Текст', 'text', fn (Reply $r) => Str::limit(strip_tags((string) $r->text), 100)),
+            Preview::make('Текст', 'text', fn (Reply $r) => self::prettyText((string) $r->text)),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class),
             Preview::make('Комментарий', 'comment_id', fn (Reply $r) => '#'.$r->comment_id),
             LocalDate::make('Создан', 'created_at')->format('d.m.Y H:i')->sortable(),

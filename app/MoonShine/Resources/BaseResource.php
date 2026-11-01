@@ -10,6 +10,7 @@ use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Laravel\Resources\ModelResource;
+use MoonShine\UI\Components\PrettyLimit;
 
 /**
  * @template TModel of Model
@@ -18,6 +19,14 @@ use MoonShine\Laravel\Resources\ModelResource;
  */
 abstract class BaseResource extends ModelResource
 {
+    protected static function prettyText(string $value, int $limit = 100): string
+    {
+        return (string) PrettyLimit::make(
+            value: trim(strip_tags($value)),
+            limit: $limit,
+        )->render();
+    }
+
     /**
      * @return list<class-string>
      */

@@ -10,7 +10,6 @@ use App\Models\Post;
 use App\Models\Question;
 use App\MoonShine\Fields\LocalDate;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\MenuManager\Attributes\Group;
@@ -57,7 +56,7 @@ class CommentResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Preview::make('Текст', 'text', fn (Comment $c) => Str::limit(strip_tags((string) $c->text), 100)),
+            Preview::make('Текст', 'text', fn (Comment $c) => self::prettyText((string) $c->text)),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class),
             Preview::make('К чему', 'commentable_type', function (Comment $comment): string {
                 $target = $comment->commentable;
