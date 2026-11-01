@@ -12,17 +12,6 @@
 .discussion-editor:focus-visible,
 .discussion-editor.ProseMirror:focus { outline: none !important; box-shadow: none; }
 
-.telegram-widget-tail {
-    position: absolute;
-    left: -7px;
-    bottom: 0;
-    width: 0;
-    height: 0;
-    border-top: 7px solid transparent;
-    border-right: 8px solid #fff;
-}
-
-
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
 
@@ -68,6 +57,12 @@
 
 @layer components {
     .site-container { width: 100%; max-width: var(--container-site); margin-inline: auto; padding-inline: 15px; }
+    .discussion-pattern {
+        background-color: var(--color-surface);
+        background-repeat: repeat;
+        background-size: 100% 100%, 360px 270px;
+        background-position: center top;
+    }
     /* Рамка шапки и подвала: тонкая линия на 6 px от края. Рисуется поверх, а не border, чтобы не сдвигать содержимое */
     .frame { position: relative; }
     .frame::after { content: ''; position: absolute; inset: 6px; border: 1px solid var(--frame-line, #000); pointer-events: none; }
