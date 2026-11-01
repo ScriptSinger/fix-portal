@@ -6,7 +6,7 @@
             @php $photos = array_map(fn ($p) => \App\Support\UserImages::url($p['full'], 480), \App\Support\ContentImages::extract($question->description)[1]); @endphp
             @php $excerpt = e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'), $photos ? 150 : 320)); @endphp
             <div>
-            <x-ui.entry-card rounded :solved="$question->isSolved()"
+            <x-ui.entry-card rounded stack-mobile :solved="$question->isSolved()"
                 :url="route('questions.show', ['question' => $question->slug])"
                 :image="\App\Support\UserImages::url($question->srcFromContent, 480) ?: null"
                 :images="$photos"
