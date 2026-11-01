@@ -17,7 +17,7 @@
         <h2 class="text-2xl font-bold leading-8 text-ink">Свежие статьи</h2>
         <a href="{{ route('articles.index') }}" class="keep text-sm font-bold text-black underline underline-offset-2">Все статьи &rarr;</a>
     </div>
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-6">
         @foreach ($posts as $post)
             <x-ui.post-card :post="$post" show-category />
         @endforeach

@@ -1,7 +1,7 @@
 @props(['questions'])
 @if ($questions->count())
     {{-- Кирпичная раскладка (masonry.js): карточки разной высоты встают вплотную, порядок чтения слева направо --}}
-    <div data-masonry class="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 sm:gap-x-6">
+    <div data-masonry class="grid grid-cols-1 items-start gap-2 sm:grid-cols-2 sm:gap-x-6">
         @foreach ($questions as $question)
             @php $photos = array_map(fn ($p) => \App\Support\UserImages::url($p['full'], 480), \App\Support\ContentImages::extract($question->description)[1]); @endphp
             @php $excerpt = e(Str::limit(html_entity_decode(strip_tags($question->description), ENT_QUOTES | ENT_HTML5, 'UTF-8'), $photos ? 150 : 320)); @endphp
@@ -14,7 +14,9 @@
                 :excerpt="$excerpt"
                 :date="$question->dateAsCarbon"
                 :author="optional($question->user)->name"
+                :author-profile-url="optional($question->user)->id ? route('users.profile', ['user' => $question->user->id]) : null"
                 :views="$question->views"
+                :answers="$question->comments_count ?? 0"
                 :category="$question->appliance->title"
                 :category-url="route('public.appliances.show', ['appliance' => $question->appliance->slug])" />
             </div>

@@ -26,6 +26,7 @@ class QuestionController extends Controller
             ])
             ->thenReturn()
             ->with('appliance', 'user')
+            ->withCount('comments')
             ->orderBy('id', 'desc')
             ->paginate(50);
 

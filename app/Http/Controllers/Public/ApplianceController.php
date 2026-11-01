@@ -21,6 +21,7 @@ class ApplianceController extends Controller
             ->through([StatusFilter::class])
             ->thenReturn()
             ->with('appliance', 'user')
+            ->withCount('comments')
             ->orderBy('id', 'desc')
             ->paginate(15);
 

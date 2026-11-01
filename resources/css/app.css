@@ -74,7 +74,12 @@
 }
 
 @layer components {
-    /* Панель фильтров прошивок: на компьютере обычная колонка, на телефоне выезжает слева */
+    /* Панель фильтров прошивок: на компьютере обычная колонка, на телефоне — bottom sheet */
+    @media (min-width: 992px) {
+        .fw-drawer { display: flex; max-height: calc(100vh - 230px); flex-direction: column; overflow: hidden; }
+        .fw-drawer > form { min-height: 0; }
+    }
+
     @media (max-width: 991.98px) {
         .fw-drawer { position: fixed; inset: 0 auto 0 0; z-index: 80; display: flex; width: 86%; max-width: 340px; flex-direction: column; background: #fff; transform: translateX(-100%); visibility: hidden; transition: transform .25s ease, visibility 0s .25s; }
         .fw-drawer.open { transform: none; visibility: visible; transition: transform .25s ease; }

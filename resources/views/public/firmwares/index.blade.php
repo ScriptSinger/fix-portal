@@ -34,7 +34,7 @@
         <div class="fw-drawer lg:rounded-card lg:bg-white" :class="{ open }">
             <form method="GET" action="{{ route('firmwares.index') }}" @submit.prevent="apply()" class="flex min-h-0 flex-1 flex-col">
                 {{-- Шапка панели на телефоне --}}
-                <div class="flex min-h-14 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden">
+                <div class="flex min-h-14 items-center gap-3 border-b border-line bg-white px-4 lg:hidden">
                     <button type="button" x-show="group" x-cloak @click="group = null" class="py-2 text-lg font-bold" aria-label="Назад к списку групп">&larr;</button>
                     <span class="flex-1 text-lg font-bold text-ink" x-text="group ? ({ brand: 'Марка', series: 'Серия', platform: 'Платформа', extension: 'Расширение' }[group]) : 'Фильтр'"></span>
                     <button type="button" @click="close()" class="px-1 text-3xl leading-none" aria-label="Закрыть фильтр">&times;</button>
@@ -107,8 +107,8 @@
 
                 <div class="flex flex-col gap-2 border-t border-line bg-white p-3 lg:border-0 lg:px-5 lg:pb-5 lg:pt-0">
                     <button type="submit"
-                        class="h-12 w-full whitespace-nowrap bg-black px-3 text-sm font-bold text-brand-400">Применить</button>
-                    <a href="{{ route('firmwares.index') }}" class="keep py-2 text-center text-[13px] font-bold text-ink underline">Сбросить фильтр</a>
+                        class="h-12 w-full whitespace-nowrap rounded-xl bg-black px-3 text-sm font-bold text-brand-400 transition hover:bg-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">Применить</button>
+                    <a href="{{ route('firmwares.index') }}" class="keep rounded-xl bg-surface py-2.5 text-center text-[13px] font-bold text-ink no-underline transition hover:bg-black/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500">Сбросить фильтр</a>
                 </div>
             </form>
         </div>

@@ -8,4 +8,5 @@
     :author="$post->administrator->name"
     :views="$post->views"
     :category="$showCategory ? $post->category->title : null"
-    :category-url="$showCategory ? route('categories.show', ['category' => $post->category->slug]) : null" />
+    :category-url="$showCategory ? route('categories.show', ['category' => $post->category->slug]) : null"
+    stack-mobile />

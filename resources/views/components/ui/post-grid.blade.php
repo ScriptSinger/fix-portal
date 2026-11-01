@@ -1,6 +1,6 @@
 @props(['posts'])
 @if ($posts->count())
-    <div class="grid gap-6 sm:grid-cols-2">
+    <div class="grid gap-2 sm:gap-6 sm:grid-cols-2">
         @foreach ($posts as $post)
             <x-ui.post-card :post="$post" />
         @endforeach
