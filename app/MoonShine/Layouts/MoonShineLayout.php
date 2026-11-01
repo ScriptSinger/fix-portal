@@ -11,7 +11,6 @@ use App\MoonShine\Resources\BlockerResource;
 use App\MoonShine\Resources\CategoryResource;
 use App\MoonShine\Resources\CommentResource;
 use App\MoonShine\Resources\FirmwareResource;
-use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
 use App\MoonShine\Resources\QuestionAnnouncementResource;
 use App\MoonShine\Resources\QuestionResource;
@@ -64,7 +63,6 @@ final class MoonShineLayout extends AppLayout
             ], 'megaphone'),
             MenuGroup::make('Пользователи', [
                 MenuItem::make(UserResource::class, 'Пользователи сайта')->icon('users'),
-                MenuItem::make(ImageResource::class, 'Изображения')->icon('photo'),
                 MenuItem::make(VisitorResource::class, 'Посетители')->icon('eye'),
             ], 'user-group'),
             MenuGroup::make('Безопасность', [

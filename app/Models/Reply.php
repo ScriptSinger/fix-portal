@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ImageCleanupService;
 use App\Traits\DateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,8 @@ class Reply extends Model
         'quote_reply_id',
         'user_id',
     ];
+
+    protected array $imageIdsForCleanup = [];
 
     public function user(): BelongsTo
     {
@@ -40,7 +43,9 @@ class Reply extends Model
         parent::boot();
 
         static::deleting(function ($reply) {
+            $reply->imageIdsForCleanup = app(ImageCleanupService::class)->idsFromHtml($reply->text);
             $reply->reactions()->delete();
         });
+        static::deleted(fn (Reply $reply) => app(ImageCleanupService::class)->cleanup($reply->imageIdsForCleanup));
     }
 }

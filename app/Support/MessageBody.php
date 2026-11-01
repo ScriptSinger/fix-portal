@@ -23,7 +23,10 @@ class MessageBody
             if ($image = $owned->get($url)) {
                 $out .= '<img src="'.e($url).'" class="img-fluid" data-id="'.$image->id.'">';
             } elseif (in_array($url, $keep, true)) {
-                $out .= '<img src="'.e($url).'" class="img-fluid">';
+                $image = Image::withTrashed()->where('url', $url)->first();
+                $id = $image?->getKey();
+                $dataId = $id === null ? '' : ' data-id="'.(int) $id.'"';
+                $out .= '<img src="'.e($url).'" class="img-fluid"'.$dataId.'>';
             }
         }
 

@@ -1,0 +1,174 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\Image;
+use App\Models\Post;
+use App\Models\User;
+use App\Services\DiscussionMessageService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
+
+class ImageCleanupTest extends TestCase
+{
+    use DatabaseTransactions;
+
+    public function test_comment_images_are_removed_when_no_longer_referenced(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $post = Post::query()->create([
+            'title' => 'Тестовая статья',
+            'slug' => 'test-image-cleanup',
+            'administrator_id' => 1,
+            'description' => 'Описание',
+            'content' => 'Содержимое',
+            'category_id' => Category::factory()->create()->id,
+            'views' => 0,
+        ]);
+        $path = "images/users/user_{$user->id}/photo.jpg";
+        Storage::disk('public')->put($path, 'image');
+
+        $image = (new Image)->forceFill([
+            'user_id' => $user->id,
+            'url' => '/storage/'.$path,
+            'mime' => 'image/jpeg',
+            'size' => 5,
+        ]);
+        $image->save();
+        $comment = $post->comments()->create([
+            'user_id' => $user->id,
+            'text' => '<img src="/storage/'.$path.'" data-id="'.$image->id.'">',
+        ]);
+
+        $comment->delete();
+
+        $this->assertDatabaseMissing('images', ['id' => $image->id]);
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_avatar_file_is_removed_when_user_is_deleted(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $path = "images/users/user_{$user->id}/avatar.jpg";
+        Storage::disk('public')->put($path, 'avatar');
+        $user->avatar()->create(['uri' => $path, 'mime' => 'image/jpeg', 'size' => 6]);
+
+        $user->delete();
+
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_article_content_images_are_removed_when_article_is_deleted(): void
+    {
+        Storage::fake('public');
+        $path = 'galleries/content/article.jpg';
+        Storage::disk('public')->put($path, 'image');
+        $post = Post::query()->create([
+            'title' => 'Статья с изображением',
+            'slug' => 'article-with-image',
+            'administrator_id' => 1,
+            'description' => 'Описание',
+            'content' => '<p><img src="/storage/'.$path.'"></p>',
+            'category_id' => Category::factory()->create()->id,
+            'views' => 0,
+        ]);
+
+        $post->delete();
+
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_comment_image_is_removed_when_comment_is_edited(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $post = Post::query()->create([
+            'title' => 'Статья для редактирования',
+            'slug' => 'article-for-editing',
+            'administrator_id' => 1,
+            'description' => 'Описание',
+            'content' => 'Содержимое',
+            'category_id' => Category::factory()->create()->id,
+            'views' => 0,
+        ]);
+        $path = "images/users/user_{$user->id}/old.jpg";
+        Storage::disk('public')->put($path, 'image');
+        $image = (new Image)->forceFill([
+            'user_id' => $user->id,
+            'url' => '/storage/'.$path,
+            'mime' => 'image/jpeg',
+            'size' => 5,
+        ]);
+        $image->save();
+        $comment = $post->comments()->create([
+            'user_id' => $user->id,
+            'text' => '<img src="/storage/'.$path.'" data-id="'.$image->id.'">',
+        ]);
+
+        app(DiscussionMessageService::class)->update($comment, ['text' => 'Новый текст'], $user->id);
+
+        Storage::disk('public')->assertMissing($path);
+        $this->assertDatabaseMissing('images', ['id' => $image->id]);
+    }
+
+    public function test_article_content_image_is_removed_when_article_is_edited(): void
+    {
+        Storage::fake('public');
+        $path = 'galleries/content/old-article.jpg';
+        Storage::disk('public')->put($path, 'image');
+        $post = Post::query()->create([
+            'title' => 'Статья для обновления',
+            'slug' => 'article-content-editing',
+            'administrator_id' => 1,
+            'description' => 'Описание',
+            'content' => '<p><img src="/storage/'.$path.'"></p>',
+            'category_id' => Category::factory()->create()->id,
+            'views' => 0,
+        ]);
+
+        $post->update(['content' => '<p>Новый текст без изображения</p>']);
+
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_orphan_image_command_removes_only_old_unreferenced_images(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $oldPath = "images/users/user_{$user->id}/orphan.jpg";
+        Storage::disk('public')->put($oldPath, 'image');
+        $old = (new Image)->forceFill([
+            'user_id' => $user->id,
+            'url' => '/storage/'.$oldPath,
+            'mime' => 'image/jpeg',
+            'size' => 5,
+            'created_at' => now()->subDays(2),
+            'updated_at' => now()->subDays(2),
+        ]);
+        $old->save();
+
+        $newPath = "images/users/user_{$user->id}/new.jpg";
+        Storage::disk('public')->put($newPath, 'image');
+        $new = (new Image)->forceFill([
+            'user_id' => $user->id,
+            'url' => '/storage/'.$newPath,
+            'mime' => 'image/jpeg',
+            'size' => 5,
+        ]);
+        $new->save();
+
+        $this->artisan('images:prune-orphans', ['--days' => '1', '--apply' => true])
+            ->assertExitCode(0)
+            ->expectsOutput('Удалено брошенных изображений: 1');
+
+        $this->assertDatabaseMissing('images', ['id' => $old->id]);
+        $this->assertDatabaseHas('images', ['id' => $new->id]);
+        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($newPath);
+    }
+}

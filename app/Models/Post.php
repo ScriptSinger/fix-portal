@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ContentImageCleanupService;
 use App\Enums\PostStatus;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
@@ -33,6 +34,8 @@ class Post extends Model
     protected $casts = [
         'status' => PostStatus::class,
     ];
+
+    protected array $contentImagesForCleanup = [];
 
     public function scopePublished(Builder $query): Builder
     {
@@ -87,9 +90,22 @@ class Post extends Model
     {
         parent::boot();
 
-        static::deleting(function ($post) {
-            $post->comments()->get()->each->delete();
+        static::updating(function (Post $post): void {
+            $post->contentImagesForCleanup = app(ContentImageCleanupService::class)->urlsFromHtml(
+                (string) $post->getOriginal('content').' '.(string) $post->getOriginal('description'),
+            );
         });
+
+        static::deleting(function ($post) {
+            $post->contentImagesForCleanup = app(ContentImageCleanupService::class)->urlsFromHtml(
+                (string) $post->content.' '.(string) $post->description,
+            );
+            $post->comments()->get()->each->delete();
+            $post->thumbnail?->delete();
+        });
+
+        static::updated(fn (Post $post) => app(ContentImageCleanupService::class)->cleanup($post->contentImagesForCleanup));
+        static::deleted(fn (Post $post) => app(ContentImageCleanupService::class)->cleanup($post->contentImagesForCleanup));
     }
 
     // public function getThumbnailAttribute($value)

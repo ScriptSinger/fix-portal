@@ -21,6 +21,8 @@ class DiscussionMessageService
 
     public function update(Comment|Reply $message, array $data, int $userId): void
     {
+        $oldImageIds = app(ImageCleanupService::class)->idsFromHtml($message->text);
+
         $message->update([
             'text' => $this->makeText(
                 $data['text'] ?? null,
@@ -29,6 +31,8 @@ class DiscussionMessageService
                 $this->existingImages($message->text),
             ),
         ]);
+
+        app(ImageCleanupService::class)->cleanup($oldImageIds);
     }
 
     public function plain(Comment|Reply $message): string

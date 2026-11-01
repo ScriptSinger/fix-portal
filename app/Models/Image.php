@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Services\ImageCleanupService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Image extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function user(): BelongsTo
     {
@@ -18,6 +20,11 @@ class Image extends Model
     public function administrator(): BelongsTo
     {
         return $this->belongsTo(Administrator::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::forceDeleting(fn (Image $image) => app(ImageCleanupService::class)->deleteFile($image->url));
     }
 
     public function getSizeMbAttribute()

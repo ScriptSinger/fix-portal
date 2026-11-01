@@ -48,6 +48,13 @@ class Kernel extends ConsoleKernel
             ->timezone('Asia/Yekaterinburg')
             ->withoutOverlapping()
             ->onFailure(fn () => Log::error('Не удалось почистить неподтверждённых пользователей: см. вывод users:prune-unverified.'));
+
+        // Брошенные пользовательские фото: форма могла быть закрыта после загрузки файла
+        $schedule->command('images:prune-orphans --apply --days=1')
+            ->dailyAt('04:30')
+            ->timezone('Asia/Yekaterinburg')
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::error('Не удалось почистить брошенные изображения: см. вывод images:prune-orphans.'));
     }
 
     /**

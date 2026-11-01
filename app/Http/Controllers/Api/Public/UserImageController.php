@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Public;
 
 use App\Http\Controllers\Controller;
 use App\Models\Image;
+use App\Services\ImageCleanupService;
 use App\Support\UserImages;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -30,18 +31,13 @@ class UserImageController extends Controller
         return response()->json(['id' => $image->id, 'url' => $url]);
     }
 
-    public function destroy($id)
+    public function destroy($id, ImageCleanupService $cleanup)
     {
         try {
             $image = Image::findOrFail($id);
             $this->authorize('delete', $image);
-            // В БД лежит публичный URL (/storage/...), а диску нужен путь внутри него
-            $original = preg_replace('#^/?storage/#', '', $image->url);
-            Storage::disk('public')->delete($original);
-            foreach (UserImages::WIDTHS as $width) {
-                Storage::disk('public')->delete(UserImages::variantPath($original, $width));
-            }
             $image->delete();
+            $cleanup->cleanup([$image->id]);
 
             return response()->json(['message' => 'Файл успешно удален']);
         } catch (ModelNotFoundException $e) {

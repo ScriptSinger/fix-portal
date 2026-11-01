@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\Announcements\QuestionAnnouncer;
+use App\Services\ImageCleanupService;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -31,6 +32,8 @@ class Question extends Model
     ];
 
     protected $casts = ['solved_at' => 'datetime'];
+
+    protected array $imageIdsForCleanup = [];
 
     /** Отметку «решён» ведём с этой даты: у старых вопросов статуса нет, и «без решения» к ним не относится. */
     public const SOLUTION_TRACKING_SINCE = '2026-10-26';
@@ -111,8 +114,10 @@ class Question extends Model
         parent::boot();
 
         static::deleting(function ($question) {
+            $question->imageIdsForCleanup = app(ImageCleanupService::class)->idsFromHtml($question->description);
             app(QuestionAnnouncer::class)->retract($question);
             $question->comments()->get()->each->delete();
         });
+        static::deleted(fn (Question $question) => app(ImageCleanupService::class)->cleanup($question->imageIdsForCleanup));
     }
 }

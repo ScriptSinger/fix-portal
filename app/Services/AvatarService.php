@@ -24,7 +24,6 @@ class AvatarService
     public function remove(User $user): void
     {
         if ($avatar = $user->avatar) {
-            Storage::disk('public')->delete($avatar->uri);
             $avatar->delete();
         }
     }

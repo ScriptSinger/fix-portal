@@ -13,7 +13,6 @@ use App\MoonShine\Resources\CategoryResource;
 use App\MoonShine\Resources\CommentResource;
 use App\MoonShine\Resources\CtaResource;
 use App\MoonShine\Resources\FirmwareResource;
-use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
 use App\MoonShine\Resources\QuestionAnnouncementResource;
 use App\MoonShine\Resources\QuestionResource;
@@ -64,7 +63,6 @@ class MoonShineServiceProvider extends ServiceProvider
                 ApplianceResource::class,
                 FirmwareResource::class,
                 UserResource::class,
-                ImageResource::class,
                 AccessLogResource::class,
                 BlockerResource::class,
                 BlockedUserAgentResource::class,
