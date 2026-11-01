@@ -9,20 +9,23 @@ use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Pages\QuestionsIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
 use App\MoonShine\Support\TinyMceUpload;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\MenuManager\Attributes\Group;
 use MoonShine\MenuManager\Attributes\Order;
 use MoonShine\Support\Attributes\Icon;
 use MoonShine\TinyMce\Fields\TinyMce;
+use MoonShine\UI\Fields\DateRange;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
+use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
 #[Icon('question-mark-circle')]
-#[Group('Контент', 'document-text')]
-#[Order(4)]
+#[Group('Вопросы', 'question-mark-circle')]
+#[Order(1)]
 /**
  * @extends ModelResource<Question>
  */
@@ -59,8 +62,15 @@ class QuestionResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Заголовок', 'title')->sortable(),
-            BelongsTo::make('Техника', 'appliance', 'title', ApplianceResource::class),
+            Text::make('Заголовок', 'title')->sortable()->link(
+                static fn (string $value, Text $field): string => route(
+                    'questions.show',
+                    ['question' => $field->getData()?->getOriginal()->slug],
+                ),
+                icon: 'arrow-top-right-on-square',
+                blank: true,
+            ),
+            BelongsTo::make('Тип техники', 'appliance', 'title', ApplianceResource::class),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class),
             Number::make('Просмотры', 'views')->sortable(),
             LocalDate::make('Создан', 'created_at')->format('d.m.Y H:i')->sortable(),
@@ -82,7 +92,7 @@ class QuestionResource extends BaseResource
             Text::make('Заголовок', 'title')->required(),
             TinyMceUpload::withImageUpload(TinyMce::make('Описание', 'description'))
                 ->required(),
-            BelongsTo::make('Техника', 'appliance', 'title', ApplianceResource::class)
+            BelongsTo::make('Тип техники', 'appliance', 'title', ApplianceResource::class)
                 ->searchable()
                 ->required(),
             BelongsTo::make('Автор', 'user', 'name', UserResource::class)
@@ -104,5 +114,29 @@ class QuestionResource extends BaseResource
     protected function search(): array
     {
         return ['id', 'title'];
+    }
+
+    protected function filters(): iterable
+    {
+        return [
+            Select::make('Статус', 'content_status')
+                ->options([
+                    'solved' => 'Решённые',
+                    'open' => 'Открытые',
+                    'unanswered' => 'Без ответа',
+                ])
+                ->nullable()
+                ->onApply(static function (Builder $query, $value): Builder {
+                    return match ($value) {
+                        'solved' => $query->whereNotNull('solved_at'),
+                        'open' => $query->whereNull('solved_at'),
+                        'unanswered' => $query->unanswered(),
+                        default => $query,
+                    };
+                }),
+            BelongsTo::make('Тип техники', 'appliance', 'title', ApplianceResource::class)->nullable(),
+            BelongsTo::make('Автор', 'user', 'name', UserResource::class)->nullable(),
+            DateRange::make('Создан', 'created_at'),
+        ];
     }
 }

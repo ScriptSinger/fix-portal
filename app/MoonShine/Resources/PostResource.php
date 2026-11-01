@@ -25,7 +25,7 @@ use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
 #[Icon('newspaper')]
-#[Group('Контент', 'document-text')]
+#[Group('Статьи', 'newspaper')]
 #[Order(1)]
 /**
  * @extends ModelResource<Post>
@@ -51,7 +51,14 @@ class PostResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Заголовок', 'title')->sortable(),
+            Text::make('Заголовок', 'title')->sortable()->link(
+                static fn (string $value, Text $field): string => route(
+                    'articles.show',
+                    ['article' => $field->getData()?->getOriginal()->slug],
+                ),
+                icon: 'arrow-top-right-on-square',
+                blank: true,
+            ),
             BelongsTo::make('Категория', 'category', 'title', CategoryResource::class),
             Number::make('Просмотры', 'views')->sortable(),
             LocalDate::make('Создана', 'created_at')->format('d.m.Y H:i')->sortable(),

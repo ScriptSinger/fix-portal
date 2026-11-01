@@ -12,7 +12,7 @@ use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
 
 #[Icon('tag')]
-#[Group('Контент', 'document-text')]
+#[Group('Статьи', 'newspaper')]
 #[Order(3)]
 /**
  * @extends ModelResource<Tag>
@@ -34,7 +34,14 @@ class TagResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Название', 'title')->sortable(),
+            Text::make('Название', 'title')->sortable()->link(
+                static fn (string $value, Text $field): string => route(
+                    'tags.show',
+                    ['tag' => $field->getData()?->getOriginal()->slug],
+                ),
+                icon: 'arrow-top-right-on-square',
+                blank: true,
+            ),
             Text::make('Slug', 'slug'),
         ];
     }

@@ -14,7 +14,7 @@ use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
 #[Icon('folder')]
-#[Group('Контент', 'document-text')]
+#[Group('Статьи', 'newspaper')]
 #[Order(2)]
 /**
  * @extends ModelResource<Category>
@@ -36,7 +36,14 @@ class CategoryResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Название', 'title')->sortable(),
+            Text::make('Название', 'title')->sortable()->link(
+                static fn (string $value, Text $field): string => route(
+                    'categories.show',
+                    ['category' => $field->getData()?->getOriginal()->slug],
+                ),
+                icon: 'arrow-top-right-on-square',
+                blank: true,
+            ),
             Text::make('Slug', 'slug'),
             LocalDate::make('Создана', 'created_at')->format('d.m.Y')->sortable(),
         ];

@@ -12,8 +12,8 @@ use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
 
 #[Icon('wrench-screwdriver')]
-#[Group('Каталог', 'rectangle-stack')]
-#[Order(5)]
+#[Group('Вопросы', 'question-mark-circle')]
+#[Order(2)]
 /**
  * @extends ModelResource<Appliance>
  */
@@ -27,7 +27,7 @@ class ApplianceResource extends BaseResource
 
     public function getTitle(): string
     {
-        return 'Техника';
+        return 'Типы техники';
     }
 
     protected function indexFields(): iterable

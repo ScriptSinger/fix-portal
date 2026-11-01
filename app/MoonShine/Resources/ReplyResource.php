@@ -19,9 +19,9 @@ use MoonShine\UI\Fields\Preview;
 use MoonShine\UI\Fields\Textarea;
 
 #[Icon('arrow-uturn-left')]
-#[Group('Контент', 'document-text')]
+#[Group('Обсуждения', 'chat-bubble-left-right')]
 #[SkipMenu]
-#[Order(7)]
+#[Order(2)]
 /**
  * @extends ModelResource<Reply>
  */

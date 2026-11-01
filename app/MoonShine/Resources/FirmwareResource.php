@@ -43,7 +43,14 @@ class FirmwareResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Название', 'title')->sortable(),
+            Text::make('Название', 'title')->sortable()->link(
+                static fn (string $value, Text $field): string => route(
+                    'firmwares.show',
+                    ['firmware' => $field->getData()?->getOriginal()->getKey()],
+                ),
+                icon: 'arrow-top-right-on-square',
+                blank: true,
+            ),
             Text::make('Платформа', 'platform')->sortable(),
             Text::make('Формат', 'extension'),
             Number::make('Размер', 'size')->sortable(),
