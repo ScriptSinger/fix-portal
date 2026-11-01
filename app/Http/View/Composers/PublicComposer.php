@@ -4,9 +4,9 @@ namespace App\Http\View\Composers;
 
 use App\Models\Appliance;
 use App\Models\Category;
-use App\Models\Customization;
 use App\Models\Post;
 use App\Models\Question;
+use App\Models\SiteWidget;
 use App\Services\LatestDiscussion;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
@@ -17,16 +17,13 @@ class PublicComposer
 
     protected $categories;
 
-    protected $customization;
-
     protected $discussion;
 
-    public function __construct(Post $posts, Category $categories, Customization $customization, LatestDiscussion $discussion)
+    public function __construct(Post $posts, Category $categories, LatestDiscussion $discussion)
     {
 
         $this->posts = $posts;
         $this->categories = $categories;
-        $this->customization = $customization;
         $this->discussion = $discussion;
     }
 
@@ -43,7 +40,6 @@ class PublicComposer
                 'latest_posts' => $this->posts->published()->orderBy('created_at', 'desc')->limit(3)->get(),
                 'popular_appliances' => Appliance::withCount('questions')->having('questions_count', '>', 0)->orderBy('questions_count', 'desc')->limit(10)->get(),
                 'latest_questions' => Question::with('appliance')->orderBy('id', 'desc')->limit(5)->get(),
-                'customization' => $this->customization->first(),
             ];
 
             Cache::put($cacheKey, $data, 30);
@@ -53,7 +49,7 @@ class PublicComposer
         $data['latest_discussions'] = Cache::remember(
             LatestDiscussion::CACHE_KEY,
             now()->addMinutes(2),
-            fn () => $this->discussion->get(),
+            fn () => $this->discussion->get((int) SiteWidget::value('latest_discussions', 'display_limit', 5)),
         );
 
         $view->with($data);

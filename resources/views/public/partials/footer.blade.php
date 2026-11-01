@@ -1,7 +1,6 @@
 @php
     $currentYear = now()->year;
-    $copyrightText = optional($customization)->copyright ?? "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
-    $copyrightText = preg_replace('/(\b\d{4}-)\d{4}\b/u', '${1}' . $currentYear, $copyrightText);
+    $copyrightText = "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
     $title = 'mb-8 pb-2 text-lg font-bold capitalize leading-[18px] text-white';
 @endphp
 <footer class="frame bg-black py-[70px] [--frame-line:#333]">

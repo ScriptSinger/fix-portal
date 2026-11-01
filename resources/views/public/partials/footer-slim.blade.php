@@ -1,7 +1,6 @@
 @php
     $currentYear = now()->year;
-    $copyrightText = optional($customization)->copyright ?? "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
-    $copyrightText = preg_replace('/(\b\d{4}-)\d{4}\b/u', '${1}' . $currentYear, $copyrightText);
+    $copyrightText = "Copyright 2014-{$currentYear} Ufamasters.ru. Все права защищены.";
 @endphp
 {{-- Лёгкий подвал для экранов входа: без списков статей, чтобы не отвлекать от формы --}}
 <footer class="frame bg-black py-[30px] text-center text-[13px] text-[#9a9a9a] [--frame-line:#333]">

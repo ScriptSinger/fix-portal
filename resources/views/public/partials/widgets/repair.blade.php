@@ -1,7 +1,8 @@
 @php
     // Виджет партнёра оформлен в стиле его сайта service.ufamasters.ru: белый фон, системный шрифт без засечек, заголовки средней жирности
     // тёмно-серого цвета, янтарная кнопка (Tailwind yellow-500) с радиусом 4 px, фото без рамок.
-    $ctaUrl = 'https://service.ufamasters.ru?' . http_build_query(['utm_source' => 'ufamasters', 'utm_medium' => 'sidebar', 'utm_content' => 'more_details']);
+    $ctaUrl = \App\Models\SiteWidget::value('repair', 'url', 'https://service.ufamasters.ru');
+    $ctaUrl .= '?' . http_build_query(['utm_source' => 'ufamasters', 'utm_medium' => 'sidebar', 'utm_content' => 'more_details']);
     $services = [
         ['Ремонт холодильников', 'GwBsWpe4Y7sEB52lkj1vxQNjnMaNga9itCMLj50g.webp'],
         ['Ремонт стиральных машин', 'QNLUCZoVksk6eIA22C5PoSMWz7r0e9nSk1zaV0od.webp'],

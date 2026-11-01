@@ -1,6 +1,6 @@
 @extends('public.layouts.app')
 @section('title', config('app.name', 'Ufamasters') . ': ремонт бытовой техники, статьи, вопросы и прошивки')
-@section('description', optional($customization)->description ?? 'Коллекция статей от мастеров по ремонту бытовой техники, вопросы и ответы, база прошивок')
+@section('description', 'Коллекция статей от мастеров по ремонту бытовой техники, вопросы и ответы, база прошивок')
 @section('canonical', url('/'))
 @section('main-pt', 'pt-8')
 @php
@@ -32,7 +32,7 @@
 @endpush
 
 @section('above')
-    <x-ui.hero :customization="$customization" />
+    <x-ui.hero />
 @endsection
 
 @section('sidebar-left')

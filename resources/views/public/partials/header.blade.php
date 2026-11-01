@@ -14,7 +14,7 @@
         default => [route('articles.index'), 'text', 'Поиск по статьям'],
     };
     $link = 'keep block px-[9.6px] py-6 text-[14px] font-bold uppercase leading-[14px] text-[#121212] hover:text-black hover:opacity-70';
-    $logo = optional($customization)->getImage('logo') ?? asset('assets/front/images/version/ufamasters-logo-trim.png');
+    $logo = asset('assets/front/images/version/ufamasters-logo-trim.png');
 @endphp
 {{-- Шапка в том же контейнере, что контент и подвал: логотип, меню по центру, поиск и вход справа --}}
 <header x-data="{ menu: false }" class="frame sticky top-0 z-40 bg-brand-400 text-ink">

@@ -10,14 +10,16 @@ use App\MoonShine\Resources\BlockedUserAgentResource;
 use App\MoonShine\Resources\BlockerResource;
 use App\MoonShine\Resources\CategoryResource;
 use App\MoonShine\Resources\CommentResource;
-use App\MoonShine\Resources\CustomizationResource;
 use App\MoonShine\Resources\FirmwareResource;
 use App\MoonShine\Resources\ImageResource;
 use App\MoonShine\Resources\PostResource;
 use App\MoonShine\Resources\QuestionAnnouncementResource;
 use App\MoonShine\Resources\QuestionResource;
 use App\MoonShine\Resources\SentEmailResource;
-use App\MoonShine\Resources\SiteSettingResource;
+use App\MoonShine\Resources\LatestDiscussionsWidgetResource;
+use App\MoonShine\Resources\RepairWidgetResource;
+use App\MoonShine\Resources\TelegramWidgetResource;
+use App\MoonShine\Resources\YandexWidgetResource;
 use App\MoonShine\Resources\TagResource;
 use App\MoonShine\Resources\UserResource;
 use App\MoonShine\Resources\VisitorResource;
@@ -70,10 +72,12 @@ final class MoonShineLayout extends AppLayout
                 MenuItem::make(BlockerResource::class, 'Заблокированные IP')->icon('x-circle'),
                 MenuItem::make(BlockedUserAgentResource::class, 'Заблокированные User-Agent')->icon('bug-ant'),
             ], 'shield-check'),
-            MenuGroup::make('Настройки', [
-                MenuItem::make(CustomizationResource::class, 'Кастомизация')->icon('paint-brush'),
-                MenuItem::make(SiteSettingResource::class, 'Настройки сайта')->icon('cog-6-tooth'),
-            ], 'cog-6-tooth'),
+            MenuGroup::make('Виджеты', [
+                MenuItem::make(YandexWidgetResource::class, 'РСЯ')->icon('megaphone'),
+                MenuItem::make(RepairWidgetResource::class, 'Ремонт')->icon('wrench-screwdriver'),
+                MenuItem::make(TelegramWidgetResource::class, 'Telegram-чат')->icon('paper-airplane'),
+                MenuItem::make(LatestDiscussionsWidgetResource::class, 'Последние обсуждения')->icon('chat-bubble-left-right'),
+            ], 'squares-2x2'),
             MenuItem::make(MoonShineUserResource::class, 'Администраторы')->icon('users'),
         ];
     }
