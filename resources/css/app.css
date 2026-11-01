@@ -126,6 +126,7 @@
 .article-content hr { margin: 1rem 0; border-top: 1px solid rgba(0, 0, 0, .1); }
 .article-content blockquote { border-left: 4px solid #eceeef; padding: 2rem; margin-bottom: 1.5rem; font-style: italic; }
 .article-content img { max-width: 100%; height: auto; }
+.article-content iframe { display: block; width: 100%; max-width: 100%; height: auto; min-height: 220px; aspect-ratio: 16 / 9; border: 0; }
 .article-content .img-fluid { max-width: 100%; height: auto; }
 .article-content .w-100 { width: 100%; }
 .article-content .d-block { display: block; }

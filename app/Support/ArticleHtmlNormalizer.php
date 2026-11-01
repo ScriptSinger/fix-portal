@@ -46,6 +46,7 @@ final class ArticleHtmlNormalizer
             self::cleanNode($child);
         }
 
+        self::removeLegacyWidgetText($root);
         self::removeEmbeddedToc($root);
 
         foreach (iterator_to_array($root->getElementsByTagName('table')) as $table) {
@@ -58,6 +59,20 @@ final class ArticleHtmlNormalizer
         }
 
         return trim($result);
+    }
+
+    private static function removeLegacyWidgetText(DOMElement $root): void
+    {
+        $xpath = new \DOMXPath($root->ownerDocument);
+        foreach ($xpath->query('.//text()[contains(translate(., "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "vk.widgets") or contains(translate(., "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "vk_post") or contains(translate(., "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "abcdefghijklmnopqrstuvwxyz"), "vk.com/js/api")]') as $text) {
+            $text->parentNode?->removeChild($text);
+        }
+
+        foreach (iterator_to_array($root->getElementsByTagName('p')) as $paragraph) {
+            if (trim($paragraph->textContent) === '' && $paragraph->getElementsByTagName('img')->length === 0) {
+                $paragraph->parentNode?->removeChild($paragraph);
+            }
+        }
     }
 
     private static function removeEmbeddedToc(DOMElement $root): void
