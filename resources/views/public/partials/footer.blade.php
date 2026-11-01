@@ -14,7 +14,7 @@
                         @foreach ($posts as $post)
                             <li>
                                 <a href="{{ route('articles.show', ['article' => $post->slug]) }}" class="flex items-start gap-4">
-                                    <img src="{{ optional($post->thumbnail)->small }}" alt="" loading="lazy"
+                                    <img src="{{ optional($post->thumbnail)->small }}" alt="" width="80" height="80" loading="lazy"
                                         class="size-20 shrink-0 border-4 border-[#333] object-cover">
                                     <span class="min-w-0">
                                         <span class="block text-base leading-6 text-white">{{ $post->title }}</span>

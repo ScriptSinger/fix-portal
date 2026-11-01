@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /firmwares?*search=
 Disallow: /firmwares/*/download
 Disallow: /login
 Disallow: /register
@@ -7,7 +6,6 @@ Disallow: /admin
 
 User-agent: ClaudeBot
 Crawl-delay: 10
-Disallow: /firmwares?*search=
 Disallow: /firmwares/*/download
 Disallow: /login
 Disallow: /register

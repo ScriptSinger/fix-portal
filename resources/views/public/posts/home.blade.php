@@ -3,6 +3,33 @@
 @section('description', optional($customization)->description ?? 'Коллекция статей от мастеров по ремонту бытовой техники, вопросы и ответы, база прошивок')
 @section('canonical', url('/'))
 @section('main-pt', 'pt-8')
+@php
+    $siteUrl = rtrim(config('app.url'), '/');
+    $siteSchema = [
+        '@context' => 'https://schema.org',
+        '@graph' => [
+            [
+                '@type' => 'Organization',
+                '@id' => $siteUrl . '/#organization',
+                'name' => config('app.name', 'Ufamasters'),
+                'url' => $siteUrl,
+                'logo' => asset('assets/front/images/version/ufamasters-logo-trim.png'),
+                'sameAs' => ['https://t.me/ufamasters_chat'],
+            ],
+            [
+                '@type' => 'WebSite',
+                '@id' => $siteUrl . '/#website',
+                'name' => config('app.name', 'Ufamasters'),
+                'url' => $siteUrl,
+                'publisher' => ['@id' => $siteUrl . '/#organization'],
+                'inLanguage' => 'ru-RU',
+            ],
+        ],
+    ];
+@endphp
+@push('head-schema')
+    <script type="application/ld+json">@json($siteSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
+@endpush
 
 @section('above')
     <x-ui.hero :customization="$customization" />

@@ -46,6 +46,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     @includeWhen(app()->environment('production'), 'components.analytics.metrika')
+    @stack('head-schema')
 </head>
 
 <body class="flex min-h-screen flex-col bg-white font-sans text-[15px] leading-[26px] text-body antialiased">

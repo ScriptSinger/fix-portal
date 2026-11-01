@@ -5,6 +5,28 @@
 @section('og-type', 'article')
 @section('og-image', $post->thumbnail?->original ?? asset('assets/front/images/og-default.jpg'))
 @section('main-pt', 'pt-8')
+@php
+    $articleSchema = [
+        '@context' => 'https://schema.org',
+        '@type' => 'Article',
+        'headline' => $post->title,
+        'description' => $post->description,
+        'datePublished' => optional($post->created_at)->toIso8601String(),
+        'dateModified' => optional($post->updated_at)->toIso8601String(),
+        'author' => [
+            '@type' => 'Person',
+            'name' => $post->administrator->name,
+        ],
+        'image' => url($post->thumbnail?->original ?? asset('assets/front/images/og-default.jpg')),
+        'mainEntityOfPage' => [
+            '@type' => 'WebPage',
+            '@id' => route('articles.show', ['article' => $post->slug]),
+        ],
+    ];
+@endphp
+@push('head-schema')
+    <script type="application/ld+json">@json($articleSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP)</script>
+@endpush
 @auth('web')
     @section('has-composer', '1')
 @endauth
@@ -57,7 +79,7 @@
             </header>
 
             @if ($post->thumbnail)
-                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" data-lightbox-cover class="mb-8 block w-full cursor-pointer">
+                <img src="{{ $post->thumbnail->blog }}" alt="{{ $post->title }}" width="1200" height="630" fetchpriority="high" data-lightbox-cover class="mb-8 block aspect-[1200/630] w-full cursor-pointer object-cover">
             @endif
 
             <div class="article-content">

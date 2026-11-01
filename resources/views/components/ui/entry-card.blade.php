@@ -17,12 +17,12 @@
                 @php $tiles = array_slice($images, 0, 3); @endphp
                 <div @class(['absolute inset-0 grid gap-0.5', 'grid-cols-2' => count($tiles) === 2, 'grid-cols-2 grid-rows-2' => count($tiles) === 3])>
                     @foreach ($tiles as $n => $tile)
-                        <img src="{{ $tile }}" alt="" loading="lazy" onerror="const a = this.closest('a'); this.remove(); if (!a.querySelector('img, span')) a.remove()"
+                        <img src="{{ $tile }}" alt="" width="480" height="300" loading="lazy" onerror="const a = this.closest('a'); this.remove(); if (!a.querySelector('img, span')) a.remove()"
                             @class(['block size-full min-h-0 object-cover', 'col-span-2' => count($tiles) === 3 && $n === 0])>
                     @endforeach
                 </div>
             @elseif ($image)
-                <img src="{{ $image }}" alt="" loading="lazy" onerror="const a = this.closest('a'); this.remove(); if (!a.querySelector('img, span')) a.remove()"
+                <img src="{{ $image }}" alt="" width="480" height="300" loading="lazy" onerror="const a = this.closest('a'); this.remove(); if (!a.querySelector('img, span')) a.remove()"
                     class="absolute inset-0 block size-full object-cover transition-transform duration-300 group-hover:scale-105">
             @endif
         </a>

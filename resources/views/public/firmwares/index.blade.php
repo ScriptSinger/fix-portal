@@ -17,6 +17,7 @@
 @endphp
 @section('title', 'Прошивки для бытовой техники | ' . config('app.name', 'Ufamasters'))
 @section('description', 'Каталог прошивок для бытовой техники: поиск и просмотр файлов по моделям и платформам.')
+@section('canonical', route('firmwares.index'))
 @section('robots', ($isFiltered || $isPaginated) ? 'noindex, follow' : 'index, follow')
 @section('left-drawer', '1')
 
