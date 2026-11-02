@@ -35,6 +35,12 @@ class TelegramUpdateHandler
 
         $parsed = $this->command($text);
         if ($parsed === null) {
+            if ($text !== '' && str_starts_with(ltrim($text), '/')) {
+                $this->markProcessed($updateId);
+
+                return;
+            }
+
             if ($this->questionIntake->store($updateId, $payload)) {
                 $this->questionModeration->preview($updateId, $payload);
             }

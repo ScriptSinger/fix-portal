@@ -225,6 +225,25 @@ final class TelegramWebhookTest extends TestCase
         $this->assertDatabaseMissing('telegram_question_messages', ['telegram_message_id' => 13]);
     }
 
+    public function test_unknown_slash_command_is_not_queued_as_a_question(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 10082,
+                'message' => [
+                    'message_id' => 14,
+                    'text' => '/attach 8',
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseMissing('telegram_question_messages', ['telegram_message_id' => 14]);
+    }
+
     public function test_photo_is_downloaded_and_attached_when_question_is_published(): void
     {
         Storage::fake('public');
