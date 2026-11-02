@@ -80,9 +80,9 @@ class TelegramQuestionModerationService
             if (mb_strlen($title) < 12) {
                 $title = Str::limit($text ?: 'Вопрос из Telegram', 150, '');
             }
-            $image = $this->importPhoto($record);
+            $images = $this->importPhotos($record);
             $description = e($text);
-            if ($image !== null) {
+            foreach ($images as $image) {
                 $description .= '<img src="'.e($image['url']).'" class="img-fluid" data-id="'.$image['id'].'">';
             }
             $question = Question::create([
@@ -156,51 +156,60 @@ class TelegramQuestionModerationService
         return "Новый вопрос #{$recordId}\nАвтор Telegram: {$author}\n\n{$text}\n\nМодерация выполняется в MoonShine → Вопросы → Telegram-модерация.";
     }
 
-    /** @return array{id: int, url: string}|null */
-    private function importPhoto(object $record): ?array
+    /** @return list<array{id: int, url: string}> */
+    private function importPhotos(object $record): array
     {
         $payload = json_decode((string) $record->payload, true) ?: [];
-        $photos = data_get($payload, 'message.photo');
-        if (! is_array($photos) || $photos === []) {
-            return null;
+        $albums = data_get($payload, 'message.album_photos', []);
+        if (! is_array($albums) || $albums === []) {
+            $albums = [data_get($payload, 'message.photo', [])];
         }
 
-        $photo = end($photos);
-        $fileId = (string) data_get($photo, 'file_id');
-        if ($fileId === '') {
-            return null;
+        $images = [];
+        foreach ($albums as $photos) {
+            if (! is_array($photos) || $photos === []) {
+                continue;
+            }
+
+            $photo = end($photos);
+            $fileId = (string) data_get($photo, 'file_id');
+            if ($fileId === '') {
+                continue;
+            }
+
+            $file = $this->telegram->call('getFile', ['file_id' => $fileId]);
+            $filePath = (string) ($file['file_path'] ?? '');
+            if ($filePath === '') {
+                throw new \RuntimeException('Telegram photo path is missing.');
+            }
+
+            $contents = $this->telegram->downloadFile($filePath);
+            if ($contents === '' || strlen($contents) > 10 * 1024 * 1024) {
+                throw new \RuntimeException('Telegram photo is empty or too large.');
+            }
+
+            $disk = Storage::disk('public');
+            $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents) ?: '';
+            if (! str_starts_with($mime, 'image/')) {
+                throw new \RuntimeException('Telegram file is not an image.');
+            }
+
+            $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) ?: 'jpg';
+            $path = 'images/telegram/'.(int) $record->id.'/'.hash('sha256', $contents).'.'.$extension;
+            $disk->put($path, $contents);
+            $url = Storage::url($path);
+
+            $image = new Image;
+            $image->url = $url;
+            $image->mime = $mime;
+            $image->size = $disk->size($path);
+            $image->user_id = (int) config('services.telegram.author_user_id');
+            $image->save();
+
+            $images[] = ['id' => (int) $image->id, 'url' => $url];
         }
 
-        $file = $this->telegram->call('getFile', ['file_id' => $fileId]);
-        $filePath = (string) ($file['file_path'] ?? '');
-        if ($filePath === '') {
-            throw new \RuntimeException('Telegram photo path is missing.');
-        }
-
-        $contents = $this->telegram->downloadFile($filePath);
-        if ($contents === '' || strlen($contents) > 10 * 1024 * 1024) {
-            throw new \RuntimeException('Telegram photo is empty or too large.');
-        }
-
-        $disk = Storage::disk('public');
-        $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents) ?: '';
-        if (! str_starts_with($mime, 'image/')) {
-            throw new \RuntimeException('Telegram file is not an image.');
-        }
-
-        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) ?: 'jpg';
-        $path = 'images/telegram/'.(int) $record->id.'/'.hash('sha256', $contents).'.'.$extension;
-        $disk->put($path, $contents);
-        $url = Storage::url($path);
-
-        $image = new Image;
-        $image->url = $url;
-        $image->mime = $mime;
-        $image->size = $disk->size($path);
-        $image->user_id = (int) config('services.telegram.author_user_id');
-        $image->save();
-
-        return ['id' => (int) $image->id, 'url' => $url];
+        return $images;
     }
 
     /** @return array<string, int|string> */

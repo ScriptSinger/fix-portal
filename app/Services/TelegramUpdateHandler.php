@@ -94,6 +94,25 @@ class TelegramUpdateHandler
         }
 
         $payload = ['message' => $reply];
+        $mediaGroupId = (string) ($reply['media_group_id'] ?? '');
+        if ($mediaGroupId !== '') {
+            $albumPhotos = [];
+            $updates = DB::table('telegram_webhook_updates')
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$mediaGroupId])
+                ->get(['payload']);
+
+            foreach ($updates as $update) {
+                $item = json_decode((string) $update->payload, true);
+                $photos = data_get($item, 'message.photo');
+                if (is_array($photos) && $photos !== []) {
+                    $albumPhotos[] = $photos;
+                }
+            }
+
+            if ($albumPhotos !== []) {
+                $payload['message']['album_photos'] = $albumPhotos;
+            }
+        }
         if (! $this->questionIntake->store($updateId, $payload, true)) {
             return 'Это сообщение уже передано на модерацию или не содержит текста.';
         }
