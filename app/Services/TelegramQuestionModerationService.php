@@ -20,7 +20,7 @@ class TelegramQuestionModerationService
     }
 
     /** @param array<string, mixed> $payload */
-    public function preview(int $updateId, array $payload): bool
+    public function preview(int $updateId, array $payload, bool $notifySameChat = true): bool
     {
         $message = $payload['message'] ?? null;
         if (! is_array($message)) {
@@ -42,15 +42,17 @@ class TelegramQuestionModerationService
             return false;
         }
 
-        $result = $this->telegram->call('sendMessage', [
-            'chat_id' => $moderationChatId,
-            'text' => $this->previewText($record->id, $text, $message, $moderationChatId !== $chatId),
-            'disable_web_page_preview' => true,
-        ] + $this->thread());
+        $result = $moderationChatId === $chatId && ! $notifySameChat
+            ? []
+            : $this->telegram->call('sendMessage', [
+                'chat_id' => $moderationChatId,
+                'text' => $this->previewText($record->id, $text, $message, $moderationChatId !== $chatId),
+                'disable_web_page_preview' => true,
+            ] + $this->thread());
 
         DB::table('telegram_question_messages')->where('id', $record->id)->update([
             'moderation_chat_id' => $moderationChatId,
-            'moderation_message_id' => (int) ($result['message_id'] ?? 0),
+            'moderation_message_id' => (int) ($result['message_id'] ?? 0) ?: null,
             'updated_at' => now(),
         ]);
 

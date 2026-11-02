@@ -152,7 +152,7 @@ class TelegramUpdateHandler
             return 'Это сообщение уже передано на модерацию или не содержит текста.';
         }
 
-        $this->questionModeration->preview($updateId, $payload);
+        $this->questionModeration->preview($updateId, $payload, false);
 
         return 'Сообщение передано на модерацию.';
     }
