@@ -10,6 +10,7 @@ class TelegramUpdateHandler
     public function __construct(
         private readonly TelegramBotApi $telegram,
         private readonly TelegramModerationService $moderation,
+        private readonly TelegramQuestionIntake $questionIntake,
     )
     {
     }
@@ -32,6 +33,7 @@ class TelegramUpdateHandler
 
         $parsed = $this->command($text);
         if ($parsed === null) {
+            $this->questionIntake->store($updateId, $payload);
             $this->markProcessed($updateId);
             return;
         }

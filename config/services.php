@@ -60,6 +60,9 @@ return [
             explode(',', (string) env('TELEGRAM_MODERATOR_IDS', ''))
         ), static fn (int $id): bool => $id > 0)),
         'mute_minutes' => (int) env('TELEGRAM_MUTE_MINUTES', 1440),
+        'source_chat_id' => env('TELEGRAM_SOURCE_CHAT_ID'),
+        'moderation_chat_id' => env('TELEGRAM_MODERATION_CHAT_ID'),
+        'moderation_thread_id' => env('TELEGRAM_MODERATION_THREAD_ID'),
     ],
 
     // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.

@@ -176,4 +176,29 @@ final class TelegramWebhookTest extends TestCase
             'action' => 'mute',
         ]);
     }
+
+    public function test_message_from_source_chat_is_queued_for_moderation(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1008,
+                'message' => [
+                    'message_id' => 12,
+                    'text' => "Холодильник не морозит\nМодель RB33",
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'telegram_chat_id' => -100123,
+            'telegram_message_id' => 12,
+            'telegram_update_id' => 1008,
+            'status' => 'pending_moderation',
+            'text' => "Холодильник не морозит\nМодель RB33",
+        ]);
+    }
 }
