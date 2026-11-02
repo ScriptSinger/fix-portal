@@ -24,6 +24,46 @@ class TelegramQuestionMessage extends Model
 
     protected $casts = ['payload' => 'array'];
 
+    /**
+     * Return Telegram file IDs for all photos attached to this moderation item.
+     *
+     * @return list<string>
+     */
+    public function telegramPhotoFileIds(): array
+    {
+        $payload = is_array($this->payload) ? $this->payload : [];
+        $messages = [];
+
+        if (is_array(data_get($payload, 'message'))) {
+            $messages[] = data_get($payload, 'message');
+        }
+
+        foreach ((array) data_get($payload, 'attached_messages', []) as $message) {
+            if (is_array($message)) {
+                $messages[] = $message;
+            }
+        }
+
+        $fileIds = [];
+        foreach ($messages as $message) {
+            $photo = data_get($message, 'photo');
+            $fileId = (string) data_get(is_array($photo) ? end($photo) : null, 'file_id');
+            if ($fileId !== '') {
+                $fileIds[] = $fileId;
+            }
+
+            foreach ((array) data_get($message, 'album_photos', []) as $album) {
+                $photo = is_array($album) ? end($album) : null;
+                $fileId = (string) data_get($photo, 'file_id');
+                if ($fileId !== '') {
+                    $fileIds[] = $fileId;
+                }
+            }
+        }
+
+        return array_values(array_unique($fileIds));
+    }
+
     public function appliance(): BelongsTo
     {
         return $this->belongsTo(Appliance::class);

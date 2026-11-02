@@ -54,6 +54,10 @@ class TelegramQuestionModerationService
             'updated_at' => now(),
         ]);
 
+        if ($moderationChatId !== $chatId) {
+            $this->sendPreviewPhotos((int) $record->id, $payload, $moderationChatId);
+        }
+
         return true;
     }
 
@@ -79,13 +83,24 @@ class TelegramQuestionModerationService
             }
 
             $text = trim((string) $record->text);
+            $storedPayload = json_decode((string) $record->payload, true) ?: [];
+            $attachedMessages = is_array($storedPayload['attached_messages'] ?? null)
+                ? $storedPayload['attached_messages']
+                : [];
+            $descriptionParts = array_values(array_filter([
+                $text,
+                ...array_map(static fn (array $message): string => trim((string) ($message['text'] ?? $message['caption'] ?? '')), $attachedMessages),
+            ], static fn (string $value): bool => $value !== ''));
             $lines = preg_split('/\R/u', $text, 2) ?: [$text];
             $title = Str::limit(trim($lines[0]) ?: 'Вопрос из Telegram', 150, '');
             if (mb_strlen($title) < 12) {
                 $title = Str::limit($text ?: 'Вопрос из Telegram', 150, '');
             }
             $images = $this->importPhotos($record);
-            $description = e($text);
+            foreach ($attachedMessages as $attachedMessage) {
+                $images = [...$images, ...$this->importPhotosPayload((int) $record->id, ['message' => $attachedMessage])];
+            }
+            $description = e(implode("\n\n", $descriptionParts));
             foreach ($images as $image) {
                 $description .= '<img src="'.e($image['url']).'" class="img-fluid" data-id="'.$image['id'].'">';
             }
@@ -156,8 +171,8 @@ class TelegramQuestionModerationService
         if (! $record) {
             return 'Запись очереди не найдена.';
         }
-        if ($record->status !== 'published' || ! $record->question_id) {
-            return 'Фото можно добавлять только к опубликованному вопросу.';
+        if (! in_array($record->status, ['pending_moderation', 'published'], true)) {
+            return 'К вопросу с текущим статусом нельзя добавлять сообщения.';
         }
 
         $messageId = (int) data_get($payload, 'message.message_id');
@@ -166,6 +181,23 @@ class TelegramQuestionModerationService
         $attachedMessageIds = array_map('intval', (array) ($storedPayload['attached_message_ids'] ?? []));
         if ($messageId > 0 && in_array($messageId, $attachedMessageIds, true)) {
             return 'Это сообщение уже прикреплено к вопросу.';
+        }
+
+        if ($record->status === 'pending_moderation') {
+            $storedPayload['attached_message_ids'][] = $messageId;
+            $storedPayload['attached_messages'][] = $payload['message'];
+            DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                'payload' => json_encode($storedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+                'updated_at' => now(),
+            ]);
+            $this->audit($moderatorId, null, 'attach', ['queue_id' => $queueId, 'message_id' => $messageId, 'deferred' => true]);
+
+            $moderationChatId = (int) (config('services.telegram.moderation_chat_id') ?: $record->telegram_chat_id);
+            if ($moderationChatId !== (int) $record->telegram_chat_id) {
+                $this->sendPreviewPhotos((int) $record->id, $payload, $moderationChatId);
+            }
+
+            return 'Сообщение добавлено к вопросу. Оно будет опубликовано вместе с ним.';
         }
 
         try {
@@ -223,6 +255,46 @@ class TelegramQuestionModerationService
         $author = (string) data_get($message, 'from.username', data_get($message, 'from.first_name', 'unknown'));
 
         return "Новый вопрос #{$recordId}\nАвтор Telegram: {$author}\n\n{$text}\n\nМодерация выполняется в MoonShine → Вопросы → Telegram-модерация.";
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function sendPreviewPhotos(int $recordId, array $payload, int $chatId): void
+    {
+        $groups = [];
+        $main = data_get($payload, 'message.photo');
+        if (is_array($main) && $main !== []) {
+            $groups[] = $main;
+        }
+        foreach ((array) data_get($payload, 'message.album_photos', []) as $photos) {
+            if (is_array($photos) && $photos !== []) {
+                $groups[] = $photos;
+            }
+        }
+        foreach ((array) data_get($payload, 'attached_messages', []) as $message) {
+            $photos = data_get($message, 'photo');
+            if (is_array($photos) && $photos !== []) {
+                $groups[] = $photos;
+            }
+        }
+
+        $sent = [];
+        foreach ($groups as $photos) {
+            $photo = end($photos);
+            $fileId = (string) data_get($photo, 'file_id');
+            if ($fileId === '' || isset($sent[$fileId])) {
+                continue;
+            }
+            $sent[$fileId] = true;
+            try {
+                $this->telegram->call('sendPhoto', [
+                    'chat_id' => $chatId,
+                    'photo' => $fileId,
+                    'caption' => "Фото к вопросу #{$recordId}",
+                ] + $this->thread());
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
     }
 
     /** @return list<array{id: int, url: string}> */

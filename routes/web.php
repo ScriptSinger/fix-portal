@@ -14,6 +14,7 @@ use App\Http\Controllers\Public\SolutionController;
 use App\Http\Controllers\Public\TagController;
 use App\Http\Controllers\Public\UserController;
 use App\Http\Controllers\Public\UserProfileController;
+use App\Http\Controllers\MoonShine\TelegramQuestionPhotoController;
 use App\Services\FirmwareCatalog;
 use Illuminate\Support\Facades\Route;
 
@@ -88,6 +89,11 @@ Route::get('/firmwares/{brand}/{series}', [FirmwareHubController::class, 'series
     ->name('firmwares.series');
 
 Route::get('/firmwares/{firmware}', [FirmwareController::class, 'show'])->whereNumber('firmware')->name('firmwares.show');
+
+Route::get('/admin/telegram-question-messages/{telegramQuestionMessage}/photo/{photo}', TelegramQuestionPhotoController::class)
+    ->whereNumber(['telegramQuestionMessage', 'photo'])
+    ->middleware('auth:moonshine')
+    ->name('moonshine.telegram-question-photo');
 
 Route::middleware(['auth:web', 'verified'])->group(
     function () {

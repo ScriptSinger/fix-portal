@@ -18,6 +18,7 @@ use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Enum;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Number;
+use MoonShine\UI\Fields\Preview;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
 
@@ -54,7 +55,7 @@ class TelegramQuestionMessageResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Текст', 'text')->sortable(),
+            Text::make('Текст', 'text')->prettyLimit(limit: 80)->sortable(),
             Enum::make('Статус', 'status')->options([
                 'pending_moderation' => 'Ожидает модерации',
                 'published' => 'Опубликован',
@@ -71,6 +72,18 @@ class TelegramQuestionMessageResource extends BaseResource
     {
         return [
             ...$this->indexFields(),
+            Preview::make('Фотографии', 'payload', function (TelegramQuestionMessage $item): string {
+                $photos = $item->telegramPhotoFileIds();
+
+                if ($photos === []) {
+                    return '<span class="text-gray-500">Нет прикреплённых фотографий</span>';
+                }
+
+                return '<div style="display:flex;flex-wrap:wrap;gap:12px;max-width:900px">'.collect($photos)
+                    ->values()
+                    ->map(fn (string $fileId, int $index): string => '<a href="'.e(route('moonshine.telegram-question-photo', [$item->id, $index])).'" target="_blank" rel="noopener"><img src="'.e(route('moonshine.telegram-question-photo', [$item->id, $index])).'" alt="Фото '.($index + 1).'" style="width:180px;height:180px;object-fit:cover;border-radius:8px;border:1px solid #ddd"></a>')
+                    ->implode('').'</div>';
+            }),
             Textarea::make('Причина отказа', 'error_message')->nullable(),
             Text::make('Question ID', 'question_id'),
         ];
