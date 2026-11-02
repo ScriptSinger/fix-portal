@@ -25,9 +25,10 @@ class TelegramUpdateHandler
             return;
         }
 
-        $text = trim((string) ($message['text'] ?? ''));
+        $text = trim((string) ($message['text'] ?? $message['caption'] ?? ''));
+        $hasPhoto = is_array($message['photo'] ?? null) && $message['photo'] !== [];
         $chatId = $message['chat']['id'] ?? null;
-        if ($text === '' || $chatId === null) {
+        if (($text === '' && ! $hasPhoto) || $chatId === null) {
             $this->markProcessed($updateId);
             return;
         }

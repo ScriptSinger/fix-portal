@@ -32,7 +32,8 @@ class TelegramQuestionIntake
         }
 
         $text = trim((string) ($message['text'] ?? $message['caption'] ?? ''));
-        if ($text === '') {
+        $hasPhoto = is_array($message['photo'] ?? null) && $message['photo'] !== [];
+        if ($text === '' && ! $hasPhoto) {
             return false;
         }
 

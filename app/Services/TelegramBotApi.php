@@ -36,4 +36,24 @@ class TelegramBotApi
 
         return (array) $response->json('result');
     }
+
+    public function downloadFile(string $filePath): string
+    {
+        $token = (string) config('services.telegram.bot_token');
+        if ($token === '') {
+            throw new \RuntimeException('TELEGRAM_BOT_TOKEN is not configured.');
+        }
+
+        $url = rtrim((string) config('services.telegram.api_url'), '/').'/file/bot'.$token.'/'.ltrim($filePath, '/');
+
+        try {
+            return Http::timeout(30)
+                ->withOptions(array_filter(['proxy' => config('services.telegram.proxy')]))
+                ->get($url)
+                ->throw()
+                ->body();
+        } catch (RequestException|ConnectionException $e) {
+            throw new \RuntimeException('Telegram file download failed.');
+        }
+    }
 }

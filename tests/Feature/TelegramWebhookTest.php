@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 final class TelegramWebhookTest extends TestCase
@@ -222,6 +223,45 @@ final class TelegramWebhookTest extends TestCase
             ->assertOk();
 
         $this->assertDatabaseMissing('telegram_question_messages', ['telegram_message_id' => 13]);
+    }
+
+    public function test_photo_is_downloaded_and_attached_when_question_is_published(): void
+    {
+        Storage::fake('public');
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', true);
+        Http::fake(function ($request) use ($png) {
+            if (str_contains($request->url(), '/getFile')) {
+                return Http::response(['ok' => true, 'result' => ['file_path' => 'photos/question.png']]);
+            }
+            if (str_contains($request->url(), '/file/bot')) {
+                return Http::response($png, 200, ['Content-Type' => 'image/png']);
+            }
+
+            return Http::response(['ok' => true, 'result' => ['message_id' => 901]]);
+        });
+        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.moderation_chat_id' => '-100999']);
+        $author = User::factory()->create();
+        $appliance = Appliance::create(['title' => 'Стиральные машины']);
+        config(['services.telegram.author_user_id' => $author->id]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1011,
+                'message' => [
+                    'message_id' => 60,
+                    'caption' => 'Не сливает воду',
+                    'photo' => [['file_id' => 'small'], ['file_id' => 'large']],
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        app(\App\Services\TelegramQuestionModerationService::class)->approve(60, $appliance->id, null);
+
+        $question = Question::query()->latest('id')->firstOrFail();
+        $this->assertStringContainsString('<img ', $question->description);
+        $this->assertDatabaseHas('images', ['user_id' => $author->id, 'mime' => 'image/png']);
     }
 
     public function test_moderator_can_preview_and_approve_a_queued_question(): void
