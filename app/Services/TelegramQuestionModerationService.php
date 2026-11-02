@@ -51,7 +51,7 @@ class TelegramQuestionModerationService
         return true;
     }
 
-    public function approve(int $messageId, int $applianceId, int $moderatorId): string
+    public function approve(int $messageId, int $applianceId, ?int $moderatorId): string
     {
         return DB::transaction(function () use ($messageId, $applianceId, $moderatorId): string {
             $record = DB::table('telegram_question_messages')->where('telegram_message_id', $messageId)->lockForUpdate()->first();
@@ -96,7 +96,7 @@ class TelegramQuestionModerationService
         });
     }
 
-    public function reject(int $messageId, string $reason, int $moderatorId): string
+    public function reject(int $messageId, string $reason, ?int $moderatorId): string
     {
         $record = DB::table('telegram_question_messages')->where('telegram_message_id', $messageId)->first();
         if (! $record) {
@@ -116,7 +116,7 @@ class TelegramQuestionModerationService
         return 'Вопрос отклонён.';
     }
 
-    public function retry(int $messageId, int $moderatorId): string
+    public function retry(int $messageId, ?int $moderatorId): string
     {
         $record = DB::table('telegram_question_messages')->where('telegram_message_id', $messageId)->first();
         if (! $record) {
@@ -145,7 +145,7 @@ class TelegramQuestionModerationService
     }
 
     /** @param array<string, mixed> $parameters */
-    private function audit(int $moderatorId, ?int $questionId, string $action, array $parameters): void
+    private function audit(?int $moderatorId, ?int $questionId, string $action, array $parameters): void
     {
         DB::table('telegram_moderation_actions')->insert([
             'moderator_telegram_id' => $moderatorId,
