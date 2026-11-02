@@ -7,6 +7,7 @@ namespace App\MoonShine\Resources;
 use App\Models\TelegramQuestionMessage;
 use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Pages\TelegramQuestionMessagesIndexPage;
+use App\MoonShine\Pages\ResourceFormPage;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\Support\Attributes\Icon;
@@ -46,7 +47,7 @@ class TelegramQuestionMessageResource extends BaseResource
 
     protected function pages(): array
     {
-        return [TelegramQuestionMessagesIndexPage::class, DetailPage::class];
+        return [TelegramQuestionMessagesIndexPage::class, ResourceFormPage::class, DetailPage::class];
     }
 
     protected function indexFields(): iterable
@@ -72,7 +73,6 @@ class TelegramQuestionMessageResource extends BaseResource
             ...$this->indexFields(),
             Textarea::make('Причина отказа', 'error_message')->nullable(),
             Text::make('Question ID', 'question_id'),
-            Textarea::make('Payload', 'payload')->unescape(),
         ];
     }
 
