@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Public\MasterController;
+use App\Http\Controllers\Api\TelegramWebhookController;
 use App\Http\Controllers\Api\Public\UserImageController;
 use App\Http\Controllers\Public\ReactionController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,10 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::get('/masters', [MasterController::class, 'index'])->name('api.masters.index');
+
+Route::post('/telegram/webhook', TelegramWebhookController::class)
+    ->withoutMiddleware('throttle:api')
+    ->name('api.telegram.webhook');
 
 Route::group(
     [

@@ -53,6 +53,8 @@ return [
         'thread_id' => env('TELEGRAM_THREAD_ID'),
         'proxy' => env('TELEGRAM_PROXY'),
         'api_url' => env('TELEGRAM_API_URL', 'https://api.telegram.org'),
+        'webhook_url' => env('TELEGRAM_WEBHOOK_URL', rtrim((string) env('APP_URL'), '/') . '/api/telegram/webhook'),
+        'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
     ],
 
     // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.
