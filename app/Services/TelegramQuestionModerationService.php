@@ -38,7 +38,7 @@ class TelegramQuestionModerationService
 
         $result = $this->telegram->call('sendMessage', [
             'chat_id' => $moderationChatId,
-            'text' => $this->previewText($record->id, $text, $message),
+            'text' => $this->previewText($record->id, $text, $message, $moderationChatId !== $chatId),
             'disable_web_page_preview' => true,
         ] + $this->thread());
 
@@ -138,8 +138,12 @@ class TelegramQuestionModerationService
         return 'Preview отправлен повторно.';
     }
 
-    private function previewText(int $recordId, string $text, array $message): string
+    private function previewText(int $recordId, string $text, array $message, bool $private): string
     {
+        if (! $private) {
+            return 'Сообщение получено и передано на модерацию.';
+        }
+
         $author = (string) data_get($message, 'from.username', data_get($message, 'from.first_name', 'unknown'));
 
         return "Новый вопрос #{$recordId}\nАвтор Telegram: {$author}\n\n{$text}\n\nМодерация выполняется в MoonShine → Вопросы → Telegram-модерация.";

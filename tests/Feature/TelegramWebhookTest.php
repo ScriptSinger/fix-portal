@@ -236,6 +236,7 @@ final class TelegramWebhookTest extends TestCase
             'status' => 'pending_moderation',
             'moderation_message_id' => 900,
         ]);
+        Http::assertSent(fn ($request) => $request->data()['text'] === 'Сообщение получено и передано на модерацию.');
 
         $result = app(\App\Services\TelegramQuestionModerationService::class)
             ->approve(50, $appliance->id, null);
