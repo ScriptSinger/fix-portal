@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\TelegramUpdateHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,7 @@ class TelegramWebhookController extends Controller
 {
     private const MAX_PAYLOAD_BYTES = 262144;
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, TelegramUpdateHandler $handler): JsonResponse
     {
         $secret = (string) config('services.telegram.webhook_secret');
         $providedSecret = (string) $request->header('X-Telegram-Bot-Api-Secret-Token');
@@ -53,6 +54,15 @@ class TelegramWebhookController extends Controller
                 array_keys($payload)
             )),
         ]);
+
+        try {
+            $handler->handle($payload['update_id'], $payload);
+        } catch (\Throwable $exception) {
+            Log::error('Telegram webhook update handling failed', [
+                'update_id' => $payload['update_id'],
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
         return response()->json(['ok' => true]);
     }

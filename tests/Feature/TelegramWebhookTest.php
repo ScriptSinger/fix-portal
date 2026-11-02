@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
@@ -17,6 +18,7 @@ final class TelegramWebhookTest extends TestCase
         parent::setUp();
 
         config(['services.telegram.webhook_secret' => 'test-webhook-secret']);
+        config(['services.telegram.bot_token' => 'test-token']);
     }
 
     public function test_webhook_rejects_requests_without_the_secret(): void
@@ -68,5 +70,55 @@ final class TelegramWebhookTest extends TestCase
                 'message' => ['text' => str_repeat('x', 262145)],
             ])
             ->assertStatus(413);
+    }
+
+    public function test_authorized_moderator_can_use_help_command(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 10]])]);
+        config(['services.telegram.moderator_ids' => [777]]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1004,
+                'message' => [
+                    'message_id' => 8,
+                    'text' => '/help@fix_portal_bot',
+                    'from' => ['id' => 777, 'username' => 'moderator'],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk()
+            ->assertJson(['ok' => true]);
+
+        Http::assertSent(fn ($request): bool => $request->url() === 'https://api.telegram.org/bottest-token/sendMessage'
+            && $request['chat_id'] === -100123
+            && str_contains($request['text'], '/status'));
+        $this->assertDatabaseHas('telegram_webhook_updates', [
+            'update_id' => 1004,
+        ]);
+        $this->assertNotNull(
+            \Illuminate\Support\Facades\DB::table('telegram_webhook_updates')->where('update_id', 1004)->value('processed_at')
+        );
+    }
+
+    public function test_unauthorized_user_cannot_use_moderator_commands(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 11]])]);
+        config(['services.telegram.moderator_ids' => [777]]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1005,
+                'message' => [
+                    'message_id' => 9,
+                    'text' => '/status',
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => 123, 'type' => 'private'],
+                ],
+            ])
+            ->assertOk();
+
+        Http::assertSent(fn ($request): bool => $request['chat_id'] === 123
+            && $request['text'] === 'Нет доступа к командам модератора.');
     }
 }

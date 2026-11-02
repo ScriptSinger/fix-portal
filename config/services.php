@@ -55,6 +55,10 @@ return [
         'api_url' => env('TELEGRAM_API_URL', 'https://api.telegram.org'),
         'webhook_url' => env('TELEGRAM_WEBHOOK_URL', rtrim((string) env('APP_URL'), '/') . '/api/telegram/webhook'),
         'webhook_secret' => env('TELEGRAM_WEBHOOK_SECRET'),
+        'moderator_ids' => array_values(array_filter(array_map(
+            static fn (string $id): int => (int) trim($id),
+            explode(',', (string) env('TELEGRAM_MODERATOR_IDS', ''))
+        ), static fn (int $id): bool => $id > 0)),
     ],
 
     // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.
