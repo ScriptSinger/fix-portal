@@ -168,7 +168,13 @@ class TelegramQuestionModerationService
             return 'Это сообщение уже прикреплено к вопросу.';
         }
 
-        $images = $this->importPhotosPayload((int) $record->id, $payload);
+        try {
+            $images = $this->importPhotosPayload((int) $record->id, $payload);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return 'Не удалось скачать вложение из Telegram. Проверьте proxy и повторите команду.';
+        }
         if ($images === [] && $text === '') {
             return 'В ответном сообщении нет текста или фото.';
         }
@@ -193,7 +199,11 @@ class TelegramQuestionModerationService
                 'updated_at' => now(),
             ]);
         }
-        $this->announcer->refresh($question);
+        try {
+            $this->announcer->refresh($question);
+        } catch (\Throwable $e) {
+            report($e);
+        }
         $this->audit($moderatorId, $question->id, 'attach', [
             'queue_id' => $queueId,
             'message_id' => $messageId,
