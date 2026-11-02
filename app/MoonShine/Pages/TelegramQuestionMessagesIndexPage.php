@@ -34,9 +34,9 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
                 ->method('retry', events: [$this->getListEventName()]))
             ->add(ActionButton::make('Удалить из очереди')
                 ->icon('trash')
-                ->canSee(fn (TelegramQuestionMessage $item): bool => in_array($item->status, ['pending_moderation', 'rejected', 'failed'], true))
+                ->canSee(fn (TelegramQuestionMessage $item): bool => true)
                 ->method('remove', events: [$this->getListEventName()])
-                ->withConfirm('Удалить запись из очереди?', 'Исходное сообщение Telegram не удаляется. Его можно будет пометить повторно.', 'Удалить'));
+                ->withConfirm('Убрать запись из модерации?', 'Question на сайте и публикация в Telegram не удаляются.', 'Убрать'));
     }
 
     #[AsyncMethod]
@@ -87,14 +87,8 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
 
             return;
         }
-        if (! in_array($item->status, ['pending_moderation', 'rejected', 'failed'], true)) {
-            toast('Опубликованный вопрос нельзя удалить из очереди', ToastType::ERROR);
-
-            return;
-        }
-
         $item->delete();
-        toast('Запись удалена из очереди', ToastType::SUCCESS);
+        toast('Запись убрана из модерации. Опубликованный вопрос сохранён.', ToastType::SUCCESS);
     }
 
     private function toast(string $message, bool $success = false): void
