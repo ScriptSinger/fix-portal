@@ -56,7 +56,8 @@ final class ImageCleanupService
         $path = parse_url((string) $url, PHP_URL_PATH);
         $path = is_string($path) ? preg_replace('#^/?storage/#', '', $path) : null;
 
-        if (! is_string($path) || ! str_starts_with($path, 'images/users/')) {
+        if (! is_string($path)
+            || (! str_starts_with($path, 'images/users/') && ! str_starts_with($path, 'images/telegram/'))) {
             return;
         }
 

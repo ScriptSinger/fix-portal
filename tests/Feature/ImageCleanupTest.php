@@ -50,6 +50,34 @@ class ImageCleanupTest extends TestCase
         Storage::disk('public')->assertMissing($path);
     }
 
+    public function test_telegram_image_is_removed_when_question_is_deleted(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $appliance = \App\Models\Appliance::create(['title' => 'Telegram appliances']);
+        $path = 'images/telegram/7/photo.png';
+        Storage::disk('public')->put($path, 'image');
+
+        $image = (new Image)->forceFill([
+            'user_id' => $user->id,
+            'url' => '/storage/'.$path,
+            'mime' => 'image/png',
+            'size' => 5,
+        ]);
+        $image->save();
+        $question = \App\Models\Question::create([
+            'title' => 'Telegram question',
+            'description' => '<img src="/storage/'.$path.'" data-id="'.$image->id.'">',
+            'appliance_id' => $appliance->id,
+            'user_id' => $user->id,
+        ]);
+
+        $question->delete();
+
+        $this->assertDatabaseMissing('images', ['id' => $image->id]);
+        Storage::disk('public')->assertMissing($path);
+    }
+
     public function test_avatar_file_is_removed_when_user_is_deleted(): void
     {
         Storage::fake('public');
