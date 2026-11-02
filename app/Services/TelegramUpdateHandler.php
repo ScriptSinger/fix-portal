@@ -131,19 +131,7 @@ class TelegramUpdateHandler
         $payload = ['message' => $reply];
         $mediaGroupId = (string) ($reply['media_group_id'] ?? '');
         if ($mediaGroupId !== '') {
-            $albumPhotos = [];
-            $updates = DB::table('telegram_webhook_updates')
-                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$mediaGroupId])
-                ->get(['payload']);
-
-            foreach ($updates as $update) {
-                $item = json_decode((string) $update->payload, true);
-                $photos = data_get($item, 'message.photo');
-                if (is_array($photos) && $photos !== []) {
-                    $albumPhotos[] = $photos;
-                }
-            }
-
+            $albumPhotos = $this->albumPhotos($reply, $mediaGroupId);
             if ($albumPhotos !== []) {
                 $payload['message']['album_photos'] = $albumPhotos;
             }
@@ -169,24 +157,48 @@ class TelegramUpdateHandler
         $payload = ['message' => $reply];
         $mediaGroupId = (string) ($reply['media_group_id'] ?? '');
         if ($mediaGroupId !== '') {
-            $albumPhotos = [];
-            $updates = DB::table('telegram_webhook_updates')
-                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$mediaGroupId])
-                ->get(['payload']);
-
-            foreach ($updates as $update) {
-                $item = json_decode((string) $update->payload, true);
-                $photos = data_get($item, 'message.photo');
-                if (is_array($photos) && $photos !== []) {
-                    $albumPhotos[] = $photos;
-                }
-            }
+            $albumPhotos = $this->albumPhotos($reply, $mediaGroupId);
             if ($albumPhotos !== []) {
                 $payload['message']['album_photos'] = $albumPhotos;
             }
         }
 
         return $this->questionModeration->attach($queueId, $payload, $moderatorTelegramId);
+    }
+
+    /** @return list<array<int, array<string, mixed>>> */
+    private function albumPhotos(array $reply, string $mediaGroupId): array
+    {
+        $groups = [];
+        $seen = [];
+
+        $add = static function (mixed $photos) use (&$groups, &$seen): void {
+            if (! is_array($photos) || $photos === []) {
+                return;
+            }
+
+            $largest = end($photos);
+            $key = (string) data_get($largest, 'file_unique_id', data_get($largest, 'file_id', ''));
+            if ($key === '' || isset($seen[$key])) {
+                return;
+            }
+
+            $seen[$key] = true;
+            $groups[] = $photos;
+        };
+
+        $add($reply['photo'] ?? null);
+
+        foreach (['telegram_webhook_updates', 'telegram_question_messages'] as $table) {
+            DB::table($table)
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$mediaGroupId])
+                ->get(['payload'])
+                ->each(function (object $row) use ($add): void {
+                    $add(data_get(json_decode((string) $row->payload, true), 'message.photo'));
+                });
+        }
+
+        return $groups;
     }
 
     private function markProcessed(int $updateId): void
