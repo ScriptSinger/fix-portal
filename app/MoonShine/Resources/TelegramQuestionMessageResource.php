@@ -55,7 +55,7 @@ class TelegramQuestionMessageResource extends BaseResource
     {
         return [
             ID::make()->sortable(),
-            Text::make('Текст', 'text')->prettyLimit(limit: 80)->sortable(),
+            Text::make('Текст', 'text')->prettyLimit(limit: 120)->sortable(),
             Enum::make('Статус', 'status')->options([
                 'pending_moderation' => 'Ожидает модерации',
                 'published' => 'Опубликован',
