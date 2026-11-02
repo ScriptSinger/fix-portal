@@ -21,6 +21,7 @@ use App\MoonShine\Resources\SentEmailResource;
 use App\MoonShine\Resources\LatestDiscussionsWidgetResource;
 use App\MoonShine\Resources\RepairWidgetResource;
 use App\MoonShine\Resources\TelegramWidgetResource;
+use App\MoonShine\Resources\TelegramQuestionMessageResource;
 use App\MoonShine\Resources\YandexWidgetResource;
 use App\MoonShine\Resources\TagResource;
 use App\MoonShine\Resources\UserResource;
@@ -56,6 +57,7 @@ class MoonShineServiceProvider extends ServiceProvider
                 TagResource::class,
                 CtaResource::class,
                 QuestionResource::class,
+                TelegramQuestionMessageResource::class,
                 QuestionAnnouncementResource::class,
                 SentEmailResource::class,
                 CommentResource::class,
