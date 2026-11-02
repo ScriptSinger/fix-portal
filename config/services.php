@@ -62,6 +62,7 @@ return [
         'mute_minutes' => (int) env('TELEGRAM_MUTE_MINUTES', 1440),
         'source_chat_id' => env('TELEGRAM_SOURCE_CHAT_ID'),
         'source_thread_id' => env('TELEGRAM_SOURCE_THREAD_ID'),
+        'silent_source_commands' => filter_var(env('TELEGRAM_SILENT_SOURCE_COMMANDS', true), FILTER_VALIDATE_BOOL),
         'moderation_chat_id' => env('TELEGRAM_MODERATION_CHAT_ID'),
         'moderation_thread_id' => env('TELEGRAM_MODERATION_THREAD_ID'),
         'author_user_id' => (int) env('TELEGRAM_AUTHOR_USER_ID', 0),

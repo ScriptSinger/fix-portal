@@ -53,6 +53,20 @@ class TelegramUpdateHandler
             ? $this->moderatorResponse($updateId, $parsed[0], $parsed[1], $telegramUserId, $message)
             : 'Нет доступа к командам модератора.';
 
+        if ($this->shouldSilenceSourceCommand($parsed[0], $chatId, $response)) {
+            try {
+                $this->telegram->call('deleteMessage', [
+                    'chat_id' => $chatId,
+                    'message_id' => (int) ($message['message_id'] ?? 0),
+                ]);
+                $this->markProcessed($updateId);
+
+                return;
+            } catch (\Throwable) {
+                // If the bot is not an administrator, keep the response visible.
+            }
+        }
+
         $this->telegram->call('sendMessage', [
             'chat_id' => $chatId,
             'text' => $response,
@@ -60,6 +74,20 @@ class TelegramUpdateHandler
         ]);
 
         $this->markProcessed($updateId);
+    }
+
+    private function shouldSilenceSourceCommand(string $command, int|string $chatId, string $response): bool
+    {
+        if (! config('services.telegram.silent_source_commands') || (string) $chatId !== (string) config('services.telegram.source_chat_id')) {
+            return false;
+        }
+
+        return match ($command) {
+            '/question' => $response === 'Сообщение передано на модерацию.',
+            '/attach' => str_starts_with($response, 'Сообщение добавлено к вопросу.')
+                || str_starts_with($response, 'Сообщение и вложения добавлены к опубликованному вопросу.'),
+            default => false,
+        };
     }
 
     /** @return array{0: string, 1: list<string>}|null */
