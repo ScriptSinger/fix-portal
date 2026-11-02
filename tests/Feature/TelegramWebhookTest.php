@@ -204,6 +204,26 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
+    public function test_reply_in_source_chat_is_not_queued_as_a_new_question(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 10081,
+                'message' => [
+                    'message_id' => 13,
+                    'text' => 'Это обычный ответ на вопрос.',
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'reply_to_message' => ['message_id' => 12],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseMissing('telegram_question_messages', ['telegram_message_id' => 13]);
+    }
+
     public function test_moderator_can_preview_and_approve_a_queued_question(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::sequence()

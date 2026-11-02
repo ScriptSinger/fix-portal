@@ -43,7 +43,7 @@ class TelegramUpdateHandler
 
         $telegramUserId = (int) ($message['from']['id'] ?? 0);
         $response = $this->isModerator($telegramUserId)
-            ? $this->moderatorResponse($parsed[0], $parsed[1], $telegramUserId)
+            ? $this->moderatorResponse($updateId, $parsed[0], $parsed[1], $telegramUserId, $message)
             : 'Нет доступа к командам модератора.';
 
         $this->telegram->call('sendMessage', [
@@ -62,7 +62,7 @@ class TelegramUpdateHandler
         $firstWord = (string) array_shift($parts);
         $command = Str::lower(Str::before($firstWord, '@'));
 
-        return in_array($command, ['/start', '/help', '/status', '/mute', '/unmute', '/block', '/unblock'], true)
+        return in_array($command, ['/start', '/help', '/status', '/question', '/mute', '/unmute', '/block', '/unblock'], true)
             ? [$command, array_values($parts)]
             : null;
     }
@@ -73,14 +73,33 @@ class TelegramUpdateHandler
     }
 
     /** @param list<string> $arguments */
-    private function moderatorResponse(string $command, array $arguments, int $moderatorTelegramId): string
+    private function moderatorResponse(int $updateId, string $command, array $arguments, int $moderatorTelegramId, array $message): string
     {
         return match ($command) {
             '/start' => 'Telegram-модератор подключён. Используйте /help для списка команд.',
-            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
+            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook\n/question — пометить ответное сообщение как вопрос\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
+            '/question' => $this->markReplyAsQuestion($updateId, $message),
             '/mute', '/unmute', '/block', '/unblock' => $this->moderation->execute($command, $arguments, $moderatorTelegramId),
         };
+    }
+
+    /** @param array<string, mixed> $message */
+    private function markReplyAsQuestion(int $updateId, array $message): string
+    {
+        $reply = $message['reply_to_message'] ?? null;
+        if (! is_array($reply)) {
+            return 'Ответьте командой /question на сообщение, которое нужно передать на модерацию.';
+        }
+
+        $payload = ['message' => $reply];
+        if (! $this->questionIntake->store($updateId, $payload, true)) {
+            return 'Это сообщение уже передано на модерацию или не содержит текста.';
+        }
+
+        $this->questionModeration->preview($updateId, $payload);
+
+        return 'Сообщение передано на модерацию.';
     }
 
     private function markProcessed(int $updateId): void

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class TelegramQuestionIntake
 {
     /** @param array<string, mixed> $payload */
-    public function store(int $updateId, array $payload): bool
+    public function store(int $updateId, array $payload, bool $allowReply = false): bool
     {
         $message = $payload['message'] ?? null;
         if (! is_array($message)) {
@@ -18,6 +18,16 @@ class TelegramQuestionIntake
         $messageId = $message['message_id'] ?? null;
         $sourceChatId = config('services.telegram.source_chat_id');
         if ($chatId === null || $messageId === null || $sourceChatId === null || (string) $chatId !== (string) $sourceChatId) {
+            return false;
+        }
+
+        // Ответы и комментарии не создают новые вопросы. Для них будет отдельный сценарий.
+        if (! $allowReply && isset($message['reply_to_message'])) {
+            return false;
+        }
+
+        $sourceThreadId = (int) config('services.telegram.source_thread_id');
+        if ($sourceThreadId > 1 && (int) ($message['message_thread_id'] ?? 0) !== $sourceThreadId) {
             return false;
         }
 
