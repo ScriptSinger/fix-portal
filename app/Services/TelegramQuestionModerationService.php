@@ -160,9 +160,17 @@ class TelegramQuestionModerationService
             return 'Фото можно добавлять только к опубликованному вопросу.';
         }
 
+        $messageId = (int) data_get($payload, 'message.message_id');
+        $text = trim((string) data_get($payload, 'message.text', data_get($payload, 'message.caption', '')));
+        $storedPayload = json_decode((string) $record->payload, true) ?: [];
+        $attachedMessageIds = array_map('intval', (array) ($storedPayload['attached_message_ids'] ?? []));
+        if ($messageId > 0 && in_array($messageId, $attachedMessageIds, true)) {
+            return 'Это сообщение уже прикреплено к вопросу.';
+        }
+
         $images = $this->importPhotosPayload((int) $record->id, $payload);
-        if ($images === []) {
-            return 'В ответном сообщении нет фото.';
+        if ($images === [] && $text === '') {
+            return 'В ответном сообщении нет текста или фото.';
         }
 
         $question = Question::query()->find($record->question_id);
@@ -170,14 +178,30 @@ class TelegramQuestionModerationService
             return 'Опубликованный вопрос не найден.';
         }
 
+        if ($text !== '') {
+            $question->description .= "\n\n".e($text);
+        }
         foreach ($images as $image) {
             $question->description .= '<img src="'.e($image['url']).'" class="img-fluid" data-id="'.$image['id'].'">';
         }
         $question->save();
+        if ($messageId > 0) {
+            $attachedMessageIds[] = $messageId;
+            $storedPayload['attached_message_ids'] = array_values(array_unique($attachedMessageIds));
+            DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                'payload' => json_encode($storedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+                'updated_at' => now(),
+            ]);
+        }
         $this->announcer->refresh($question);
-        $this->audit($moderatorId, $question->id, 'attach', ['queue_id' => $queueId, 'images' => count($images)]);
+        $this->audit($moderatorId, $question->id, 'attach', [
+            'queue_id' => $queueId,
+            'message_id' => $messageId,
+            'images' => count($images),
+            'has_text' => $text !== '',
+        ]);
 
-        return 'Фото добавлены к опубликованному вопросу.';
+        return 'Сообщение и вложения добавлены к опубликованному вопросу.';
     }
 
     private function previewText(int $recordId, string $text, array $message, bool $private): string

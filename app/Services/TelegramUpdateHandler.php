@@ -78,7 +78,7 @@ class TelegramUpdateHandler
     {
         return match ($command) {
             '/start' => 'Telegram-модератор подключён. Используйте /help для списка команд.',
-            '/help' => "/start — состояние подключения\n/help — список команд\n/question — пометить ответное сообщение как вопрос\n/attach <queue_id> — добавить фото к опубликованному вопросу\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
+            '/help' => "/start — состояние подключения\n/help — список команд\n/question — пометить ответное сообщение как вопрос\n/attach <queue_id> — добавить сообщение и фото к опубликованному вопросу\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
             '/question' => $this->markReplyAsQuestion($updateId, $message),
             '/attach' => $this->attachReply($arguments, $message, $moderatorTelegramId),
@@ -129,10 +129,30 @@ class TelegramUpdateHandler
         $queueId = (int) ($arguments[0] ?? 0);
         $reply = $message['reply_to_message'] ?? null;
         if ($queueId < 1 || ! is_array($reply)) {
-            return 'Ответьте /attach <queue_id> на сообщение с фото.';
+            return 'Ответьте /attach <queue_id> на сообщение с текстом или фото.';
         }
 
-        return $this->questionModeration->attach($queueId, ['message' => $reply], $moderatorTelegramId);
+        $payload = ['message' => $reply];
+        $mediaGroupId = (string) ($reply['media_group_id'] ?? '');
+        if ($mediaGroupId !== '') {
+            $albumPhotos = [];
+            $updates = DB::table('telegram_webhook_updates')
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$mediaGroupId])
+                ->get(['payload']);
+
+            foreach ($updates as $update) {
+                $item = json_decode((string) $update->payload, true);
+                $photos = data_get($item, 'message.photo');
+                if (is_array($photos) && $photos !== []) {
+                    $albumPhotos[] = $photos;
+                }
+            }
+            if ($albumPhotos !== []) {
+                $payload['message']['album_photos'] = $albumPhotos;
+            }
+        }
+
+        return $this->questionModeration->attach($queueId, $payload, $moderatorTelegramId);
     }
 
     private function markProcessed(int $updateId): void
