@@ -32,7 +32,7 @@ trait CreatesDiscussions
         return Question::create($overrides + [
             'title' => 'Тестовый вопрос про насос '.Str::random(8),
             'description' => 'Машина не сливает воду, подскажите что проверить. '.Str::random(20),
-            'appliance_id' => Appliance::factory()->create()->id,
+            'appliance_id' => $overrides['appliance_id'] ?? Appliance::factory()->create()->id,
             'user_id' => $author->id,
         ]);
     }

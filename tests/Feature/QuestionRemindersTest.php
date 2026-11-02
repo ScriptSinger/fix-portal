@@ -53,17 +53,26 @@ class QuestionRemindersTest extends TestCase
     {
         $author = User::factory()->create();
         $bare = $this->makeQuestion($author);
-        $ownComment = $this->makeQuestion($author);
+        $sameAppliance = ['appliance_id' => $bare->appliance_id];
+        $ownComment = $this->makeQuestion($author, $sameAppliance);
         $this->commentOn($ownComment, $author, 'Дополнение от автора');
-        $answered = $this->makeQuestion($author);
+        $answered = $this->makeQuestion($author, $sameAppliance);
         $this->commentOn($answered, User::factory()->create(), 'Совет от мастера');
-        $solved = $this->makeQuestion($author, ['solved_at' => now()]);
+        $replyOnly = $this->makeQuestion($author, $sameAppliance);
+        $commentByAuthor = $this->commentOn($replyOnly, $author, 'Уточнение автора');
+        \App\Models\Reply::factory()->create([
+            'comment_id' => $commentByAuthor->id,
+            'user_id' => User::factory()->create()->id,
+            'text' => 'Ответ мастера вложенным сообщением',
+        ]);
+        $solved = $this->makeQuestion($author, $sameAppliance + ['solved_at' => now()]);
 
         $ids = Question::unanswered()->pluck('id')->all();
 
         $this->assertContains($bare->id, $ids);
         $this->assertContains($ownComment->id, $ids, 'комментарий самого автора ответом не считается');
         $this->assertNotContains($answered->id, $ids);
+        $this->assertNotContains($replyOnly->id, $ids, 'ответ в reply считается ответом на вопрос');
         $this->assertNotContains($solved->id, $ids);
     }
 

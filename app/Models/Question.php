@@ -46,7 +46,12 @@ class Question extends Model
     {
         return $query->whereNull('solved_at')->whereDoesntHave(
             'comments',
-            fn ($comments) => $comments->whereColumn('comments.user_id', '!=', 'questions.user_id')
+            fn ($comments) => $comments
+                ->whereColumn('comments.user_id', '!=', 'questions.user_id')
+                ->orWhereHas(
+                    'replies',
+                    fn ($replies) => $replies->whereColumn('replies.user_id', '!=', 'questions.user_id')
+                )
         );
     }
 
