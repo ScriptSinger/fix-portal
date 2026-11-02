@@ -78,9 +78,10 @@ class TelegramUpdateHandler
     {
         return match ($command) {
             '/start' => 'Telegram-модератор подключён. Используйте /help для списка команд.',
-            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook\n/question — пометить ответное сообщение как вопрос\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
+            '/help' => "/start — состояние подключения\n/help — список команд\n/question — пометить ответное сообщение как вопрос\n/attach <queue_id> — добавить фото к опубликованному вопросу\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
             '/question' => $this->markReplyAsQuestion($updateId, $message),
+            '/attach' => $this->attachReply($arguments, $message, $moderatorTelegramId),
             '/mute', '/unmute', '/block', '/unblock' => $this->moderation->execute($command, $arguments, $moderatorTelegramId),
         };
     }
@@ -120,6 +121,18 @@ class TelegramUpdateHandler
         $this->questionModeration->preview($updateId, $payload);
 
         return 'Сообщение передано на модерацию.';
+    }
+
+    /** @param list<string> $arguments  @param array<string, mixed> $message */
+    private function attachReply(array $arguments, array $message, int $moderatorTelegramId): string
+    {
+        $queueId = (int) ($arguments[0] ?? 0);
+        $reply = $message['reply_to_message'] ?? null;
+        if ($queueId < 1 || ! is_array($reply)) {
+            return 'Ответьте /attach <queue_id> на сообщение с фото.';
+        }
+
+        return $this->questionModeration->attach($queueId, ['message' => $reply], $moderatorTelegramId);
     }
 
     private function markProcessed(int $updateId): void

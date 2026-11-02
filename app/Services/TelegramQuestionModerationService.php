@@ -5,13 +5,17 @@ namespace App\Services;
 use App\Models\Appliance;
 use App\Models\Image;
 use App\Models\Question;
+use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class TelegramQuestionModerationService
 {
-    public function __construct(private readonly TelegramBotApi $telegram)
+    public function __construct(
+        private readonly TelegramBotApi $telegram,
+        private readonly QuestionAnnouncer $announcer,
+    )
     {
     }
 
@@ -145,6 +149,37 @@ class TelegramQuestionModerationService
         return 'Preview отправлен повторно.';
     }
 
+    /** @param array<string, mixed> $payload */
+    public function attach(int $queueId, array $payload, ?int $moderatorId): string
+    {
+        $record = DB::table('telegram_question_messages')->where('id', $queueId)->first();
+        if (! $record) {
+            return 'Запись очереди не найдена.';
+        }
+        if ($record->status !== 'published' || ! $record->question_id) {
+            return 'Фото можно добавлять только к опубликованному вопросу.';
+        }
+
+        $images = $this->importPhotosPayload((int) $record->id, $payload);
+        if ($images === []) {
+            return 'В ответном сообщении нет фото.';
+        }
+
+        $question = Question::query()->find($record->question_id);
+        if (! $question) {
+            return 'Опубликованный вопрос не найден.';
+        }
+
+        foreach ($images as $image) {
+            $question->description .= '<img src="'.e($image['url']).'" class="img-fluid" data-id="'.$image['id'].'">';
+        }
+        $question->save();
+        $this->announcer->refresh($question);
+        $this->audit($moderatorId, $question->id, 'attach', ['queue_id' => $queueId, 'images' => count($images)]);
+
+        return 'Фото добавлены к опубликованному вопросу.';
+    }
+
     private function previewText(int $recordId, string $text, array $message, bool $private): string
     {
         if (! $private) {
@@ -160,6 +195,12 @@ class TelegramQuestionModerationService
     private function importPhotos(object $record): array
     {
         $payload = json_decode((string) $record->payload, true) ?: [];
+        return $this->importPhotosPayload((int) $record->id, $payload);
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function importPhotosPayload(int $recordId, array $payload): array
+    {
         $albums = data_get($payload, 'message.album_photos', []);
         if (! is_array($albums) || $albums === []) {
             $albums = [data_get($payload, 'message.photo', [])];
@@ -195,7 +236,7 @@ class TelegramQuestionModerationService
             }
 
             $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) ?: 'jpg';
-            $path = 'images/telegram/'.(int) $record->id.'/'.hash('sha256', $contents).'.'.$extension;
+            $path = 'images/telegram/'.$recordId.'/'.hash('sha256', $contents).'.'.$extension;
             $disk->put($path, $contents);
             $url = Storage::url($path);
 
