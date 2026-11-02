@@ -106,6 +106,46 @@ final class TelegramWebhookTest extends TestCase
         );
     }
 
+    public function test_authorized_moderator_can_use_attach_command(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 14]])]);
+        config(['services.telegram.moderator_ids' => [777]]);
+
+        $queueId = DB::table('telegram_question_messages')->insertGetId([
+            'telegram_chat_id' => -100123,
+            'telegram_message_id' => 20,
+            'telegram_update_id' => 2000,
+            'telegram_user_id' => 778,
+            'text' => 'Вопрос с фото',
+            'payload' => json_encode(['message' => ['message_id' => 20, 'text' => 'Вопрос с фото']]),
+            'status' => 'pending_moderation',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2001,
+                'message' => [
+                    'message_id' => 21,
+                    'text' => '/attach '.$queueId,
+                    'from' => ['id' => 777],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'reply_to_message' => [
+                        'message_id' => 19,
+                        'text' => 'Дополнительная информация',
+                    ],
+                ],
+            ])
+            ->assertOk();
+
+        Http::assertSent(fn ($request): bool => $request['chat_id'] === -100123
+            && str_contains($request['text'], 'Сообщение добавлено к вопросу'));
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'id' => $queueId,
+        ]);
+    }
+
     public function test_unauthorized_user_cannot_use_moderator_commands(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 11]])]);

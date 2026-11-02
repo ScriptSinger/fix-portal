@@ -69,7 +69,7 @@ class TelegramUpdateHandler
         $firstWord = (string) array_shift($parts);
         $command = Str::lower(Str::before($firstWord, '@'));
 
-        return in_array($command, ['/start', '/help', '/status', '/question', '/mute', '/unmute', '/block', '/unblock'], true)
+        return in_array($command, ['/start', '/help', '/status', '/question', '/attach', '/mute', '/unmute', '/block', '/unblock'], true)
             ? [$command, array_values($parts)]
             : null;
     }
