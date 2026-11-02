@@ -7,7 +7,10 @@ use Illuminate\Support\Str;
 
 class TelegramUpdateHandler
 {
-    public function __construct(private readonly TelegramBotApi $telegram)
+    public function __construct(
+        private readonly TelegramBotApi $telegram,
+        private readonly TelegramModerationService $moderation,
+    )
     {
     }
 
@@ -27,15 +30,15 @@ class TelegramUpdateHandler
             return;
         }
 
-        $command = $this->command($text);
-        if ($command === null) {
+        $parsed = $this->command($text);
+        if ($parsed === null) {
             $this->markProcessed($updateId);
             return;
         }
 
         $telegramUserId = (int) ($message['from']['id'] ?? 0);
         $response = $this->isModerator($telegramUserId)
-            ? $this->moderatorResponse($command)
+            ? $this->moderatorResponse($parsed[0], $parsed[1], $telegramUserId)
             : 'Нет доступа к командам модератора.';
 
         $this->telegram->call('sendMessage', [
@@ -47,12 +50,16 @@ class TelegramUpdateHandler
         $this->markProcessed($updateId);
     }
 
-    private function command(string $text): ?string
+    /** @return array{0: string, 1: list<string>}|null */
+    private function command(string $text): ?array
     {
-        $firstWord = Str::before($text, ' ');
+        $parts = preg_split('/\s+/u', trim($text)) ?: [];
+        $firstWord = (string) array_shift($parts);
         $command = Str::lower(Str::before($firstWord, '@'));
 
-        return in_array($command, ['/start', '/help', '/status'], true) ? $command : null;
+        return in_array($command, ['/start', '/help', '/status', '/mute', '/unmute', '/block', '/unblock'], true)
+            ? [$command, array_values($parts)]
+            : null;
     }
 
     private function isModerator(int $telegramUserId): bool
@@ -60,12 +67,14 @@ class TelegramUpdateHandler
         return $telegramUserId > 0 && in_array($telegramUserId, config('services.telegram.moderator_ids', []), true);
     }
 
-    private function moderatorResponse(string $command): string
+    /** @param list<string> $arguments */
+    private function moderatorResponse(string $command, array $arguments, int $moderatorTelegramId): string
     {
         return match ($command) {
             '/start' => 'Telegram-модератор подключён. Используйте /help для списка команд.',
-            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook",
+            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
+            '/mute', '/unmute', '/block', '/unblock' => $this->moderation->execute($command, $arguments, $moderatorTelegramId),
         };
     }
 

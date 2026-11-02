@@ -59,6 +59,7 @@ return [
             static fn (string $id): int => (int) trim($id),
             explode(',', (string) env('TELEGRAM_MODERATOR_IDS', ''))
         ), static fn (int $id): bool => $id > 0)),
+        'mute_minutes' => (int) env('TELEGRAM_MUTE_MINUTES', 1440),
     ],
 
     // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.

@@ -57,6 +57,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'last_seen_at' => 'datetime',
+        'blocked_at' => 'datetime',
+        'muted_until' => 'datetime',
         'email_notifications' => 'boolean',
     ];
 

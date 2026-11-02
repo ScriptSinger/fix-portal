@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
@@ -120,5 +122,58 @@ final class TelegramWebhookTest extends TestCase
 
         Http::assertSent(fn ($request): bool => $request['chat_id'] === 123
             && $request['text'] === 'Нет доступа к командам модератора.');
+    }
+
+    public function test_moderator_can_block_a_site_user_and_action_is_audited(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 12]])]);
+        config(['services.telegram.moderator_ids' => [777]]);
+        $user = User::factory()->create();
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1006,
+                'message' => [
+                    'message_id' => 10,
+                    'text' => '/block '.$user->id,
+                    'from' => ['id' => 777],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertNotNull($user->fresh()->blocked_at);
+        $this->assertDatabaseHas('telegram_moderation_actions', [
+            'moderator_telegram_id' => 777,
+            'user_id' => $user->id,
+            'action' => 'block',
+        ]);
+        Http::assertSent(fn ($request): bool => str_contains($request['text'], 'заблокирован'));
+    }
+
+    public function test_mute_blocks_content_creation_until_expiry(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 13]])]);
+        config(['services.telegram.moderator_ids' => [777], 'services.telegram.mute_minutes' => 60]);
+        $user = User::factory()->create();
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1007,
+                'message' => [
+                    'message_id' => 11,
+                    'text' => '/mute '.$user->id,
+                    'from' => ['id' => 777],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertTrue($user->fresh()->muted_until->isFuture());
+        $this->assertDatabaseHas('telegram_moderation_actions', [
+            'moderator_telegram_id' => 777,
+            'user_id' => $user->id,
+            'action' => 'mute',
+        ]);
     }
 }

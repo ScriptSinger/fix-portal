@@ -10,6 +10,7 @@ use App\Http\Middleware\PreventRequestsDuringMaintenance;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\RequestIdMiddleware;
 use App\Http\Middleware\TrackUserActivity;
+use App\Http\Middleware\UserModerationMiddleware;
 use App\Http\Middleware\TrimStrings;
 use App\Http\Middleware\TrustProxies;
 use App\Http\Middleware\ValidateSignature;
@@ -66,6 +67,7 @@ class Kernel extends HttpKernel
             VerifyCsrfToken::class,
             SubstituteBindings::class,
             BlockedMiddleware::class,
+            UserModerationMiddleware::class,
             TrackUserActivity::class,
         ],
 
