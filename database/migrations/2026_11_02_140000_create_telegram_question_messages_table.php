@@ -18,6 +18,8 @@ return new class extends Migration
             $table->json('payload');
             $table->string('status', 32)->default('pending_moderation')->index();
             $table->unsignedInteger('question_id')->nullable();
+            $table->bigInteger('moderation_chat_id')->nullable();
+            $table->unsignedBigInteger('moderation_message_id')->nullable();
             $table->text('error_message')->nullable();
             $table->timestamps();
             $table->unique(['telegram_chat_id', 'telegram_message_id'], 'telegram_question_messages_chat_message_unique');

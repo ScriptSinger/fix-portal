@@ -63,6 +63,7 @@ return [
         'source_chat_id' => env('TELEGRAM_SOURCE_CHAT_ID'),
         'moderation_chat_id' => env('TELEGRAM_MODERATION_CHAT_ID'),
         'moderation_thread_id' => env('TELEGRAM_MODERATION_THREAD_ID'),
+        'author_user_id' => (int) env('TELEGRAM_AUTHOR_USER_ID', 0),
     ],
 
     // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.

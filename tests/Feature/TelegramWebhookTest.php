@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Appliance;
+use App\Models\Question;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -200,5 +202,58 @@ final class TelegramWebhookTest extends TestCase
             'status' => 'pending_moderation',
             'text' => "Холодильник не морозит\nМодель RB33",
         ]);
+    }
+
+    public function test_moderator_can_preview_and_approve_a_queued_question(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::sequence()
+            ->push(['ok' => true, 'result' => ['message_id' => 900]])
+            ->push(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config([
+            'services.telegram.source_chat_id' => '-100123',
+            'services.telegram.moderation_chat_id' => '-100123',
+            'services.telegram.moderator_ids' => [777],
+        ]);
+        $author = User::factory()->create();
+        $appliance = Appliance::create(['title' => 'Холодильники']);
+        config(['services.telegram.author_user_id' => $author->id]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1009,
+                'message' => [
+                    'message_id' => 50,
+                    'text' => "Холодильник Samsung не морозит\nНужна помощь мастера.",
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup', 'title' => 'Ufamasters'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'telegram_message_id' => 50,
+            'status' => 'pending_moderation',
+            'moderation_message_id' => 900,
+        ]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1010,
+                'message' => [
+                    'message_id' => 51,
+                    'text' => '/approve 50 '.$appliance->id,
+                    'from' => ['id' => 777],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup', 'title' => 'Ufamasters'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'telegram_message_id' => 50,
+            'status' => 'published',
+        ]);
+        $this->assertDatabaseCount('questions', 1);
+        $this->assertDatabaseHas('questions', ['user_id' => $author->id, 'appliance_id' => $appliance->id]);
+        $this->assertDatabaseHas('telegram_moderation_actions', ['action' => 'approve']);
     }
 }
