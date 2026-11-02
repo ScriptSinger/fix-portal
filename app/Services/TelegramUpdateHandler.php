@@ -62,7 +62,7 @@ class TelegramUpdateHandler
         $firstWord = (string) array_shift($parts);
         $command = Str::lower(Str::before($firstWord, '@'));
 
-        return in_array($command, ['/start', '/help', '/status', '/mute', '/unmute', '/block', '/unblock', '/approve', '/reject', '/retry'], true)
+        return in_array($command, ['/start', '/help', '/status', '/mute', '/unmute', '/block', '/unblock'], true)
             ? [$command, array_values($parts)]
             : null;
     }
@@ -77,12 +77,9 @@ class TelegramUpdateHandler
     {
         return match ($command) {
             '/start' => 'Telegram-модератор подключён. Используйте /help для списка команд.',
-            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook\n/approve <message_id> <appliance_id>\n/reject <message_id> <причина>\n/retry <message_id>\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
+            '/help' => "/start — состояние подключения\n/help — список команд\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
             '/mute', '/unmute', '/block', '/unblock' => $this->moderation->execute($command, $arguments, $moderatorTelegramId),
-            '/approve' => $this->questionModeration->approve((int) ($arguments[0] ?? 0), (int) ($arguments[1] ?? 0), $moderatorTelegramId),
-            '/reject' => $this->questionModeration->reject((int) ($arguments[0] ?? 0), implode(' ', array_slice($arguments, 1)), $moderatorTelegramId),
-            '/retry' => $this->questionModeration->retry((int) ($arguments[0] ?? 0), $moderatorTelegramId),
         };
     }
 

@@ -92,6 +92,15 @@ class TelegramQuestionModerationService
             ]);
             $this->audit($moderatorId, $question->id, 'approve', ['message_id' => $messageId]);
 
+            try {
+                $this->telegram->call('sendMessage', $this->publishedMessagePayload($record, $question));
+            } catch (\Throwable $e) {
+                DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                    'error_message' => 'Вопрос опубликован, но ссылка не отправлена в Telegram: '.Str::limit($e->getMessage(), 900),
+                    'updated_at' => now(),
+                ]);
+            }
+
             return "Вопрос опубликован: ".route('questions.show', ['question' => $question->slug]);
         });
     }
@@ -133,7 +142,22 @@ class TelegramQuestionModerationService
     {
         $author = (string) data_get($message, 'from.username', data_get($message, 'from.first_name', 'unknown'));
 
-        return "Новый вопрос #{$recordId}\nАвтор Telegram: {$author}\n\n{$text}\n\n/approve {$message['message_id']} <appliance_id>\n/reject {$message['message_id']} причина";
+        return "Новый вопрос #{$recordId}\nАвтор Telegram: {$author}\n\n{$text}\n\nМодерация выполняется в MoonShine → Вопросы → Telegram-модерация.";
+    }
+
+    /** @return array<string, int|string> */
+    private function publishedMessagePayload(object $record, Question $question): array
+    {
+        $payload = json_decode((string) $record->payload, true) ?: [];
+        $threadId = (int) data_get($payload, 'message.message_thread_id');
+
+        return array_filter([
+            'chat_id' => (int) $record->telegram_chat_id,
+            'text' => "Вопрос опубликован на Ufamasters:\n".route('questions.show', ['question' => $question->slug]),
+            'reply_to_message_id' => (int) $record->telegram_message_id,
+            'message_thread_id' => $threadId > 1 ? $threadId : null,
+            'disable_web_page_preview' => false,
+        ], static fn (mixed $value): bool => $value !== null);
     }
 
     /** @return array<string, int> */
@@ -147,8 +171,10 @@ class TelegramQuestionModerationService
     /** @param array<string, mixed> $parameters */
     private function audit(?int $moderatorId, ?int $questionId, string $action, array $parameters): void
     {
+        $parameters['source'] = $moderatorId === null ? 'moonshine' : 'telegram';
+
         DB::table('telegram_moderation_actions')->insert([
-            'moderator_telegram_id' => $moderatorId,
+            'moderator_telegram_id' => $moderatorId ?? 0,
             'user_id' => null,
             'action' => $action,
             'parameters' => json_encode($parameters, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
