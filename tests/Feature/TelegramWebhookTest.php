@@ -418,4 +418,44 @@ final class TelegramWebhookTest extends TestCase
             && data_get($request->data(), 'reply_to_message_id') === 50
             && str_contains((string) data_get($request->data(), 'text'), 'Вопрос опубликован на Ufamasters'));
     }
+
+    public function test_repeated_approve_does_not_create_a_second_question(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 903]])]);
+        $author = User::factory()->create();
+        $appliance = Appliance::create(['title' => 'Стиральные машины']);
+        config(['services.telegram.author_user_id' => $author->id]);
+
+        DB::table('telegram_question_messages')->insert([
+            'telegram_chat_id' => -100123,
+            'telegram_message_id' => 61,
+            'telegram_update_id' => 1061,
+            'telegram_user_id' => 778,
+            'text' => 'Стиральная машина не запускается',
+            'payload' => json_encode([
+                'message' => [
+                    'message_id' => 61,
+                    'text' => 'Стиральная машина не запускается',
+                ],
+            ]),
+            'status' => 'pending_moderation',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $service = app(\App\Services\TelegramQuestionModerationService::class);
+        $first = $service->approve(61, $appliance->id, null);
+        $second = $service->approve(61, $appliance->id, null);
+        $questionId = (int) DB::table('telegram_question_messages')
+            ->where('telegram_message_id', 61)
+            ->value('question_id');
+
+        $this->assertStringContainsString('Вопрос опубликован', $first);
+        $this->assertSame("Вопрос уже опубликован: #{$questionId}.", $second);
+        $this->assertDatabaseCount('questions', 1);
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'telegram_message_id' => 61,
+            'status' => 'published',
+        ]);
+    }
 }
