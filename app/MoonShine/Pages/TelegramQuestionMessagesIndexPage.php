@@ -7,6 +7,7 @@ namespace App\MoonShine\Pages;
 use App\Models\TelegramQuestionMessage;
 use App\Services\TelegramQuestionModerationService;
 use Illuminate\Http\Request;
+use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Support\Attributes\AsyncMethod;
 use MoonShine\Support\Enums\ToastType;
@@ -17,36 +18,43 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
 {
     protected function buttons(): ListOf
     {
-        return parent::buttons()
-            // MoonShine leaves an empty slot when its default detail button is
-            // hidden by the ability check. Keep an explicit eye action visible.
-            ->except(fn (object $button): bool => method_exists($button, 'getName') && $button->getName() === 'resource-detail-button')
-            ->prepend(ActionButton::make(
+        return new ListOf(ActionButtonContract::class, [
+            ActionButton::make(
                 '',
                 url: fn (mixed $item): string => $this->getResource()->getDetailPageUrl((int) $item->getKey()),
             )
                 ->icon('eye')
                 ->square()
-                ->showInLine())
-            ->add(ActionButton::make('Опубликовать')
+                ->showInLine(),
+            $this->getResource()->getEditButton(isAsync: $this->isAsync()),
+            ActionButton::make('Опубликовать')
                 ->icon('check')
+                ->customAttributes(['title' => 'Опубликовать', 'aria-label' => 'Опубликовать'])
+                ->showInDropdown()
                 ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation' && $item->appliance_id !== null)
                 ->method('approve', events: [$this->getListEventName()])
-                ->withConfirm('Опубликовать вопрос?', 'Вопрос будет создан на сайте.', 'Опубликовать'))
-            ->add(ActionButton::make('Отклонить')
+                ->withConfirm('Опубликовать вопрос?', 'Вопрос будет создан на сайте.', 'Опубликовать'),
+            ActionButton::make('Отклонить')
                 ->icon('x-mark')
+                ->customAttributes(['title' => 'Отклонить', 'aria-label' => 'Отклонить'])
+                ->showInDropdown()
                 ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation')
                 ->method('reject', events: [$this->getListEventName()])
-                ->withConfirm('Отклонить вопрос?', 'Причина берётся из поля «Причина отказа».', 'Отклонить'))
-            ->add(ActionButton::make('Повторить')
+                ->withConfirm('Отклонить вопрос?', 'Причина берётся из поля «Причина отказа».', 'Отклонить'),
+            ActionButton::make('Повторить')
                 ->icon('arrow-path')
+                ->customAttributes(['title' => 'Повторить preview', 'aria-label' => 'Повторить preview'])
+                ->showInDropdown()
                 ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation')
-                ->method('retry', events: [$this->getListEventName()]))
-            ->add(ActionButton::make('Убрать')
+                ->method('retry', events: [$this->getListEventName()]),
+            ActionButton::make('Убрать')
                 ->icon('trash')
+                ->customAttributes(['title' => 'Убрать из модерации', 'aria-label' => 'Убрать из модерации'])
+                ->showInDropdown()
                 ->canSee(fn (TelegramQuestionMessage $item): bool => true)
                 ->method('remove', events: [$this->getListEventName()])
-                ->withConfirm('Убрать запись из модерации?', 'Question на сайте и публикация в Telegram не удаляются.', 'Убрать'));
+                ->withConfirm('Убрать запись из модерации?', 'Question на сайте и публикация в Telegram не удаляются.', 'Убрать'),
+        ]);
     }
 
     #[AsyncMethod]

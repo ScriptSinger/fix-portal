@@ -8,6 +8,8 @@ use App\Models\TelegramQuestionMessage;
 use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Pages\TelegramQuestionMessagesIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
+use MoonShine\Contracts\UI\ActionButtonContract;
+use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\Support\Attributes\Icon;
@@ -21,6 +23,7 @@ use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Preview;
 use MoonShine\UI\Fields\Text;
 use MoonShine\UI\Fields\Textarea;
+use MoonShine\UI\Components\ActionButton;
 
 #[Icon('inbox-arrow-down')]
 #[Group('Вопросы', 'question-mark-circle')]
@@ -44,6 +47,18 @@ class TelegramQuestionMessageResource extends BaseResource
     protected function activeActions(): ListOf
     {
         return parent::activeActions()->only(Action::VIEW, Action::UPDATE);
+    }
+
+    /**
+     * The index page provides its own compact eye action. Disable MoonShine's
+     * default detail action to prevent a clipped "Показать" slot in the row.
+     */
+    public function getDetailButton(
+        ?CrudResource $resource = null,
+        ?string $modalName = null,
+        bool $isSeparateModal = true,
+    ): ActionButtonContract {
+        return ActionButton::emptyHidden();
     }
 
     protected function pages(): array
