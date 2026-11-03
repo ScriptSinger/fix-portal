@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
 class TelegramUpdateHandler
@@ -50,7 +51,7 @@ class TelegramUpdateHandler
 
         $telegramUserId = (int) ($message['from']['id'] ?? 0);
         $response = $this->isModerator($telegramUserId)
-            ? $this->moderatorResponse($updateId, $parsed[0], $parsed[1], $telegramUserId, $message)
+            ? $this->moderatorResponseWithLimits($updateId, $parsed[0], $parsed[1], $telegramUserId, $message)
             : 'Нет доступа к командам модератора.';
 
         if ($this->shouldSilenceSourceCommand($parsed[0], $chatId, $response)) {
@@ -74,6 +75,33 @@ class TelegramUpdateHandler
         ]);
 
         $this->markProcessed($updateId);
+    }
+
+    /** @param list<string> $arguments */
+    private function moderatorResponseWithLimits(
+        int $updateId,
+        string $command,
+        array $arguments,
+        int $moderatorTelegramId,
+        array $message,
+    ): string {
+        if (in_array($command, ['/question', '/attach'], true)) {
+            $key = sprintf(
+                'telegram-command:%s:%s:%s',
+                $message['chat']['id'] ?? 0,
+                $moderatorTelegramId,
+                $command,
+            );
+            $limit = max(1, (int) config('services.telegram.command_rate_limit_per_minute', 10));
+
+            if (RateLimiter::tooManyAttempts($key, $limit)) {
+                return 'Слишком много команд. Повторите через '.RateLimiter::availableIn($key).' сек.';
+            }
+
+            RateLimiter::hit($key, 60);
+        }
+
+        return $this->moderatorResponse($updateId, $command, $arguments, $moderatorTelegramId, $message);
     }
 
     private function shouldSilenceSourceCommand(string $command, int|string $chatId, string $response): bool
@@ -126,6 +154,15 @@ class TelegramUpdateHandler
         $reply = $message['reply_to_message'] ?? null;
         if (! is_array($reply)) {
             return 'Ответьте командой /question на сообщение, которое нужно передать на модерацию.';
+        }
+
+        $authorId = (int) data_get($reply, 'from.id');
+        $maxPending = max(1, (int) config('services.telegram.max_pending_per_user', 5));
+        if ($authorId > 0 && DB::table('telegram_question_messages')
+            ->where('telegram_user_id', $authorId)
+            ->where('status', 'pending_moderation')
+            ->count() >= $maxPending) {
+            return "У автора уже есть {$maxPending} вопрос(ов) на модерации.";
         }
 
         $payload = ['message' => $reply];

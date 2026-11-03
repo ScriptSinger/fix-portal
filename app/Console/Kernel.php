@@ -55,6 +55,11 @@ class Kernel extends ConsoleKernel
             ->timezone('Asia/Yekaterinburg')
             ->withoutOverlapping()
             ->onFailure(fn () => Log::error('Не удалось почистить брошенные изображения: см. вывод images:prune-orphans.'));
+
+        $schedule->command('telegram:webhook-monitor --minutes=5')
+            ->everyFiveMinutes()
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::warning('Обнаружены зависшие или ошибочные Telegram webhook updates.'));
     }
 
     /**

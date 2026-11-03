@@ -56,12 +56,30 @@ class TelegramWebhookController extends Controller
         ]);
 
         try {
+            DB::table('telegram_webhook_updates')
+                ->where('update_id', $payload['update_id'])
+                ->increment('attempts');
+
             $handler->handle($payload['update_id'], $payload);
+
+            DB::table('telegram_webhook_updates')
+                ->where('update_id', $payload['update_id'])
+                ->update([
+                    'failed_at' => null,
+                    'processing_error' => null,
+                ]);
         } catch (\Throwable $exception) {
             Log::error('Telegram webhook update handling failed', [
                 'update_id' => $payload['update_id'],
                 'error' => $exception->getMessage(),
             ]);
+
+            DB::table('telegram_webhook_updates')
+                ->where('update_id', $payload['update_id'])
+                ->update([
+                    'failed_at' => now(),
+                    'processing_error' => mb_substr($exception->getMessage(), 0, 2000),
+                ]);
         }
 
         return response()->json(['ok' => true]);

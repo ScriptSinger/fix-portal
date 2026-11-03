@@ -67,6 +67,23 @@ final class TelegramWebhookTest extends TestCase
         $this->assertDatabaseCount('telegram_webhook_updates', 1);
     }
 
+    public function test_webhook_monitor_reports_stale_updates(): void
+    {
+        DB::table('telegram_webhook_updates')->insert([
+            'update_id' => 1099,
+            'payload' => json_encode(['update_id' => 1099]),
+            'received_at' => now()->subMinutes(10),
+            'attempts' => 1,
+            'failed_at' => now()->subMinutes(9),
+            'processing_error' => 'Telegram API unavailable',
+        ]);
+
+        $this->artisan('telegram:webhook-monitor', ['--minutes' => 5, '--json' => true])
+            ->assertExitCode(1)
+            ->expectsOutputToContain('"stale_count": 1')
+            ->expectsOutputToContain('"failed_count": 1');
+    }
+
     public function test_webhook_rejects_an_oversized_payload(): void
     {
         $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
@@ -144,6 +161,35 @@ final class TelegramWebhookTest extends TestCase
         $this->assertDatabaseHas('telegram_question_messages', [
             'id' => $queueId,
         ]);
+    }
+
+    public function test_question_command_is_rate_limited(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 15]])]);
+        config([
+            'services.telegram.moderator_ids' => [990],
+            'services.telegram.source_chat_id' => '-100990',
+            'services.telegram.command_rate_limit_per_minute' => 1,
+        ]);
+
+        $payload = static fn (int $updateId): array => [
+            'update_id' => $updateId,
+            'message' => [
+                'message_id' => $updateId,
+                'text' => '/question',
+                'from' => ['id' => 990],
+                'chat' => ['id' => -100990, 'type' => 'supergroup'],
+            ],
+        ];
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', $payload(2010))
+            ->assertOk();
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', $payload(2011))
+            ->assertOk();
+
+        Http::assertSent(fn ($request): bool => str_contains($request['text'], 'Слишком много команд'));
     }
 
     public function test_unauthorized_user_cannot_use_moderator_commands(): void
