@@ -18,6 +18,16 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
     protected function buttons(): ListOf
     {
         return parent::buttons()
+            // MoonShine leaves an empty slot when its default detail button is
+            // hidden by the ability check. Keep an explicit eye action visible.
+            ->except(fn (object $button): bool => method_exists($button, 'getName') && $button->getName() === 'resource-detail-button')
+            ->prepend(ActionButton::make(
+                '',
+                url: fn (mixed $item): string => $this->getResource()->getDetailPageUrl((int) $item->getKey()),
+            )
+                ->icon('eye')
+                ->square()
+                ->showInLine())
             ->add(ActionButton::make('Опубликовать')
                 ->icon('check')
                 ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation' && $item->appliance_id !== null)
