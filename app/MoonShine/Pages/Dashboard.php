@@ -208,9 +208,17 @@ class Dashboard extends Page
 
     private function linkedMetric(ValueMetric $metric, string $url, string $label): Column
     {
+        $navigate = 'window.location.href = '.json_encode($url, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).';';
+
         return Column::make([
-            $metric,
-            ActionButton::make($label, $url)->icon('arrow-top-right-on-square'),
+            $metric->customAttributes([
+                'class' => 'cursor-pointer transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500',
+                'role' => 'link',
+                'tabindex' => '0',
+                'aria-label' => $label,
+                'onclick' => $navigate,
+                'onkeydown' => "if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); {$navigate} }",
+            ]),
         ], 4);
     }
 }
