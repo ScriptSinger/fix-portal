@@ -65,12 +65,14 @@
         </ul>
     </section>
 
-    <div class="mt-4">
-        <section class="rounded-card bg-brand-400 p-4 text-sm text-black">
-            <h2 class="m-0 text-base font-bold">Поддержите нас</h2>
-            <p class="mb-0 mt-2 leading-6">Сайт работает на платном сервере, а доход приносит реклама. Отключите, пожалуйста, блокировщик рекламы: так вы поможете проекту жить дальше.</p>
-        </section>
-    </div>
+    @if (\App\Models\SiteWidget::enabled('ads'))
+        <div class="mt-4">
+            <section class="rounded-card bg-brand-400 p-4 text-sm text-black">
+                <h2 class="m-0 text-base font-bold">Поддержите нас</h2>
+                <p class="mb-0 mt-2 leading-6">Сайт работает на платном сервере, а доход приносит реклама. Отключите, пожалуйста, блокировщик рекламы: так вы поможете проекту жить дальше.</p>
+            </section>
+        </div>
+    @endif
 @endsection
 
 @section('sidebar')
