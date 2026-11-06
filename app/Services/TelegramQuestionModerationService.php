@@ -186,9 +186,14 @@ class TelegramQuestionModerationService
         }
 
         if ($record->status === 'pending_moderation') {
+            $combinedText = trim((string) $record->text);
+            if ($text !== '') {
+                $combinedText = $combinedText === '' ? $text : $combinedText."\n\n".$text;
+            }
             $storedPayload['attached_message_ids'][] = $messageId;
             $storedPayload['attached_messages'][] = $payload['message'];
             DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                'text' => $combinedText,
                 'payload' => json_encode($storedPayload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
                 'updated_at' => now(),
             ]);

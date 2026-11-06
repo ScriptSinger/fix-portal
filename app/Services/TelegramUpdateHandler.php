@@ -42,6 +42,13 @@ class TelegramUpdateHandler
                 return;
             }
 
+            if ($continuation = $this->questionIntake->latestPendingContinuation($payload)) {
+                $this->questionModeration->attach((int) $continuation->id, $payload, null);
+                $this->markProcessed($updateId);
+
+                return;
+            }
+
             if ($this->questionIntake->store($updateId, $payload)) {
                 $this->questionModeration->preview($updateId, $payload);
             }

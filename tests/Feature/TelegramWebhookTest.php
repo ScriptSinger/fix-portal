@@ -291,6 +291,53 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
+    public function test_consecutive_messages_from_the_same_author_are_merged_into_one_question(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config([
+            'services.telegram.source_chat_id' => '-100123',
+            'services.telegram.question_continuation_minutes' => 10,
+        ]);
+
+        $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
+        $baseMessage = [
+            'from' => ['id' => 778],
+            'chat' => ['id' => -100123, 'type' => 'supergroup'],
+        ];
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2010,
+            'message' => $baseMessage + [
+                'message_id' => 201,
+                'text' => 'Компрессор запускается, но не охлаждает.',
+            ],
+        ])->assertOk();
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2011,
+            'message' => $baseMessage + [
+                'message_id' => 202,
+                'photo' => [['file_id' => 'photo-202', 'width' => 100, 'height' => 100]],
+            ],
+        ])->assertOk();
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2012,
+            'message' => $baseMessage + [
+                'message_id' => 203,
+                'text' => 'Модель Indesit DF 5200 W.',
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseCount('telegram_question_messages', 1);
+        $record = DB::table('telegram_question_messages')->first();
+        $this->assertSame("Компрессор запускается, но не охлаждает.\n\nМодель Indesit DF 5200 W.", $record->text);
+        $payload = json_decode((string) $record->payload, true, 32, JSON_THROW_ON_ERROR);
+        $this->assertContains(202, $payload['attached_message_ids']);
+        $this->assertContains(203, $payload['attached_message_ids']);
+        Http::assertSentCount(1);
+    }
+
     public function test_reply_in_source_chat_is_not_queued_as_a_new_question(): void
     {
         config(['services.telegram.source_chat_id' => '-100123']);

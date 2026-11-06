@@ -68,6 +68,7 @@ return [
         'author_user_id' => (int) env('TELEGRAM_AUTHOR_USER_ID', 0),
         'command_rate_limit_per_minute' => (int) env('TELEGRAM_COMMAND_RATE_LIMIT_PER_MINUTE', 10),
         'max_pending_per_user' => (int) env('TELEGRAM_MAX_PENDING_PER_USER', 5),
+        'question_continuation_minutes' => (int) env('TELEGRAM_QUESTION_CONTINUATION_MINUTES', 10),
     ],
 
     // Стена VK-группы: сюда уходят новые вопросы. Ключ доступа сообщества с правом на стену, номер группы без минуса.
