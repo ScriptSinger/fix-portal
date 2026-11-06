@@ -15,6 +15,15 @@ class TelegramWebhookController extends Controller
 
     public function __invoke(Request $request, TelegramUpdateHandler $handler): JsonResponse
     {
+        if ((string) config('services.telegram.environment') !== app()->environment()) {
+            Log::critical('Telegram webhook environment mismatch', [
+                'configured' => config('services.telegram.environment'),
+                'application' => app()->environment(),
+            ]);
+
+            return response()->json(['message' => 'Telegram environment is misconfigured'], 503);
+        }
+
         $secret = (string) config('services.telegram.webhook_secret');
         $providedSecret = (string) $request->header('X-Telegram-Bot-Api-Secret-Token');
 

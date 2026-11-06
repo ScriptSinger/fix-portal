@@ -31,7 +31,7 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
                 ->icon('check')
                 ->customAttributes(['title' => 'Опубликовать', 'aria-label' => 'Опубликовать'])
                 ->showInDropdown()
-                ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation' && $item->appliance_id !== null)
+                ->canSee(fn (TelegramQuestionMessage $item): bool => in_array($item->status, ['pending_moderation', 'failed'], true) && $item->appliance_id !== null)
                 ->method('approve', events: [$this->getListEventName()])
                 ->withConfirm('Опубликовать вопрос?', 'Вопрос будет создан на сайте.', 'Опубликовать'),
             ActionButton::make('Отклонить')

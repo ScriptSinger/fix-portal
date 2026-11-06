@@ -76,6 +76,7 @@ class TelegramQuestionMessageResource extends BaseResource
                 'published' => 'Опубликован',
                 'rejected' => 'Отклонён',
                 'failed' => 'Ошибка',
+                'needs_context' => 'Нужно описание',
             ]),
             BelongsTo::make('Тип техники', 'appliance', 'title', ApplianceResource::class)->nullable(),
             Number::make('Telegram message ID', 'telegram_message_id'),

@@ -73,7 +73,7 @@ class TelegramQuestionModerationService
             if ($record->status === 'published') {
                 return "Вопрос уже опубликован: #{$record->question_id}.";
             }
-            if ($record->status !== 'pending_moderation') {
+            if (! in_array($record->status, ['pending_moderation', 'failed'], true)) {
                 return "Нельзя опубликовать: текущий статус {$record->status}.";
             }
             if (! Appliance::query()->whereKey($applianceId)->exists()) {
@@ -98,9 +98,25 @@ class TelegramQuestionModerationService
             if (mb_strlen($title) < 12) {
                 $title = Str::limit($text ?: 'Вопрос из Telegram', 150, '');
             }
-            $images = $this->importPhotos($record);
-            foreach ($attachedMessages as $attachedMessage) {
-                $images = [...$images, ...$this->importPhotosPayload((int) $record->id, ['message' => $attachedMessage])];
+            try {
+                $images = $this->importPhotos($record);
+                foreach ($attachedMessages as $attachedMessage) {
+                    $images = [...$images, ...$this->importPhotosPayload((int) $record->id, ['message' => $attachedMessage])];
+                }
+            } catch (\Throwable $e) {
+                report($e);
+                $message = 'Не удалось импортировать фотографии: '.Str::limit($e->getMessage(), 700);
+                DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                    'status' => 'failed',
+                    'error_message' => $message,
+                    'updated_at' => now(),
+                ]);
+                $this->audit($moderatorId, null, 'approve_failed', [
+                    'message_id' => $messageId,
+                    'reason' => $message,
+                ]);
+
+                return 'Публикация остановлена: фото не удалось импортировать. Исправьте ошибку и повторите публикацию.';
             }
             $description = e(implode("\n\n", $descriptionParts));
             foreach ($images as $image) {

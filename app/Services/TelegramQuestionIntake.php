@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class TelegramQuestionIntake
 {
     /** @param array<string, mixed> $payload */
-    public function latestPendingContinuation(array $payload): ?object
+    public function pendingReplyContinuation(array $payload): ?object
     {
         $message = $payload['message'] ?? null;
         if (! is_array($message)) {
@@ -20,17 +20,33 @@ class TelegramQuestionIntake
             return null;
         }
 
-        $minutes = max(1, (int) config('services.telegram.question_continuation_minutes', 10));
+        $replyMessageId = (int) data_get($message, 'reply_to_message.message_id');
+        if ($replyMessageId < 1) {
+            return null;
+        }
 
-        return DB::table('telegram_question_messages')
+        $records = DB::table('telegram_question_messages')
             ->where('telegram_chat_id', (int) $chatId)
             ->where('telegram_user_id', (int) $userId)
             ->where('status', 'pending_moderation')
             ->whereNotNull('text')
             ->where('text', '<>', '')
-            ->where('created_at', '>=', now()->subMinutes($minutes))
             ->latest('id')
-            ->first();
+            ->get();
+
+        foreach ($records as $record) {
+            if ((int) $record->telegram_message_id === $replyMessageId) {
+                return $record;
+            }
+
+            $payload = json_decode((string) $record->payload, true) ?: [];
+            $attachedIds = array_map('intval', (array) ($payload['attached_message_ids'] ?? []));
+            if (in_array($replyMessageId, $attachedIds, true)) {
+                return $record;
+            }
+        }
+
+        return null;
     }
 
     /** @param array<string, mixed> $payload */
@@ -60,7 +76,7 @@ class TelegramQuestionIntake
 
         $text = trim((string) ($message['text'] ?? $message['caption'] ?? ''));
         $hasPhoto = is_array($message['photo'] ?? null) && $message['photo'] !== [];
-        if ($text === '' && ! $hasPhoto) {
+        if ($text === '' && (! $allowReply || ! $hasPhoto)) {
             return false;
         }
 

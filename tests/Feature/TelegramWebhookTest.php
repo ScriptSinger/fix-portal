@@ -32,6 +32,16 @@ final class TelegramWebhookTest extends TestCase
             ->assertUnauthorized();
     }
 
+    public function test_webhook_rejects_a_mismatched_telegram_environment(): void
+    {
+        config(['services.telegram.environment' => 'production']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', ['update_id' => 10011])
+            ->assertStatus(503)
+            ->assertJson(['message' => 'Telegram environment is misconfigured']);
+    }
+
     public function test_webhook_rejects_invalid_updates(): void
     {
         $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
@@ -294,10 +304,7 @@ final class TelegramWebhookTest extends TestCase
     public function test_consecutive_messages_from_the_same_author_are_merged_into_one_question(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
-        config([
-            'services.telegram.source_chat_id' => '-100123',
-            'services.telegram.question_continuation_minutes' => 10,
-        ]);
+        config(['services.telegram.source_chat_id' => '-100123']);
 
         $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
         $baseMessage = [
@@ -318,6 +325,7 @@ final class TelegramWebhookTest extends TestCase
             'message' => $baseMessage + [
                 'message_id' => 202,
                 'photo' => [['file_id' => 'photo-202', 'width' => 100, 'height' => 100]],
+                'reply_to_message' => ['message_id' => 201],
             ],
         ])->assertOk();
 
@@ -326,6 +334,7 @@ final class TelegramWebhookTest extends TestCase
             'message' => $baseMessage + [
                 'message_id' => 203,
                 'text' => 'Модель Indesit DF 5200 W.',
+                'reply_to_message' => ['message_id' => 201],
             ],
         ])->assertOk();
 
@@ -336,6 +345,26 @@ final class TelegramWebhookTest extends TestCase
         $this->assertContains(202, $payload['attached_message_ids']);
         $this->assertContains(203, $payload['attached_message_ids']);
         Http::assertSentCount(1);
+    }
+
+    public function test_photo_without_text_is_not_created_as_an_orphan_question(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2013,
+                'message' => [
+                    'message_id' => 204,
+                    'photo' => [['file_id' => 'photo-204', 'width' => 100, 'height' => 100]],
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseMissing('telegram_question_messages', ['telegram_message_id' => 204]);
+        $this->assertDatabaseHas('telegram_webhook_updates', ['update_id' => 2013]);
     }
 
     public function test_reply_in_source_chat_is_not_queued_as_a_new_question(): void
