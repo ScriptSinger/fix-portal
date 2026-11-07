@@ -8,6 +8,8 @@ use App\Models\TelegramQuestionMessage;
 use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Pages\TelegramQuestionMessagesIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
+use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
+use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
@@ -46,7 +48,27 @@ class TelegramQuestionMessageResource extends BaseResource
 
     protected function activeActions(): ListOf
     {
-        return parent::activeActions()->only(Action::VIEW, Action::UPDATE);
+        return parent::activeActions()->only(
+            Action::VIEW,
+            Action::UPDATE,
+            Action::DELETE,
+            Action::MASS_DELETE,
+        );
+    }
+
+    /**
+     * The moderation queue may be cleaned up, but a published moderation
+     * record must not be removed from the CRUD accidentally or via a direct
+     * mass-delete request.
+     */
+    public function delete(DataWrapperContract $item, ?FieldsContract $fields = null): bool
+    {
+        if ($item->getOriginal() instanceof TelegramQuestionMessage
+            && $item->getOriginal()->status === 'published') {
+            return false;
+        }
+
+        return parent::delete($item, $fields);
     }
 
     /**

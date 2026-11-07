@@ -47,13 +47,9 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
                 ->showInDropdown()
                 ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation')
                 ->method('retry', events: [$this->getListEventName()]),
-            ActionButton::make('Убрать')
-                ->icon('trash')
-                ->customAttributes(['title' => 'Убрать из модерации', 'aria-label' => 'Убрать из модерации'])
-                ->showInDropdown()
-                ->canSee(fn (TelegramQuestionMessage $item): bool => true)
-                ->method('remove', events: [$this->getListEventName()])
-                ->withConfirm('Убрать запись из модерации?', 'Question на сайте и публикация в Telegram не удаляются.', 'Убрать'),
+            $this->getResource()->getDeleteButton(isAsync: $this->isAsync())
+                ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status !== 'published'),
+            $this->getResource()->getMassDeleteButton(isAsync: $this->isAsync()),
         ]);
     }
 
@@ -94,19 +90,6 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
         }
 
         $this->toast($service->retry($item->telegram_message_id, null), true);
-    }
-
-    #[AsyncMethod]
-    public function remove(Request $request): void
-    {
-        $item = TelegramQuestionMessage::find($request->integer('resourceItem'));
-        if (! $item) {
-            toast('Запись не найдена', ToastType::ERROR);
-
-            return;
-        }
-        $item->delete();
-        toast('Запись убрана из модерации. Опубликованный вопрос сохранён.', ToastType::SUCCESS);
     }
 
     private function toast(string $message, bool $success = false): void
