@@ -64,7 +64,7 @@ class TelegramQuestionMessageResource extends BaseResource
     public function delete(DataWrapperContract $item, ?FieldsContract $fields = null): bool
     {
         if ($item->getOriginal() instanceof TelegramQuestionMessage
-            && $item->getOriginal()->status === 'published') {
+            && ($item->getOriginal()->registered_at !== null || $item->getOriginal()->status === 'published')) {
             return false;
         }
 

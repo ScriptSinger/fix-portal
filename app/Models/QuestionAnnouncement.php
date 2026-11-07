@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class QuestionAnnouncement extends Model
 {
-    protected $fillable = ['question_id', 'channel', 'kind', 'status', 'attempts', 'last_error', 'external_id', 'sent_at'];
+    protected $fillable = ['question_id', 'channel', 'kind', 'reminder_number', 'status', 'attempts', 'last_error', 'external_id', 'sent_at'];
 
     protected $casts = ['status' => AnnouncementStatus::class, 'kind' => AnnouncementKind::class, 'sent_at' => 'datetime'];
 

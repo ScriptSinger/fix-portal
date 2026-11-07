@@ -45,7 +45,7 @@ class TelegramWebhook extends Command
         $telegram->call('setWebhook', array_filter([
             'url' => $url,
             'secret_token' => $secret,
-            'allowed_updates' => ['message', 'callback_query', 'my_chat_member'],
+            'allowed_updates' => ['message', 'callback_query', 'message_reaction', 'my_chat_member'],
             'drop_pending_updates' => $this->option('drop-pending-updates') ?: null,
         ], static fn ($value) => $value !== null));
 

@@ -18,12 +18,46 @@ final class TelegramWebhookTest extends TestCase
 {
     use DatabaseTransactions;
 
+    // Nutgram validates Telegram's required DTO fields. Supply transport metadata
+    // omitted by the historical business-scenario fixtures, without changing IDs/text.
+    public function postJson($uri, array $data = [], array $headers = [], $options = 0)
+    {
+        $completeMessage = function (array $message, ?array $chat = null) use (&$completeMessage): array {
+            $message['date'] ??= now()->timestamp;
+            if ($chat !== null) {
+                $message['chat'] ??= $chat;
+            }
+            if (isset($message['from'])) {
+                $message['from'] += ['is_bot' => false, 'first_name' => 'Test'];
+            }
+            foreach ($message['photo'] ?? [] as $i => $photo) {
+                $message['photo'][$i] += ['file_unique_id' => $photo['file_id'], 'width' => 100, 'height' => 100];
+            }
+            if (isset($message['reply_to_message'])) {
+                $message['reply_to_message'] = $completeMessage($message['reply_to_message'], $message['chat'] ?? null);
+            }
+            return $message;
+        };
+        if (isset($data['message'])) {
+            $data['message'] = $completeMessage($data['message']);
+        }
+        if (isset($data['callback_query'])) {
+            $data['callback_query']['chat_instance'] ??= 'test-chat-instance';
+            $data['callback_query']['from'] += ['is_bot' => false, 'first_name' => 'Test'];
+            if (isset($data['callback_query']['message'])) {
+                $data['callback_query']['message'] = $completeMessage($data['callback_query']['message']);
+            }
+        }
+        return parent::postJson($uri, $data, $headers, $options);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
 
         config(['services.telegram.webhook_secret' => 'test-webhook-secret']);
         config(['services.telegram.bot_token' => 'test-token']);
+        config(['services.telegram.environment' => app()->environment()]);
     }
 
     public function test_webhook_rejects_requests_without_the_secret(): void
@@ -202,6 +236,32 @@ final class TelegramWebhookTest extends TestCase
         Http::assertSent(fn ($request): bool => str_contains($request['text'], 'Слишком много команд'));
     }
 
+    public function test_marked_question_tells_the_author_about_thumbs_up_reaction(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config(['services.telegram.moderator_ids' => [777], 'services.telegram.source_chat_id' => '-100123']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2095,
+                'message' => [
+                    'message_id' => 95,
+                    'text' => '/question',
+                    'from' => ['id' => 777],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'reply_to_message' => [
+                        'message_id' => 94,
+                        'text' => 'Почему холодильник не охлаждает?',
+                        'from' => ['id' => 778],
+                    ],
+                ],
+            ])->assertOk();
+
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage')
+            && data_get($request->data(), 'reply_to_message_id') === 94
+            && str_contains((string) data_get($request->data(), 'text'), 'поставьте 👍'));
+    }
+
     public function test_unauthorized_user_cannot_use_moderator_commands(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 11]])]);
@@ -347,6 +407,8 @@ final class TelegramWebhookTest extends TestCase
             'id' => $record->id,
             'status' => 'pending_moderation',
         ]);
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/editMessageText')
+            && str_contains((string) data_get($request->data(), 'text'), 'поставьте 👍'));
     }
 
     public function test_plain_message_from_source_chat_is_not_queued(): void
@@ -431,7 +493,7 @@ final class TelegramWebhookTest extends TestCase
         $payload = json_decode((string) $record->payload, true, 32, JSON_THROW_ON_ERROR);
         $this->assertContains(202, $payload['attached_message_ids']);
         $this->assertContains(203, $payload['attached_message_ids']);
-        Http::assertSentCount(4);
+        Http::assertSentCount(3);
     }
 
     public function test_photo_without_text_is_not_created_as_an_orphan_question(): void
@@ -620,5 +682,165 @@ final class TelegramWebhookTest extends TestCase
             'telegram_message_id' => 61,
             'status' => 'published',
         ]);
+    }
+
+    public function test_author_can_mark_a_telegram_only_question_as_solved_and_award_the_answerer(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 904]])]);
+
+        DB::table('telegram_question_messages')->insert([
+            'telegram_chat_id' => -100123,
+            'telegram_message_id' => 70,
+            'telegram_update_id' => 1070,
+            'telegram_user_id' => 778,
+            'text' => 'Холодильник не охлаждает',
+            'payload' => json_encode(['message' => ['message_id' => 70, 'text' => 'Холодильник не охлаждает']]),
+            'status' => 'pending_moderation',
+            'resolution_status' => 'open',
+            'registered_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1071,
+                'message' => [
+                    'message_id' => 71,
+                    'text' => '/solved',
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'reply_to_message' => [
+                        'message_id' => 72,
+                        'text' => 'Проверьте датчик температуры.',
+                        'from' => ['id' => 779, 'is_bot' => false],
+                    ],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'telegram_message_id' => 70,
+            'resolution_status' => 'solved',
+            'solution_telegram_user_id' => 779,
+            'solution_telegram_message_id' => 72,
+        ]);
+
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/setChatMemberTag')
+            && $request['user_id'] === 779
+            && $request['tag'] === 'Помощник');
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage')
+            && str_contains((string) $request['text'], 'Вопрос отмечен решённым'));
+    }
+
+    public function test_author_can_choose_a_solved_question_with_buttons_after_reacting_to_helper(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+
+        foreach ([81, 82] as $messageId) {
+            DB::table('telegram_question_messages')->insert([
+                'telegram_chat_id' => -100123,
+                'telegram_message_id' => $messageId,
+                'telegram_update_id' => 2000 + $messageId,
+                'telegram_user_id' => 778,
+                'text' => "Холодильник {$messageId} не охлаждает?",
+                'payload' => '{}',
+                'status' => 'pending_moderation',
+                'registered_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2083,
+                'message' => [
+                    'message_id' => 84,
+                    'text' => 'Проверьте датчик.',
+                    'from' => ['id' => 779],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])->assertOk();
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2085,
+                'message_reaction' => [
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'message_id' => 84,
+                    'user' => ['id' => 778, 'is_bot' => false],
+                    'date' => now()->timestamp,
+                    'old_reaction' => [],
+                    'new_reaction' => [['type' => 'emoji', 'emoji' => '👍']],
+                ],
+            ])->assertOk();
+
+        $request = Http::recorded(fn ($request) => str_ends_with($request->url(), '/sendMessage'))->first()[0];
+        $keyboard = json_decode($request['reply_markup'], true, 32, JSON_THROW_ON_ERROR);
+        $this->assertCount(3, $keyboard['inline_keyboard']);
+        $callbackData = $keyboard['inline_keyboard'][1][0]['callback_data'];
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2084,
+                'callback_query' => [
+                    'id' => 'solve-test',
+                    'data' => $callbackData,
+                    'from' => ['id' => 778],
+                    'message' => ['message_id' => 901, 'chat' => ['id' => -100123, 'type' => 'supergroup']],
+                ],
+            ])->assertOk();
+
+        $this->assertDatabaseHas('telegram_solution_awards', [
+            'telegram_user_id' => 779,
+            'telegram_message_id' => 84,
+        ]);
+        $this->assertSame(1, DB::table('telegram_question_messages')->where('resolution_status', 'solved')->count());
+    }
+
+    public function test_thumbs_up_reaction_silently_solves_the_only_open_question(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        DB::table('telegram_question_messages')->insert([
+            'telegram_chat_id' => -100123,
+            'telegram_message_id' => 90,
+            'telegram_update_id' => 2090,
+            'telegram_user_id' => 778,
+            'text' => 'Холодильник не охлаждает?',
+            'payload' => '{}',
+            'status' => 'pending_moderation',
+            'registered_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2091,
+                'message' => [
+                    'message_id' => 91,
+                    'text' => 'Проверьте датчик.',
+                    'from' => ['id' => 779],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])->assertOk();
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2092,
+                'message_reaction' => [
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'message_id' => 91,
+                    'user' => ['id' => 778, 'is_bot' => false],
+                    'date' => now()->timestamp,
+                    'old_reaction' => [],
+                    'new_reaction' => [['type' => 'emoji', 'emoji' => '👍']],
+                ],
+            ])->assertOk();
+        $this->assertDatabaseHas('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);
+        Http::assertNotSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage'));
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/setMessageReaction')
+            && $request['message_id'] === 91);
     }
 }

@@ -59,7 +59,7 @@ class TelegramWebhookController extends Controller
         Log::info('Telegram webhook update accepted', [
             'update_id' => $payload['update_id'],
             'update_types' => array_values(array_intersect(
-                ['message', 'edited_message', 'callback_query', 'my_chat_member'],
+                ['message', 'edited_message', 'callback_query', 'message_reaction', 'my_chat_member'],
                 array_keys($payload)
             )),
         ]);

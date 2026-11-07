@@ -34,6 +34,10 @@ class QuestionAnnouncer
     /** Пауза перед обновлением сообщения: серия быстрых правок превращается в один запрос. */
     public const EDIT_DELAY_SECONDS = 30;
 
+    public const REMINDER_INTERVAL_HOURS = 72;
+
+    public const MAX_REMINDERS = 3;
+
     /** Вопрос отредактировали: уже отправленные сообщения в чатах обновляются. Неотправленные уйдут сразу с новым текстом. */
     public function refresh(Question $question): void
     {
@@ -65,15 +69,41 @@ class QuestionAnnouncer
                 continue;
             }
 
-            $reminder = QuestionAnnouncement::firstOrCreate(
-                ['question_id' => $question->id, 'channel' => $name, 'kind' => AnnouncementKind::Reminder],
-                ['status' => AnnouncementStatus::Pending],
-            );
+            $latest = QuestionAnnouncement::query()
+                ->where(['question_id' => $question->id, 'channel' => $name, 'kind' => AnnouncementKind::Reminder])
+                ->latest('reminder_number')
+                ->first();
 
-            if ($reminder->wasRecentlyCreated) {
-                SendQuestionAnnouncement::dispatch($reminder->id)->afterCommit();
-                $queued++;
+            if ($latest?->status === AnnouncementStatus::Pending) {
+                continue;
             }
+
+            if ($latest?->status === AnnouncementStatus::Sent
+                && $latest->sent_at?->gt(now()->subHours(self::REMINDER_INTERVAL_HOURS))) {
+                continue;
+            }
+
+            if ($latest?->status === AnnouncementStatus::Failed) {
+                $latest->update(['status' => AnnouncementStatus::Pending, 'attempts' => 0, 'last_error' => null]);
+                SendQuestionAnnouncement::dispatch($latest->id)->afterCommit();
+                $queued++;
+                continue;
+            }
+
+            $nextNumber = ((int) ($latest?->reminder_number ?? 0)) + 1;
+            if ($nextNumber > self::MAX_REMINDERS) {
+                continue;
+            }
+
+            $reminder = QuestionAnnouncement::create([
+                'question_id' => $question->id,
+                'channel' => $name,
+                'kind' => AnnouncementKind::Reminder,
+                'reminder_number' => $nextNumber,
+                'status' => AnnouncementStatus::Pending,
+            ]);
+            SendQuestionAnnouncement::dispatch($reminder->id)->afterCommit();
+            $queued++;
         }
 
         return $queued;

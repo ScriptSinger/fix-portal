@@ -27,13 +27,20 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->onFailure(fn () => Log::critical('Ночная резервная копия базы не снята или не загружена в облако: см. вывод db:backup.'));
 
-        // Напоминание в чат о вопросах без ответа: один раз, днём по Уфе (мастера отвечают добровольно, ночью не тревожим)
+        // Напоминания в чат о вопросах без ответа: каждые 72 часа, днём по Уфе, максимум три раза
         $schedule->command('questions:remind')
             ->hourly()
             ->between('9:00', '21:00')
             ->timezone('Asia/Yekaterinburg')
             ->withoutOverlapping()
             ->onFailure(fn () => Log::error('Не удалось отправить напоминания о вопросах: см. вывод questions:remind.'));
+
+        $schedule->command('telegram:questions-remind')
+            ->hourly()
+            ->between('9:00', '21:00')
+            ->timezone('Asia/Yekaterinburg')
+            ->withoutOverlapping()
+            ->onFailure(fn () => Log::error('Не удалось отправить напоминания о Telegram-вопросах.'));
 
         // Раз в неделю одним сообщением: сколько вопросов ждут ответа
         $schedule->command('questions:digest')

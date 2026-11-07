@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Queue;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
 
-/** Вопросы без ответа: выборка, фильтр на сайте, одно напоминание в чат и еженедельная сводка. */
+/** Вопросы без ответа: выборка, повторные напоминания в чат и еженедельная сводка. */
 class QuestionRemindersTest extends TestCase
 {
     use CreatesDiscussions, DatabaseTransactions;
@@ -95,7 +95,7 @@ class QuestionRemindersTest extends TestCase
     {
         $this->telegram();
         Queue::fake();
-        $question = $this->announced(72);
+        $question = $this->announced(80);
 
         $this->artisan('questions:remind')->assertSuccessful();
         $this->artisan('questions:remind')->assertSuccessful();
@@ -104,7 +104,36 @@ class QuestionRemindersTest extends TestCase
         Queue::assertPushed(SendQuestionAnnouncement::class, 1);
     }
 
-    public function test_only_questions_between_48_hours_and_7_days_are_reminded(): void
+    public function test_reminder_repeats_every_72_hours_but_stops_after_three_messages(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $question = $this->announced(80);
+
+        $this->assertSame(1, app(QuestionAnnouncer::class)->remind($question));
+        $question->announcements()->where('kind', AnnouncementKind::Reminder->value)->update([
+            'status' => AnnouncementStatus::Sent,
+            'sent_at' => now()->subHours(80),
+        ]);
+        $this->assertSame(1, app(QuestionAnnouncer::class)->remind($question));
+        $question->announcements()->where('kind', AnnouncementKind::Reminder->value)->orderByDesc('reminder_number')->firstOrFail()->update([
+            'status' => AnnouncementStatus::Sent,
+            'sent_at' => now()->subHours(80),
+        ]);
+
+        $this->assertSame(1, app(QuestionAnnouncer::class)->remind($question));
+        $this->assertSame(3, $this->reminders($question));
+
+        $question->announcements()->where('kind', AnnouncementKind::Reminder->value)->orderByDesc('reminder_number')->firstOrFail()->update([
+            'status' => AnnouncementStatus::Sent,
+            'sent_at' => now()->subHours(80),
+        ]);
+        $this->assertSame(0, app(QuestionAnnouncer::class)->remind($question));
+
+        $this->assertSame(3, $this->reminders($question));
+    }
+
+    public function test_questions_are_reminded_after_72_hours_without_an_upper_age_limit(): void
     {
         $this->telegram();
         Queue::fake();
@@ -115,7 +144,7 @@ class QuestionRemindersTest extends TestCase
         $this->artisan('questions:remind')->assertSuccessful();
 
         $this->assertSame(0, $this->reminders($tooNew));
-        $this->assertSame(0, $this->reminders($tooOld));
+        $this->assertSame(1, $this->reminders($tooOld));
         $this->assertSame(1, $this->reminders($fits));
     }
 

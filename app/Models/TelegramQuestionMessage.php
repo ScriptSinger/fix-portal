@@ -15,6 +15,10 @@ class TelegramQuestionMessage extends Model
         'text',
         'payload',
         'status',
+        'resolution_status',
+        'resolved_at',
+        'solution_telegram_user_id',
+        'solution_telegram_message_id',
         'question_id',
         'appliance_id',
         'moderation_chat_id',
@@ -22,7 +26,7 @@ class TelegramQuestionMessage extends Model
         'error_message',
     ];
 
-    protected $casts = ['payload' => 'array'];
+    protected $casts = ['payload' => 'array', 'resolved_at' => 'datetime'];
 
     /**
      * Return Telegram file IDs for all photos attached to this moderation item.

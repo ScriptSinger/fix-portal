@@ -9,6 +9,7 @@ use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
@@ -59,12 +60,30 @@ class SendQuestionAnnouncement implements ShouldQueue
     /** Номер сообщения с самим вопросом в том же канале: на него отвечает напоминание. */
     private function originalMessageId(QuestionAnnouncement $reminder): ?string
     {
-        return QuestionAnnouncement::where([
+        $announcementId = QuestionAnnouncement::where([
             'question_id' => $reminder->question_id,
             'channel' => $reminder->channel,
             'kind' => AnnouncementKind::New,
             'status' => AnnouncementStatus::Sent,
         ])->value('external_id');
+
+        if ($announcementId) {
+            return (string) $announcementId;
+        }
+
+        $telegramRecord = DB::table('telegram_question_messages')
+            ->where('question_id', $reminder->question_id)
+            ->where('status', 'published')
+            ->latest('id')
+            ->first(['telegram_message_id', 'payload']);
+
+        if (! $telegramRecord) {
+            return null;
+        }
+
+        $payload = json_decode((string) $telegramRecord->payload, true) ?: [];
+
+        return (string) (data_get($payload, 'published_message_id') ?: '');
     }
 
     public function failed(\Throwable $e): void

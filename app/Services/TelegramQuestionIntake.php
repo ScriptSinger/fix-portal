@@ -28,7 +28,11 @@ class TelegramQuestionIntake
         $records = DB::table('telegram_question_messages')
             ->where('telegram_chat_id', (int) $chatId)
             ->where('telegram_user_id', (int) $userId)
-            ->whereIn('status', ['awaiting_confirmation', 'pending_moderation'])
+            ->whereNull('archived_at')
+            ->where('resolution_status', 'open')
+            ->where(function ($query): void {
+                $query->whereNotNull('registered_at')->orWhere('status', 'awaiting_confirmation');
+            })
             ->whereNotNull('text')
             ->where('text', '<>', '')
             ->latest('id')
@@ -103,6 +107,7 @@ class TelegramQuestionIntake
             'telegram_message_id' => (int) $messageId,
             'telegram_update_id' => $updateId,
             'telegram_user_id' => isset($message['from']['id']) ? (int) $message['from']['id'] : null,
+            'telegram_thread_id' => (int) ($message['message_thread_id'] ?? 0) > 1 ? (int) $message['message_thread_id'] : 0,
             'text' => $text,
             'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
             'status' => $status,
@@ -114,9 +119,15 @@ class TelegramQuestionIntake
             return null;
         }
 
-        return (int) DB::table('telegram_question_messages')
+        $id = (int) DB::table('telegram_question_messages')
             ->where('telegram_chat_id', (int) $chatId)
             ->where('telegram_message_id', (int) $messageId)
             ->value('id');
+
+        if ($status === 'pending_moderation') {
+            \App\Actions\TelegramQuestions\RegisterQuestion::run($id);
+        }
+
+        return $id;
     }
 }
