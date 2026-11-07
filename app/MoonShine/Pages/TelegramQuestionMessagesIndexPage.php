@@ -63,7 +63,7 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
             return;
         }
 
-        $this->toast($service->approve($item->telegram_message_id, $item->appliance_id, null), true);
+        $this->toast($service->approve((int) $item->getKey(), $item->appliance_id, null), true);
     }
 
     #[AsyncMethod]
@@ -76,7 +76,7 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
             return;
         }
 
-        $this->toast($service->reject($item->telegram_message_id, (string) $item->error_message, null), true);
+        $this->toast($service->reject((int) $item->getKey(), (string) $item->error_message, null), true);
     }
 
     #[AsyncMethod]
@@ -89,7 +89,7 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
             return;
         }
 
-        $this->toast($service->retry($item->telegram_message_id, null), true);
+        $this->toast($service->retry((int) $item->getKey(), null), true);
     }
 
     private function toast(string $message, bool $success = false): void

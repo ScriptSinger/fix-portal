@@ -132,13 +132,13 @@ class SitePublicationTest extends TestCase
         $record = $this->record($id);
         $service = app(TelegramQuestionModerationService::class);
 
-        $this->assertStringContainsString('Вопрос опубликован:', $service->approve($record->telegram_message_id, $this->appliance->id, null));
+        $this->assertStringContainsString('Вопрос опубликован:', $service->approve($id, $this->appliance->id, null));
         $publication = $this->state($id);
         $this->assertMirrors($id, 'published', (int) $publication->question_id, null);
         $this->assertSame($this->appliance->id, (int) $publication->appliance_id);
         $this->assertSame($this->appliance->id, (int) $this->record($id)->appliance_id);
         $this->assertSame(901, json_decode($this->record($id)->payload, true)['published_message_id']);
-        $this->assertSame("Вопрос уже опубликован: #{$publication->question_id}.", $service->approve($record->telegram_message_id, $this->appliance->id, null));
+        $this->assertSame("Вопрос уже опубликован: #{$publication->question_id}.", $service->approve($id, $this->appliance->id, null));
         $this->assertSame(1, DB::table('telegram_moderation_actions')->where('action', 'approve')->whereJsonContains('parameters->message_id', $record->telegram_message_id)->count());
         Http::assertSentCount(1);
         Http::assertSent(fn ($request) => $request['message_thread_id'] === 42 && $request['reply_to_message_id'] === $record->telegram_message_id);
@@ -164,7 +164,7 @@ class SitePublicationTest extends TestCase
         $before = $this->record($id);
         $award = DB::table('telegram_solution_awards')->where('telegram_question_message_id', $id)->first();
 
-        $this->assertSame('Вопрос отклонён.', app(TelegramQuestionModerationService::class)->reject($before->telegram_message_id, 'Не для сайта', 777));
+        $this->assertSame('Вопрос отклонён.', app(TelegramQuestionModerationService::class)->reject($id, 'Не для сайта', 777));
         $this->assertMirrors($id, 'rejected', null, 'Не для сайта');
         $after = $this->record($id);
         foreach (['registered_at', 'resolution_status', 'resolved_at', 'solution_telegram_user_id', 'solution_telegram_message_id'] as $field) {
@@ -291,9 +291,14 @@ class SitePublicationTest extends TestCase
         $this->publication($first);
         $this->publication($second);
 
-        PublishQuestion::run($second, $this->appliance->id, null);
+        $service = app(TelegramQuestionModerationService::class);
+        $this->assertSame('Preview отправлен повторно.', $service->retry($second, null));
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/sendMessage')
+            && $request['chat_id'] === (int) $this->record($second)->telegram_chat_id);
+        $this->assertSame('Вопрос отклонён.', $service->reject($first, 'Причина', null));
+        $this->assertStringContainsString('Вопрос опубликован:', $service->approve($second, $this->appliance->id, null));
 
-        $this->assertMirrors($first, 'pending_moderation', null, null);
+        $this->assertMirrors($first, 'rejected', null, 'Причина');
         $this->assertMirrors($second, 'published', (int) $this->state($second)->question_id, null);
     }
 
@@ -338,7 +343,7 @@ class SitePublicationTest extends TestCase
         $record = $this->record($id);
         $service = app(TelegramQuestionModerationService::class);
         $this->assertTrue($service->preview($record->telegram_update_id, json_decode($record->payload, true)));
-        $this->assertSame('Preview отправлен повторно.', $service->retry($record->telegram_message_id, null));
+        $this->assertSame('Preview отправлен повторно.', $service->retry($id, null));
         $this->assertStringContainsString('будет опубликовано вместе с ним', $service->attach($id, ['message' => ['message_id' => 999, 'text' => 'Продолжение']], null));
         $this->assertStringContainsString('Продолжение', $this->record($id)->text);
         Http::assertSentCount(2);

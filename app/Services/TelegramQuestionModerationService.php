@@ -63,27 +63,19 @@ class TelegramQuestionModerationService
         return true;
     }
 
-    public function approve(int $messageId, int $applianceId, ?int $moderatorId): string
+    public function approve(int $queueId, int $applianceId, ?int $moderatorId): string
     {
-        $queueId = DB::table('telegram_question_messages')->where('telegram_message_id', $messageId)->value('id');
-
-        return $queueId === null
-            ? 'Сообщение для модерации не найдено.'
-            : PublishQuestion::run((int) $queueId, $applianceId, $moderatorId);
+        return PublishQuestion::run($queueId, $applianceId, $moderatorId);
     }
 
-    public function reject(int $messageId, string $reason, ?int $moderatorId): string
+    public function reject(int $queueId, string $reason, ?int $moderatorId): string
     {
-        $queueId = DB::table('telegram_question_messages')->where('telegram_message_id', $messageId)->value('id');
-
-        return $queueId === null
-            ? 'Сообщение для модерации не найдено.'
-            : RejectPublication::run((int) $queueId, $reason, $moderatorId);
+        return RejectPublication::run($queueId, $reason, $moderatorId);
     }
 
-    public function retry(int $messageId, ?int $moderatorId): string
+    public function retry(int $queueId, ?int $moderatorId): string
     {
-        $record = DB::table('telegram_question_messages')->where('telegram_message_id', $messageId)->first();
+        $record = DB::table('telegram_question_messages')->where('id', $queueId)->first();
         if (! $record) {
             return 'Сообщение для модерации не найдено.';
         }

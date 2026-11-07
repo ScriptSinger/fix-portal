@@ -627,7 +627,7 @@ final class TelegramWebhookTest extends TestCase
         $record = DB::table('telegram_question_messages')->where('telegram_message_id', 60)->firstOrFail();
         $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
         $this->assertSame('Сообщение передано на модерацию.', \App\Actions\SitePublication\SubmitForModeration::run($record->id, 777));
-        app(\App\Services\TelegramQuestionModerationService::class)->approve(60, $appliance->id, null);
+        app(\App\Services\TelegramQuestionModerationService::class)->approve((int) $record->id, $appliance->id, null);
 
         $question = Question::query()->latest('id')->firstOrFail();
         $this->assertStringContainsString('<img ', $question->description);
@@ -694,10 +694,9 @@ final class TelegramWebhookTest extends TestCase
         Http::assertSent(fn ($request) => $request->data()['chat_id'] === -100999
             && str_contains((string) $request->data()['text'], 'Новый вопрос'));
 
-        $result = app(\App\Services\TelegramQuestionModerationService::class)
-            ->approve(50, $appliance->id, null);
-
         $queueId = (int) DB::table('telegram_question_messages')->where('telegram_message_id', 50)->value('id');
+        $result = app(\App\Services\TelegramQuestionModerationService::class)
+            ->approve($queueId, $appliance->id, null);
         $this->assertNull(DB::table('telegram_question_messages')->where('id', $queueId)->value('registered_at'));
         $registration = \App\Actions\TelegramQuestions\ConfirmRegistration::run($queueId, 778, -100123, true);
         $this->assertTrue($registration['confirmed']);
@@ -740,8 +739,8 @@ final class TelegramWebhookTest extends TestCase
         DB::table('telegram_question_publications')->insert(['telegram_question_message_id' => $queueId, 'status' => 'pending_moderation', 'created_at' => now(), 'updated_at' => now()]);
 
         $service = app(\App\Services\TelegramQuestionModerationService::class);
-        $first = $service->approve(61, $appliance->id, null);
-        $second = $service->approve(61, $appliance->id, null);
+        $first = $service->approve($queueId, $appliance->id, null);
+        $second = $service->approve($queueId, $appliance->id, null);
         $questionId = (int) DB::table('telegram_question_messages')
             ->where('telegram_message_id', 61)
             ->value('question_id');
