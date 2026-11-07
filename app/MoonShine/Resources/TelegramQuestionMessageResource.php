@@ -71,6 +71,7 @@ class TelegramQuestionMessageResource extends BaseResource
         return [
             ID::make()->sortable(),
             Text::make('Текст', 'text')->prettyLimit(limit: 120)->sortable(),
+            Preview::make('Автор', 'telegram_user_id', fn (TelegramQuestionMessage $item): string => self::authorPreview($item)),
             Enum::make('Статус', 'status')->options([
                 'pending_moderation' => 'Ожидает модерации',
                 'published' => 'Опубликован',
@@ -102,7 +103,26 @@ class TelegramQuestionMessageResource extends BaseResource
             }),
             Textarea::make('Причина отказа', 'error_message')->nullable(),
             Text::make('Question ID', 'question_id'),
+            Preview::make('Автор', 'telegram_user_id', fn (TelegramQuestionMessage $item): string => self::authorPreview($item)),
         ];
+    }
+
+    private static function authorPreview(TelegramQuestionMessage $item): string
+    {
+        $from = (array) data_get($item->payload, 'message.from', []);
+        $name = trim(implode(' ', array_filter([
+            (string) ($from['first_name'] ?? ''),
+            (string) ($from['last_name'] ?? ''),
+        ])));
+        $username = trim((string) ($from['username'] ?? ''));
+        $telegramId = (int) $item->telegram_user_id;
+        $displayName = $name !== '' ? $name : ($username !== '' ? '@'.$username : 'Неизвестный автор');
+        $usernameHtml = $username !== ''
+            ? ' <a href="https://t.me/'.rawurlencode($username).'" target="_blank" rel="noopener">@'.e($username).'</a>'
+            : '';
+
+        return '<div><strong>'.e($displayName).'</strong>'.$usernameHtml
+            .'<div style="font-size:.8em;color:#6b7280">Telegram ID: '.e((string) $telegramId).'</div></div>';
     }
 
     protected function formFields(): iterable

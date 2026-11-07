@@ -80,6 +80,12 @@ class TelegramQuestionIntake
             return false;
         }
 
+        // Автоматически считаем сообщением-вопросом только текст с вопросительным знаком.
+        // Команда /question передаёт allowReply=true и может явно пометить любой текст/фото.
+        if (! $allowReply && ! str_contains($text, '?') && ! str_contains($text, '？')) {
+            return false;
+        }
+
         return DB::table('telegram_question_messages')->insertOrIgnore([
             'telegram_chat_id' => (int) $chatId,
             'telegram_message_id' => (int) $messageId,

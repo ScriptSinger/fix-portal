@@ -276,16 +276,19 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
-    public function test_message_from_source_chat_is_queued_for_moderation(): void
+    public function test_question_mark_message_from_source_chat_is_queued_for_moderation(): void
     {
-        config(['services.telegram.source_chat_id' => '-100123']);
+        config([
+            'services.telegram.source_chat_id' => '-100123',
+            'services.telegram.moderation_chat_id' => '-100123',
+        ]);
 
         $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
             ->postJson('/api/telegram/webhook', [
                 'update_id' => 1008,
                 'message' => [
                     'message_id' => 12,
-                    'text' => "Холодильник не морозит\nМодель RB33",
+                    'text' => "Холодильник не морозит?\nМодель RB33",
                     'from' => ['id' => 778],
                     'chat' => ['id' => -100123, 'type' => 'supergroup'],
                 ],
@@ -297,14 +300,38 @@ final class TelegramWebhookTest extends TestCase
             'telegram_message_id' => 12,
             'telegram_update_id' => 1008,
             'status' => 'pending_moderation',
-            'text' => "Холодильник не морозит\nМодель RB33",
+            'text' => "Холодильник не морозит?\nМодель RB33",
+        ]);
+    }
+
+    public function test_plain_message_from_source_chat_is_not_queued(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123']);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 10081,
+                'message' => [
+                    'message_id' => 121,
+                    'text' => 'Холодильник уже починили, спасибо.',
+                    'from' => ['id' => 778],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseMissing('telegram_question_messages', [
+            'telegram_message_id' => 121,
         ]);
     }
 
     public function test_consecutive_messages_from_the_same_author_are_merged_into_one_question(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
-        config(['services.telegram.source_chat_id' => '-100123']);
+        config([
+            'services.telegram.source_chat_id' => '-100123',
+            'services.telegram.moderation_chat_id' => '-100123',
+        ]);
 
         $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
         $baseMessage = [
@@ -316,7 +343,7 @@ final class TelegramWebhookTest extends TestCase
             'update_id' => 2010,
             'message' => $baseMessage + [
                 'message_id' => 201,
-                'text' => 'Компрессор запускается, но не охлаждает.',
+                'text' => 'Компрессор запускается, но не охлаждает?',
             ],
         ])->assertOk();
 
@@ -340,7 +367,7 @@ final class TelegramWebhookTest extends TestCase
 
         $this->assertDatabaseCount('telegram_question_messages', 1);
         $record = DB::table('telegram_question_messages')->first();
-        $this->assertSame("Компрессор запускается, но не охлаждает.\n\nМодель Indesit DF 5200 W.", $record->text);
+        $this->assertSame("Компрессор запускается, но не охлаждает?\n\nМодель Indesit DF 5200 W.", $record->text);
         $payload = json_decode((string) $record->payload, true, 32, JSON_THROW_ON_ERROR);
         $this->assertContains(202, $payload['attached_message_ids']);
         $this->assertContains(203, $payload['attached_message_ids']);
@@ -430,7 +457,7 @@ final class TelegramWebhookTest extends TestCase
                 'update_id' => 1011,
                 'message' => [
                     'message_id' => 60,
-                    'caption' => 'Не сливает воду',
+                    'caption' => 'Не сливает воду?',
                     'photo' => [['file_id' => 'small'], ['file_id' => 'large']],
                     'from' => ['id' => 778],
                     'chat' => ['id' => -100123, 'type' => 'supergroup'],
@@ -465,7 +492,7 @@ final class TelegramWebhookTest extends TestCase
                 'update_id' => 1009,
                 'message' => [
                     'message_id' => 50,
-                    'text' => "Холодильник Samsung не морозит\nНужна помощь мастера.",
+                    'text' => "Холодильник Samsung не морозит?\nНужна помощь мастера.",
                     'from' => ['id' => 778],
                     'chat' => ['id' => -100123, 'type' => 'supergroup', 'title' => 'Ufamasters'],
                 ],
