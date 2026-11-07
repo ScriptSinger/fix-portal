@@ -305,7 +305,7 @@ final class TelegramWebhookTest extends TestCase
         ]);
 
         Http::assertSent(fn ($request): bool => $request['chat_id'] === -100123
-            && str_contains($request['text'], 'Отправить его на модерацию?')
+            && $request['text'] === 'Похоже, это вопрос. Зарегистрировать его?'
             && str_contains((string) $request['reply_markup'], 'question_confirm:'));
     }
 

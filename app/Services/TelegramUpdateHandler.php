@@ -155,8 +155,8 @@ class TelegramUpdateHandler
         }
 
         $payload = json_decode((string) $record->payload, true, 32, JSON_THROW_ON_ERROR);
-        $this->answerCallback($callback, 'Вопрос отправлен на модерацию.', false);
-        $this->editConfirmationMessage($callback, '✅ Вопрос отправлен на модерацию.');
+            $this->answerCallback($callback, 'Вопрос зарегистрирован.', false);
+            $this->editConfirmationMessage($callback, '✅ Вопрос зарегистрирован и передан на модерацию.');
         $this->questionModeration->preview((int) $record->telegram_update_id, $payload);
     }
 
@@ -166,16 +166,15 @@ class TelegramUpdateHandler
         $message = $payload['message'] ?? [];
         $chatId = (int) data_get($message, 'chat.id');
         $messageId = (int) data_get($message, 'message_id');
-        $text = trim((string) data_get($message, 'text', data_get($message, 'caption', '')));
 
         $this->telegram->call('sendMessage', [
             'chat_id' => $chatId,
             'reply_to_message_id' => $messageId,
-            'text' => "Похоже, это вопрос. Отправить его на модерацию?\n\n".Str::limit($text, 700),
+            'text' => 'Похоже, это вопрос. Зарегистрировать его?',
             'disable_web_page_preview' => true,
             'reply_markup' => json_encode([
                 'inline_keyboard' => [[
-                    ['text' => '✅ Отправить', 'callback_data' => "question_confirm:{$recordId}"],
+                    ['text' => '📋 Зарегистрировать', 'callback_data' => "question_confirm:{$recordId}"],
                     ['text' => '❌ Не отправлять', 'callback_data' => "question_cancel:{$recordId}"],
                 ]],
             ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
