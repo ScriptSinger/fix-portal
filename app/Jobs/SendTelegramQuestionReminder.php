@@ -56,7 +56,7 @@ class SendTelegramQuestionReminder implements ShouldQueue
             $payload = [
                 'chat_id' => (int) $question->telegram_chat_id,
                 'text' => "Вопрос #{$question->id} пока открыт. Если можете помочь, ответьте, пожалуйста.\n"
-                    ."Автор: если решение найдено, ответьте на сообщение помощника командой /solved {$question->id}.",
+                    ."Автор: если ответ помог, поставьте 🤝 на сообщение помощника, чтобы отметить решение.",
                 'reply_parameters' => ['message_id' => (int) $question->telegram_message_id],
             ];
             if ((int) $question->telegram_thread_id > 0) {

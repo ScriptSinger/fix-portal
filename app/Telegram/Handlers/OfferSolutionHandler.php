@@ -2,6 +2,7 @@
 
 namespace App\Telegram\Handlers;
 
+use App\Enums\TelegramQuestionResolutionStatus;
 use App\Services\TelegramBotApi;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,7 @@ class OfferSolutionHandler
             ->where('telegram_user_id', $authorId)
             ->whereNotNull('registered_at')
             ->whereNull('archived_at')
-            ->where('resolution_status', 'open')
+            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
             ->where('telegram_message_id', '<', (int) data_get($reply, 'message_id'))
             ->orderByDesc('id')->limit(10)->get(['id', 'text']);
 

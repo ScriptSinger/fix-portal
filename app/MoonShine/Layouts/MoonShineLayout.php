@@ -19,6 +19,7 @@ use App\MoonShine\Resources\LatestDiscussionsWidgetResource;
 use App\MoonShine\Resources\RepairWidgetResource;
 use App\MoonShine\Resources\TelegramWidgetResource;
 use App\MoonShine\Resources\TelegramQuestionMessageResource;
+use App\MoonShine\Resources\TelegramCommunityQuestionResource;
 use App\MoonShine\Resources\YandexWidgetResource;
 use App\MoonShine\Resources\TagResource;
 use App\MoonShine\Resources\UserResource;
@@ -51,6 +52,7 @@ final class MoonShineLayout extends AppLayout
                 MenuItem::make(TagResource::class, 'Теги')->icon('tag'),
             ], 'newspaper'),
             MenuGroup::make('Вопросы', [
+                MenuItem::make(TelegramCommunityQuestionResource::class, 'Вопросы Telegram-группы')->icon('chat-bubble-left-right'),
                 MenuItem::make(TelegramQuestionMessageResource::class, 'Telegram-модерация')->icon('inbox-arrow-down'),
                 MenuItem::make(QuestionResource::class, 'Вопросы')->icon('question-mark-circle'),
                 MenuItem::make(ApplianceResource::class, 'Типы техники')->icon('wrench-screwdriver'),

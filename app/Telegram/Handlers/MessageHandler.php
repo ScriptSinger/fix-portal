@@ -20,7 +20,7 @@ class MessageHandler
         }
         $intake = app(TelegramQuestionIntake::class);
         if ($continuation = $intake->pendingReplyContinuation($payload)) {
-            app(TelegramQuestionModerationService::class)->attach($continuation->id, $payload, null);
+            app(TelegramQuestionModerationService::class)->attachCommunity($continuation->id, $payload);
             return;
         }
         if (! $id = $intake->storeAwaitingConfirmation($bot->update()->update_id, $payload)) {

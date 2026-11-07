@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources;
 
 use App\Models\TelegramQuestionMessage;
+use App\Enums\TelegramQuestionConfirmationStatus;
 use App\MoonShine\Fields\LocalDate;
 use App\MoonShine\Pages\TelegramQuestionMessagesIndexPage;
 use App\MoonShine\Pages\ResourceFormPage;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Contracts\UI\ActionButtonContract;
@@ -43,7 +46,12 @@ class TelegramQuestionMessageResource extends BaseResource
 
     public function getTitle(): string
     {
-        return 'Telegram-вопросы';
+        return 'Публикация Telegram-вопросов на сайте';
+    }
+
+    protected function modifyQueryBuilder(Builder $builder): Builder
+    {
+        return $builder->whereHas('publication');
     }
 
     protected function activeActions(): ListOf
@@ -56,19 +64,29 @@ class TelegramQuestionMessageResource extends BaseResource
         );
     }
 
-    /**
-     * The moderation queue may be cleaned up, but a published moderation
-     * record must not be removed from the CRUD accidentally or via a direct
-     * mass-delete request.
-     */
     public function delete(DataWrapperContract $item, ?FieldsContract $fields = null): bool
     {
-        if ($item->getOriginal() instanceof TelegramQuestionMessage
-            && ($item->getOriginal()->registered_at !== null || $item->getOriginal()->status === 'published')) {
+        $message = $item->getOriginal();
+        if (! $message instanceof TelegramQuestionMessage) {
             return false;
         }
 
-        return parent::delete($item, $fields);
+        return DB::transaction(function () use ($message): bool {
+            $record = DB::table('telegram_question_messages')->where('id', $message->getKey())->lockForUpdate()->first();
+            $publication = DB::table('telegram_question_publications')->where('telegram_question_message_id', $message->getKey())->lockForUpdate()->first();
+            if (! $record || ! $publication || $publication->status === 'published') {
+                return false;
+            }
+            DB::table('telegram_question_publications')->where('id', $publication->id)->delete();
+            DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                'status' => $record->registered_at !== null ? 'registered'
+                    : ($record->community_confirmation_status === TelegramQuestionConfirmationStatus::Pending->value ? 'awaiting_confirmation' : 'cancelled'),
+                'question_id' => null, 'appliance_id' => null, 'error_message' => null,
+                'moderation_chat_id' => null, 'moderation_message_id' => null, 'updated_at' => now(),
+            ]);
+
+            return true;
+        });
     }
 
     /**

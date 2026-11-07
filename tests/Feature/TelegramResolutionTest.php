@@ -41,11 +41,11 @@ class TelegramResolutionTest extends TestCase
     public function test_single_registered_question_is_resolved_and_award_records_its_provenance(): void
     {
         $id = $this->question();
-        $message = $this->message();
+        $message = $this->message(['reply_to_message' => ['from' => ['first_name' => 'Артём', 'last_name' => 'Никитин']]]);
 
         $response = app(TelegramReputation::class)->resolve($message);
 
-        $this->assertSame('Вопрос отмечен решённым. Помощник — решений: 1.', $response);
+        $this->assertSame('Вопрос отмечен решённым. Артём Никитин — Техноадепт, карма: 1.', $response);
         $this->assertDatabaseHas('telegram_solution_awards', [
             'telegram_question_message_id' => $id,
             'telegram_chat_id' => $this->chatId,
@@ -227,7 +227,7 @@ class TelegramResolutionTest extends TestCase
 
         $reputation = app(TelegramReputation::class);
         $this->assertSame(1, $reputation->countFor($this->helperId));
-        $this->assertSame('Помощник', $reputation->rankFor($this->helperId));
+        $this->assertSame('Техноадепт', $reputation->rankFor($this->helperId));
         $this->assertDatabaseHas('telegram_solution_awards', ['telegram_question_message_id' => $id]);
         $second = $this->question();
         $this->assertStringContainsString('уже учтены', ResolveQuestion::run($message, $second));
@@ -251,7 +251,7 @@ class TelegramResolutionTest extends TestCase
             ]), $id));
             // Counts are all-time, even for awards outside a reporting window.
             DB::table('telegram_solution_awards')->where('telegram_question_message_id', $id)->update(['created_at' => '2020-01-01 00:00:00']);
-            $expectedRank = $i < 2 ? 'Помощник' : ($i < 9 ? 'Знаток' : 'Эксперт');
+            $expectedRank = $i < 2 ? 'Техноадепт' : ($i < 9 ? 'Техножрец' : 'Магос');
             $this->assertSame($i + 1, $reputation->countFor($this->helperId));
             $this->assertSame($expectedRank, $reputation->rankFor($this->helperId));
         }
@@ -329,12 +329,22 @@ class TelegramResolutionTest extends TestCase
             $this->assertSolved(ResolveQuestion::run($this->message(), $this->question()));
         }
         $this->configureTelegram();
-        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
+        Http::fake(fn ($request) => Http::response(['ok' => true, 'result' => str_ends_with($request->url(), '/getChatMember') ? ['status' => 'member'] : true]));
 
         $job->handle(app(TelegramBotApi::class), app(TelegramReputation::class));
 
         Http::assertSent(fn ($request) => str_ends_with($request->url(), '/setChatMemberTag')
-            && $request['chat_id'] === $this->chatId && $request['user_id'] === $this->helperId && $request['tag'] === 'Знаток');
+            && $request['chat_id'] === $this->chatId && $request['user_id'] === $this->helperId && $request['tag'] === 'Техножрец');
+    }
+
+    public function test_tag_job_does_not_try_to_change_admin_or_owner_titles(): void
+    {
+        $this->configureTelegram();
+        foreach (['creator', 'administrator'] as $status) {
+            Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['status' => $status]])]);
+            (new SyncTelegramMemberTag($this->chatId, $this->helperId))->handle(app(TelegramBotApi::class), app(TelegramReputation::class));
+            Http::assertNotSent(fn ($request) => str_ends_with($request->url(), '/setChatMemberTag'));
+        }
     }
 
     public function test_tag_failure_can_be_retried_without_losing_or_duplicating_the_award(): void
@@ -342,7 +352,8 @@ class TelegramResolutionTest extends TestCase
         $id = $this->question();
         $this->assertSolved(ResolveQuestion::run($this->message(), $id));
         $this->configureTelegram();
-        Http::fakeSequence()->push(['ok' => false], 500)->push(['ok' => true, 'result' => true]);
+        Http::fakeSequence()->push(['ok' => true, 'result' => ['status' => 'member']])->push(['ok' => false], 500)
+            ->push(['ok' => true, 'result' => ['status' => 'member']])->push(['ok' => true, 'result' => true]);
         $job = new SyncTelegramMemberTag($this->chatId, $this->helperId);
         $this->assertSame(3, $job->tries);
         $this->assertSame([60, 300], $job->backoff());

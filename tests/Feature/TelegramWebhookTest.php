@@ -122,10 +122,11 @@ final class TelegramWebhookTest extends TestCase
             'processing_error' => 'Telegram API unavailable',
         ]);
 
-        $this->artisan('telegram:webhook-monitor', ['--minutes' => 5, '--json' => true])
-            ->assertExitCode(1)
-            ->expectsOutputToContain('"stale_count": 1')
-            ->expectsOutputToContain('"failed_count": 1');
+        $exitCode = \Illuminate\Support\Facades\Artisan::call('telegram:webhook-monitor', ['--minutes' => 5, '--json' => true]);
+        $result = json_decode(\Illuminate\Support\Facades\Artisan::output(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame(1, $exitCode);
+        $this->assertSame(1, $result['stale_count']);
+        $this->assertSame(1, $result['failed_count']);
     }
 
     public function test_webhook_rejects_an_oversized_payload(): void
@@ -184,6 +185,8 @@ final class TelegramWebhookTest extends TestCase
             'updated_at' => now(),
         ]);
 
+        DB::table('telegram_question_publications')->insert(['telegram_question_message_id' => $queueId, 'status' => 'pending_moderation', 'created_at' => now(), 'updated_at' => now()]);
+
         $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
             ->postJson('/api/telegram/webhook', [
                 'update_id' => 2001,
@@ -207,7 +210,7 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
-    public function test_question_command_is_rate_limited(): void
+    public function test_moderate_command_is_rate_limited(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 15]])]);
         config([
@@ -220,7 +223,7 @@ final class TelegramWebhookTest extends TestCase
             'update_id' => $updateId,
             'message' => [
                 'message_id' => $updateId,
-                'text' => '/question',
+                'text' => '/moderate',
                 'from' => ['id' => 990],
                 'chat' => ['id' => -100990, 'type' => 'supergroup'],
             ],
@@ -236,7 +239,7 @@ final class TelegramWebhookTest extends TestCase
         Http::assertSent(fn ($request): bool => str_contains($request['text'], 'Слишком много команд'));
     }
 
-    public function test_marked_question_tells_the_author_about_thumbs_up_reaction(): void
+    public function test_moderation_command_reports_only_site_publication_status(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
         config(['services.telegram.moderator_ids' => [777], 'services.telegram.source_chat_id' => '-100123']);
@@ -246,7 +249,7 @@ final class TelegramWebhookTest extends TestCase
                 'update_id' => 2095,
                 'message' => [
                     'message_id' => 95,
-                    'text' => '/question',
+                    'text' => '/moderate',
                     'from' => ['id' => 777],
                     'chat' => ['id' => -100123, 'type' => 'supergroup'],
                     'reply_to_message' => [
@@ -259,7 +262,13 @@ final class TelegramWebhookTest extends TestCase
 
         Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage')
             && data_get($request->data(), 'reply_to_message_id') === 94
-            && str_contains((string) data_get($request->data(), 'text'), 'поставьте 👍'));
+            && data_get($request->data(), 'text') === '📋 Вопрос передан на модерацию сайта.');
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 94)->firstOrFail();
+        $this->assertNull($record->registered_at);
+        $this->assertDatabaseHas('telegram_question_publications', [
+            'telegram_question_message_id' => $record->id,
+            'status' => 'pending_moderation',
+        ]);
     }
 
     public function test_unauthorized_user_cannot_use_moderator_commands(): void
@@ -336,7 +345,7 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
-    public function test_question_mark_message_from_source_chat_requires_confirmation_before_moderation(): void
+    public function test_question_mark_message_from_source_chat_requires_confirmation_before_registration(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 900]])]);
         config([
@@ -375,6 +384,7 @@ final class TelegramWebhookTest extends TestCase
         config([
             'services.telegram.source_chat_id' => '-100123',
             'services.telegram.moderation_chat_id' => '-100123',
+            'services.telegram.moderator_ids' => [777],
         ]);
 
         $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
@@ -405,10 +415,37 @@ final class TelegramWebhookTest extends TestCase
 
         $this->assertDatabaseHas('telegram_question_messages', [
             'id' => $record->id,
+            'community_confirmation_status' => 'confirmed',
+        ]);
+        $this->assertNotNull(DB::table('telegram_question_messages')->where('id', $record->id)->value('registered_at'));
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
+        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/editMessageText')
+            && str_contains((string) data_get($request->data(), 'text'), 'поставьте 🤝'));
+
+        $command = [
+            'text' => '/moderate',
+            'chat' => ['id' => -100123, 'type' => 'supergroup'],
+            'reply_to_message' => [
+                'message_id' => 30,
+                'text' => 'Компрессор не запускается?',
+                'from' => ['id' => 778],
+            ],
+        ];
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 1012,
+            'message' => ['message_id' => 31, 'from' => ['id' => 779]] + $command,
+        ])->assertOk();
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 1013,
+            'message' => ['message_id' => 32, 'from' => ['id' => 777]] + $command,
+        ])->assertOk();
+        $this->assertDatabaseCount('telegram_question_messages', 1);
+        $this->assertDatabaseHas('telegram_question_publications', [
+            'telegram_question_message_id' => $record->id,
             'status' => 'pending_moderation',
         ]);
-        Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/editMessageText')
-            && str_contains((string) data_get($request->data(), 'text'), 'поставьте 👍'));
     }
 
     public function test_plain_message_from_source_chat_is_not_queued(): void
@@ -569,7 +606,7 @@ final class TelegramWebhookTest extends TestCase
 
             return Http::response(['ok' => true, 'result' => ['message_id' => 901]]);
         });
-        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.moderation_chat_id' => '-100999']);
+        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.moderation_chat_id' => '-100999', 'services.telegram.moderator_ids' => [777]]);
         $author = User::factory()->create();
         $appliance = Appliance::create(['title' => 'Стиральные машины']);
         config(['services.telegram.author_user_id' => $author->id]);
@@ -587,6 +624,9 @@ final class TelegramWebhookTest extends TestCase
             ])
             ->assertOk();
 
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 60)->firstOrFail();
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
+        $this->assertSame('Сообщение передано на модерацию.', \App\Actions\SitePublication\SubmitForModeration::run($record->id, 777));
         app(\App\Services\TelegramQuestionModerationService::class)->approve(60, $appliance->id, null);
 
         $question = Question::query()->latest('id')->firstOrFail();
@@ -599,10 +639,11 @@ final class TelegramWebhookTest extends TestCase
         Http::fake(['https://api.telegram.org/*' => Http::sequence()
             ->push(['ok' => true, 'result' => ['message_id' => 900]])
             ->push(['ok' => true, 'result' => ['message_id' => 901]])
-            ->push(['ok' => true, 'result' => ['message_id' => 902]])]);
+            ->push(['ok' => true, 'result' => ['message_id' => 902]])
+            ->push(['ok' => true, 'result' => ['message_id' => 903]])]);
         config([
             'services.telegram.source_chat_id' => '-100123',
-            'services.telegram.moderation_chat_id' => '-100123',
+            'services.telegram.moderation_chat_id' => '-100999',
             'services.telegram.moderator_ids' => [777],
         ]);
         $author = User::factory()->create();
@@ -623,13 +664,44 @@ final class TelegramWebhookTest extends TestCase
 
         $this->assertDatabaseHas('telegram_question_messages', [
             'telegram_message_id' => 50,
-            'status' => 'pending_moderation',
-            'moderation_message_id' => 900,
+            'status' => 'awaiting_confirmation',
         ]);
-        Http::assertSent(fn ($request) => $request->data()['text'] === 'Сообщение получено и передано на модерацию.');
+        $this->assertDatabaseMissing('telegram_question_publications', [
+            'telegram_question_message_id' => DB::table('telegram_question_messages')->where('telegram_message_id', 50)->value('id'),
+        ]);
+
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 1012,
+                'message' => [
+                    'message_id' => 51,
+                    'text' => '/moderate',
+                    'from' => ['id' => 777],
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'reply_to_message' => [
+                        'message_id' => 50,
+                        'text' => "Холодильник Samsung не морозит?\nНужна помощь мастера.",
+                        'from' => ['id' => 778],
+                    ],
+                ],
+            ])->assertOk();
+
+        $this->assertDatabaseHas('telegram_question_messages', ['telegram_message_id' => 50, 'status' => 'pending_moderation']);
+        $this->assertDatabaseHas('telegram_question_publications', [
+            'telegram_question_message_id' => DB::table('telegram_question_messages')->where('telegram_message_id', 50)->value('id'),
+            'status' => 'pending_moderation',
+        ]);
+        Http::assertSent(fn ($request) => $request->data()['chat_id'] === -100999
+            && str_contains((string) $request->data()['text'], 'Новый вопрос'));
 
         $result = app(\App\Services\TelegramQuestionModerationService::class)
             ->approve(50, $appliance->id, null);
+
+        $queueId = (int) DB::table('telegram_question_messages')->where('telegram_message_id', 50)->value('id');
+        $this->assertNull(DB::table('telegram_question_messages')->where('id', $queueId)->value('registered_at'));
+        $registration = \App\Actions\TelegramQuestions\ConfirmRegistration::run($queueId, 778, -100123, true);
+        $this->assertTrue($registration['confirmed']);
+        $this->assertNotNull(DB::table('telegram_question_messages')->where('id', $queueId)->value('registered_at'));
 
         $this->assertDatabaseHas('telegram_question_messages', [
             'telegram_message_id' => 50,
@@ -639,9 +711,6 @@ final class TelegramWebhookTest extends TestCase
         $this->assertDatabaseCount('questions', 1);
         $this->assertDatabaseHas('questions', ['user_id' => $author->id, 'appliance_id' => $appliance->id]);
         $this->assertDatabaseHas('telegram_moderation_actions', ['action' => 'approve']);
-        Http::assertSent(fn ($request) => data_get($request->data(), 'chat_id') === -100123
-            && data_get($request->data(), 'reply_to_message_id') === 50
-            && str_contains((string) data_get($request->data(), 'text'), 'Вопрос опубликован на Ufamasters'));
     }
 
     public function test_repeated_approve_does_not_create_a_second_question(): void
@@ -651,7 +720,7 @@ final class TelegramWebhookTest extends TestCase
         $appliance = Appliance::create(['title' => 'Стиральные машины']);
         config(['services.telegram.author_user_id' => $author->id]);
 
-        DB::table('telegram_question_messages')->insert([
+        $queueId = DB::table('telegram_question_messages')->insertGetId([
             'telegram_chat_id' => -100123,
             'telegram_message_id' => 61,
             'telegram_update_id' => 1061,
@@ -667,6 +736,8 @@ final class TelegramWebhookTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        DB::table('telegram_question_publications')->insert(['telegram_question_message_id' => $queueId, 'status' => 'pending_moderation', 'created_at' => now(), 'updated_at' => now()]);
 
         $service = app(\App\Services\TelegramQuestionModerationService::class);
         $first = $service->approve(61, $appliance->id, null);
@@ -686,7 +757,7 @@ final class TelegramWebhookTest extends TestCase
 
     public function test_author_can_mark_a_telegram_only_question_as_solved_and_award_the_answerer(): void
     {
-        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 904]])]);
+        Http::fake(fn ($request) => Http::response(['ok' => true, 'result' => str_ends_with($request->url(), '/getChatMember') ? ['status' => 'member'] : ['message_id' => 904]]));
 
         DB::table('telegram_question_messages')->insert([
             'telegram_chat_id' => -100123,
@@ -728,7 +799,7 @@ final class TelegramWebhookTest extends TestCase
 
         Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/setChatMemberTag')
             && $request['user_id'] === 779
-            && $request['tag'] === 'Помощник');
+            && $request['tag'] === 'Техноадепт');
         Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage')
             && str_contains((string) $request['text'], 'Вопрос отмечен решённым'));
     }
@@ -773,7 +844,7 @@ final class TelegramWebhookTest extends TestCase
                     'user' => ['id' => 778, 'is_bot' => false],
                     'date' => now()->timestamp,
                     'old_reaction' => [],
-                    'new_reaction' => [['type' => 'emoji', 'emoji' => '👍']],
+                    'new_reaction' => [['type' => 'emoji', 'emoji' => '🤝']],
                 ],
             ])->assertOk();
 
@@ -800,10 +871,10 @@ final class TelegramWebhookTest extends TestCase
         $this->assertSame(1, DB::table('telegram_question_messages')->where('resolution_status', 'solved')->count());
     }
 
-    public function test_thumbs_up_reaction_silently_solves_the_only_open_question(): void
+    public function test_handshake_reaction_silently_solves_the_only_open_question(): void
     {
         config(['services.telegram.source_chat_id' => '-100123']);
-        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        Http::fake(fn ($request) => Http::response(['ok' => true, 'result' => str_ends_with($request->url(), '/getChatMember') ? ['status' => 'member'] : ['message_id' => 901]]));
         DB::table('telegram_question_messages')->insert([
             'telegram_chat_id' => -100123,
             'telegram_message_id' => 90,
@@ -828,7 +899,7 @@ final class TelegramWebhookTest extends TestCase
             ])->assertOk();
         $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
             ->postJson('/api/telegram/webhook', [
-                'update_id' => 2092,
+                'update_id' => 2093,
                 'message_reaction' => [
                     'chat' => ['id' => -100123, 'type' => 'supergroup'],
                     'message_id' => 91,
@@ -836,6 +907,19 @@ final class TelegramWebhookTest extends TestCase
                     'date' => now()->timestamp,
                     'old_reaction' => [],
                     'new_reaction' => [['type' => 'emoji', 'emoji' => '👍']],
+                ],
+            ])->assertOk();
+        $this->assertDatabaseMissing('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', [
+                'update_id' => 2092,
+                'message_reaction' => [
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                    'message_id' => 91,
+                    'user' => ['id' => 778, 'is_bot' => false],
+                    'date' => now()->timestamp,
+                    'old_reaction' => [],
+                    'new_reaction' => [['type' => 'emoji', 'emoji' => '🤝']],
                 ],
             ])->assertOk();
         $this->assertDatabaseHas('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);

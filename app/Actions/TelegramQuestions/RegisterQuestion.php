@@ -2,6 +2,7 @@
 
 namespace App\Actions\TelegramQuestions;
 
+use App\Enums\TelegramQuestionConfirmationStatus;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
 
@@ -17,11 +18,9 @@ class RegisterQuestion
                 return;
             }
             DB::table('telegram_question_messages')->where('id', $id)->update([
-                'registered_at' => now(), 'status' => 'pending_moderation', 'updated_at' => now(),
-            ]);
-            DB::table('telegram_question_publications')->insertOrIgnore([
-                'telegram_question_message_id' => $id, 'status' => 'pending_moderation',
-                'created_at' => now(), 'updated_at' => now(),
+                'registered_at' => now(),
+                'community_confirmation_status' => TelegramQuestionConfirmationStatus::Confirmed->value,
+                'updated_at' => now(),
             ]);
         });
     }

@@ -17,7 +17,7 @@ class HowItWorksPageTest extends TestCase
     {
         $response = $this->get(route('how-it-works'))->assertOk()
             ->assertSee('Опишите проблему')->assertSee('Вам отвечают')->assertSee('Вы отмечаете правильный ответ')->assertSee('нажмите «Это решение»')->assertSee('Разбор остаётся на сайте')
-            ->assertSee('Звания и репутация')->assertSee('До первого решения звания нет.');
+            ->assertSee('Звания и карма')->assertSee('До первого решения звания нет.');
 
         // звания и пороги берутся из тех же настроек, что и расчёт репутации
         foreach (Reputation::RANKS as $threshold => $title) {

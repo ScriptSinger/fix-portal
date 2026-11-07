@@ -165,7 +165,7 @@ class TelegramCommunityRemindersTest extends TestCase
         Http::assertSentCount(3);
     }
 
-    public function test_job_replies_to_original_message_in_its_topic_with_explicit_solved_command(): void
+    public function test_job_replies_to_original_message_in_its_topic_with_reaction_instructions(): void
     {
         $id = $this->question(['telegram_thread_id' => 42, 'status' => 'rejected']);
         $reminderId = app(TelegramQuestionReminders::class)->reserve($id);
@@ -175,7 +175,7 @@ class TelegramCommunityRemindersTest extends TestCase
             && $request['chat_id'] === -100123
             && $request['message_thread_id'] === 42
             && $request['reply_parameters'] === ['message_id' => 55]
-            && str_contains($request['text'], '/solved '.$id)
+            && str_contains($request['text'], 'поставьте 🤝')
             && ! isset($request['reply_markup']));
     }
 
@@ -347,9 +347,9 @@ class TelegramCommunityRemindersTest extends TestCase
         $text = app(TelegramCommunityDigest::class)->text();
 
         $this->assertStringContainsString('Открытых вопросов в Telegram: 0.', $text);
-        $this->assertStringContainsString('1. <a href="tg://user?id=900">ID 900</a> — 10, Эксперт', $text);
-        $this->assertStringContainsString('2. <a href="tg://user?id=800">ID 800</a> — 3, Знаток', $text);
-        $this->assertStringContainsString('3. <a href="tg://user?id=700">ID 700</a> — 1, Помощник', $text);
+        $this->assertStringContainsString('1. <a href="tg://user?id=900">ID 900</a> — карма: 10, Магос', $text);
+        $this->assertStringContainsString('2. <a href="tg://user?id=800">ID 800</a> — карма: 3, Техножрец', $text);
+        $this->assertStringContainsString('3. <a href="tg://user?id=700">ID 700</a> — карма: 1, Техноадепт', $text);
         $this->assertSame(10, substr_count($text, 'tg://user?id='));
         $this->assertStringNotContainsString('ID 1007', $text);
         $this->assertStringNotContainsString('\\n', $text);

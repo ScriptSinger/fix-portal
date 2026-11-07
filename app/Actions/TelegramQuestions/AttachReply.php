@@ -2,6 +2,7 @@
 
 namespace App\Actions\TelegramQuestions;
 
+use App\Enums\TelegramQuestionResolutionStatus;
 use App\Services\TelegramQuestionModerationService;
 use Illuminate\Support\Facades\DB;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -28,7 +29,7 @@ class AttachReply
                 ->where('telegram_user_id', $authorId)
                 ->whereNotNull('registered_at')
                 ->whereNull('archived_at')
-                ->where('resolution_status', 'open')
+            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
                 ->where('telegram_thread_id', max(0, (int) ($message['message_thread_id'] ?? 0) > 1 ? (int) $message['message_thread_id'] : 0))
                 ->latest('id')
                 ->value('id');

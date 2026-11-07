@@ -29,6 +29,18 @@ class SyncTelegramMemberTag implements ShouldQueue
 
     public function handle(TelegramBotApi $api, TelegramReputation $reputation): void
     {
+        $member = $api->call('getChatMember', [
+            'chat_id' => $this->telegramChatId,
+            'user_id' => $this->telegramUserId,
+        ]);
+        $status = $member['status'] ?? null;
+        if (in_array($status, ['creator', 'administrator', 'left', 'kicked'], true)) {
+            return;
+        }
+        if (! in_array($status, ['member', 'restricted'], true)) {
+            throw new \RuntimeException('Telegram returned an unknown member status.');
+        }
+
         // Recompute on every attempt so an old queued job cannot restore an old rank.
         $api->call('setChatMemberTag', [
             'chat_id' => $this->telegramChatId,

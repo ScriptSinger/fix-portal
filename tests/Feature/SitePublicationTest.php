@@ -26,6 +26,85 @@ class SitePublicationTest extends TestCase
 
     private int $httpTransactionLevel;
 
+    public function test_deleting_moderation_record_preserves_group_question_and_confirmation(): void
+    {
+        $id = $this->message(['registered_at' => null, 'community_confirmation_status' => 'pending']);
+        $this->publication($id);
+        $registered = $this->message(['community_confirmation_status' => 'confirmed']);
+        $this->publication($registered);
+        $published = $this->message();
+        $this->publication($published, ['status' => 'published']);
+        $resource = app(\App\MoonShine\Resources\TelegramQuestionMessageResource::class);
+        $resource->massDelete([$id, $registered, $published]);
+
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $id]);
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $registered]);
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $registered, 'community_confirmation_status' => 'confirmed']);
+        $this->assertDatabaseHas('telegram_question_publications', ['telegram_question_message_id' => $published, 'status' => 'published']);
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'pending']);
+        $record = $this->record($id);
+        $this->assertTrue(\App\Actions\TelegramQuestions\ConfirmRegistration::run($id, 778, (int) $record->telegram_chat_id, true)['confirmed']);
+    }
+
+    public function test_existing_question_keeps_collected_album_when_submitted(): void
+    {
+        $id = $this->message();
+        $record = $this->record($id);
+        config(['services.telegram.source_chat_id' => (string) $record->telegram_chat_id,
+            'services.telegram.moderation_chat_id' => (string) $record->telegram_chat_id,
+            'services.telegram.moderator_ids' => [777]]);
+        $photos = [[['file_id' => 'photo-one']], [['file_id' => 'photo-two']]];
+        $this->mock(\App\Telegram\TelegramAlbum::class)->shouldReceive('collect')->once()->andReturn($photos);
+        $message = [
+            'from' => ['id' => 777], 'chat' => ['id' => $record->telegram_chat_id],
+            'reply_to_message' => ['message_id' => $record->telegram_message_id, 'chat' => ['id' => $record->telegram_chat_id],
+                'from' => ['id' => 778], 'text' => 'Вопрос?', 'media_group_id' => 'album-1'],
+        ];
+        $this->assertSame('Сообщение передано на модерацию.', \App\Actions\TelegramQuestions\MarkQuestion::run($record->telegram_update_id + 1, $message));
+        $this->assertSame($photos, data_get(json_decode($this->record($id)->payload, true), 'message.album_photos'));
+    }
+
+    public function test_cancelled_registration_can_still_be_submitted_by_moderator(): void
+    {
+        $id = $this->message(['registered_at' => null, 'status' => 'awaiting_confirmation', 'community_confirmation_status' => 'pending']);
+        $record = $this->record($id);
+        config(['services.telegram.source_chat_id' => (string) $record->telegram_chat_id, 'services.telegram.moderator_ids' => [777]]);
+
+        $result = \App\Actions\TelegramQuestions\ConfirmRegistration::run($id, 778, (int) $record->telegram_chat_id, false);
+        $this->assertFalse($result['confirmed']);
+        $this->assertSame('declined', $this->record($id)->community_confirmation_status);
+        $this->assertSame('Сообщение передано на модерацию.', \App\Actions\SitePublication\SubmitForModeration::run($id, 777));
+        $this->assertNull($this->record($id)->registered_at);
+        $this->assertSame('pending_moderation', $this->state($id)->status);
+    }
+
+    public function test_moderation_does_not_end_pending_group_confirmation_or_lose_a_reply(): void
+    {
+        $id = $this->message(['registered_at' => null, 'status' => 'awaiting_confirmation', 'community_confirmation_status' => 'pending']);
+        $record = $this->record($id);
+        config(['services.telegram.source_chat_id' => (string) $record->telegram_chat_id, 'services.telegram.moderator_ids' => [777]]);
+        \App\Actions\SitePublication\SubmitForModeration::run($id, 777);
+        $payload = ['message' => [
+            'message_id' => 999, 'chat' => ['id' => $record->telegram_chat_id],
+            'from' => ['id' => 778], 'reply_to_message' => ['message_id' => $record->telegram_message_id],
+            'text' => 'Дополнительная информация',
+        ]];
+        $continuation = app(\App\Services\TelegramQuestionIntake::class)->pendingReplyContinuation($payload);
+        $this->assertSame($id, $continuation->id);
+        app(TelegramQuestionModerationService::class)->attachCommunity($id, $payload);
+        $this->assertStringContainsString('Дополнительная информация', $this->record($id)->text);
+        $this->assertTrue(\App\Actions\TelegramQuestions\ConfirmRegistration::run($id, 778, (int) $record->telegram_chat_id, true)['confirmed']);
+        $this->assertSame('pending_moderation', $this->state($id)->status);
+    }
+
+    public function test_publication_actions_cannot_create_a_moderation_record(): void
+    {
+        $id = $this->message();
+        $this->assertSame('Вопрос не передан на модерацию.', PublishQuestion::run($id, $this->appliance->id, null));
+        $this->assertSame('Вопрос не передан на модерацию.', RejectPublication::run($id, '', null));
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $id]);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -132,19 +211,22 @@ class SitePublicationTest extends TestCase
         $record = $this->record($id);
         $payload = json_decode($record->payload, true);
         $payload['attached_messages'] = [['caption' => 'Фото детали', 'photo' => [['file_id' => 'third']]]];
-        DB::table('telegram_question_messages')->where('id', $id)->update(['payload' => json_encode($payload)]);
+        DB::table('telegram_question_messages')->where('id', $id)->update(['payload' => json_encode($payload), 'text' => $record->text."\n\nФото детали"]);
+        $this->publication($id);
 
         PublishQuestion::run($id, $this->appliance->id, null);
 
         $question = Question::findOrFail($this->state($id)->question_id);
         $this->assertSame(3, substr_count($question->description, '<img '));
         $this->assertStringContainsString('Фото детали', $question->description);
+        $this->assertSame(1, substr_count($question->description, 'Фото детали'));
         Http::assertSentCount(7);
     }
 
     public function test_notification_failure_keeps_publication_and_error_in_both_records(): void
     {
         $id = $this->message();
+        $this->publication($id);
         $this->fakeTelegram(static fn () => Http::response(['ok' => false, 'description' => 'chat unavailable'], 403));
 
         $this->assertStringContainsString('Вопрос опубликован:', PublishQuestion::run($id, $this->appliance->id, null));
@@ -157,6 +239,7 @@ class SitePublicationTest extends TestCase
     public function test_notification_merges_reply_id_with_concurrent_payload_changes(): void
     {
         $id = $this->message();
+        $this->publication($id);
         $this->fakeTelegram(function () use ($id) {
             $payload = json_decode($this->record($id)->payload, true);
             $payload['attached_message_ids'] = [888];
@@ -217,6 +300,7 @@ class SitePublicationTest extends TestCase
     public function test_append_uses_authoritative_question_id_and_deduplicates_messages(): void
     {
         $id = $this->message();
+        $this->publication($id);
         PublishQuestion::run($id, $this->appliance->id, null);
         $questionId = (int) $this->state($id)->question_id;
         DB::table('telegram_question_messages')->where('id', $id)->update(['status' => 'pending_moderation', 'question_id' => null]);
@@ -250,6 +334,7 @@ class SitePublicationTest extends TestCase
     public function test_preview_retry_and_pending_attachment_apis_remain_available(): void
     {
         $id = $this->message();
+        $this->publication($id);
         $record = $this->record($id);
         $service = app(TelegramQuestionModerationService::class);
         $this->assertTrue($service->preview($record->telegram_update_id, json_decode($record->payload, true)));

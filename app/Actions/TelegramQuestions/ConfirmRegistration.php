@@ -2,6 +2,7 @@
 
 namespace App\Actions\TelegramQuestions;
 
+use App\Enums\TelegramQuestionConfirmationStatus;
 use Illuminate\Support\Facades\DB;
 use App\Telegram\QuestionInstructions;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -19,13 +20,16 @@ class ConfirmRegistration
             if (! $record || (int) $record->telegram_user_id !== $actor || (int) $record->telegram_chat_id !== $chat) {
                 return $result + ['message' => 'Подтвердить может только автор вопроса.'];
             }
-            if ($record->status !== 'awaiting_confirmation' || $record->registered_at !== null || $record->archived_at !== null) {
+            if ($record->community_confirmation_status !== TelegramQuestionConfirmationStatus::Pending->value
+                || $record->registered_at !== null || $record->archived_at !== null) {
                 return $result + ['message' => 'Этот вопрос уже обработан.'];
             }
             $expired = $record->created_at < now()->subMinutes(max(1, (int) config('services.telegram.question_confirmation_minutes', 10)))->toDateTimeString();
             if (! $confirm || $expired) {
-                DB::table('telegram_question_messages')->where('id', $id)->update(['status' => 'cancelled', 'updated_at' => now()]);
-                return ['confirmed' => false, 'edit' => true, 'message' => $expired ? '⌛ Срок подтверждения истёк.' : '❌ Вопрос не отправлен на модерацию.'];
+                DB::table('telegram_question_messages')->where('id', $id)->update([
+                    'community_confirmation_status' => $expired ? TelegramQuestionConfirmationStatus::Expired->value : TelegramQuestionConfirmationStatus::Declined->value, 'updated_at' => now(),
+                ]);
+                return ['confirmed' => false, 'edit' => true, 'message' => $expired ? '⌛ Срок подтверждения истёк.' : '❌ Вопрос не зарегистрирован.'];
             }
             RegisterQuestion::run($id);
 

@@ -38,7 +38,7 @@ class AppendToPublishedQuestion
                 return 'Запись очереди не найдена.';
             }
             $publication = PublicationState::lockForMessage($record);
-            if ($publication->status !== 'published') {
+            if (! $publication || $publication->status !== 'published') {
                 return 'К вопросу с текущим статусом нельзя добавлять сообщения.';
             }
             $storedPayload = json_decode((string) $record->payload, true) ?: [];

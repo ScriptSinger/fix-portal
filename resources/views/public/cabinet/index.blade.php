@@ -42,7 +42,7 @@
         {{-- Решений: репутация, считается по ответам, которые авторы вопросов отметили решением --}}
         <div class="rounded-card bg-white p-4 text-ink shadow-sm">
             <b class="block font-serif text-[28px] leading-none tabular-nums">{{ $stats['solutions'] }}</b>
-            <span class="text-[13px] text-subtle">Решений</span>
+            <span class="text-[13px] text-subtle">Карма · решений</span>
             @if ($rank)
                 <span class="mt-1 block text-[13px] font-bold text-green-700">✓ {{ $rank }}</span>
             @endif

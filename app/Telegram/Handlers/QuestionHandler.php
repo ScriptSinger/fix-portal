@@ -3,7 +3,6 @@ namespace App\Telegram\Handlers;
 
 use App\Actions\TelegramQuestions\MarkQuestion;
 use App\Telegram\CommandResponse;
-use App\Telegram\QuestionInstructions;
 use App\Services\TelegramBotApi;
 use SergiX44\Nutgram\Nutgram;
 
@@ -29,7 +28,7 @@ class QuestionHandler
                 'chat_id' => $chatId,
                 'reply_to_message_id' => (int) data_get($message, 'reply_to_message.message_id'),
                 'message_thread_id' => $threadId > 1 ? $threadId : null,
-                'text' => QuestionInstructions::registered(),
+                'text' => '📋 Вопрос передан на модерацию сайта.',
             ], static fn ($value) => $value !== null));
             return;
         }

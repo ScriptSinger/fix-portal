@@ -50,7 +50,7 @@ class CabinetTest extends TestCase
         $answer = $this->commentOn($other, $me);
         $other->forceFill(['solved_at' => now(), 'solution_type' => 'comment', 'solution_id' => $answer->id])->save();
 
-        $this->actingAs($me)->get(route('cabinet.index'))->assertOk()->assertSee($question->title)->assertSee('Помощник')->assertSee('Решений');
+        $this->actingAs($me)->get(route('cabinet.index'))->assertOk()->assertSee($question->title)->assertSee('Техноадепт')->assertSee('Карма');
     }
 
     public function test_notification_opens_the_target_and_is_marked_read(): void

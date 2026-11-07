@@ -68,18 +68,12 @@ class PublishQuestion
             }
 
             $text = trim((string) $record->text);
-            $payload = json_decode((string) $record->payload, true) ?: [];
-            $attached = is_array($payload['attached_messages'] ?? null) ? $payload['attached_messages'] : [];
-            $parts = array_values(array_filter([
-                $text,
-                ...array_map(static fn (array $message): string => trim((string) ($message['text'] ?? $message['caption'] ?? '')), $attached),
-            ], static fn (string $value): bool => $value !== ''));
             $lines = preg_split('/\R/u', $text, 2) ?: [$text];
             $title = Str::limit(trim($lines[0]) ?: 'Вопрос из Telegram', 150, '');
             if (mb_strlen($title) < 12) {
                 $title = Str::limit($text ?: 'Вопрос из Telegram', 150, '');
             }
-            $description = e(implode("\n\n", $parts));
+            $description = e($text);
             foreach ($this->photos->persist($files) as $image) {
                 $description .= '<img src="'.e($image['url']).'" class="img-fluid" data-id="'.$image['id'].'">';
             }
@@ -104,8 +98,11 @@ class PublishQuestion
         });
     }
 
-    private function cannotPublish(object $publication): ?string
+    private function cannotPublish(?object $publication): ?string
     {
+        if (! $publication) {
+            return 'Вопрос не передан на модерацию.';
+        }
         if ($publication->status === 'published') {
             return "Вопрос уже опубликован: #{$publication->question_id}.";
         }

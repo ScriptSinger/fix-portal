@@ -126,11 +126,11 @@ class SolutionTest extends TestCase
     public function test_ranks_and_progress(): void
     {
         $this->assertNull(Reputation::rank(0));
-        $this->assertSame('Помощник', Reputation::rank(1));
-        $this->assertSame('Помощник', Reputation::rank(2));
-        $this->assertSame('Знаток', Reputation::rank(3));
-        $this->assertSame('Эксперт', Reputation::rank(10));
-        $this->assertSame(['Знаток', 1], Reputation::next(2));
+        $this->assertSame('Техноадепт', Reputation::rank(1));
+        $this->assertSame('Техноадепт', Reputation::rank(2));
+        $this->assertSame('Техножрец', Reputation::rank(3));
+        $this->assertSame('Магос', Reputation::rank(10));
+        $this->assertSame(['Техножрец', 1], Reputation::next(2));
         $this->assertNull(Reputation::next(10));
         $this->assertEqualsWithDelta(0.5, Reputation::progress(2), 0.001);
         $this->assertNull(Reputation::progress(10));

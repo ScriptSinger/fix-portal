@@ -32,6 +32,7 @@ class TelegramAlbum
         foreach (['telegram_webhook_updates', 'telegram_question_messages'] as $table) {
             DB::table($table)
                 ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$mediaGroupId])
+                ->when(data_get($reply, 'chat.id') !== null, fn ($query) => $query->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.chat.id')) = ?", [(string) data_get($reply, 'chat.id')]))
                 ->get(['payload'])
                 ->each(function (object $row) use ($add): void {
                     $add(data_get(json_decode((string) $row->payload, true), 'message.photo'));

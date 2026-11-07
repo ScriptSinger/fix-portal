@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\TelegramQuestionResolutionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class TelegramQuestionMessage extends Model
 {
@@ -26,7 +28,11 @@ class TelegramQuestionMessage extends Model
         'error_message',
     ];
 
-    protected $casts = ['payload' => 'array', 'resolved_at' => 'datetime'];
+    protected $casts = [
+        'payload' => 'array',
+        'resolution_status' => TelegramQuestionResolutionStatus::class,
+        'resolved_at' => 'datetime',
+    ];
 
     /**
      * Return Telegram file IDs for all photos attached to this moderation item.
@@ -76,5 +82,10 @@ class TelegramQuestionMessage extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class);
+    }
+
+    public function publication(): HasOne
+    {
+        return $this->hasOne(TelegramQuestionPublication::class, 'telegram_question_message_id');
     }
 }

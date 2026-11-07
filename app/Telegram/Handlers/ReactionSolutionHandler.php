@@ -2,6 +2,7 @@
 
 namespace App\Telegram\Handlers;
 
+use App\Enums\TelegramQuestionResolutionStatus;
 use App\Services\TelegramReputation;
 use App\Services\TelegramBotApi;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class ReactionSolutionHandler
         if ($chatId === 0 || $authorId === 0 || $messageId <= 0
             || (string) $chatId !== (string) config('services.telegram.source_chat_id')
             || data_get($reaction, 'user.is_bot') === true
-            || ! $this->addedThumbsUp($reaction)) {
+            || ! $this->addedHandshake($reaction)) {
             return;
         }
 
@@ -42,7 +43,7 @@ class ReactionSolutionHandler
             ->where('telegram_user_id', $authorId)
             ->whereNotNull('registered_at')
             ->whereNull('archived_at')
-            ->where('resolution_status', 'open')
+            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
             ->where('telegram_message_id', '<', $messageId)
             ->orderByDesc('id')->limit(2)->get(['id']);
 
@@ -82,13 +83,13 @@ class ReactionSolutionHandler
         }
     }
 
-    private function addedThumbsUp(array $reaction): bool
+    private function addedHandshake(array $reaction): bool
     {
-        $hasThumbsUp = static fn (array $items): bool => collect($items)->contains(
-            static fn ($item): bool => data_get($item, 'type') === 'emoji' && data_get($item, 'emoji') === '👍'
+        $hasHandshake = static fn (array $items): bool => collect($items)->contains(
+            static fn ($item): bool => data_get($item, 'type') === 'emoji' && data_get($item, 'emoji') === '🤝'
         );
 
-        return $hasThumbsUp((array) ($reaction['new_reaction'] ?? []))
-            && ! $hasThumbsUp((array) ($reaction['old_reaction'] ?? []));
+        return $hasHandshake((array) ($reaction['new_reaction'] ?? []))
+            && ! $hasHandshake((array) ($reaction['old_reaction'] ?? []));
     }
 }

@@ -11,7 +11,7 @@ use App\Telegram\Middleware\RequireModerator;
 use App\Telegram\Middleware\ThrottleCommand;
 
 /** @var \SergiX44\Nutgram\Nutgram $bot */
-$bot->onText('/question(?:@[A-Za-z0-9_]+)?(?:\s.*)?', QuestionHandler::class)
+$bot->onText('/moderate(?:@[A-Za-z0-9_]+)?(?:\s.*)?', QuestionHandler::class)
     ->middleware(RequireModerator::class)->middleware(ThrottleCommand::class);
 $bot->onText('/attach(?:@[A-Za-z0-9_]+)?(?:\s.*)?', AttachHandler::class)
     ->middleware(RequireModerator::class)->middleware(ThrottleCommand::class);

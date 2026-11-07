@@ -1,6 +1,6 @@
 @extends('public.layouts.app')
 @section('title', 'Как это работает | ' . config('app.name', 'Ufamasters'))
-@section('description', 'Как задать вопрос, получить ответ и отметить решение на Ufamasters, и как растут звания Помощник, Знаток и Эксперт.')
+@section('description', 'Как задать вопрос, получить ответ и отметить решение на Ufamasters, и как получить звания Техноадепт, Техножрец и Магос.')
 
 @section('hero')
     <x-ui.page-header title="Как это работает" :items="[['Как это работает', null]]" />
@@ -39,8 +39,8 @@
     </section>
 
     <section class="mt-4 rounded-card bg-white p-5 shadow-sm sm:p-7" aria-labelledby="ranks">
-        <h2 id="ranks" class="m-0 text-xl font-bold text-black">Звания и репутация</h2>
-        <p class="mb-0 mt-1 text-sm text-subtle">Репутацию дают за пользу: один ответ, который автор отметил решением, добавляет одно очко.</p>
+        <h2 id="ranks" class="m-0 text-xl font-bold text-black">Звания и карма</h2>
+        <p class="mb-0 mt-1 text-sm text-subtle">Ответ, который автор вопроса отметил решением, добавляет помощнику +1 к карме на сайте. Карма в Telegram считается отдельно.</p>
         <ol class="relative m-0 mt-5 list-none p-0 before:absolute before:bottom-4 before:left-[17px] before:top-4 before:w-[3px] before:rounded before:bg-gradient-to-b before:from-brand-400 before:to-line">
             @foreach ($ranks as $threshold => $title)
                 <li class="relative grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-4 pb-5 last:pb-0">
@@ -54,7 +54,7 @@
         </ol>
         <p class="mb-0 mt-4 text-sm">До первого решения звания нет.</p>
         <ul class="m-0 mt-4 grid list-none gap-2 rounded-xl bg-surface p-4 text-sm">
-            @foreach (['Засчитывается только отметка «Решено» от автора вопроса. Реакции в репутацию не входят.', 'Свои вопросы не считаются.', 'Число решений видно рядом с именем (например, «✓ 12»), а звание и прогресс есть в кабинете.'] as $rule)
+            @foreach (['На сайте засчитывается только отметка «Решено» от автора вопроса. Реакции в карму сайта не входят.', 'Свои вопросы не считаются.', 'Число решений видно рядом с именем (например, «✓ 12»), а карма, звание и прогресс есть в кабинете.'] as $rule)
                 <li class="relative pl-5 before:absolute before:left-0 before:font-bold before:text-green-700 before:content-['✓']">{{ $rule }}</li>
             @endforeach
         </ul>

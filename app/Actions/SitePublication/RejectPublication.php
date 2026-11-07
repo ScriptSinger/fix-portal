@@ -18,6 +18,9 @@ class RejectPublication
                 return 'Сообщение для модерации не найдено.';
             }
             $publication = PublicationState::lockForMessage($record);
+            if (! $publication) {
+                return 'Вопрос не передан на модерацию.';
+            }
             if ($publication->status !== 'pending_moderation') {
                 return "Нельзя отклонить: текущий статус {$publication->status}.";
             }

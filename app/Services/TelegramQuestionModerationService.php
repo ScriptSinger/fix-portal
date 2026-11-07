@@ -7,6 +7,8 @@ use App\Actions\SitePublication\PublicationState;
 use App\Actions\SitePublication\PublishQuestion;
 use App\Actions\SitePublication\RecordsModerationActions;
 use App\Actions\SitePublication\RejectPublication;
+use App\Enums\TelegramQuestionConfirmationStatus;
+use App\Enums\TelegramQuestionResolutionStatus;
 use Illuminate\Support\Facades\DB;
 
 class TelegramQuestionModerationService
@@ -36,7 +38,7 @@ class TelegramQuestionModerationService
         $record = DB::table('telegram_question_messages')
             ->where('telegram_update_id', $updateId)
             ->first();
-        if (! $record || $record->status !== 'pending_moderation') {
+        if (! $record || (PublicationState::forMessage($record)->status ?? null) !== 'pending_moderation') {
             return false;
         }
 
@@ -93,27 +95,56 @@ class TelegramQuestionModerationService
     }
 
     /** @param array<string, mixed> $payload */
+    public function attachCommunity(int $id, array $payload): void
+    {
+        DB::transaction(function () use ($id, $payload): void {
+            $record = DB::table('telegram_question_messages')->where('id', $id)->lockForUpdate()->first();
+            if (! $record || $record->archived_at !== null || $record->resolution_status !== TelegramQuestionResolutionStatus::Open->value
+                || ($record->registered_at === null && $record->community_confirmation_status !== TelegramQuestionConfirmationStatus::Pending->value)) {
+                return;
+            }
+            $stored = json_decode((string) $record->payload, true) ?: [];
+            $messageId = (int) data_get($payload, 'message.message_id');
+            $ids = array_map('intval', (array) ($stored['attached_message_ids'] ?? []));
+            if ($messageId <= 0 || in_array($messageId, $ids, true)) {
+                return;
+            }
+            $text = trim((string) data_get($payload, 'message.text', data_get($payload, 'message.caption', '')));
+            $stored['attached_message_ids'][] = $messageId;
+            $stored['attached_messages'][] = $payload['message'];
+            DB::table('telegram_question_messages')->where('id', $id)->update([
+                'text' => trim((string) $record->text.($text !== '' ? "\n\n".$text : '')),
+                'payload' => json_encode($stored, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+                'updated_at' => now(),
+            ]);
+        });
+    }
+
+    /** @param array<string, mixed> $payload */
     public function attach(int $queueId, array $payload, ?int $moderatorId): string
     {
-        $record = DB::table('telegram_question_messages')->where('id', $queueId)->first();
-        if (! $record) {
-            return 'Запись очереди не найдена.';
-        }
-        $publication = PublicationState::forMessage($record);
-        $record->status = $publication->status;
-        if (! in_array($record->status, ['awaiting_confirmation', 'pending_moderation', 'published'], true)) {
-            return 'К вопросу с текущим статусом нельзя добавлять сообщения.';
-        }
+        $outcome = DB::transaction(function () use ($queueId, $payload, $moderatorId): array {
+            $record = DB::table('telegram_question_messages')->where('id', $queueId)->lockForUpdate()->first();
+            if (! $record) {
+                return ['message' => 'Запись очереди не найдена.'];
+            }
+            $publication = PublicationState::lockForMessage($record);
+            $record->status = $publication->status ?? ($record->registered_at !== null ? 'registered' : ($record->community_confirmation_status === TelegramQuestionConfirmationStatus::Pending->value ? 'awaiting_confirmation' : 'unavailable'));
+            if (! in_array($record->status, ['awaiting_confirmation', 'registered', 'pending_moderation', 'published'], true)) {
+                return ['message' => 'К вопросу с текущим статусом нельзя добавлять сообщения.'];
+            }
+            if ($record->status === 'published') {
+                return ['published' => true];
+            }
 
-        $messageId = (int) data_get($payload, 'message.message_id');
-        $text = trim((string) data_get($payload, 'message.text', data_get($payload, 'message.caption', '')));
-        $storedPayload = json_decode((string) $record->payload, true) ?: [];
-        $attachedMessageIds = array_map('intval', (array) ($storedPayload['attached_message_ids'] ?? []));
-        if ($messageId > 0 && in_array($messageId, $attachedMessageIds, true)) {
-            return 'Это сообщение уже прикреплено к вопросу.';
-        }
+            $messageId = (int) data_get($payload, 'message.message_id');
+            $text = trim((string) data_get($payload, 'message.text', data_get($payload, 'message.caption', '')));
+            $storedPayload = json_decode((string) $record->payload, true) ?: [];
+            $attachedMessageIds = array_map('intval', (array) ($storedPayload['attached_message_ids'] ?? []));
+            if ($messageId > 0 && in_array($messageId, $attachedMessageIds, true)) {
+                return ['message' => 'Это сообщение уже прикреплено к вопросу.'];
+            }
 
-        if (in_array($record->status, ['awaiting_confirmation', 'pending_moderation'], true)) {
             $combinedText = trim((string) $record->text);
             if ($text !== '') {
                 $combinedText = $combinedText === '' ? $text : $combinedText."\n\n".$text;
@@ -128,14 +159,22 @@ class TelegramQuestionModerationService
             $this->audit($moderatorId, 'attach', ['queue_id' => $queueId, 'message_id' => $messageId, 'deferred' => true]);
 
             $moderationChatId = (int) (config('services.telegram.moderation_chat_id') ?: $record->telegram_chat_id);
-            if ($record->status === 'pending_moderation' && $moderationChatId !== (int) $record->telegram_chat_id) {
-                $this->sendPreviewPhotos((int) $record->id, $payload, $moderationChatId);
-            }
+            return [
+                'message' => $record->status === 'pending_moderation'
+                    ? 'Сообщение добавлено к вопросу. Оно будет опубликовано вместе с ним.'
+                    : 'Сообщение добавлено к вопросу в Telegram.',
+                'preview_chat' => $record->status === 'pending_moderation' && $moderationChatId !== (int) $record->telegram_chat_id ? $moderationChatId : null,
+            ];
+        });
 
-            return 'Сообщение добавлено к вопросу. Оно будет опубликовано вместе с ним.';
+        if ($outcome['published'] ?? false) {
+            return AppendToPublishedQuestion::run($queueId, $payload, $moderatorId);
+        }
+        if ($outcome['preview_chat'] ?? null) {
+            $this->sendPreviewPhotos($queueId, $payload, $outcome['preview_chat']);
         }
 
-        return AppendToPublishedQuestion::run($queueId, $payload, $moderatorId);
+        return $outcome['message'];
     }
 
     private function previewText(int $recordId, string $text, array $message, bool $private): string

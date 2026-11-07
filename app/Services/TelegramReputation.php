@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class TelegramReputation
 {
-    public const RANKS = [10 => 'Эксперт', 3 => 'Знаток', 1 => 'Помощник'];
+    public const RANKS = Reputation::RANKS;
 
     public function countFor(int $telegramUserId): int
     {

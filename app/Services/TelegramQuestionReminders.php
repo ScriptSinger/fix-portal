@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TelegramQuestionResolutionStatus;
 use App\Jobs\SendTelegramQuestionReminder;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
@@ -26,7 +27,7 @@ class TelegramQuestionReminders
             ->where('telegram_chat_id', (int) config('services.telegram.source_chat_id'))
             ->whereNotNull('registered_at')
             ->where('registered_at', '<=', now()->subHours(self::INTERVAL_HOURS))
-            ->where('resolution_status', 'open')
+            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
             ->whereNull('archived_at');
 
         // Match the intake policy: 0/1 means no specific topic restriction.

@@ -48,7 +48,7 @@ class TelegramQuestionMessagesIndexPage extends IndexPage
                 ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status === 'pending_moderation')
                 ->method('retry', events: [$this->getListEventName()]),
             $this->getResource()->getDeleteButton(isAsync: $this->isAsync())
-                ->canSee(fn (TelegramQuestionMessage $item): bool => $item->registered_at === null && $item->status !== 'published'),
+                ->canSee(fn (TelegramQuestionMessage $item): bool => $item->status !== 'published'),
             $this->getResource()->getMassDeleteButton(isAsync: $this->isAsync()),
         ]);
     }

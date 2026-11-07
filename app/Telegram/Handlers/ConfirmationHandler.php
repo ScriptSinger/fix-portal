@@ -3,8 +3,6 @@ namespace App\Telegram\Handlers;
 
 use App\Actions\TelegramQuestions\ConfirmRegistration;
 use App\Services\TelegramBotApi;
-use App\Services\TelegramQuestionModerationService;
-use Illuminate\Support\Facades\DB;
 use SergiX44\Nutgram\Nutgram;
 
 class ConfirmationHandler
@@ -22,10 +20,6 @@ class ConfirmationHandler
                 'chat_id' => data_get($callback, 'message.chat.id'), 'message_id' => data_get($callback, 'message.message_id'),
                 'text' => $result['message'], 'reply_markup' => json_encode(['inline_keyboard' => []], JSON_THROW_ON_ERROR),
             ]);
-        }
-        if ($result['confirmed']) {
-            $record = DB::table('telegram_question_messages')->find($id);
-            app(TelegramQuestionModerationService::class)->preview($record->telegram_update_id, json_decode($record->payload, true), false);
         }
     }
 }

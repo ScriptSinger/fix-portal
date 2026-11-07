@@ -44,7 +44,7 @@ class NotifyPublishedQuestion
                 return;
             }
             $publication = PublicationState::lockForMessage($record);
-            if ($publication->status !== 'published' || (int) $publication->question_id !== $questionId) {
+            if (! $publication || $publication->status !== 'published' || (int) $publication->question_id !== $questionId) {
                 return;
             }
             PublicationState::update($publication, ['error_message' => $error]);

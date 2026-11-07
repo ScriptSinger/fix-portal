@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TelegramQuestionResolutionStatus;
 use Illuminate\Support\Facades\DB;
 
 class TelegramCommunityDigest
@@ -17,7 +18,7 @@ class TelegramCommunityDigest
         $open = DB::table('telegram_question_messages')
             ->where('telegram_chat_id', $sourceChatId)
             ->whereNotNull('registered_at')
-            ->where('resolution_status', 'open')
+            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
             ->whereNull('archived_at')->count();
 
         // Reputation is global and all-time; reopening a question does not erase awards.
@@ -38,7 +39,7 @@ class TelegramCommunityDigest
                 $userId = (int) $leader->telegram_user_id;
                 $count = (int) $leader->solutions;
                 $rank = htmlspecialchars(TelegramReputation::rank($count) ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-                $lines[] = ($index + 1).". <a href=\"tg://user?id={$userId}\">ID {$userId}</a> — {$count}, {$rank}";
+                $lines[] = ($index + 1).". <a href=\"tg://user?id={$userId}\">ID {$userId}</a> — карма: {$count}, {$rank}";
             }
         }
 

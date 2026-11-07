@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\TelegramQuestionResolutionStatus;
+use App\Enums\TelegramQuestionConfirmationStatus;
 use Illuminate\Support\Facades\DB;
 
 class TelegramQuestionIntake
@@ -29,9 +31,9 @@ class TelegramQuestionIntake
             ->where('telegram_chat_id', (int) $chatId)
             ->where('telegram_user_id', (int) $userId)
             ->whereNull('archived_at')
-            ->where('resolution_status', 'open')
+            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
             ->where(function ($query): void {
-                $query->whereNotNull('registered_at')->orWhere('status', 'awaiting_confirmation');
+                $query->whereNotNull('registered_at')->orWhere('community_confirmation_status', TelegramQuestionConfirmationStatus::Pending->value);
             })
             ->whereNotNull('text')
             ->where('text', '<>', '')
@@ -97,7 +99,7 @@ class TelegramQuestionIntake
         }
 
         // Автоматически считаем сообщением-вопросом только текст с вопросительным знаком.
-        // Команда /question передаёт allowReply=true и может явно пометить любой текст/фото.
+        // Команда /moderate передаёт allowReply=true и может явно пометить любой текст/фото.
         if (! $allowReply && ! str_contains($text, '?') && ! str_contains($text, '？')) {
             return null;
         }
@@ -111,6 +113,7 @@ class TelegramQuestionIntake
             'text' => $text,
             'payload' => json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
             'status' => $status,
+            'community_confirmation_status' => $status === 'awaiting_confirmation' ? TelegramQuestionConfirmationStatus::Pending->value : null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -123,10 +126,6 @@ class TelegramQuestionIntake
             ->where('telegram_chat_id', (int) $chatId)
             ->where('telegram_message_id', (int) $messageId)
             ->value('id');
-
-        if ($status === 'pending_moderation') {
-            \App\Actions\TelegramQuestions\RegisterQuestion::run($id);
-        }
 
         return $id;
     }
