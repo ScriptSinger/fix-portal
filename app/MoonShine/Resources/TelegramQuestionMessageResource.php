@@ -110,7 +110,21 @@ class TelegramQuestionMessageResource extends BaseResource
     protected function detailFields(): iterable
     {
         return [
-            ...$this->indexFields(),
+            ID::make()->sortable(),
+            Preview::make('Текст вопроса', 'text', function (TelegramQuestionMessage $item): string {
+                return '<div style="white-space:pre-wrap;line-height:1.55;max-width:900px">'.e((string) $item->text).'</div>';
+            }),
+            Preview::make('Автор', 'telegram_user_id', fn (TelegramQuestionMessage $item): string => self::authorPreview($item)),
+            Enum::make('Статус', 'status')->options([
+                'pending_moderation' => 'Ожидает модерации',
+                'published' => 'Опубликован',
+                'rejected' => 'Отклонён',
+                'failed' => 'Ошибка',
+                'needs_context' => 'Нужно описание',
+            ]),
+            BelongsTo::make('Тип техники', 'appliance', 'title', ApplianceResource::class)->nullable(),
+            Number::make('Telegram message ID', 'telegram_message_id'),
+            LocalDate::make('Получен', 'created_at')->format('d.m.Y H:i'),
             Preview::make('Фотографии', 'payload', function (TelegramQuestionMessage $item): string {
                 $photos = $item->telegramPhotoFileIds();
 
@@ -125,7 +139,6 @@ class TelegramQuestionMessageResource extends BaseResource
             }),
             Textarea::make('Причина отказа', 'error_message')->nullable(),
             Text::make('Question ID', 'question_id'),
-            Preview::make('Автор', 'telegram_user_id', fn (TelegramQuestionMessage $item): string => self::authorPreview($item)),
         ];
     }
 

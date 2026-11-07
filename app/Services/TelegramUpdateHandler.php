@@ -20,6 +20,13 @@ class TelegramUpdateHandler
     /** @param array<string, mixed> $payload */
     public function handle(int $updateId, array $payload): void
     {
+        if (is_array($payload['callback_query'] ?? null)) {
+            $this->handleQuestionConfirmation($payload['callback_query']);
+            $this->markProcessed($updateId);
+
+            return;
+        }
+
         $message = $payload['message'] ?? null;
         if (! is_array($message) || ! is_array($message['chat'] ?? null)) {
             $this->markProcessed($updateId);
@@ -49,8 +56,8 @@ class TelegramUpdateHandler
                 return;
             }
 
-            if ($this->questionIntake->store($updateId, $payload)) {
-                $this->questionModeration->preview($updateId, $payload);
+            if ($recordId = $this->questionIntake->storeAwaitingConfirmation($updateId, $payload)) {
+                $this->sendQuestionConfirmation($recordId, $payload);
             }
             $this->markProcessed($updateId);
             return;
@@ -82,6 +89,129 @@ class TelegramUpdateHandler
         ]);
 
         $this->markProcessed($updateId);
+    }
+
+    /** @param array<string, mixed> $callback */
+    private function handleQuestionConfirmation(array $callback): void
+    {
+        $data = (string) ($callback['data'] ?? '');
+        if (! preg_match('/^question_(confirm|cancel):(\d+)$/', $data, $matches)) {
+            return;
+        }
+
+        $recordId = (int) $matches[2];
+        $action = $matches[1];
+        $actorId = (int) data_get($callback, 'from.id');
+        $callbackChatId = (int) data_get($callback, 'message.chat.id');
+        $record = DB::table('telegram_question_messages')->where('id', $recordId)->first();
+
+        if (! $record || (int) $record->telegram_user_id !== $actorId || (int) $record->telegram_chat_id !== $callbackChatId) {
+            $this->answerCallback($callback, 'Подтвердить может только автор вопроса.', true);
+
+            return;
+        }
+
+        if ($record->status !== 'awaiting_confirmation') {
+            $this->answerCallback($callback, 'Этот вопрос уже обработан.', true);
+
+            return;
+        }
+
+        $confirmationMinutes = max(1, (int) config('services.telegram.question_confirmation_minutes', 10));
+        if ((string) $record->created_at < now()->subMinutes($confirmationMinutes)->toDateTimeString()) {
+            DB::table('telegram_question_messages')->where('id', $recordId)->update([
+                'status' => 'cancelled',
+                'updated_at' => now(),
+            ]);
+            $this->answerCallback($callback, 'Срок подтверждения истёк.', true);
+            $this->editConfirmationMessage($callback, '⌛ Срок подтверждения истёк.');
+
+            return;
+        }
+
+        if ($action === 'cancel') {
+            DB::table('telegram_question_messages')->where('id', $recordId)->update([
+                'status' => 'cancelled',
+                'updated_at' => now(),
+            ]);
+            $this->answerCallback($callback, 'Вопрос не отправлен.', false);
+            $this->editConfirmationMessage($callback, '❌ Вопрос не отправлен на модерацию.');
+
+            return;
+        }
+
+        $updated = DB::table('telegram_question_messages')
+            ->where('id', $recordId)
+            ->where('status', 'awaiting_confirmation')
+            ->update([
+                'status' => 'pending_moderation',
+                'updated_at' => now(),
+            ]);
+
+        if ($updated !== 1) {
+            $this->answerCallback($callback, 'Этот вопрос уже обработан.', true);
+
+            return;
+        }
+
+        $payload = json_decode((string) $record->payload, true, 32, JSON_THROW_ON_ERROR);
+        $this->answerCallback($callback, 'Вопрос отправлен на модерацию.', false);
+        $this->editConfirmationMessage($callback, '✅ Вопрос отправлен на модерацию.');
+        $this->questionModeration->preview((int) $record->telegram_update_id, $payload);
+    }
+
+    /** @param array<string, mixed> $payload */
+    private function sendQuestionConfirmation(int $recordId, array $payload): void
+    {
+        $message = $payload['message'] ?? [];
+        $chatId = (int) data_get($message, 'chat.id');
+        $messageId = (int) data_get($message, 'message_id');
+        $text = trim((string) data_get($message, 'text', data_get($message, 'caption', '')));
+
+        $this->telegram->call('sendMessage', [
+            'chat_id' => $chatId,
+            'reply_to_message_id' => $messageId,
+            'text' => "Похоже, это вопрос. Отправить его на модерацию?\n\n".Str::limit($text, 700),
+            'disable_web_page_preview' => true,
+            'reply_markup' => json_encode([
+                'inline_keyboard' => [[
+                    ['text' => '✅ Отправить', 'callback_data' => "question_confirm:{$recordId}"],
+                    ['text' => '❌ Не отправлять', 'callback_data' => "question_cancel:{$recordId}"],
+                ]],
+            ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+        ]);
+    }
+
+    /** @param array<string, mixed> $callback */
+    private function answerCallback(array $callback, string $text, bool $alert): void
+    {
+        $callbackId = (string) ($callback['id'] ?? '');
+        if ($callbackId === '') {
+            return;
+        }
+
+        $this->telegram->call('answerCallbackQuery', [
+            'callback_query_id' => $callbackId,
+            'text' => $text,
+            'show_alert' => $alert,
+        ]);
+    }
+
+    /** @param array<string, mixed> $callback */
+    private function editConfirmationMessage(array $callback, string $text): void
+    {
+        $chatId = (int) data_get($callback, 'message.chat.id');
+        $messageId = (int) data_get($callback, 'message.message_id');
+        if ($chatId === 0 || $messageId === 0) {
+            return;
+        }
+
+        $this->telegram->call('editMessageText', [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'text' => $text,
+            'reply_markup' => json_encode(['inline_keyboard' => []], JSON_THROW_ON_ERROR),
+        ]);
     }
 
     /** @param list<string> $arguments */
@@ -147,7 +277,7 @@ class TelegramUpdateHandler
     {
         return match ($command) {
             '/start' => 'Telegram-модератор подключён. Используйте /help для списка команд.',
-            '/help' => "/start — состояние подключения\n/help — список команд\n/question — пометить ответное сообщение как вопрос\n/attach <queue_id> — добавить сообщение и фото к опубликованному вопросу\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
+            '/help' => "/start — состояние подключения\n/help — список команд\n/question — пометить ответное сообщение как вопрос\n/attach [queue_id] — добавить сообщение и фото к вопросу; без ID используется последний вопрос автора\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
             '/question' => $this->markReplyAsQuestion($updateId, $message),
             '/attach' => $this->attachReply($arguments, $message, $moderatorTelegramId),
@@ -194,8 +324,22 @@ class TelegramUpdateHandler
     {
         $queueId = (int) ($arguments[0] ?? 0);
         $reply = $message['reply_to_message'] ?? null;
-        if ($queueId < 1 || ! is_array($reply)) {
-            return 'Ответьте /attach <queue_id> на сообщение с текстом или фото.';
+        if (! is_array($reply)) {
+            return 'Ответьте командой /attach [queue_id] на сообщение с текстом или фото.';
+        }
+
+        if ($queueId < 1) {
+            $authorId = (int) data_get($reply, 'from.id');
+            $queueId = (int) DB::table('telegram_question_messages')
+                ->where('telegram_chat_id', (int) ($message['chat']['id'] ?? 0))
+                ->where('telegram_user_id', $authorId)
+                ->where('status', 'pending_moderation')
+                ->latest('id')
+                ->value('id');
+
+            if ($queueId < 1) {
+                return 'У автора нет активного вопроса на модерации. Укажите queue_id явно.';
+            }
         }
 
         $payload = ['message' => $reply];

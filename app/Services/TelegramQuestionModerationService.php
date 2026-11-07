@@ -189,7 +189,7 @@ class TelegramQuestionModerationService
         if (! $record) {
             return 'Запись очереди не найдена.';
         }
-        if (! in_array($record->status, ['pending_moderation', 'published'], true)) {
+        if (! in_array($record->status, ['awaiting_confirmation', 'pending_moderation', 'published'], true)) {
             return 'К вопросу с текущим статусом нельзя добавлять сообщения.';
         }
 
@@ -201,7 +201,7 @@ class TelegramQuestionModerationService
             return 'Это сообщение уже прикреплено к вопросу.';
         }
 
-        if ($record->status === 'pending_moderation') {
+        if (in_array($record->status, ['awaiting_confirmation', 'pending_moderation'], true)) {
             $combinedText = trim((string) $record->text);
             if ($text !== '') {
                 $combinedText = $combinedText === '' ? $text : $combinedText."\n\n".$text;
@@ -216,7 +216,7 @@ class TelegramQuestionModerationService
             $this->audit($moderatorId, null, 'attach', ['queue_id' => $queueId, 'message_id' => $messageId, 'deferred' => true]);
 
             $moderationChatId = (int) (config('services.telegram.moderation_chat_id') ?: $record->telegram_chat_id);
-            if ($moderationChatId !== (int) $record->telegram_chat_id) {
+            if ($record->status === 'pending_moderation' && $moderationChatId !== (int) $record->telegram_chat_id) {
                 $this->sendPreviewPhotos((int) $record->id, $payload, $moderationChatId);
             }
 

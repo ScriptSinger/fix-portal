@@ -276,8 +276,9 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
-    public function test_question_mark_message_from_source_chat_is_queued_for_moderation(): void
+    public function test_question_mark_message_from_source_chat_requires_confirmation_before_moderation(): void
     {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 900]])]);
         config([
             'services.telegram.source_chat_id' => '-100123',
             'services.telegram.moderation_chat_id' => '-100123',
@@ -299,8 +300,52 @@ final class TelegramWebhookTest extends TestCase
             'telegram_chat_id' => -100123,
             'telegram_message_id' => 12,
             'telegram_update_id' => 1008,
-            'status' => 'pending_moderation',
+            'status' => 'awaiting_confirmation',
             'text' => "Холодильник не морозит?\nМодель RB33",
+        ]);
+
+        Http::assertSent(fn ($request): bool => $request['chat_id'] === -100123
+            && str_contains($request['text'], 'Отправить его на модерацию?')
+            && str_contains((string) $request['reply_markup'], 'question_confirm:'));
+    }
+
+    public function test_author_can_confirm_an_automatically_detected_question(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config([
+            'services.telegram.source_chat_id' => '-100123',
+            'services.telegram.moderation_chat_id' => '-100123',
+        ]);
+
+        $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 1010,
+            'message' => [
+                'message_id' => 30,
+                'text' => 'Компрессор не запускается?',
+                'from' => ['id' => 778],
+                'chat' => ['id' => -100123, 'type' => 'supergroup'],
+            ],
+        ])->assertOk();
+
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 30)->firstOrFail();
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 1011,
+            'callback_query' => [
+                'id' => 'callback-1011',
+                'data' => "question_confirm:{$record->id}",
+                'from' => ['id' => 778],
+                'message' => [
+                    'message_id' => 901,
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ],
+        ])->assertOk();
+
+        $this->assertDatabaseHas('telegram_question_messages', [
+            'id' => $record->id,
+            'status' => 'pending_moderation',
         ]);
     }
 
@@ -347,6 +392,21 @@ final class TelegramWebhookTest extends TestCase
             ],
         ])->assertOk();
 
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 201)->firstOrFail();
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 20105,
+            'callback_query' => [
+                'id' => 'callback-20105',
+                'data' => "question_confirm:{$record->id}",
+                'from' => ['id' => 778],
+                'message' => [
+                    'message_id' => 901,
+                    'chat' => ['id' => -100123, 'type' => 'supergroup'],
+                ],
+            ],
+        ])->assertOk();
+
         $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
             'update_id' => 2011,
             'message' => $baseMessage + [
@@ -371,7 +431,7 @@ final class TelegramWebhookTest extends TestCase
         $payload = json_decode((string) $record->payload, true, 32, JSON_THROW_ON_ERROR);
         $this->assertContains(202, $payload['attached_message_ids']);
         $this->assertContains(203, $payload['attached_message_ids']);
-        Http::assertSentCount(1);
+        Http::assertSentCount(4);
     }
 
     public function test_photo_without_text_is_not_created_as_an_orphan_question(): void
