@@ -14,8 +14,10 @@ use App\Models\Reply;
 use App\Models\User;
 use App\Services\Announcements\QuestionAnnouncer;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Str;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
 
@@ -384,6 +386,50 @@ class QuestionAnnouncementTest extends TestCase
         (new SendQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
 
         Http::assertNothingSent();
+    }
+
+    public function test_second_worker_does_not_send_while_first_is_sending(): void
+    {
+        $this->telegram();
+        $announcement = $this->announcement();
+        $requests = 0;
+        Http::fake(function () use (&$requests, $announcement) {
+            $requests++;
+            (new SendQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
+
+            return Http::response(['ok' => true, 'result' => ['message_id' => 99]]);
+        });
+        (new SendQuestionAnnouncement($announcement->id))->handle(app(QuestionAnnouncer::class));
+        $this->assertSame(1, $requests);
+        $this->assertSame(AnnouncementStatus::Sent, $announcement->refresh()->status);
+        $this->assertNull($announcement->processing_token);
+    }
+
+    public function test_expired_lease_allows_retry_and_failed_callback_does_not_overwrite_sent(): void
+    {
+        $this->telegram();
+        Http::fake(['api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 99]])]);
+        $announcement = $this->announcement();
+        DB::table('question_announcements')->where('id', $announcement->id)->update([
+            'processing_token' => (string) Str::uuid(), 'processing_until' => now()->subSecond(),
+        ]);
+        $job = new SendQuestionAnnouncement($announcement->id);
+        $job->handle(app(QuestionAnnouncer::class));
+        $job->failed(new \RuntimeException('A duplicate job failed'));
+        $this->assertSame(AnnouncementStatus::Sent, $announcement->refresh()->status);
+        Http::assertSentCount(1);
+    }
+
+    public function test_queued_duplicate_is_released_until_the_lease_expires(): void
+    {
+        $announcement = $this->announcement();
+        DB::table('question_announcements')->where('id', $announcement->id)->update([
+            'processing_token' => (string) Str::uuid(), 'processing_until' => now()->addSeconds(120),
+        ]);
+        $job = (new SendQuestionAnnouncement($announcement->id))->withFakeQueueInteractions();
+        $job->handle(app(QuestionAnnouncer::class));
+        $job->assertReleased();
+        $this->assertSame(AnnouncementStatus::Pending, $announcement->refresh()->status);
     }
 
     public function test_failure_is_recorded_without_secrets_and_rethrown_for_retry(): void
