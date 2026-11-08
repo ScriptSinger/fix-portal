@@ -7,6 +7,7 @@ namespace App\MoonShine\Resources;
 use App\Enums\TelegramQuestionResolutionStatus;
 use App\Models\TelegramQuestionMessage;
 use App\MoonShine\Fields\LocalDate;
+use App\MoonShine\Fields\TelegramQuestionPhotos;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
@@ -74,6 +75,7 @@ class TelegramCommunityQuestionResource extends BaseResource
         return [
             ID::make(),
             Textarea::make('Вопрос', 'text')->readonly(),
+            TelegramQuestionPhotos::make(),
             Preview::make('Автор', 'telegram_user_id', fn (TelegramQuestionMessage $item): string => $this->participant($item, false)),
             Enum::make('Решение', 'resolution_status')->attach(TelegramQuestionResolutionStatus::class),
             Preview::make('Помог', 'solution_telegram_user_id', fn (TelegramQuestionMessage $item): string => $item->solution_telegram_user_id

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\TelegramQuestionResolutionStatus;
 use App\Enums\TelegramQuestionConfirmationStatus;
+use App\Telegram\TelegramAlbum;
 use Illuminate\Support\Facades\DB;
 
 class TelegramQuestionIntake
@@ -64,7 +65,57 @@ class TelegramQuestionIntake
     /** @param array<string, mixed> $payload */
     public function storeAwaitingConfirmation(int $updateId, array $payload): ?int
     {
+        $message = $payload['message'] ?? [];
+        $group = (string) ($message['media_group_id'] ?? '');
+        if ($group !== '' && is_array($message)) {
+            $payload['message']['album_photos'] = app(TelegramAlbum::class)->collect($message, $group);
+        }
         return $this->storeRecord($updateId, $payload, false, 'awaiting_confirmation');
+    }
+
+    /** @param array<string, mixed> $message */
+    public function addAlbumPhoto(array $message): bool
+    {
+        $group = (string) ($message['media_group_id'] ?? '');
+        $chatId = (int) data_get($message, 'chat.id');
+        $authorId = (int) data_get($message, 'from.id');
+        if ($group === '' || empty($message['photo']) || $chatId === 0 || $authorId <= 0
+            || (string) $chatId !== (string) config('services.telegram.source_chat_id')) {
+            return false;
+        }
+
+        return DB::transaction(function () use ($message, $group, $chatId, $authorId): bool {
+            $record = DB::table('telegram_question_messages')
+                ->where('telegram_chat_id', $chatId)->where('telegram_user_id', $authorId)
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(payload, '$.message.media_group_id')) = ?", [$group])
+                ->lockForUpdate()->first();
+            if (! $record) {
+                return false;
+            }
+            $stored = json_decode((string) $record->payload, true) ?: [];
+            $photos = app(TelegramAlbum::class)->collect($message, $group);
+            $groups = array_merge((array) data_get($stored, 'message.album_photos', []), $photos);
+            $unique = [];
+            foreach ($groups as $photos) {
+                if (! is_array($photos) || $photos === []) {
+                    continue;
+                }
+                $largest = end($photos);
+                $key = (string) data_get($largest, 'file_unique_id', data_get($largest, 'file_id', ''));
+                if ($key !== '') {
+                    $unique[$key] = $photos;
+                }
+            }
+            data_set($stored, 'message.album_photos', array_values($unique));
+            $caption = trim((string) ($message['caption'] ?? ''));
+            DB::table('telegram_question_messages')->where('id', $record->id)->update([
+                'payload' => json_encode($stored, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR),
+                'text' => trim((string) $record->text) !== '' ? $record->text : $caption,
+                'updated_at' => now(),
+            ]);
+
+            return true;
+        });
     }
 
     /** @param array<string, mixed> $payload */

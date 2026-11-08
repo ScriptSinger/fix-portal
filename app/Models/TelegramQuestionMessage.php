@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TelegramQuestionResolutionStatus;
+use App\Telegram\TelegramAlbum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -62,7 +63,13 @@ class TelegramQuestionMessage extends Model
                 $fileIds[] = $fileId;
             }
 
-            foreach ((array) data_get($message, 'album_photos', []) as $album) {
+            $albums = (array) data_get($message, 'album_photos', []);
+            $mediaGroupId = (string) data_get($message, 'media_group_id', '');
+            if ($mediaGroupId !== '') {
+                $message['chat'] ??= ['id' => $this->telegram_chat_id];
+                $albums = array_merge($albums, app(TelegramAlbum::class)->collect($message, $mediaGroupId));
+            }
+            foreach ($albums as $album) {
                 $photo = is_array($album) ? end($album) : null;
                 $fileId = (string) data_get($photo, 'file_id');
                 if ($fileId !== '') {

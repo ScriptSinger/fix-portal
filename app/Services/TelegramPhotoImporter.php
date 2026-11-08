@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Image;
+use App\Telegram\TelegramAlbum;
 use Illuminate\Support\Facades\Storage;
 
 class TelegramPhotoImporter
@@ -22,6 +23,10 @@ class TelegramPhotoImporter
         $files = [];
         foreach ($messages as $message) {
             $groups = [$message['photo'] ?? [], ...($message['album_photos'] ?? [])];
+            $mediaGroupId = (string) ($message['media_group_id'] ?? '');
+            if ($mediaGroupId !== '' && isset($message['chat']['id'])) {
+                $groups = array_merge($groups, app(TelegramAlbum::class)->collect($message, $mediaGroupId));
+            }
             foreach ($groups as $photos) {
                 if (! is_array($photos) || $photos === []) {
                     continue;

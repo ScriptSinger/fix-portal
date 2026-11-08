@@ -288,6 +288,28 @@ final class TelegramWebhookTest extends TestCase
         $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
     }
 
+    public function test_automatically_detected_question_collects_album_photos_before_and_after_caption(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config(['services.telegram.source_chat_id' => '-100123']);
+        $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
+        $base = ['chat' => ['id' => -100123, 'type' => 'supergroup'], 'from' => ['id' => 778], 'media_group_id' => 'auto-album'];
+        foreach ([
+            ['update_id' => 2310, 'message_id' => 120, 'file_id' => 'first'],
+            ['update_id' => 2311, 'message_id' => 121, 'file_id' => 'second', 'caption' => 'Почему не охлаждает?'],
+            ['update_id' => 2312, 'message_id' => 122, 'file_id' => 'third'],
+        ] as $photo) {
+            $message = ['message_id' => $photo['message_id'], 'photo' => [['file_id' => $photo['file_id']]]] + $base;
+            if (isset($photo['caption'])) {
+                $message['caption'] = $photo['caption'];
+            }
+            $this->withHeaders($headers)->postJson('/api/telegram/webhook', ['update_id' => $photo['update_id'], 'message' => $message])->assertOk();
+        }
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 121)->firstOrFail();
+        $this->assertCount(3, data_get(json_decode($record->payload, true), 'message.album_photos'));
+        $this->assertSame(1, DB::table('telegram_question_messages')->where('telegram_chat_id', -100123)->count());
+    }
+
     public function test_moderate_command_is_rate_limited(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 15]])]);

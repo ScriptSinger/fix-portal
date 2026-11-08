@@ -202,6 +202,21 @@ class SitePublicationTest extends TestCase
         $this->assertSame(1, DB::table('images')->where('user_id', $question->user_id)->count());
     }
 
+    public function test_publication_recovers_album_photos_from_saved_updates(): void
+    {
+        $id = $this->message([], ['media_group_id' => 'saved-album', 'photo' => [['file_id' => 'first']]]);
+        $record = $this->record($id);
+        DB::table('telegram_webhook_updates')->insert([
+            'update_id' => $record->telegram_update_id + 100,
+            'payload' => json_encode(['message' => ['chat' => ['id' => $record->telegram_chat_id],
+                'media_group_id' => 'saved-album', 'photo' => [['file_id' => 'second']]]]),
+            'received_at' => now(),
+        ]);
+        $this->publication($id);
+        $this->assertStringContainsString('Вопрос опубликован:', PublishQuestion::run($id, $this->appliance->id, null));
+        $this->assertSame(2, substr_count(Question::findOrFail($this->state($id)->question_id)->description, '<img '));
+    }
+
     public function test_album_and_attached_photos_are_imported_once_per_file_id(): void
     {
         $id = $this->message([], [

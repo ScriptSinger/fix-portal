@@ -19,6 +19,9 @@ class MessageHandler
             return;
         }
         $intake = app(TelegramQuestionIntake::class);
+        if ($intake->addAlbumPhoto($message)) {
+            return;
+        }
         if ($continuation = $intake->pendingReplyContinuation($payload)) {
             app(TelegramQuestionModerationService::class)->attachCommunity($continuation->id, $payload);
             return;

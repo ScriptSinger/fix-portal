@@ -58,7 +58,8 @@ class AppendToPublishedQuestion
             foreach ($images as $image) {
                 $question->description .= '<img src="'.e($image['url']).'" class="img-fluid" data-id="'.$image['id'].'">';
             }
-            $question->save();
+            // This operation only appends content; its refresh is scheduled after commit below.
+            $question->saveQuietly();
             if ($messageId > 0) {
                 $storedPayload['attached_message_ids'] = [...$attachedIds, $messageId];
                 DB::table('telegram_question_messages')->where('id', $queueId)->update([
