@@ -24,19 +24,14 @@ class TelegramQuestionPhotoController extends Controller
         abort_if($filePath === '', 404);
 
         $contents = $telegram->downloadFile($filePath);
-        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-        $mime = match ($extension) {
-            'jpg', 'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'webp' => 'image/webp',
-            'gif' => 'image/gif',
-            default => 'application/octet-stream',
-        };
+        $mime = (new \finfo(FILEINFO_MIME_TYPE))->buffer($contents);
+        abort_unless(in_array($mime, ['image/jpeg', 'image/png', 'image/webp', 'image/gif'], true), 415);
 
         return response($contents, 200, [
             'Content-Type' => $mime,
             'Cache-Control' => 'private, max-age=300',
             'Content-Disposition' => 'inline',
+            'X-Content-Type-Options' => 'nosniff',
         ]);
     }
 }
