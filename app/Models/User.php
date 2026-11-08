@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Mail\RegistrationConfirmation;
-use App\Services\ImageCleanupService;
 use App\Notifications\QueuedResetPassword;
+use App\Services\UserDeletionService;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -61,8 +61,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'muted_until' => 'datetime',
         'email_notifications' => 'boolean',
     ];
-
-    protected array $imageIdsForCleanup = [];
 
     /** Сколько минут после последнего запроса пользователь считается «онлайн» */
     public const ONLINE_MINUTES = 5;
@@ -123,18 +121,16 @@ class User extends Authenticatable implements MustVerifyEmail
             }
         });
 
-        // Пользователь стирается окончательно вместе со своими вопросами, комментариями и привязками соцсетей:
-        // иначе занятая «пустая» привязка не пустила бы его войти через ту же соцсеть заново
-        static::deleting(function ($user) {
-            $user->imageIdsForCleanup = $user->images()->withTrashed()->pluck('id')->all();
-            $user->comments()->get()->each->delete();
-            $user->questions()->get()->each->delete();
-            SocialAccount::where('user_id', $user->id)->delete();
-            $user->avatar?->delete();
-            Reaction::where('user_id', $user->id)->delete();
-            $user->notifications()->delete();
-        });
-        static::deleted(fn (User $user) => app(ImageCleanupService::class)->cleanup($user->imageIdsForCleanup ?? []));
+    }
+
+    public function delete()
+    {
+        return app(UserDeletionService::class)->delete($this);
+    }
+
+    public function deleteWithoutCleanup(): ?bool
+    {
+        return parent::delete();
     }
 
     public static function makeUsername(?string $name): string

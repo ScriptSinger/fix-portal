@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\CleanupDeletedUserImages;
 use App\Models\Appliance;
 use App\Models\Category;
 use App\Models\Image;
@@ -11,6 +12,7 @@ use App\Models\User;
 use App\Services\ContentImageCleanupService;
 use App\Services\DiscussionMessageService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -133,6 +135,7 @@ class ImageCleanupTest extends TestCase
 
     public function test_avatar_file_is_removed_when_user_is_deleted(): void
     {
+        DB::table('image_registry_state')->updateOrInsert(['id' => 1], ['indexed_at' => now()]);
         Storage::fake('public');
         $user = User::factory()->create();
         $path = "images/users/user_{$user->id}/avatar.jpg";
@@ -140,6 +143,8 @@ class ImageCleanupTest extends TestCase
         $user->avatar()->create(['uri' => $path, 'mime' => 'image/jpeg', 'size' => 6]);
 
         $user->delete();
+
+        (new CleanupDeletedUserImages([], $path))->handle();
 
         Storage::disk('public')->assertMissing($path);
     }

@@ -6,6 +6,7 @@ use App\Models\SocialAccount;
 use App\Models\User;
 use App\Services\SocialLogin;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Two\User as SocialUser;
 use Tests\TestCase;
@@ -68,6 +69,7 @@ class SocialLoginTest extends TestCase
 
     public function test_deleted_user_can_sign_in_again_as_a_new_account(): void
     {
+        DB::table('image_registry_state')->updateOrInsert(['id' => 1], ['indexed_at' => now()]);
         $gone = User::factory()->create(['email' => 'gone@mail.ru']);
         app(SocialLogin::class)->resolve('yandex', $this->social('y-4', 'gone@mail.ru'));
         $gone->delete();

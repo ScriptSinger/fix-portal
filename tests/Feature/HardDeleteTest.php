@@ -18,6 +18,7 @@ use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\Concerns\CreatesDiscussions;
 use Tests\TestCase;
 
@@ -79,6 +80,7 @@ class HardDeleteTest extends TestCase
 
     public function test_deleting_a_user_erases_their_content_and_social_links_but_not_others(): void
     {
+        DB::table('image_registry_state')->updateOrInsert(['id' => 1], ['indexed_at' => now()]);
         $gone = User::factory()->create();
         $other = User::factory()->create();
         $mine = $this->makeQuestion($gone);

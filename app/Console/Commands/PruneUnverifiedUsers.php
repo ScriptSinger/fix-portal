@@ -39,10 +39,14 @@ class PruneUnverifiedUsers extends Command
 
         $deleted = 0;
 
-        // Без events-цепочки на каждый аккаунт: у кандидатов нет комментариев и вопросов, каскадить нечего.
-        // Удаляем окончательно: мягко удалённая запись продолжала бы занимать e-mail и человек не смог бы зарегистрироваться заново
-        (clone $query)->select('id')->chunkById(500, function ($users) use (&$deleted): void {
-            $deleted += User::withoutEvents(fn () => User::whereIn('id', $users->pluck('id'))->delete());
+        (clone $query)->select('id')->chunkById(500, function ($users) use (&$deleted, $days): void {
+            foreach ($users as $user) {
+                $deleted += DB::transaction(function () use ($user, $days): int {
+                    $candidate = $this->candidates($days)->whereKey($user->id)->lockForUpdate()->first();
+
+                    return $candidate ? (int) $candidate->delete() : 0;
+                });
+            }
         });
 
         $this->info("Удалено навсегда: {$deleted}");
