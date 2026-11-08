@@ -68,7 +68,7 @@ return [
         'moderation_thread_id' => env('TELEGRAM_MODERATION_THREAD_ID'),
         'author_user_id' => (int) env('TELEGRAM_AUTHOR_USER_ID', 0),
         'command_rate_limit_per_minute' => (int) env('TELEGRAM_COMMAND_RATE_LIMIT_PER_MINUTE', 10),
-        'question_confirmation_minutes' => (int) env('TELEGRAM_QUESTION_CONFIRMATION_MINUTES', 10),
+        'question_confirmation_minutes' => (int) env('TELEGRAM_QUESTION_CONFIRMATION_MINUTES', 5),
         'max_pending_per_user' => (int) env('TELEGRAM_MAX_PENDING_PER_USER', 5),
     ],
 

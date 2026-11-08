@@ -5,13 +5,14 @@ namespace App\Actions\TelegramQuestions;
 use App\Enums\TelegramQuestionConfirmationStatus;
 use Illuminate\Support\Facades\DB;
 use App\Telegram\QuestionInstructions;
+use Illuminate\Support\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class ConfirmRegistration
 {
     use AsAction;
 
-    /** @return array{message: string, confirmed: bool, edit: bool} */
+    /** @return array{message: string, confirmed: bool, edit: bool, delete?: bool} */
     public function handle(int $id, int $actor, int $chat, bool $confirm): array
     {
         return DB::transaction(function () use ($id, $actor, $chat, $confirm): array {
@@ -24,12 +25,15 @@ class ConfirmRegistration
                 || $record->registered_at !== null || $record->archived_at !== null) {
                 return $result + ['message' => 'Этот вопрос уже обработан.'];
             }
-            $expired = $record->created_at < now()->subMinutes(max(1, (int) config('services.telegram.question_confirmation_minutes', 10)))->toDateTimeString();
+            $expiresAt = $record->confirmation_expires_at !== null
+                ? Carbon::parse($record->confirmation_expires_at)
+                : Carbon::parse($record->created_at)->addMinutes(max(1, (int) config('services.telegram.question_confirmation_minutes', 5)));
+            $expired = now()->gte($expiresAt);
             if (! $confirm || $expired) {
                 DB::table('telegram_question_messages')->where('id', $id)->update([
                     'community_confirmation_status' => $expired ? TelegramQuestionConfirmationStatus::Expired->value : TelegramQuestionConfirmationStatus::Declined->value, 'updated_at' => now(),
                 ]);
-                return ['confirmed' => false, 'edit' => true, 'message' => $expired ? '⌛ Срок подтверждения истёк.' : '❌ Вопрос не зарегистрирован.'];
+                return ['confirmed' => false, 'edit' => true, 'delete' => true, 'message' => $expired ? '⌛ Срок подтверждения истёк.' : '❌ Вопрос не зарегистрирован.'];
             }
             RegisterQuestion::run($id);
 
