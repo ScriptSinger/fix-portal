@@ -119,6 +119,19 @@ class TelegramQuestionIntake
         ]);
 
         if ($inserted !== 1) {
+            // Retry the same update after a failed confirmation prompt, without creating a second question.
+            if ($status === 'awaiting_confirmation') {
+                $existingId = DB::table('telegram_question_messages')
+                    ->where('telegram_chat_id', (int) $chatId)
+                    ->where('telegram_message_id', (int) $messageId)
+                    ->where('telegram_update_id', $updateId)
+                    ->where('status', $status)
+                    ->where('community_confirmation_status', TelegramQuestionConfirmationStatus::Pending->value)
+                    ->value('id');
+
+                return $existingId === null ? null : (int) $existingId;
+            }
+
             return null;
         }
 

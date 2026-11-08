@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\TelegramUpdateHandler;
+use App\Jobs\ProcessTelegramUpdate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ class TelegramWebhookController extends Controller
 {
     private const MAX_PAYLOAD_BYTES = 262144;
 
-    public function __invoke(Request $request, TelegramUpdateHandler $handler): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         if ((string) config('services.telegram.environment') !== app()->environment()) {
             Log::critical('Telegram webhook environment mismatch', [
@@ -53,6 +53,8 @@ class TelegramWebhookController extends Controller
         ]);
 
         if ($inserted === 0) {
+            ProcessTelegramUpdate::dispatch($payload['update_id']);
+
             return response()->json(['ok' => true, 'duplicate' => true]);
         }
 
@@ -65,30 +67,14 @@ class TelegramWebhookController extends Controller
         ]);
 
         try {
-            DB::table('telegram_webhook_updates')
-                ->where('update_id', $payload['update_id'])
-                ->increment('attempts');
-
-            $handler->handle($payload['update_id'], $payload);
-
-            DB::table('telegram_webhook_updates')
-                ->where('update_id', $payload['update_id'])
-                ->update([
-                    'failed_at' => null,
-                    'processing_error' => null,
-                ]);
+            ProcessTelegramUpdate::dispatch($payload['update_id']);
         } catch (\Throwable $exception) {
-            Log::error('Telegram webhook update handling failed', [
+            // The persisted update will be recovered by the scheduler even if enqueueing fails.
+            Log::error('Telegram webhook dispatch failed', [
                 'update_id' => $payload['update_id'],
                 'error' => $exception->getMessage(),
             ]);
 
-            DB::table('telegram_webhook_updates')
-                ->where('update_id', $payload['update_id'])
-                ->update([
-                    'failed_at' => now(),
-                    'processing_error' => mb_substr($exception->getMessage(), 0, 2000),
-                ]);
         }
 
         return response()->json(['ok' => true]);

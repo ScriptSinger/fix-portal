@@ -63,6 +63,8 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping()
             ->onFailure(fn () => Log::error('Не удалось почистить брошенные изображения: см. вывод images:prune-orphans.'));
 
+        $schedule->command('telegram:updates-retry')->everyMinute()->withoutOverlapping();
+
         $schedule->command('telegram:webhook-monitor --minutes=5')
             ->everyFiveMinutes()
             ->withoutOverlapping()

@@ -129,6 +129,31 @@ final class TelegramWebhookTest extends TestCase
         $this->assertSame(1, $result['failed_count']);
     }
 
+    public function test_failed_confirmation_prompt_is_sent_on_retry_without_duplicate_question(): void
+    {
+        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.source_thread_id' => null]);
+        $requests = 0;
+        Http::fake(function () use (&$requests) {
+            if (++$requests === 1) {
+                throw new \RuntimeException('Temporary Telegram outage');
+            }
+
+            return Http::response(['ok' => true, 'result' => ['message_id' => 10]]);
+        });
+        $payload = ['update_id' => 987650, 'message' => [
+            'message_id' => 987650, 'text' => 'Как починить телевизор?',
+            'from' => ['id' => 778], 'chat' => ['id' => -100123, 'type' => 'supergroup'],
+        ]];
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', $payload)->assertOk();
+        $this->assertDatabaseHas('telegram_webhook_updates', ['update_id' => 987650, 'processed_at' => null, 'attempts' => 1]);
+        $this->travel(61)->seconds();
+        $this->postJson('/api/telegram/webhook', $payload)->assertOk();
+        $this->assertSame(2, $requests);
+        $this->assertSame(1, DB::table('telegram_question_messages')->where('telegram_update_id', 987650)->count());
+        $this->assertNotNull(DB::table('telegram_webhook_updates')->where('update_id', 987650)->value('processed_at'));
+    }
+
     public function test_webhook_rejects_an_oversized_payload(): void
     {
         $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')

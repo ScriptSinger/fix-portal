@@ -2,10 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
-use SergiX44\Nutgram\Nutgram;
-use App\Telegram\PersistedUpdate;
 use App\Telegram\Handlers\ReactionSolutionHandler;
+use App\Telegram\PersistedUpdate;
+use SergiX44\Nutgram\Nutgram;
 
 /** Adapts authenticated, persisted webhook updates to Nutgram routing. */
 class TelegramUpdateHandler
@@ -19,6 +18,5 @@ class TelegramUpdateHandler
             $bot->setRunningMode(new PersistedUpdate($payload));
             $bot->run();
         }
-        DB::table('telegram_webhook_updates')->where('update_id', $updateId)->update(['processed_at' => now()]);
     }
 }
