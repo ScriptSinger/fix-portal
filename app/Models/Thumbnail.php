@@ -25,13 +25,13 @@ class Thumbnail extends Model
 
     protected static function booted(): void
     {
-        static::deleting(function (Thumbnail $thumbnail): void {
+        static::deleted(function (Thumbnail $thumbnail): void {
             foreach ([$thumbnail->original, $thumbnail->blog, $thumbnail->small] as $url) {
                 $path = parse_url((string) $url, PHP_URL_PATH);
                 $path = is_string($path) ? preg_replace('#^/?storage/#', '', $path) : null;
 
                 if (is_string($path) && str_starts_with($path, 'images/posts/thumbnails/')) {
-                    Storage::disk('public')->delete($path);
+                    $thumbnail->getConnection()->afterCommit(fn () => Storage::disk('public')->delete($path));
                 }
             }
         });

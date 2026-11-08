@@ -7,6 +7,7 @@ use App\Models\Image;
 use App\Models\Question;
 use App\Models\Reply;
 use App\Support\UserImages;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 final class ImageCleanupService
@@ -37,6 +38,11 @@ final class ImageCleanupService
     /** @param list<int> $ids */
     public function cleanup(array $ids): void
     {
+        DB::afterCommit(fn () => $this->cleanupCommitted($ids));
+    }
+
+    private function cleanupCommitted(array $ids): void
+    {
         if ($ids === []) {
             return;
         }
@@ -46,12 +52,16 @@ final class ImageCleanupService
                 return;
             }
 
-            $this->deleteFile($image->url);
             $image->forceDelete();
         });
     }
 
     public function deleteFile(?string $url): void
+    {
+        DB::afterCommit(fn () => $this->deleteCommittedFile($url));
+    }
+
+    private function deleteCommittedFile(?string $url): void
     {
         $path = parse_url((string) $url, PHP_URL_PATH);
         $path = is_string($path) ? preg_replace('#^/?storage/#', '', $path) : null;

@@ -11,14 +11,17 @@ class AvatarService
 {
     public function replace(User $user, UploadedFile $file): void
     {
-        $this->remove($user);
         $uri = $file->store("images/users/user_{$user->id}", 'public');
-
-        $user->avatar()->updateOrCreate(['user_id' => $user->id], [
+        $attributes = [
             'uri' => $uri,
             'mime' => Storage::disk('public')->mimeType($uri),
             'size' => Storage::disk('public')->size($uri),
-        ]);
+        ];
+        $user->getConnection()->transaction(function () use ($user, $attributes): void {
+            $this->remove($user);
+            $user->avatar()->create($attributes);
+        });
+        $user->unsetRelation('avatar');
     }
 
     public function remove(User $user): void

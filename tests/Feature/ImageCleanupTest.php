@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Models\Appliance;
 use App\Models\Category;
-use App\Models\Comment;
 use App\Models\Image;
 use App\Models\Post;
+use App\Models\Question;
 use App\Models\User;
+use App\Services\ContentImageCleanupService;
 use App\Services\DiscussionMessageService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +17,57 @@ use Tests\TestCase;
 class ImageCleanupTest extends TestCase
 {
     use DatabaseTransactions;
+
+    public function test_files_survive_nested_commit_and_rollback_and_are_deleted_after_outer_commit(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $path = "images/users/user_{$user->id}/transaction.jpg";
+        Storage::disk('public')->put($path, 'image');
+        $image = Image::forceCreate([
+            'user_id' => $user->id, 'url' => '/storage/'.$path,
+            'mime' => 'image/jpeg', 'size' => 5,
+        ]);
+        $db = $image->getConnection();
+        $db->beginTransaction();
+        $db->beginTransaction();
+        $image->forceDelete();
+        $db->commit();
+        Storage::disk('public')->assertExists($path);
+        $db->rollBack();
+        $this->assertDatabaseHas('images', ['id' => $image->id]);
+        Storage::disk('public')->assertExists($path);
+
+        $db->transaction(function () use ($image, $path): void {
+            Image::findOrFail($image->id)->forceDelete();
+            Storage::disk('public')->assertExists($path);
+        });
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_avatar_and_content_cleanup_are_cancelled_on_rollback(): void
+    {
+        Storage::fake('public');
+        config(['filesystems.media' => 'public']);
+        $user = User::factory()->create();
+        $avatarPath = "images/users/user_{$user->id}/avatar.jpg";
+        $contentPath = 'galleries/content/rollback.jpg';
+        foreach ([$avatarPath, $contentPath] as $path) {
+            Storage::disk('public')->put($path, 'image');
+        }
+        $avatar = $user->avatar()->create(['uri' => $avatarPath, 'mime' => 'image/jpeg', 'size' => 5]);
+        $db = $avatar->getConnection();
+        $db->beginTransaction();
+        $avatar->delete();
+        app(ContentImageCleanupService::class)->cleanup(['/storage/'.$contentPath]);
+        Storage::disk('public')->assertExists($avatarPath);
+        Storage::disk('public')->assertExists($contentPath);
+        $db->rollBack();
+        // A later successful transaction must not execute discarded callbacks.
+        $db->transaction(fn () => $user->update(['name' => 'Updated']));
+        Storage::disk('public')->assertExists($avatarPath);
+        Storage::disk('public')->assertExists($contentPath);
+    }
 
     public function test_comment_images_are_removed_when_no_longer_referenced(): void
     {
@@ -54,7 +107,7 @@ class ImageCleanupTest extends TestCase
     {
         Storage::fake('public');
         $user = User::factory()->create();
-        $appliance = \App\Models\Appliance::create(['title' => 'Telegram appliances']);
+        $appliance = Appliance::create(['title' => 'Telegram appliances']);
         $path = 'images/telegram/7/photo.png';
         Storage::disk('public')->put($path, 'image');
 
@@ -65,7 +118,7 @@ class ImageCleanupTest extends TestCase
             'size' => 5,
         ]);
         $image->save();
-        $question = \App\Models\Question::create([
+        $question = Question::create([
             'title' => 'Telegram question',
             'description' => '<img src="/storage/'.$path.'" data-id="'.$image->id.'">',
             'appliance_id' => $appliance->id,

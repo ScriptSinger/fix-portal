@@ -243,14 +243,20 @@ class Firmware extends Model
 
         static::deleting(function ($firmware) {
             $firmware->comments()->get()->each->delete();
-
-            if ($firmware->file_path && ! static::query()
-                ->whereKeyNot($firmware->getKey())
-                ->where('file_disk', $firmware->file_disk)
-                ->where('file_path', $firmware->file_path)
-                ->exists()) {
-                Storage::disk($firmware->disk_name)->delete($firmware->storage_path);
-            }
+        });
+        static::deleted(function (Firmware $firmware): void {
+            $filePath = $firmware->file_path;
+            $fileDisk = $firmware->file_disk;
+            $disk = $firmware->disk_name;
+            $path = $firmware->storage_path;
+            $firmware->getConnection()->afterCommit(static function () use ($filePath, $fileDisk, $disk, $path): void {
+                if ($filePath && ! static::query()
+                    ->where('file_disk', $fileDisk)
+                    ->where('file_path', $filePath)
+                    ->exists()) {
+                    Storage::disk($disk)->delete($path);
+                }
+            });
         });
     }
 }

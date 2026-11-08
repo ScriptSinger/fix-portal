@@ -24,7 +24,7 @@ class Image extends Model
 
     protected static function booted(): void
     {
-        static::forceDeleting(fn (Image $image) => app(ImageCleanupService::class)->deleteFile($image->url));
+        static::forceDeleted(fn (Image $image) => app(ImageCleanupService::class)->deleteFile($image->url));
     }
 
     public function getSizeMbAttribute()

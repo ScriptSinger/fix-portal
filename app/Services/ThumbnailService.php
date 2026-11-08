@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -52,7 +53,7 @@ class ThumbnailService
     public function destroy(array $paths)
     {
         foreach ($paths as $path) {
-            Storage::disk('public')->delete($path);
+            DB::afterCommit(fn () => Storage::disk('public')->delete($path));
         }
 
         return $this;

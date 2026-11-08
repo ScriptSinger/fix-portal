@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Post;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 final class ContentImageCleanupService
@@ -27,6 +28,11 @@ final class ContentImageCleanupService
 
     /** @param list<string> $urls */
     public function cleanup(array $urls): void
+    {
+        DB::afterCommit(fn () => $this->cleanupCommitted($urls));
+    }
+
+    private function cleanupCommitted(array $urls): void
     {
         foreach (array_unique($urls) as $url) {
             if ($this->isReferenced($url)) {

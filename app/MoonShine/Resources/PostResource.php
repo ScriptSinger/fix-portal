@@ -212,11 +212,10 @@ class PostResource extends BaseResource
             return $post;
         }
 
-        $paths = $post->thumbnail
-            ? ThumbnailService::getInstance()->destroy($this->thumbnailPaths($post))
-            : ThumbnailService::getInstance();
-
-        $post->thumbnail()->updateOrCreate([], $paths->store($file));
+        $oldPaths = $post->thumbnail ? $this->thumbnailPaths($post) : [];
+        $service = ThumbnailService::getInstance();
+        $post->thumbnail()->updateOrCreate([], $service->store($file));
+        $service->destroy($oldPaths);
 
         return $post;
     }

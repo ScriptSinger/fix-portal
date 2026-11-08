@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Avatar extends Model
 {
@@ -24,6 +24,9 @@ class Avatar extends Model
 
     protected static function booted(): void
     {
-        static::deleting(fn (Avatar $avatar) => Storage::disk('public')->delete($avatar->uri));
+        static::deleted(function (Avatar $avatar): void {
+            $path = $avatar->uri;
+            $avatar->getConnection()->afterCommit(fn () => Storage::disk('public')->delete($path));
+        });
     }
 }
