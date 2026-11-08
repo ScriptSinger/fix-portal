@@ -68,6 +68,12 @@ class TelegramQuestionIntake
     }
 
     /** @param array<string, mixed> $payload */
+    public function storeForGroup(int $updateId, array $payload): ?int
+    {
+        return $this->storeRecord($updateId, $payload, true, 'registered');
+    }
+
+    /** @param array<string, mixed> $payload */
     private function storeRecord(int $updateId, array $payload, bool $allowReply, string $status): ?int
     {
         $message = $payload['message'] ?? null;

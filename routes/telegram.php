@@ -6,12 +6,15 @@ use App\Telegram\Handlers\ConfirmSolutionHandler;
 use App\Telegram\Handlers\MessageHandler;
 use App\Telegram\Handlers\ModeratorHandler;
 use App\Telegram\Handlers\QuestionHandler;
+use App\Telegram\Handlers\RegisterQuestionHandler;
 use App\Telegram\Handlers\SolvedHandler;
 use App\Telegram\Middleware\RequireModerator;
 use App\Telegram\Middleware\ThrottleCommand;
 
 /** @var \SergiX44\Nutgram\Nutgram $bot */
 $bot->onText('/moderate(?:@[A-Za-z0-9_]+)?(?:\s.*)?', QuestionHandler::class)
+    ->middleware(RequireModerator::class)->middleware(ThrottleCommand::class);
+$bot->onText('/question(?:@[A-Za-z0-9_]+)?(?:\s.*)?', RegisterQuestionHandler::class)
     ->middleware(RequireModerator::class)->middleware(ThrottleCommand::class);
 $bot->onText('/attach(?:@[A-Za-z0-9_]+)?(?:\s.*)?', AttachHandler::class)
     ->middleware(RequireModerator::class)->middleware(ThrottleCommand::class);

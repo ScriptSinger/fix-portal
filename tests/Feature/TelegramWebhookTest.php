@@ -235,6 +235,59 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
+    public function test_moderator_can_register_a_question_without_question_mark(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.moderator_ids' => [777]]);
+        $base = [
+            'text' => '/question', 'chat' => ['id' => -100123, 'type' => 'supergroup'],
+            'reply_to_message' => ['message_id' => 94, 'caption' => 'Холодильник не охлаждает',
+                'photo' => [['file_id' => 'photo-94']], 'from' => ['id' => 778]],
+        ];
+        $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2201, 'message' => ['message_id' => 95, 'from' => ['id' => 779]] + $base,
+        ])->assertOk();
+        $this->assertDatabaseMissing('telegram_question_messages', ['telegram_message_id' => 94]);
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2202, 'message' => ['message_id' => 96, 'from' => ['id' => 777]] + $base,
+        ])->assertOk();
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 94)->firstOrFail();
+        $this->assertNotNull($record->registered_at);
+        $this->assertSame('confirmed', $record->community_confirmation_status);
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/sendMessage')
+            && data_get($request->data(), 'reply_to_message_id') === 94
+            && str_contains((string) data_get($request->data(), 'text'), '🤝'));
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2203, 'message' => ['message_id' => 97, 'from' => ['id' => 777]] + $base,
+        ])->assertOk();
+        $this->assertSame(1, DB::table('telegram_question_messages')->where('telegram_chat_id', -100123)->where('telegram_message_id', 94)->count());
+    }
+
+    public function test_moderator_can_register_album_by_replying_to_photo_without_caption(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.moderator_ids' => [777]]);
+        $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
+        $base = ['chat' => ['id' => -100123, 'type' => 'supergroup'], 'from' => ['id' => 778], 'media_group_id' => 'album-test'];
+        $first = ['message_id' => 110, 'photo' => [['file_id' => 'first']]] + $base;
+        $second = ['message_id' => 111, 'caption' => 'Холодильник не охлаждает', 'photo' => [['file_id' => 'second']]] + $base;
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', ['update_id' => 2301, 'message' => $first])->assertOk();
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', ['update_id' => 2302, 'message' => $second])->assertOk();
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 2303, 'message' => ['message_id' => 112, 'text' => '/question',
+                'chat' => ['id' => -100123, 'type' => 'supergroup'], 'from' => ['id' => 777], 'reply_to_message' => $first],
+        ])->assertOk();
+
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 110)->firstOrFail();
+        $this->assertSame('Холодильник не охлаждает', $record->text);
+        $this->assertCount(2, data_get(json_decode($record->payload, true), 'message.album_photos'));
+        $this->assertDatabaseMissing('telegram_question_publications', ['telegram_question_message_id' => $record->id]);
+    }
+
     public function test_moderate_command_is_rate_limited(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 15]])]);

@@ -13,7 +13,7 @@ class ModeratorHandler
         $command = explode('@', preg_split('/\s+/', trim($message['text']))[0])[0];
         $response = match ($command) {
             '/start' => 'Telegram-бот подключён. Используйте /help для списка команд.',
-            '/help' => "/moderate — отправить вопрос на модерацию сайта ответом на сообщение\n/attach [ID] — прикрепить дополнение\n/solved [ID] — отметить решение ответом на сообщение помощника\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
+            '/help' => "/question — зарегистрировать вопрос в группе ответом на сообщение\n/moderate — отправить вопрос на модерацию сайта ответом на сообщение\n/attach [ID] — прикрепить дополнение\n/solved [ID] — отметить решение ответом на сообщение помощника\n/status — состояние webhook\n/mute <user_id> [минуты]\n/unmute <user_id>\n/block <user_id>\n/unblock <user_id>",
             '/status' => 'Webhook активен. Обновления принимаются и сохраняются в Laravel.',
             default => app(TelegramModerationService::class)->execute($command, CommandResponse::arguments($message), $bot->userId()),
         };
