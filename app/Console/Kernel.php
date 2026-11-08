@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;
+use App\Services\TelegramQuestionPromptCleanup;
 
 class Kernel extends ConsoleKernel
 {
@@ -41,6 +42,11 @@ class Kernel extends ConsoleKernel
             ->timezone('Asia/Yekaterinburg')
             ->withoutOverlapping()
             ->onFailure(fn () => Log::error('Не удалось отправить напоминания о Telegram-вопросах.'));
+
+        $schedule->call(fn () => app(TelegramQuestionPromptCleanup::class)->run())
+            ->name('telegram:question-prompt-cleanup')
+            ->everyMinute()
+            ->withoutOverlapping();
 
         // Раз в неделю одним сообщением: сколько вопросов ждут ответа
         $schedule->command('questions:digest')

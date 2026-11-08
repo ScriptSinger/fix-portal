@@ -39,10 +39,11 @@ class MessageHandler
             ->addRow(InlineKeyboardButton::make('📋 Зарегистрировать', callback_data: "question_confirm:{$id}"))
             ->addRow(InlineKeyboardButton::make('❌ Не отправлять', callback_data: "question_cancel:{$id}"));
         $thread = (int) ($message['message_thread_id'] ?? 0);
+        $minutes = max(1, (int) config('services.telegram.question_confirmation_minutes', 5));
         $sent = app(TelegramBotApi::class)->call('sendMessage', array_filter([
             'chat_id' => $message['chat']['id'], 'reply_to_message_id' => $message['message_id'],
             'message_thread_id' => $thread > 1 ? $thread : null,
-            'text' => 'Похоже, это вопрос. Зарегистрировать его?', 'disable_web_page_preview' => true,
+            'text' => "Похоже, это вопрос. Зарегистрировать его?\nПодтвердите в течение {$minutes} мин.", 'disable_web_page_preview' => true,
             'reply_markup' => json_encode($keyboard->toArray(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
         ], static fn ($value) => $value !== null));
         $promptId = (int) ($sent['message_id'] ?? 0);

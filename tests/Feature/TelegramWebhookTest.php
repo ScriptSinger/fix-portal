@@ -445,6 +445,32 @@ final class TelegramWebhookTest extends TestCase
         ]);
     }
 
+    public function test_cancel_deletes_only_the_bot_confirmation_prompt(): void
+    {
+        \Illuminate\Support\Facades\Bus::fake([\App\Jobs\ExpireTelegramQuestionPrompt::class]);
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
+        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.question_confirmation_minutes' => 5]);
+        $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 60101,
+            'message' => ['message_id' => 601, 'text' => 'Почему не охлаждает?', 'from' => ['id' => 778], 'chat' => ['id' => -100123, 'type' => 'supergroup']],
+        ])->assertOk();
+        $record = DB::table('telegram_question_messages')->where('telegram_message_id', 601)->firstOrFail();
+        $this->assertSame(901, (int) $record->confirmation_prompt_message_id);
+        $this->assertNotNull($record->confirmation_expires_at);
+        \Illuminate\Support\Facades\Bus::assertDispatched(\App\Jobs\ExpireTelegramQuestionPrompt::class, fn ($job) => $job->questionId === $record->id && $job->promptMessageId === 901 && $job->delay !== null);
+
+        $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
+            'update_id' => 60102,
+            'callback_query' => ['id' => 'cancel-601', 'data' => "question_cancel:{$record->id}", 'from' => ['id' => 778],
+                'message' => ['message_id' => 901, 'chat' => ['id' => -100123, 'type' => 'supergroup']]],
+        ])->assertOk();
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $record->id, 'community_confirmation_status' => 'declined', 'confirmation_prompt_message_id' => null]);
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage') && $request['chat_id'] === -100123 && $request['message_id'] === 901);
+        Http::assertNotSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage') && $request['message_id'] === 601);
+        Http::assertNotSent(fn ($request) => str_ends_with($request->url(), '/editMessageText'));
+    }
+
     public function test_question_mark_message_from_source_chat_requires_confirmation_before_registration(): void
     {
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 900]])]);
@@ -474,7 +500,7 @@ final class TelegramWebhookTest extends TestCase
         ]);
 
         Http::assertSent(fn ($request): bool => $request['chat_id'] === -100123
-            && $request['text'] === 'Похоже, это вопрос. Зарегистрировать его?'
+            && str_contains($request['text'], 'Похоже, это вопрос. Зарегистрировать его?')
             && str_contains((string) $request['reply_markup'], 'question_confirm:'));
     }
 

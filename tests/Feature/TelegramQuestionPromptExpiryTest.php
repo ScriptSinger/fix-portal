@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Actions\TelegramQuestions\ConfirmRegistration;
 use App\Jobs\ExpireTelegramQuestionPrompt;
 use App\Services\TelegramPromptDeletion;
+use App\Services\TelegramQuestionPromptCleanup;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -18,12 +19,12 @@ class TelegramQuestionPromptExpiryTest extends TestCase
     {
         parent::setUp();
         config(['services.telegram.bot_token' => 'test-token', 'services.telegram.api_url' => 'https://api.telegram.org', 'services.telegram.proxy' => null]);
-        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
         $this->travelTo(now()->startOfSecond());
     }
 
     public function test_expired_prompt_is_deleted_without_touching_question_or_publication(): void
     {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
         $id = $this->question();
         DB::table('telegram_question_publications')->insert(['telegram_question_message_id' => $id, 'status' => 'pending_moderation', 'created_at' => now(), 'updated_at' => now()]);
         $this->travel(5)->minutes();
@@ -37,6 +38,7 @@ class TelegramQuestionPromptExpiryTest extends TestCase
 
     public function test_expiry_does_not_delete_successfully_confirmed_prompt(): void
     {
+        Http::fake();
         $id = $this->question();
         $this->assertTrue(ConfirmRegistration::run($id, 778, -100123, true)['confirmed']);
         // The callback has edited the prompt and cleared its pending cleanup marker.
@@ -55,6 +57,18 @@ class TelegramQuestionPromptExpiryTest extends TestCase
         $this->assertFalse($result['confirmed']);
         $this->assertTrue($result['delete']);
         $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'expired', 'registered_at' => null]);
+    }
+
+    public function test_scheduler_cleans_up_even_if_delayed_job_ran_early(): void
+    {
+        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
+        $id = $this->question();
+        (new ExpireTelegramQuestionPrompt($id, 500))->handle(app(TelegramPromptDeletion::class));
+        Http::assertNothingSent();
+        $this->travel(5)->minutes();
+        app(TelegramQuestionPromptCleanup::class)->run();
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'expired', 'confirmation_prompt_message_id' => null]);
+        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage') && $request['message_id'] === 500);
     }
 
     public function test_cleanup_can_retry_after_api_failure_and_accepts_already_deleted_message(): void
