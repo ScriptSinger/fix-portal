@@ -164,6 +164,19 @@ class QuestionAnnouncementTest extends TestCase
         Queue::assertNotPushed(UpdateQuestionAnnouncement::class);
     }
 
+    public function test_direct_model_edit_refreshes_announcement_once_and_ignores_view_counts(): void
+    {
+        $this->telegram();
+        Queue::fake();
+        $question = $this->makeQuestion(User::factory()->create());
+        $announcement = $this->sentAnnouncementFor($question);
+
+        $question->update(['title' => 'Исправленный в админке заголовок']);
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, fn ($job) => $job->announcementId === $announcement->id);
+        $question->increment('views');
+        Queue::assertPushed(UpdateQuestionAnnouncement::class, 1);
+    }
+
     public function test_an_unsent_announcement_is_not_updated_it_goes_out_with_the_new_text(): void
     {
         $this->telegram();

@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Comment;
 use App\Models\Post;
+use App\Models\Question;
+use App\Models\Reply;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -51,7 +54,10 @@ final class ContentImageCleanupService
         return Post::query()
             ->where('content', 'like', '%'.$url.'%')
             ->orWhere('description', 'like', '%'.$url.'%')
-            ->exists();
+            ->exists()
+            || Question::query()->where('description', 'like', '%'.$url.'%')->exists()
+            || Comment::query()->where('text', 'like', '%'.$url.'%')->exists()
+            || Reply::query()->where('text', 'like', '%'.$url.'%')->exists();
     }
 
     private function contentPath(string $url): ?string

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ContentImageCleanupService;
 use App\Services\ImageCleanupService;
 use App\Traits\DateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,11 +48,24 @@ class Comment extends Model
     {
         parent::boot();
 
+        static::updated(function (Comment $comment): void {
+            if ($comment->wasChanged('text')) {
+                $cleanup = app(ImageCleanupService::class);
+                $cleanup->cleanup($cleanup->idsFromHtml($comment->getRawOriginal('text')));
+                $contentCleanup = app(ContentImageCleanupService::class);
+                $contentCleanup->cleanup($contentCleanup->urlsFromHtml($comment->getRawOriginal('text')));
+            }
+        });
+
         static::deleting(function ($comment) {
             $comment->imageIdsForCleanup = app(ImageCleanupService::class)->idsFromHtml($comment->text);
             $comment->replies()->get()->each->delete();
             $comment->reactions()->delete();
         });
         static::deleted(fn (Comment $comment) => app(ImageCleanupService::class)->cleanup($comment->imageIdsForCleanup));
+        static::deleted(function (Comment $comment): void {
+            $cleanup = app(ContentImageCleanupService::class);
+            $cleanup->cleanup($cleanup->urlsFromHtml($comment->text));
+        });
     }
 }

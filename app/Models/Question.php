@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\Announcements\QuestionAnnouncer;
+use App\Services\ContentImageCleanupService;
 use App\Services\ImageCleanupService;
 use App\Traits\DateTrait;
 use App\Traits\ImageHandlerTrait;
@@ -118,11 +119,28 @@ class Question extends Model
     {
         parent::boot();
 
+        static::updated(function (Question $question): void {
+            if ($question->wasChanged('description')) {
+                $cleanup = app(ImageCleanupService::class);
+                $cleanup->cleanup($cleanup->idsFromHtml($question->getRawOriginal('description')));
+                $contentCleanup = app(ContentImageCleanupService::class);
+                $contentCleanup->cleanup($contentCleanup->urlsFromHtml($question->getRawOriginal('description')));
+            }
+
+            if ($question->wasChanged(['title', 'description', 'model', 'error_code', 'appliance_id'])) {
+                app(QuestionAnnouncer::class)->refresh($question);
+            }
+        });
+
         static::deleting(function ($question) {
             $question->imageIdsForCleanup = app(ImageCleanupService::class)->idsFromHtml($question->description);
             app(QuestionAnnouncer::class)->retract($question);
             $question->comments()->get()->each->delete();
         });
         static::deleted(fn (Question $question) => app(ImageCleanupService::class)->cleanup($question->imageIdsForCleanup));
+        static::deleted(function (Question $question): void {
+            $cleanup = app(ContentImageCleanupService::class);
+            $cleanup->cleanup($cleanup->urlsFromHtml($question->description));
+        });
     }
 }

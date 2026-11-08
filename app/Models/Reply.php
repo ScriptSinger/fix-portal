@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\ContentImageCleanupService;
 use App\Services\ImageCleanupService;
 use App\Traits\DateTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,10 +43,23 @@ class Reply extends Model
     {
         parent::boot();
 
+        static::updated(function (Reply $reply): void {
+            if ($reply->wasChanged('text')) {
+                $cleanup = app(ImageCleanupService::class);
+                $cleanup->cleanup($cleanup->idsFromHtml($reply->getRawOriginal('text')));
+                $contentCleanup = app(ContentImageCleanupService::class);
+                $contentCleanup->cleanup($contentCleanup->urlsFromHtml($reply->getRawOriginal('text')));
+            }
+        });
+
         static::deleting(function ($reply) {
             $reply->imageIdsForCleanup = app(ImageCleanupService::class)->idsFromHtml($reply->text);
             $reply->reactions()->delete();
         });
         static::deleted(fn (Reply $reply) => app(ImageCleanupService::class)->cleanup($reply->imageIdsForCleanup));
+        static::deleted(function (Reply $reply): void {
+            $cleanup = app(ContentImageCleanupService::class);
+            $cleanup->cleanup($cleanup->urlsFromHtml($reply->text));
+        });
     }
 }

@@ -25,17 +25,9 @@ class QuestionService
 
     public function update(Question $question, User $editor, array $data): Question
     {
-        $oldImageIds = app(ImageCleanupService::class)->idsFromHtml($question->description);
-
         // фото, уже стоявшие в вопросе, остаются, даже если их загрузил не редактор
         $kept = array_column(ContentImages::extract($question->description)[1], 'full');
         $question->update($this->fields($editor, $data, $kept));
-        app(ImageCleanupService::class)->cleanup($oldImageIds);
-
-        // в чате показаны заголовок, техника, модель, код ошибки и начало описания: если они изменились, сообщение обновляется
-        if ($question->wasChanged(['title', 'description', 'model', 'error_code', 'appliance_id'])) {
-            $this->announcer->refresh($question);
-        }
 
         return $question;
     }
