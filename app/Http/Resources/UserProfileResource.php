@@ -27,6 +27,8 @@ class UserProfileResource extends JsonResource
             'location' => $this->location,
             'registered_at' => $this->created_at?->toDateString(),
             'is_online' => $this->last_seen_at?->gte(now()->subMinutes(User::ONLINE_MINUTES)) ?? false,
+            'reputation_rank' => $this->reputation_rank,
+            'reputation_level' => $this->reputation_level,
             'statistics' => [
                 'questions' => (int) $this->questions_count,
                 'answers' => (int) $this->answers_count,

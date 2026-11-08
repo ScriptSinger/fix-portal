@@ -44,6 +44,7 @@
                         <div class="min-w-0 pb-0.5">
                             <h2 id="user-profile-name" class="m-0 truncate text-lg font-bold" x-text="data.name"></h2>
                             <p class="m-0 truncate text-sm text-white/70">@<span x-text="data.username"></span></p>
+                            <span x-show="data.reputation_rank" x-text="data.reputation_rank" :class="{ 'bg-green-100 text-green-800': data.reputation_level === 'green', 'bg-blue-100 text-blue-800': data.reputation_level === 'blue', 'bg-red-100 text-red-800': data.reputation_level === 'red' }" class="mt-1 inline-block rounded-md px-2 py-0.5 text-xs font-medium leading-4"></span>
                         </div>
                     </div>
                     <div class="mt-3 flex items-center gap-2 text-xs text-white/75">

@@ -82,6 +82,9 @@
                     @if ($e->firstInSeries)
                         <div class="flex flex-wrap items-baseline gap-x-2 text-sm font-bold leading-snug {{ $names[$e->colorSlot] }}">
                             {{ $m->user->name }}
+                            @if ($rank = \App\Services\Reputation::rank($e->solutions))
+                                <span @class(['rounded-md px-1.5 py-0.5 text-[10px] font-medium leading-4', 'bg-green-100 text-green-800' => \App\Services\Reputation::rankColor($e->solutions) === 'green', 'bg-blue-100 text-blue-800' => \App\Services\Reputation::rankColor($e->solutions) === 'blue', 'bg-red-100 text-red-800' => \App\Services\Reputation::rankColor($e->solutions) === 'red'])>{{ $rank }}</span>
+                            @endif
                             @if (($n = $e->solutions) > 0)
                                 <span class="text-[11px] font-bold text-green-700" title="{{ \App\Services\Reputation::rank($n) }}: {{ $n }} {{ trans_choice('решение|решения|решений', $n, [], 'ru') }}">✓ {{ $n }}</span>
                             @endif

@@ -56,6 +56,16 @@ class Reputation
         return null;
     }
 
+    public static function rankColor(int $count): ?string
+    {
+        return match (self::rank($count)) {
+            'Техноадепт' => 'green',
+            'Техножрец' => 'blue',
+            'Магос' => 'red',
+            default => null,
+        };
+    }
+
     /** Сколько решений осталось до следующего звания: [название, сколько] или null на высшем. */
     public static function next(int $count): ?array
     {

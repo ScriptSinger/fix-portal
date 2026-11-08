@@ -10,6 +10,7 @@ use App\Models\Comment;
 use App\Models\Question;
 use App\Models\Reply;
 use App\Models\User;
+use App\Services\Reputation;
 
 class UserProfileController extends Controller
 {
@@ -37,6 +38,9 @@ class UserProfileController extends Controller
                         ->whereIn('solution_id', $replyIds));
             })
             ->count());
+        $reputation = Reputation::countFor($user->id);
+        $user->setAttribute('reputation_rank', Reputation::rank($reputation));
+        $user->setAttribute('reputation_level', Reputation::rankColor($reputation));
 
         return new UserProfileResource($user);
     }
