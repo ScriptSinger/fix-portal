@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Image;
 use App\Services\ImageCleanupService;
+use App\Services\ImageRegistry;
 use Illuminate\Console\Command;
 
 class PruneOrphanImages extends Command
@@ -18,6 +19,9 @@ class PruneOrphanImages extends Command
     {
         $days = max(1, (int) $this->option('days'));
         $query = Image::withTrashed()->where('created_at', '<', now()->subDays($days));
+        if (app(ImageRegistry::class)->ready()) {
+            $query->whereNotExists(fn ($q) => $q->selectRaw('1')->from('imageables')->whereColumn('imageables.image_id', 'images.id'));
+        }
         $total = (clone $query)->count();
 
         $this->info("Старых изображений для проверки: {$total}");

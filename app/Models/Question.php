@@ -6,6 +6,7 @@ use App\Services\Announcements\QuestionAnnouncer;
 use App\Services\ContentImageCleanupService;
 use App\Services\ImageCleanupService;
 use App\Traits\DateTrait;
+use App\Traits\HasContentImages;
 use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Question extends Model
 {
     use DateTrait, HasFactory, ImageHandlerTrait, Sluggable;
+    use HasContentImages;
     use HasFactory;
 
     protected $fillable = [

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Comment;
+use App\Models\Image;
 use App\Models\Post;
 use App\Models\Question;
 use App\Models\Reply;
@@ -37,6 +38,13 @@ final class ContentImageCleanupService
 
     private function cleanupCommitted(array $urls): void
     {
+        if (app(ImageRegistry::class)->ready()) {
+            $ids = Image::withTrashed()->whereIn('url', $urls)->pluck('id')->all();
+            app(ImageCleanupService::class)->cleanup($ids);
+
+            return;
+        }
+
         foreach (array_unique($urls) as $url) {
             if ($this->isReferenced($url)) {
                 continue;

@@ -47,12 +47,35 @@ final class ImageCleanupService
             return;
         }
 
-        Image::withTrashed()->whereIn('id', $ids)->get()->each(function (Image $image): void {
-            if ($this->isReferenced($image)) {
+        foreach (array_unique($ids) as $id) {
+            DB::transaction(function () use ($id): void {
+                $image = Image::withTrashed()->whereKey($id)->lockForUpdate()->first();
+                if ($image && ! $this->isReferenced($image)) {
+                    $image->forceDelete();
+                }
+            });
+        }
+    }
+
+    public function deleteStoredFile(Image $image): void
+    {
+        if (! $image->disk || ! $image->path) {
+            $this->deleteFile($image->url);
+
+            return;
+        }
+        $disk = $image->disk;
+        $path = $image->path;
+        DB::afterCommit(function () use ($disk, $path): void {
+            if (Image::withTrashed()->where('disk', $disk)->where('path', $path)->exists()) {
                 return;
             }
-
-            $image->forceDelete();
+            Storage::disk($disk)->delete($path);
+            if ($disk === 'public' && str_starts_with($path, 'images/')) {
+                foreach (UserImages::WIDTHS as $width) {
+                    Storage::disk($disk)->delete(UserImages::variantPath($path, $width));
+                }
+            }
         });
     }
 
@@ -81,6 +104,10 @@ final class ImageCleanupService
 
     private function isReferenced(Image $image): bool
     {
+        if (app(ImageRegistry::class)->ready()) {
+            return DB::table('imageables')->where('image_id', $image->id)->exists();
+        }
+
         $id = (string) $image->getKey();
         $url = (string) $image->url;
 

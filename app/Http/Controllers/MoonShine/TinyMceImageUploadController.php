@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\MoonShine;
 
+use App\Services\ImageRegistry;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,6 +26,8 @@ class TinyMceImageUploadController
         if (! is_string($path) || $path === '') {
             abort(Response::HTTP_INTERNAL_SERVER_ERROR, 'Upload failed');
         }
+
+        app(ImageRegistry::class)->register($disk, $path, $file->getSize(), $file->getMimeType());
 
         return response()->json([
             // TinyMCE expects { location: "https://..." }

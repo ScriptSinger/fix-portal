@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Services\ImageCleanupService;
+use App\Services\ImageRegistry;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +25,15 @@ class Image extends Model
 
     protected static function booted(): void
     {
-        static::forceDeleted(fn (Image $image) => app(ImageCleanupService::class)->deleteFile($image->url));
+        static::saving(function (Image $image): void {
+            if (! $image->disk || ! $image->path) {
+                $location = app(ImageRegistry::class)->location((string) $image->url);
+                if ($location) {
+                    $image->forceFill($location);
+                }
+            }
+        });
+        static::forceDeleted(fn (Image $image) => app(ImageCleanupService::class)->deleteStoredFile($image));
     }
 
     public function getSizeMbAttribute()

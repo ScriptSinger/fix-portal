@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use App\Services\ContentImageCleanupService;
 use App\Enums\PostStatus;
+use App\Services\ContentImageCleanupService;
 use App\Traits\DateTrait;
+use App\Traits\HasContentImages;
 use App\Traits\ImageHandlerTrait;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Post extends Model
 {
     use DateTrait, HasFactory, ImageHandlerTrait, Sluggable;
+    use HasContentImages;
 
     protected $fillable = [
         'title',
