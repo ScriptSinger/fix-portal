@@ -4,6 +4,7 @@ namespace App\Actions\TelegramQuestions;
 
 use App\Enums\TelegramQuestionResolutionStatus;
 use App\Jobs\SyncTelegramMemberTag;
+use App\Jobs\SendTelegramSolutionAcknowledgement;
 use App\Services\TelegramReputation;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ class ResolveQuestion
     use AsAction;
 
     /** @param array<string, mixed> $message */
-    public function handle(array $message, ?int $questionId = null): string
+    public function handle(array $message, ?int $questionId = null, bool $acknowledge = false): string
     {
         $chatId = (int) data_get($message, 'chat.id');
         $threadId = (int) data_get($message, 'message_thread_id', 0);
@@ -46,7 +47,7 @@ class ResolveQuestion
         }
 
         try {
-            return DB::transaction(function () use ($message, $questionId, $chatId, $threadId, $authorId, $answererId, $answerMessageId, $answererName): string {
+            return DB::transaction(function () use ($message, $questionId, $chatId, $threadId, $authorId, $answererId, $answerMessageId, $answererName, $acknowledge): string {
                 // Publication/moderation status does not govern Telegram resolution.
                 $questions = DB::table('telegram_question_messages')
                     ->where('telegram_chat_id', $chatId)
@@ -99,6 +100,9 @@ class ResolveQuestion
                     'updated_at' => $now,
                 ]);
 
+                if ($acknowledge) {
+                    SendTelegramSolutionAcknowledgement::dispatch($chatId, $answerMessageId);
+                }
                 DB::afterCommit(fn () => SyncTelegramMemberTag::dispatch($chatId, $answererId));
 
                 $count = app(TelegramReputation::class)->countFor($answererId);

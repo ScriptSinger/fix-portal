@@ -4,7 +4,6 @@ namespace App\Telegram\Handlers;
 
 use App\Enums\TelegramQuestionResolutionStatus;
 use App\Services\TelegramReputation;
-use App\Services\TelegramBotApi;
 use Illuminate\Support\Facades\DB;
 
 class ReactionSolutionHandler
@@ -59,28 +58,12 @@ class ReactionSolutionHandler
             'reply_to_message' => $answer,
         ];
         if ($questions->count() === 1) {
-            $result = app(TelegramReputation::class)->resolve($message, (int) $questions->first()->id);
-            if (str_starts_with($result, 'Вопрос отмечен решённым.')) {
-                $this->acknowledge($chatId, $messageId);
-            }
+            app(TelegramReputation::class)->resolve($message, (int) $questions->first()->id, acknowledge: true);
             return;
         }
 
         // Only this exceptional case needs one prompt to identify the question.
         app(OfferSolutionHandler::class)->handle($message);
-    }
-
-    public function acknowledge(int $chatId, int $messageId): void
-    {
-        try {
-            app(TelegramBotApi::class)->call('setMessageReaction', [
-                'chat_id' => $chatId,
-                'message_id' => $messageId,
-                'reaction' => [['type' => 'emoji', 'emoji' => '🎉']],
-            ]);
-        } catch (\Throwable $exception) {
-            report($exception);
-        }
     }
 
     private function addedHandshake(array $reaction): bool

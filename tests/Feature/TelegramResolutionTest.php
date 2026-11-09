@@ -370,6 +370,49 @@ class TelegramResolutionTest extends TestCase
         $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'resolution_status' => 'solved']);
     }
 
+    public function test_acknowledgement_is_persisted_with_solution_and_retries_without_awarding_again(): void
+    {
+        $id = $this->question();
+        $message = $this->message();
+        $before = DB::table('jobs')->count();
+        $this->assertSolved(ResolveQuestion::run($message, $id, true));
+        $this->assertSame($before + 1, DB::table('jobs')->count());
+        $payload = json_decode(DB::table('jobs')->orderByDesc('id')->value('payload'), true);
+        $job = unserialize($payload['data']['command']);
+        $this->assertInstanceOf(\App\Jobs\SendTelegramSolutionAcknowledgement::class, $job);
+        $this->assertSame($message['reply_to_message']['message_id'], $job->messageId);
+        $this->assertSame(5, $job->tries);
+        $this->assertSame([60, 300, 900, 3600], $job->backoff());
+
+        $this->configureTelegram();
+        Http::fakeSequence()->push(['description' => 'temporary failure'], 500)
+            ->push(['ok' => true, 'result' => true]);
+        try {
+            $job->handle(app(TelegramBotApi::class));
+            $this->fail('Delivery failure must reach the queue worker.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('temporary failure', $exception->getMessage());
+        }
+        $job->handle(app(TelegramBotApi::class));
+        ResolveQuestion::run($message, $id, true);
+        $this->assertSame($before + 1, DB::table('jobs')->count());
+        $this->assertSame(1, app(TelegramReputation::class)->countFor($this->helperId));
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'resolution_status' => 'solved']);
+    }
+
+    public function test_solution_rollback_also_removes_acknowledgement_job(): void
+    {
+        $id = $this->question();
+        $before = DB::table('jobs')->count();
+        DB::beginTransaction();
+        $this->assertSolved(ResolveQuestion::run($this->message(), $id, true));
+        $this->assertSame($before + 1, DB::table('jobs')->count());
+        DB::rollBack();
+        $this->assertSame($before, DB::table('jobs')->count());
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'resolution_status' => 'open']);
+        $this->assertDatabaseMissing('telegram_solution_awards', ['telegram_question_message_id' => $id]);
+    }
+
     private function question(array $attributes = []): int
     {
         return DB::table('telegram_question_messages')->insertGetId(array_replace([

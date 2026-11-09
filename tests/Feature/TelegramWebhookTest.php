@@ -1049,6 +1049,14 @@ final class TelegramWebhookTest extends TestCase
             ])->assertOk();
         $this->assertDatabaseHas('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);
         Http::assertNotSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage'));
+        $jobRow = DB::table('jobs')->get()->first(function ($row): bool {
+            $payload = json_decode($row->payload, true);
+            return ($payload['displayName'] ?? '') === \App\Jobs\SendTelegramSolutionAcknowledgement::class
+                && unserialize($payload['data']['command'])->messageId === 91;
+        });
+        $this->assertNotNull($jobRow);
+        $job = unserialize(json_decode($jobRow->payload, true)['data']['command']);
+        $job->handle(app(\App\Services\TelegramBotApi::class));
         Http::assertSent(fn ($request): bool => str_ends_with($request->url(), '/setMessageReaction')
             && $request['message_id'] === 91);
     }

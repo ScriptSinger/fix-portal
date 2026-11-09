@@ -33,8 +33,8 @@ class TelegramReputation
     }
 
     /** @param array<string, mixed> $message */
-    public function resolve(array $message, ?int $questionId = null): string
+    public function resolve(array $message, ?int $questionId = null, bool $acknowledge = false): string
     {
-        return ResolveQuestion::run($message, $questionId);
+        return ResolveQuestion::run($message, $questionId, $acknowledge);
     }
 }

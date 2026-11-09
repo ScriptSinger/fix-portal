@@ -23,17 +23,11 @@ class ConfirmSolutionHandler
             $api->call('answerCallbackQuery', ['callback_query_id' => $callback['id'], 'text' => 'Отметить решение может только автор вопроса.', 'show_alert' => true]);
             return;
         }
-        $result = $id === 0 ? 'Вопрос остаётся открытым.' : app(TelegramReputation::class)->resolve($message, $id);
+        $result = $id === 0 ? 'Вопрос остаётся открытым.' : app(TelegramReputation::class)->resolve($message, $id, acknowledge: true);
         $completed = $id === 0 || str_starts_with($result, 'Вопрос отмечен решённым.');
         if ($completed) {
             // SQL uniqueness also protects against callbacks from another prompt.
             Cache::forget('telegram-solution:'.$token);
-            if ($id !== 0) {
-                app(ReactionSolutionHandler::class)->acknowledge(
-                    (int) data_get($message, 'chat.id'),
-                    (int) data_get($message, 'reply_to_message.message_id'),
-                );
-            }
         }
         $api->call('answerCallbackQuery', [
             'callback_query_id' => $callback['id'],
