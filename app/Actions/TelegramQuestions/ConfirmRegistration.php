@@ -21,6 +21,10 @@ class ConfirmRegistration
             if (! $record || (int) $record->telegram_user_id !== $actor || (int) $record->telegram_chat_id !== $chat) {
                 return $result + ['message' => 'Подтвердить может только автор вопроса.'];
             }
+            if ($record->community_confirmation_status === TelegramQuestionConfirmationStatus::Confirmed->value
+                && $record->registered_at !== null && $record->archived_at === null) {
+                return ['confirmed' => true, 'edit' => true, 'message' => QuestionInstructions::registered()];
+            }
             if ($record->community_confirmation_status !== TelegramQuestionConfirmationStatus::Pending->value
                 || $record->registered_at !== null || $record->archived_at !== null) {
                 return $result + ['message' => 'Этот вопрос уже обработан.'];

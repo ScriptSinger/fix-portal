@@ -89,6 +89,54 @@ class TelegramQuestionPromptExpiryTest extends TestCase
         $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'confirmation_prompt_message_id' => null]);
     }
 
+    public function test_confirmation_retry_delivers_result_even_when_callback_has_expired(): void
+    {
+        $id = $this->question();
+        $payload = ['update_id' => 123456, 'callback_query' => [
+            'id' => 'confirmation-retry', 'chat_instance' => 'test',
+            'data' => "question_confirm:{$id}",
+            'from' => ['id' => 778, 'is_bot' => false, 'first_name' => 'Author'],
+            'message' => ['message_id' => 500, 'date' => now()->timestamp,
+                'chat' => ['id' => -100123, 'type' => 'supergroup']],
+        ]];
+        Http::fakeSequence()
+            ->push(['ok' => true, 'result' => true])
+            ->push(['description' => 'temporary edit failure'], 500)
+            ->push(['description' => 'query is too old'], 400)
+            ->push(['ok' => true, 'result' => ['message_id' => 500]]);
+
+        try {
+            app(\App\Services\TelegramUpdateHandler::class)->handle(123456, $payload);
+            $this->fail('Editing failure must remain retryable.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('temporary edit failure', $exception->getMessage());
+        }
+        $registeredAt = DB::table('telegram_question_messages')->where('id', $id)->value('registered_at');
+        $this->assertNotNull($registeredAt);
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'confirmation_prompt_message_id' => 500]);
+        $this->travel(1)->minutes();
+        app(\App\Services\TelegramUpdateHandler::class)->handle(123456, $payload);
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id,
+            'registered_at' => $registeredAt, 'confirmation_prompt_message_id' => null]);
+        Http::assertSentCount(4);
+    }
+
+    public function test_cleanup_recovers_confirmed_prompt_and_accepts_already_edited_message(): void
+    {
+        $id = $this->question();
+        ConfirmRegistration::run($id, 778, -100123, true);
+        $this->travel(5)->minutes();
+        Http::fakeSequence()->push(['description' => 'temporary error'], 500)
+            ->push(['description' => 'Bad Request: message is not modified'], 400);
+        app(TelegramQuestionPromptCleanup::class)->run();
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'confirmation_prompt_message_id' => 500]);
+        app(TelegramQuestionPromptCleanup::class)->run();
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id,
+            'community_confirmation_status' => 'confirmed', 'confirmation_prompt_message_id' => null]);
+        Http::assertNotSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage'));
+        Http::assertSentCount(2);
+    }
+
     private function question(): int
     {
         $number = random_int(1000000000, 2000000000);

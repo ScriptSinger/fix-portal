@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\TelegramQuestionConfirmationStatus;
 use App\Services\TelegramPromptDeletion;
+use App\Services\TelegramRegistrationPrompt;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -51,7 +52,8 @@ class ExpireTelegramQuestionPrompt implements ShouldQueue
                 return [];
             }
 
-            return ['chat_id' => (int) $record->telegram_chat_id];
+            return ['chat_id' => (int) $record->telegram_chat_id,
+                'confirmed' => $status === TelegramQuestionConfirmationStatus::Confirmed->value];
         });
 
         if (isset($outcome['delay'])) {
@@ -59,6 +61,10 @@ class ExpireTelegramQuestionPrompt implements ShouldQueue
             return;
         }
         if (! isset($outcome['chat_id'])) {
+            return;
+        }
+        if ($outcome['confirmed']) {
+            app(TelegramRegistrationPrompt::class)->confirm($this->questionId, $outcome['chat_id'], $this->promptMessageId);
             return;
         }
         $deletion->delete($outcome['chat_id'], $this->promptMessageId);
