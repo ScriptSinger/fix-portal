@@ -280,6 +280,47 @@ class TelegramCommunityRemindersTest extends TestCase
         ]);
     }
 
+    public function test_abandoned_pending_reservation_is_requeued_without_duplicate_delivery(): void
+    {
+        $questionId = $this->question();
+        $reminderId = app(TelegramQuestionReminders::class)->reserve($questionId);
+        // Simulate a process exiting after reservation, before dispatch.
+        $this->artisan('telegram:questions-remind')->assertSuccessful();
+        Queue::assertNothingPushed();
+        $this->travel(TelegramQuestionReminders::PENDING_TIMEOUT_MINUTES)->minutes();
+
+        $this->artisan('telegram:questions-remind --dry-run')->assertSuccessful();
+        Queue::assertNothingPushed();
+        $this->assertTrue(app(TelegramQuestionReminders::class)->due()->where('id', $questionId)->exists());
+
+        $this->artisan('telegram:questions-remind')->assertSuccessful();
+        $this->artisan('telegram:questions-remind')->assertSuccessful();
+        Queue::assertPushed(SendTelegramQuestionReminder::class, 1);
+        Queue::assertPushed(SendTelegramQuestionReminder::class, fn ($job) => $job->reminderId === $reminderId);
+        $this->assertDatabaseCount('telegram_question_reminders', 1);
+        $this->assertDatabaseHas('telegram_question_reminders', ['id' => $reminderId, 'number' => 1]);
+
+        // A delayed original job and its replacement cannot both deliver.
+        $this->send($reminderId);
+        $this->send($reminderId);
+        Http::assertSentCount(1);
+        $this->assertDatabaseHas('telegram_question_reminders', ['id' => $reminderId, 'status' => 'sent']);
+    }
+
+    public function test_stale_pending_reminder_for_a_solved_question_is_not_requeued(): void
+    {
+        $questionId = $this->question();
+        $reminderId = app(TelegramQuestionReminders::class)->reserve($questionId);
+        $this->travel(TelegramQuestionReminders::PENDING_TIMEOUT_MINUTES)->minutes();
+        DB::table('telegram_question_messages')->where('id', $questionId)->update(['resolution_status' => 'solved']);
+        $this->artisan('telegram:questions-remind')->assertSuccessful();
+        Queue::assertNothingPushed();
+        $this->assertNull(app(TelegramQuestionReminders::class)->reserve($questionId));
+        $this->send($reminderId);
+        Http::assertNothingSent();
+        $this->assertDatabaseHas('telegram_question_reminders', ['id' => $reminderId, 'status' => 'cancelled']);
+    }
+
     public function test_cancelled_reservation_can_be_reused_if_question_becomes_eligible_again(): void
     {
         $questionId = $this->question();

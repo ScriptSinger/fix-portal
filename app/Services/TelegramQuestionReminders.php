@@ -14,6 +14,10 @@ class TelegramQuestionReminders
 
     public const MAX_REMINDERS = 3;
 
+    // Longer than a worker's execution timeout. Row locks also serialize recovery
+    // with an in-flight send; a delayed original job may safely use the same row.
+    public const PENDING_TIMEOUT_MINUTES = 10;
+
     public function enabled(): bool
     {
         return trim((string) config('services.telegram.bot_token')) !== ''
@@ -45,7 +49,8 @@ class TelegramQuestionReminders
             ->whereNotExists(fn (Builder $query) => $query->selectRaw('1')
                 ->from('telegram_question_reminders')
                 ->whereColumn('telegram_question_message_id', 'telegram_question_messages.id')
-                ->where('status', 'pending'))
+                ->where('status', 'pending')
+                ->where('updated_at', '>', now()->subMinutes(self::PENDING_TIMEOUT_MINUTES)))
             ->whereNotExists(fn (Builder $query) => $query->selectRaw('1')
                 ->from('telegram_question_reminders')
                 ->whereColumn('telegram_question_message_id', 'telegram_question_messages.id')
@@ -74,7 +79,9 @@ class TelegramQuestionReminders
                 ->where('telegram_question_message_id', $questionId)
                 ->lockForUpdate()->get();
 
-            if ($reminders->contains('status', 'pending')) {
+            if ($reminders->contains(fn ($reminder) => $reminder->status === 'pending'
+                && $reminder->updated_at !== null
+                && Carbon::parse($reminder->updated_at)->gt(now()->subMinutes(self::PENDING_TIMEOUT_MINUTES)))) {
                 return null;
             }
 
