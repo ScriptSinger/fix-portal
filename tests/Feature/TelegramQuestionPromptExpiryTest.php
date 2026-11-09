@@ -22,18 +22,18 @@ class TelegramQuestionPromptExpiryTest extends TestCase
         $this->travelTo(now()->startOfSecond());
     }
 
-    public function test_expired_prompt_is_deleted_without_touching_question_or_publication(): void
+    public function test_old_expiry_job_and_scheduler_preserve_pending_invitation(): void
     {
-        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
+        Http::fake();
         $id = $this->question();
-        DB::table('telegram_question_publications')->insert(['telegram_question_message_id' => $id, 'status' => 'pending_moderation', 'created_at' => now(), 'updated_at' => now()]);
-        $this->travel(5)->minutes();
+        $this->travel(30)->days();
         (new ExpireTelegramQuestionPrompt($id, 500))->handle(app(TelegramPromptDeletion::class));
-
-        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'expired', 'confirmation_prompt_message_id' => null, 'registered_at' => null]);
-        $this->assertDatabaseHas('telegram_question_publications', ['telegram_question_message_id' => $id, 'status' => 'pending_moderation']);
-        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage') && $request['chat_id'] === -100123 && $request['message_id'] === 500);
-        $this->assertFalse(ConfirmRegistration::run($id, 778, -100123, true)['confirmed']);
+        app(TelegramQuestionPromptCleanup::class)->run();
+        Http::assertNothingSent();
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id,
+            'community_confirmation_status' => 'pending', 'confirmation_prompt_message_id' => 500]);
+        $this->assertFalse(ConfirmRegistration::run($id, 999, -100123, true)['confirmed']);
+        $this->assertTrue(ConfirmRegistration::run($id, 778, -100123, true)['confirmed']);
     }
 
     public function test_expiry_does_not_delete_successfully_confirmed_prompt(): void
@@ -49,32 +49,18 @@ class TelegramQuestionPromptExpiryTest extends TestCase
         $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'confirmed']);
     }
 
-    public function test_late_confirmation_is_rejected_even_before_cleanup_job_runs(): void
+    public function test_legacy_expired_invitation_can_be_confirmed(): void
     {
         $id = $this->question();
-        $this->travel(5)->minutes();
-        $result = ConfirmRegistration::run($id, 778, -100123, true);
-        $this->assertFalse($result['confirmed']);
-        $this->assertTrue($result['delete']);
-        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'expired', 'registered_at' => null]);
-    }
-
-    public function test_scheduler_cleans_up_even_if_delayed_job_ran_early(): void
-    {
-        Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => true])]);
-        $id = $this->question();
-        (new ExpireTelegramQuestionPrompt($id, 500))->handle(app(TelegramPromptDeletion::class));
-        Http::assertNothingSent();
-        $this->travel(5)->minutes();
-        app(TelegramQuestionPromptCleanup::class)->run();
-        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'expired', 'confirmation_prompt_message_id' => null]);
-        Http::assertSent(fn ($request) => str_ends_with($request->url(), '/deleteMessage') && $request['message_id'] === 500);
+        DB::table('telegram_question_messages')->where('id', $id)->update(['community_confirmation_status' => 'expired']);
+        $this->travel(30)->days();
+        $this->assertTrue(ConfirmRegistration::run($id, 778, -100123, true)['confirmed']);
     }
 
     public function test_cleanup_can_retry_after_api_failure_and_accepts_already_deleted_message(): void
     {
         $id = $this->question();
-        $this->travel(5)->minutes();
+        ConfirmRegistration::run($id, 778, -100123, false);
         Http::fakeSequence()->push(['ok' => false, 'description' => 'temporary error'], 500)
             ->push(['ok' => false, 'description' => 'Bad Request: message to delete not found'], 400);
         $job = new ExpireTelegramQuestionPrompt($id, 500);
@@ -84,7 +70,7 @@ class TelegramQuestionPromptExpiryTest extends TestCase
         } catch (\RuntimeException $exception) {
             $this->assertStringContainsString('temporary error', $exception->getMessage());
         }
-        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'expired', 'confirmation_prompt_message_id' => 500]);
+        $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'community_confirmation_status' => 'declined', 'confirmation_prompt_message_id' => 500]);
         $job->handle(app(TelegramPromptDeletion::class));
         $this->assertDatabaseHas('telegram_question_messages', ['id' => $id, 'confirmation_prompt_message_id' => null]);
     }
@@ -125,7 +111,7 @@ class TelegramQuestionPromptExpiryTest extends TestCase
     {
         $id = $this->question();
         ConfirmRegistration::run($id, 778, -100123, true);
-        $this->travel(5)->minutes();
+        ConfirmRegistration::run($id, 778, -100123, false);
         Http::fakeSequence()->push(['description' => 'temporary error'], 500)
             ->push(['description' => 'Bad Request: message is not modified'], 400);
         app(TelegramQuestionPromptCleanup::class)->run();

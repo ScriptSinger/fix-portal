@@ -449,7 +449,7 @@ final class TelegramWebhookTest extends TestCase
     {
         \Illuminate\Support\Facades\Bus::fake([\App\Jobs\ExpireTelegramQuestionPrompt::class]);
         Http::fake(['https://api.telegram.org/*' => Http::response(['ok' => true, 'result' => ['message_id' => 901]])]);
-        config(['services.telegram.source_chat_id' => '-100123', 'services.telegram.question_confirmation_minutes' => 5]);
+        config(['services.telegram.source_chat_id' => '-100123']);
         $headers = ['X-Telegram-Bot-Api-Secret-Token' => 'test-webhook-secret'];
         $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
             'update_id' => 60101,
@@ -457,8 +457,8 @@ final class TelegramWebhookTest extends TestCase
         ])->assertOk();
         $record = DB::table('telegram_question_messages')->where('telegram_message_id', 601)->firstOrFail();
         $this->assertSame(901, (int) $record->confirmation_prompt_message_id);
-        $this->assertNotNull($record->confirmation_expires_at);
-        \Illuminate\Support\Facades\Bus::assertDispatched(\App\Jobs\ExpireTelegramQuestionPrompt::class, fn ($job) => $job->questionId === $record->id && $job->promptMessageId === 901 && $job->delay !== null);
+        $this->assertNull($record->confirmation_expires_at);
+        \Illuminate\Support\Facades\Bus::assertNotDispatched(\App\Jobs\ExpireTelegramQuestionPrompt::class);
 
         $this->withHeaders($headers)->postJson('/api/telegram/webhook', [
             'update_id' => 60102,
@@ -996,7 +996,7 @@ final class TelegramWebhookTest extends TestCase
         $this->assertSame(1, DB::table('telegram_question_messages')->where('resolution_status', 'solved')->count());
     }
 
-    public function test_handshake_reaction_silently_solves_the_only_open_question(): void
+    public function test_handshake_requires_confirmation_even_for_the_only_open_question(): void
     {
         config(['services.telegram.source_chat_id' => '-100123']);
         Http::fake(fn ($request) => Http::response(['ok' => true, 'result' => str_ends_with($request->url(), '/getChatMember') ? ['status' => 'member'] : ['message_id' => 901]]));
@@ -1047,8 +1047,24 @@ final class TelegramWebhookTest extends TestCase
                     'new_reaction' => [['type' => 'emoji', 'emoji' => '🤝']],
                 ],
             ])->assertOk();
+        $this->assertDatabaseMissing('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);
+        $this->assertDatabaseHas('telegram_question_messages', ['telegram_message_id' => 90, 'resolution_status' => 'open']);
+        Http::assertNotSent(fn ($request) => str_ends_with($request->url(), '/setMessageReaction'));
+        $request = Http::recorded(fn ($request) => str_ends_with($request->url(), '/sendMessage'))->last()[0];
+        $keyboard = json_decode($request['reply_markup'], true);
+        $this->assertCount(2, $keyboard['inline_keyboard']);
+        $data = $keyboard['inline_keyboard'][0][0]['callback_data'];
+        $callback = ['callback_query' => [
+            'id' => 'single-solution', 'data' => $data, 'from' => ['id' => 780],
+            'message' => ['message_id' => 901, 'chat' => ['id' => -100123, 'type' => 'supergroup']],
+        ]];
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', ['update_id' => 2094] + $callback)->assertOk();
+        $this->assertDatabaseMissing('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);
+        $callback['callback_query']['from']['id'] = 778;
+        $this->withHeader('X-Telegram-Bot-Api-Secret-Token', 'test-webhook-secret')
+            ->postJson('/api/telegram/webhook', ['update_id' => 2095] + $callback)->assertOk();
         $this->assertDatabaseHas('telegram_solution_awards', ['telegram_user_id' => 779, 'telegram_message_id' => 91]);
-        Http::assertNotSent(fn ($request): bool => str_ends_with($request->url(), '/sendMessage'));
         $jobRow = DB::table('jobs')->get()->first(function ($row): bool {
             $payload = json_decode($row->payload, true);
             return ($payload['displayName'] ?? '') === \App\Jobs\SendTelegramSolutionAcknowledgement::class

@@ -11,9 +11,8 @@ class TelegramQuestionPromptCleanup
     {
         $prompts = DB::table('telegram_question_messages')
             ->whereNotNull('confirmation_prompt_message_id')
-            ->whereNotNull('confirmation_expires_at')
-            ->where('confirmation_expires_at', '<=', now())
-            ->orderBy('confirmation_expires_at')->limit(100)
+            ->whereIn('community_confirmation_status', ['confirmed', 'declined'])
+            ->orderBy('updated_at')->limit(100)
             ->get(['id', 'confirmation_prompt_message_id']);
 
         foreach ($prompts as $prompt) {

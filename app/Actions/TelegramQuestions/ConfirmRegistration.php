@@ -5,7 +5,6 @@ namespace App\Actions\TelegramQuestions;
 use App\Enums\TelegramQuestionConfirmationStatus;
 use Illuminate\Support\Facades\DB;
 use App\Telegram\QuestionInstructions;
-use Illuminate\Support\Carbon;
 use Lorisleiva\Actions\Concerns\AsAction;
 
 class ConfirmRegistration
@@ -25,19 +24,15 @@ class ConfirmRegistration
                 && $record->registered_at !== null && $record->archived_at === null) {
                 return ['confirmed' => true, 'edit' => true, 'message' => QuestionInstructions::registered()];
             }
-            if ($record->community_confirmation_status !== TelegramQuestionConfirmationStatus::Pending->value
+            if (! in_array($record->community_confirmation_status, [TelegramQuestionConfirmationStatus::Pending->value, TelegramQuestionConfirmationStatus::Expired->value], true)
                 || $record->registered_at !== null || $record->archived_at !== null) {
                 return $result + ['message' => 'Этот вопрос уже обработан.'];
             }
-            $expiresAt = $record->confirmation_expires_at !== null
-                ? Carbon::parse($record->confirmation_expires_at)
-                : Carbon::parse($record->created_at)->addMinutes(max(1, (int) config('services.telegram.question_confirmation_minutes', 5)));
-            $expired = now()->gte($expiresAt);
-            if (! $confirm || $expired) {
+            if (! $confirm) {
                 DB::table('telegram_question_messages')->where('id', $id)->update([
-                    'community_confirmation_status' => $expired ? TelegramQuestionConfirmationStatus::Expired->value : TelegramQuestionConfirmationStatus::Declined->value, 'updated_at' => now(),
+                    'community_confirmation_status' => TelegramQuestionConfirmationStatus::Declined->value, 'updated_at' => now(),
                 ]);
-                return ['confirmed' => false, 'edit' => true, 'delete' => true, 'message' => $expired ? '⌛ Срок подтверждения истёк.' : '❌ Вопрос не зарегистрирован.'];
+                return ['confirmed' => false, 'edit' => true, 'delete' => true, 'message' => '❌ Вопрос не зарегистрирован.'];
             }
             RegisterQuestion::run($id);
 

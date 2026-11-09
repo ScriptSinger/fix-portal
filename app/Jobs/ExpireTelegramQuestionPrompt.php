@@ -10,9 +10,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
+// Retained for already queued jobs; pending invitations no longer expire.
 class ExpireTelegramQuestionPrompt implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -34,21 +34,7 @@ class ExpireTelegramQuestionPrompt implements ShouldQueue
                 return [];
             }
             $status = $record->community_confirmation_status;
-            if ($status === TelegramQuestionConfirmationStatus::Pending->value) {
-                if ($record->confirmation_expires_at === null) {
-                    return [];
-                }
-                $expiresAt = Carbon::parse($record->confirmation_expires_at);
-                if (now()->lt($expiresAt)) {
-                    return ['delay' => max(1, $expiresAt->getTimestamp() - now()->getTimestamp())];
-                }
-                DB::table('telegram_question_messages')->where('id', $record->id)->update([
-                    'community_confirmation_status' => TelegramQuestionConfirmationStatus::Expired->value,
-                    'updated_at' => now(),
-                ]);
-                $status = TelegramQuestionConfirmationStatus::Expired->value;
-            }
-            if (! in_array($status, [TelegramQuestionConfirmationStatus::Declined->value, TelegramQuestionConfirmationStatus::Expired->value, TelegramQuestionConfirmationStatus::Confirmed->value], true)) {
+            if (! in_array($status, [TelegramQuestionConfirmationStatus::Declined->value, TelegramQuestionConfirmationStatus::Confirmed->value], true)) {
                 return [];
             }
 
@@ -56,10 +42,6 @@ class ExpireTelegramQuestionPrompt implements ShouldQueue
                 'confirmed' => $status === TelegramQuestionConfirmationStatus::Confirmed->value];
         });
 
-        if (isset($outcome['delay'])) {
-            $this->release($outcome['delay']);
-            return;
-        }
         if (! isset($outcome['chat_id'])) {
             return;
         }

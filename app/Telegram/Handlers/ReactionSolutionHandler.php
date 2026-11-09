@@ -2,8 +2,6 @@
 
 namespace App\Telegram\Handlers;
 
-use App\Enums\TelegramQuestionResolutionStatus;
-use App\Services\TelegramReputation;
 use Illuminate\Support\Facades\DB;
 
 class ReactionSolutionHandler
@@ -36,20 +34,6 @@ class ReactionSolutionHandler
 
         $threadId = (int) ($answer['message_thread_id'] ?? 0);
         $threadId = $threadId > 1 ? $threadId : 0;
-        $questions = DB::table('telegram_question_messages')
-            ->where('telegram_chat_id', $chatId)
-            ->where('telegram_thread_id', $threadId)
-            ->where('telegram_user_id', $authorId)
-            ->whereNotNull('registered_at')
-            ->whereNull('archived_at')
-            ->where('resolution_status', TelegramQuestionResolutionStatus::Open->value)
-            ->where('telegram_message_id', '<', $messageId)
-            ->orderByDesc('id')->limit(2)->get(['id']);
-
-        if ($questions->isEmpty()) {
-            return;
-        }
-
         $message = [
             'message_id' => $messageId,
             'from' => ['id' => $authorId, 'is_bot' => false],
@@ -57,12 +41,7 @@ class ReactionSolutionHandler
             'message_thread_id' => $threadId,
             'reply_to_message' => $answer,
         ];
-        if ($questions->count() === 1) {
-            app(TelegramReputation::class)->resolve($message, (int) $questions->first()->id, acknowledge: true);
-            return;
-        }
-
-        // Only this exceptional case needs one prompt to identify the question.
+        // Even one open question requires the author to explicitly confirm the link.
         app(OfferSolutionHandler::class)->handle($message);
     }
 
